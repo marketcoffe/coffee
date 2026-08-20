@@ -20,10 +20,10 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ config, onComplete }
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase('logo'), 200),
-      setTimeout(() => setPhase('text'), 900),
-      setTimeout(() => setPhase('fade'), 2600),
-      setTimeout(() => safeComplete(), 3200),
+      setTimeout(() => setPhase('logo'), 100),
+      setTimeout(() => setPhase('text'), 400),
+      setTimeout(() => setPhase('fade'), 800),
+      setTimeout(() => safeComplete(), 1100),
     ];
     return () => timers.forEach(clearTimeout);
   }, [safeComplete]);
