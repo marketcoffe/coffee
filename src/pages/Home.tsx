@@ -100,6 +100,18 @@ export const Home: React.FC<HomeProps> = ({
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showIOSInstallModal, setShowIOSInstallModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    return activeItems.filter(p =>
+      p.nombre.toLowerCase().includes(q) ||
+      p.categoria.toLowerCase().includes(q) ||
+      (p.subcategoria && p.subcategoria.toLowerCase().includes(q))
+    ).slice(0, 6);
+  }, [searchQuery, activeItems]);
 
   const activeSedes = useMemo(() => (config.sedes || []).filter(s => s.activa), [config.sedes]);
   const [selectedSedeId, setSelectedSedeId] = useState<string>(() => {
@@ -240,7 +252,7 @@ export const Home: React.FC<HomeProps> = ({
       <SEOHead title={`${config.site_nombre || 'Market Coffee Sweet'} - Mercado, Panaderia & Comida Rapida`} type="home" />
 
       {/* ═══ 1. HERO — Horizontal Swipe Carousel ═══ */}
-      <section className="relative w-full overflow-hidden h-[75vh] min-h-[500px] max-h-[900px] md:h-[80vh] md:min-h-[600px] md:max-h-[800px]">
+      <section className="relative w-full overflow-hidden h-[50vh] min-h-[320px] max-h-[600px] md:h-[80vh] md:min-h-[600px] md:max-h-[800px]">
         <div
           ref={heroScrollRef}
           onScroll={handleHeroScroll}
@@ -330,6 +342,62 @@ export const Home: React.FC<HomeProps> = ({
             </button>
           </>
         )}
+      </section>
+
+      {/* ═══ 1B. SEARCH BAR ═══ */}
+      <section className="px-4 md:px-8 max-w-[1440px] mx-auto w-full -mt-5 relative z-20">
+        <div className="relative">
+          <div className="flex items-center gap-3 rounded-2xl px-4 py-3 shadow-lg border"
+            style={{ backgroundColor: cardBg, borderColor: cardBorder }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={tc} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+            </svg>
+            <input
+              type="text"
+              placeholder="Buscar productos, categorías..."
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setShowSearchResults(true); }}
+              onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
+              onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+              className="flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-gray-400"
+              style={{ color: text1 }}
+            />
+            {searchQuery && (
+              <button onClick={() => { setSearchQuery(''); setShowSearchResults(false); }} className="p-1 rounded-full" style={{ color: text2 }}>
+                <X size={16} />
+              </button>
+            )}
+          </div>
+
+          {showSearchResults && searchResults.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 rounded-2xl border shadow-xl overflow-hidden z-30"
+              style={{ backgroundColor: cardBg, borderColor: cardBorder }}>
+              {searchResults.map((item) => (
+                <button key={item.id}
+                  onClick={() => { setSearchQuery(''); setShowSearchResults(false); onViewProductDetails(item); }}
+                  className="w-full flex items-center gap-3 p-3 text-left transition-colors hover:bg-black/5 border-b last:border-b-0"
+                  style={{ borderColor: cardBorder }}>
+                  <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
+                    <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold truncate" style={{ color: text1 }}>{item.nombre}</p>
+                    <p className="text-[10px] uppercase tracking-wider" style={{ color: text2 }}>{item.categoria}{item.subcategoria ? ` · ${item.subcategoria}` : ''}</p>
+                  </div>
+                  <span className="text-sm font-bold shrink-0" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {showSearchResults && searchQuery.trim() && searchResults.length === 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 rounded-2xl border shadow-xl p-6 text-center z-30"
+              style={{ backgroundColor: cardBg, borderColor: cardBorder }}>
+              <p className="text-sm font-medium" style={{ color: text2 }}>No se encontró "{searchQuery}"</p>
+              <p className="text-[11px] mt-1" style={{ color: text2 }}>Intenta con otro nombre o categoría</p>
+            </div>
+          )}
+        </div>
       </section>
 
       {activeSedes.length > 1 && (
