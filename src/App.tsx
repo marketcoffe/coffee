@@ -15,7 +15,7 @@ import { SEOHead } from './components/SEOHead';
 import { OfflineBanner } from './components/OfflineBanner';
 import { FreeDeliveryBar } from './components/FreeDeliveryBar';
 import { ProductModal } from './components/ProductModal';
-import { SplashScreen } from './components/SplashScreen';
+
 import { ToastProvider, useToast } from './components/Toast';
 
 import { SkeletonHome, SkeletonCatalog, SkeletonCheckout, SkeletonProfile } from './components/Skeletons';
@@ -52,7 +52,6 @@ function AppContent() {
 
   // PWA Install Prompt State
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [showSplash, setShowSplash] = useState(true);
 
 
   useEffect(() => {
@@ -288,7 +287,6 @@ function AppContent() {
 
     return (
       <div className={`min-h-screen w-full flex justify-center transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`} style={{ backgroundColor: isDarkMode ? '#0f0f1a' : '#f9f9fb', color: isDarkMode ? '#e8e8f0' : '#1a1c1d' }}>
-        {showSplash && <SplashScreen config={config} onComplete={() => setShowSplash(false)} />}
         <SEOHead />
         <OfflineBanner />
         <PushNotificationModal />
