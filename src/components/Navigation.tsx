@@ -94,7 +94,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               className="flex items-center gap-3 shrink-0 cursor-pointer group"
             >
               {config.logo_url ? (
-                <img src={config.logo_url} alt={config.site_nombre || 'Market Coffee Sweet'} className="h-[70px] w-auto max-w-[200px] object-contain" />
+                <img src={config.logo_url} alt={config.site_nombre || 'Market Coffee Sweet'} className="h-[85px] w-auto max-w-[200px] object-contain" />
               ) : (
                 <h1
                   className="text-xl font-extrabold tracking-tighter"
@@ -208,7 +208,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           <div className="p-5 border-b flex justify-between items-center" style={{ borderColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(228,190,177,0.2)' }}>
             <div className="flex items-center gap-3">
               {config.logo_url ? (
-                <img src={config.logo_url} alt={config.site_nombre || 'Logo'} className="h-[70px] w-auto max-w-[180px] object-contain" />
+                <img src={config.logo_url} alt={config.site_nombre || 'Logo'} className="h-[50px] w-auto max-w-[180px] object-contain" />
               ) : (
                 <h1
                   className="text-lg font-extrabold tracking-tighter"
