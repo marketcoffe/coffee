@@ -8,8 +8,8 @@
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait",
-  "theme_color": "#6E472A",
-  "background_color": "#6E472A",
+  "theme_color": "#73512D",
+  "background_color": "#73512D",
   "prefer_related_applications": false,
   "icons": [
     {
