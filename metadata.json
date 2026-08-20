@@ -1,6 +1,6 @@
 {
-  "name": "TuRepuestoValencia",
-  "description": "Plataforma premium para la compra de repuestos automotrices en Valencia, Venezuela con catálogo inteligente, cotización multimoneda y checkout con geolocalización.",
+  "name": "Market Coffee Sweet",
+  "description": "Tu minimarket de confianza en El Trigal, Valencia. Panadería fresca, comida rápida (hamburguesas, shawarmas, perros calientes), víveres, frutas, verduras, bebidas y agua potable con delivery a domicilio.",
   "requestFramePermissions": [
     "camera"
   ],

@@ -1,91 +1,91 @@
-@import "tailwindcss";
-
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
+@import "tailwindcss";
+
 :root {
-  /* Luminous Electric Design System */
-  --bg: #f9f9fb;
+  /* Market Coffee Sweet Design System */
+  --bg: #F8F6F0;
   --card: #ffffff;
-  --border: #e4beb1;
-  --text: #1a1c1d;
-  --muted: #5b4137;
+  --border: #d4c4b0;
+  --text: #2B1E16;
+  --muted: #6E472A;
 
-  /* Primary */
-  --primary: #1a1c1d;
-  --primary-container: var(--theme-color, #FF6B35);
+  /* Primary - Marrón Tostado */
+  --primary: #6E472A;
+  --primary-container: #6E472A;
   --on-primary: #ffffff;
-  --on-primary-container: #ffffff;
+  --on-primary-container: #F8F6F0;
 
-  /* Surface */
-  --surface: #f9f9fb;
+  /* Surface - Crema Suave */
+  --surface: #F8F6F0;
   --surface-container-lowest: #ffffff;
-  --surface-container-low: #f3f3f5;
-  --surface-container: #eeeef0;
-  --surface-container-high: #e8e8ea;
-  --surface-container-highest: #e2e2e4;
+  --surface-container-low: #f5f3ed;
+  --surface-container: #edeae3;
+  --surface-container-high: #e5e2db;
+  --surface-container-highest: #dddad3;
 
-  /* Text */
-  --on-surface: #1a1c1d;
-  --on-surface-variant: #5b4137;
+  /* Text - Marrón Oscuro */
+  --on-surface: #2B1E16;
+  --on-surface-variant: #6E472A;
 
-  /* Outline */
-  --outline: #8f7065;
-  --outline-variant: #e4beb1;
+  /* Outline - Marrón Suave */
+  --outline: #8B6B4A;
+  --outline-variant: #d4c4b0;
 
-  /* Secondary */
-  --secondary: #5f5e5e;
-  --secondary-container: #e2dfde;
+  /* Secondary - Verde Manzana */
+  --secondary: #A4D045;
+  --secondary-container: #e8f5d0;
 
   /* Inverse */
-  --inverse-surface: #2f3132;
-  --inverse-on-surface: #f0f0f2;
-  --inverse-primary: #ffb59a;
+  --inverse-surface: #2B1E16;
+  --inverse-on-surface: #F8F6F0;
+  --inverse-primary: #A4D045;
 
   /* Error */
   --error: #ba1a1a;
   --error-container: #ffdad6;
 
   /* Shadows */
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.04);
-  --shadow-xl: 0 20px 60px rgba(0,0,0,0.1);
-  --shadow-glass: 0 8px 32px rgba(0,0,0,0.08);
+  --shadow-card: 0 1px 3px rgba(43,30,22,0.04);
+  --shadow-xl: 0 20px 60px rgba(43,30,22,0.1);
+  --shadow-glass: 0 8px 32px rgba(43,30,22,0.08);
 
   /* Theme color (dynamic, set by JS from config.theme_color) */
-  --theme-color: #FF6B35;
+  --theme-color: #A4D045;
 }
 
 /* ═══ DARK MODE ═══ */
 .dark {
-  --bg: #0f0f1a;
-  --card: #1a1a2e;
-  --border: #2a2a4a;
-  --text: #e8e8f0;
-  --muted: #a0a0b8;
+  --bg: #1a1510;
+  --card: #2a2318;
+  --border: #3d3228;
+  --text: #F8F6F0;
+  --muted: #c4a882;
 
-  --primary: #e8e8f0;
-  --primary-container: var(--theme-color, #FF6B35);
-  --on-primary: #ffffff;
-  --on-primary-container: #ffffff;
+  --primary: #F8F6F0;
+  --primary-container: var(--theme-color, #A4D045);
+  --on-primary: #2B1E16;
+  --on-primary-container: #2B1E16;
 
-  --surface: #0f0f1a;
-  --surface-container-lowest: #0a0a14;
-  --surface-container-low: #12122a;
-  --surface-container: #16213e;
-  --surface-container-high: #1e1e3a;
-  --surface-container-highest: #252548;
+  --surface: #1a1510;
+  --surface-container-lowest: #120e0a;
+  --surface-container-low: #221c15;
+  --surface-container: #2a2318;
+  --surface-container-high: #332b20;
+  --surface-container-highest: #3d3228;
 
-  --on-surface: #e8e8f0;
-  --on-surface-variant: #a0a0b8;
+  --on-surface: #F8F6F0;
+  --on-surface-variant: #c4a882;
 
-  --outline: #5a5a7a;
-  --outline-variant: #2a2a4a;
+  --outline: #8B6B4A;
+  --outline-variant: #3d3228;
 
-  --secondary: #8888a0;
-  --secondary-container: #2a2a4a;
+  --secondary: #c4a882;
+  --secondary-container: #3d3228;
 
-  --inverse-surface: #e8e8f0;
-  --inverse-on-surface: #1a1a2e;
-  --inverse-primary: var(--theme-color, #FF6B35);
+  --inverse-surface: #F8F6F0;
+  --inverse-on-surface: #2B1E16;
+  --inverse-primary: var(--theme-color, #A4D045);
 
   --error: #ff6b6b;
   --error-container: #3a1a1a;
@@ -98,30 +98,31 @@
 @theme {
   --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
   --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "Fira Code", monospace;
 
-  /* Luminous Electric color tokens */
-  --color-primary: #1a1c1d;
-  --color-primary-container: var(--theme-color, #FF6B35);
+  /* Market Coffee Sweet color tokens */
+  --color-primary: #6E472A;
+  --color-primary-container: #6E472A;
   --color-on-primary: #ffffff;
-  --color-on-primary-container: #ffffff;
-  --color-surface: #f9f9fb;
-  --color-surface-dim: #d9dadc;
-  --color-surface-bright: #f9f9fb;
+  --color-on-primary-container: #F8F6F0;
+  --color-surface: #F8F6F0;
+  --color-surface-dim: #d4d1ca;
+  --color-surface-bright: #F8F6F0;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f3f3f5;
-  --color-surface-container: #eeeef0;
-  --color-surface-container-high: #e8e8ea;
-  --color-surface-container-highest: #e2e2e4;
-  --color-on-surface: #1a1c1d;
-  --color-on-surface-variant: #5b4137;
-  --color-outline: #8f7065;
-  --color-outline-variant: #e4beb1;
-  --color-secondary: #5f5e5e;
-  --color-secondary-container: #e2dfde;
-  --color-inverse-surface: #2f3132;
-  --color-inverse-on-surface: #f0f0f2;
-  --color-inverse-primary: #ffb59a;
+  --color-surface-container-low: #f5f3ed;
+  --color-surface-container: #edeae3;
+  --color-surface-container-high: #e5e2db;
+  --color-surface-container-highest: #dddad3;
+  --color-on-surface: #2B1E16;
+  --color-on-surface-variant: #6E472A;
+  --color-outline: #8B6B4A;
+  --color-outline-variant: #d4c4b0;
+  --color-secondary: #A4D045;
+  --color-secondary-container: #e8f5d0;
+  --color-inverse-surface: #2B1E16;
+  --color-inverse-on-surface: #F8F6F0;
+  --color-inverse-primary: #A4D045;
   --color-error: #ba1a1a;
   --color-error-container: #ffdad6;
   --color-background: #f9f9fb;

@@ -882,35 +882,33 @@ export const Home: React.FC<HomeProps> = ({
         <div className="max-w-[1440px] mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-2 items-center gap-12 relative z-10">
           <div className="order-2 lg:order-1">
             <div className="aspect-[4/3] rounded-3xl overflow-hidden border border-white/10 relative group">
-              <img src={config.banners?.[0] || CATEGORY_HERO_BG['combos']} alt="Brand"
+              <img src="https://images.unsplash.com/photo-1728512552043-51d51e7aa9f8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Agua potable fresca - Market Coffee Sweet"
                 className="w-full h-full object-cover md:grayscale md:opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
               <div className="absolute inset-0 group-hover:bg-transparent transition-all" style={{ backgroundColor: `${tc}10`, mixBlendMode: 'overlay' }} />
             </div>
           </div>
           <div className="order-1 lg:order-2">
             <h2 className="text-white font-extrabold mb-6 text-2xl md:text-4xl leading-tight">
-              {config.brand_section_title || 'Más que comida,'}<br /><span style={{ color: tc }}>{config.brand_section_subtitle || 'es una experiencia.'}</span>
+              {config.brand_section_title || 'Es tu tienda favorita.'}<br /><span style={{ color: tc }}>{config.brand_section_subtitle || 'Todo lo que necesitas, cerca de ti.'}</span>
             </h2>
             <p className="text-white/50 mb-8 text-sm md:text-base leading-relaxed max-w-md">
-              Nacimos para romper las reglas de la comida rápida. Ingredientes de primera, tecnología de punta y una obsesión por la frescura absoluta en cada entrega.
+              Panadería fresca cada mañana, comida rápida para resolver, víveres para el mercado, frutas y verduras frescas, bebidas, agua potable y mucho más. Todo en un solo lugar.
             </p>
             <div className="grid grid-cols-2 gap-8 mb-8">
               <div>
-                <p className="font-extrabold leading-none mb-2 text-3xl md:text-5xl" style={{ color: tc }}>{config.brand_stat1_value || '15min'}</p>
+                <p className="font-extrabold leading-none mb-2 text-3xl md:text-5xl" style={{ color: tc }}>{config.brand_stat1_value || '20min'}</p>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold">{config.brand_stat1_label || 'Entrega Promedio'}</p>
               </div>
               <div>
-                <p className="font-extrabold leading-none mb-2 text-3xl md:text-5xl" style={{ color: tc }}>{config.brand_stat2_value || '100%'}</p>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold">{config.brand_stat2_label || 'Ingredientes Frescos'}</p>
+                <p className="font-extrabold leading-none mb-2 text-3xl md:text-5xl" style={{ color: tc }}>{config.brand_stat2_value || '7+'}</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold">{config.brand_stat2_label || 'Categorías'}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex -space-x-3">
-                <div className="w-9 h-9 rounded-full border-2 border-gray-800 bg-gray-700" />
-                <div className="w-9 h-9 rounded-full border-2 border-gray-800 bg-gray-600" />
-                <div className="w-9 h-9 rounded-full border-2 border-gray-800 flex items-center justify-center text-[9px] font-bold text-white bg-gray-500">{config.brand_users_count || '+50k'}</div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${tc}20` }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={tc} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               </div>
-              <p className="text-white/50 text-xs">Usuarios activos disfrutan de la app a diario.</p>
+              <p className="text-white/50 text-xs">Delivery directo a tu casa u oficina en El Trigal y alrededores.</p>
             </div>
           </div>
         </div>

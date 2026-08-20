@@ -1,0 +1,22 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Agua Potable",
+  "description": "Agua potable: botellones, recargas y botellitas. Delivery a domicilio en Valencia, El Trigal, Prebo, La Viña, Mañongo, Naguanagua y San Diego.",
+  "category": "Agua Potable",
+  "brand": {
+    "@type": "Brand",
+    "name": "Market Coffee Sweet"
+  },
+  "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "0.50",
+    "highPrice": "8.00",
+    "availability": "https://schema.org/InStock",
+    "seller": {
+      "@type": "Organization",
+      "name": "Market Coffee Sweet"
+    }
+  }
+}

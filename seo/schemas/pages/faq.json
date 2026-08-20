@@ -1,0 +1,46 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cuál es la dirección de Market Coffee Sweet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Estamos ubicados en Av. Principal El Trigal, justo al frente de Patio Trigal, Valencia, Carabobo, Venezuela."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Hacen delivery a domicilio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí, ofrecemos delivery directo a tu casa u oficina. Cubrimos El Trigal, La Trigaleña, Prebo, La Viña, Mañongo, Valencia, Naguanagua y San Diego."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué productos venden?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Somos un minimarket completo: panadería y pastelería fresca, comida rápida (hamburguesas, shawarmas, perros calientes, club house), víveres, charcutería, frutas y verduras frescas, bebidas, licores, agua potable y chucherías."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuáles son los horarios de atención?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Atendemos todos los días de 7:00 AM a 10:00 PM."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué métodos de pago aceptan?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Aceptamos Pago Móvil, Zelle, efectivo y transferencia bancaria."
+      }
+    }
+  ]
+}

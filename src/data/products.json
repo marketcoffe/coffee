@@ -1,0 +1,4546 @@
+[
+  {
+    "id": "prod_0001",
+    "nombre": "Morcilla La Montserratina",
+    "descripcion": "Morcilla La Montserratina disponible para delivery.",
+    "categoria": "Charcutería y Embutidos",
+    "precio_usd": 5.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/morcilla_la_montserratina_4und.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "morcilla-la-montserratina-4-und",
+    "palabras_clave": "morcilla, montserratina, und"
+  },
+  {
+    "id": "prod_0002",
+    "nombre": "Tequeños Fiestero Teque Trof",
+    "descripcion": "Tequeños Fiestero Teque Trof disponible para delivery.",
+    "categoria": "Congelados y Charcutería",
+    "precio_usd": 6.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/tequenos_fiestero_teque_trof_50_und.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "tequenos-fiestero-teque-trof-50-und",
+    "palabras_clave": "tequeños, fiestero, teque, trof, und"
+  },
+  {
+    "id": "prod_0003",
+    "nombre": "Chorizo Ahumado La Montserratina",
+    "descripcion": "Chorizo Ahumado La Montserratina disponible para delivery.",
+    "categoria": "Charcutería y Embutidos",
+    "precio_usd": 8.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/chorizo_ahumado_la_montserratina_5und.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "chorizo-ahumado-la-montserratina-5-und",
+    "palabras_clave": "chorizo, ahumado, montserratina, und"
+  },
+  {
+    "id": "prod_0004",
+    "nombre": "Pork Belly Parrillero Ricci",
+    "descripcion": "Pork Belly Parrillero Ricci disponible para delivery.",
+    "categoria": "Carnicería (Cerdo)",
+    "precio_usd": 12.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pork_belly_parrillero_ricci.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "pork-belly-parrillero-ricci",
+    "palabras_clave": "pork, belly, parrillero, ricci"
+  },
+  {
+    "id": "prod_0005",
+    "nombre": "Asado de Tira de Cerdo Ricci",
+    "descripcion": "Asado de Tira de Cerdo Ricci disponible para delivery.",
+    "categoria": "Carnicería (Cerdo)",
+    "precio_usd": 12.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/lomo_de_cerdo_sin_cuero_ricci.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "asado-de-tira-de-cerdo-ricci",
+    "palabras_clave": "asado, tira, cerdo, ricci"
+  },
+  {
+    "id": "prod_0006",
+    "nombre": "Copa de Cerdo Ricci",
+    "descripcion": "Copa de Cerdo Ricci disponible para delivery.",
+    "categoria": "Carnicería (Cerdo)",
+    "precio_usd": 11.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/lomo_de_cerdo_sin_cuero_ricci.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "copa-de-cerdo-ricci",
+    "palabras_clave": "copa, cerdo, ricci"
+  },
+  {
+    "id": "prod_0007",
+    "nombre": "Lomo de Cerdo sin Cuero Ricci",
+    "descripcion": "Lomo de Cerdo sin Cuero Ricci disponible para delivery.",
+    "categoria": "Carnicería (Cerdo)",
+    "precio_usd": 12.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/lomo_de_cerdo_sin_cuero_ricci.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "lomo-de-cerdo-sin-cuero-ricci",
+    "palabras_clave": "lomo, cerdo, sin, cuero, ricci"
+  },
+  {
+    "id": "prod_0008",
+    "nombre": "Punta Trasera de Cerdo Ricci",
+    "descripcion": "Punta Trasera de Cerdo Ricci disponible para delivery.",
+    "categoria": "Carnicería (Cerdo)",
+    "precio_usd": 12.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/punta_trasera_de_cerdo_ricci.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "punta-trasera-de-cerdo-ricci",
+    "palabras_clave": "punta, trasera, cerdo, ricci"
+  },
+  {
+    "id": "prod_0009",
+    "nombre": "Carne de Hamburguesas Ricci",
+    "descripcion": "Carne de Hamburguesas Ricci disponible para delivery.",
+    "categoria": "Carnicería y Congelados",
+    "precio_usd": 14.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/carne_de_hamburguesas_ricci.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "carne-de-hamburguesas-ricci",
+    "palabras_clave": "carne, hamburguesas, ricci"
+  },
+  {
+    "id": "prod_0010",
+    "nombre": "Chorizo con Ajo La Montserratina",
+    "descripcion": "Chorizo con Ajo La Montserratina disponible para delivery.",
+    "categoria": "Charcutería y Embutidos",
+    "precio_usd": 8.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/chorizo_con_ajo_la_montserratina_5und.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "chorizo-con-ajo-la-montserratina-5-und",
+    "palabras_clave": "chorizo, con, ajo, montserratina, und"
+  },
+  {
+    "id": "prod_0011",
+    "nombre": "Masa para Pastelitos Romys",
+    "descripcion": "Masa para Pastelitos Romys disponible para delivery.",
+    "categoria": "Varios y Repostería",
+    "precio_usd": 2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/masa_para_pastelitos_romys_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "masa-para-pastelitos-romys-1kg",
+    "palabras_clave": "masa, para, pastelitos, romys, 1kg"
+  },
+  {
+    "id": "prod_0012",
+    "nombre": "Rikomalt Parmalat",
+    "descripcion": "Rikomalt Parmalat disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 2.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/rikomalt_parmalat_250ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "rikomalt-parmalat-250ml",
+    "palabras_clave": "rikomalt, parmalat, 250ml"
+  },
+  {
+    "id": "prod_0013",
+    "nombre": "Té Crystal",
+    "descripcion": "Té Crystal disponible en diferentes presentaciones.",
+    "categoria": "Bebidas",
+    "precio_usd": 2.8,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/te_crystal_1_5lt.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "te-crystal",
+    "palabras_clave": "crystal, 1.5",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "1.5 LT",
+        "price_usd": 2.8,
+        "description": "Té Crystal - 1.5 LT"
+      },
+      {
+        "id": "size_2",
+        "name": "500ML",
+        "price_usd": 1.4,
+        "description": "Té Crystal - 500ML"
+      }
+    ]
+  },
+  {
+    "id": "prod_0014",
+    "nombre": "Agua Aguafiel",
+    "descripcion": "Agua Aguafiel disponible en diferentes presentaciones.",
+    "categoria": "Bebidas",
+    "precio_usd": 0.65,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/agua_aguafiel_1_5_lt.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "agua-aguafiel",
+    "palabras_clave": "agua, aguafiel, 600ml",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "600ML",
+        "price_usd": 0.65,
+        "description": "Agua Aguafiel - 600ML"
+      },
+      {
+        "id": "size_2",
+        "name": "1.5 LT",
+        "price_usd": 1.35,
+        "description": "Agua Aguafiel - 1.5 LT"
+      }
+    ]
+  },
+  {
+    "id": "prod_0015",
+    "nombre": "Jugo Natulac",
+    "descripcion": "Jugo Natulac disponible en diferentes presentaciones.",
+    "categoria": "Bebidas",
+    "precio_usd": 1.4,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/jugo_natulac_1lt.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "jugo-natulac",
+    "palabras_clave": "jugo, natulac, 250ml",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "250ML",
+        "price_usd": 1.4,
+        "description": "Jugo Natulac - 250ML"
+      },
+      {
+        "id": "size_2",
+        "name": "1 LT",
+        "price_usd": 2.9,
+        "description": "Jugo Natulac - 1 LT"
+      }
+    ]
+  },
+  {
+    "id": "prod_0016",
+    "nombre": "Bebida Green Spot",
+    "descripcion": "Bebida Green Spot disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 1.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/bebida_green_spot_500ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "bebida-green-spot-500ml",
+    "palabras_clave": "bebida, green, spot, 500ml"
+  },
+  {
+    "id": "prod_0017",
+    "nombre": "Té Negro Limón/Durazno",
+    "descripcion": "Té Negro Limón/Durazno disponible en diferentes presentaciones.",
+    "categoria": "Bebidas",
+    "precio_usd": 2.5,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/frijol_pico_negro_pantera_454g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "te-negro-limondurazno",
+    "palabras_clave": "negro, limón/durazno, 500ml",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "500ML",
+        "price_usd": 2.5,
+        "description": "Té Negro Limón/Durazno - 500ML"
+      },
+      {
+        "id": "size_2",
+        "name": "Unitario",
+        "price_usd": 2.5,
+        "description": "Té Negro Limón/Durazno"
+      }
+    ]
+  },
+  {
+    "id": "prod_0018",
+    "nombre": "Chicha El Chichero",
+    "descripcion": "Chicha El Chichero disponible para delivery.",
+    "categoria": "Bebidas y Lácteos",
+    "precio_usd": 2.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/chicha_el_chichero_500ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "chicha-el-chichero-500ml",
+    "palabras_clave": "chicha, chichero, 500ml"
+  },
+  {
+    "id": "prod_0019",
+    "nombre": "Naranjada Natulac",
+    "descripcion": "Naranjada Natulac disponible en diferentes presentaciones.",
+    "categoria": "Bebidas",
+    "precio_usd": 3.6,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/naranjada_natulac_1lt.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "naranjada-natulac",
+    "palabras_clave": "naranjada, natulac",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "1 LT",
+        "price_usd": 3.6,
+        "description": "Naranjada Natulac - 1 LT"
+      },
+      {
+        "id": "size_2",
+        "name": "250ML",
+        "price_usd": 1.7,
+        "description": "Naranjada Natulac - 250ML"
+      }
+    ]
+  },
+  {
+    "id": "prod_0020",
+    "nombre": "Frutys Bebida Tropical",
+    "descripcion": "Frutys Bebida Tropical disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 1.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/frutys_bebida_tropical_1_5lt.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "frutys-bebida-tropical-15-lt",
+    "palabras_clave": "frutys, bebida, tropical, 1.5"
+  },
+  {
+    "id": "prod_0021",
+    "nombre": "Néctar La Pastoreña",
+    "descripcion": "Néctar La Pastoreña disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 3.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/nectar_la_pastorena_1lt.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "nectar-la-pastorena-1-lt",
+    "palabras_clave": "néctar, pastoreña"
+  },
+  {
+    "id": "prod_0022",
+    "nombre": "Jugo Frooti",
+    "descripcion": "Jugo Frooti disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 1.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/jugo_frooti_350ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "jugo-frooti-350ml",
+    "palabras_clave": "jugo, frooti, 350ml"
+  },
+  {
+    "id": "prod_0023",
+    "nombre": "Leche Parmalat",
+    "descripcion": "Leche Parmalat disponible para delivery.",
+    "categoria": "Bebidas y Lácteos",
+    "precio_usd": 2.45,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/leche_parmalat_1_lt.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "leche-parmalat-1-lt",
+    "palabras_clave": "leche, parmalat"
+  },
+  {
+    "id": "prod_0024",
+    "nombre": "Naranjada Ricci",
+    "descripcion": "Naranjada Ricci disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/naranjada_ricci_200ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "naranjada-ricci-200ml",
+    "palabras_clave": "naranjada, ricci, 200ml"
+  },
+  {
+    "id": "prod_0025",
+    "nombre": "Té Durazno/Limón Parmalat",
+    "descripcion": "Té Durazno/Limón Parmalat disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 4.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/jugo_parmalat_1ltr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "te-duraznolimon-parmalat-15-lt",
+    "palabras_clave": "durazno/limón, parmalat, 1.5"
+  },
+  {
+    "id": "prod_0026",
+    "nombre": "Té Parmalat",
+    "descripcion": "Té Parmalat disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 4.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/te_parmalat_1_lt.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "te-parmalat-1-lt",
+    "palabras_clave": "parmalat"
+  },
+  {
+    "id": "prod_0027",
+    "nombre": "Migurt",
+    "descripcion": "Migurt disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 8.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/migurt_750g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "migurt-750g",
+    "palabras_clave": "migurt, 750g"
+  },
+  {
+    "id": "prod_0028",
+    "nombre": "Carbón Vegetal Brixia Fidelis",
+    "descripcion": "Carbón Vegetal Brixia Fidelis disponible para delivery.",
+    "categoria": "Parrilla y Carbón",
+    "precio_usd": 4.3,
+    "stock": 100,
+    "imagen_urls": [],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "carbon-vegetal-brixia-fidelis-2kg",
+    "palabras_clave": "carbón, vegetal, brixia, fidelis, 2kg"
+  },
+  {
+    "id": "prod_0029",
+    "nombre": "Carbón Rosado",
+    "descripcion": "Carbón Rosado disponible para delivery.",
+    "categoria": "Parrilla y Carbón",
+    "precio_usd": 10.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/carbon_rosado.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "carbon-rosado",
+    "palabras_clave": "carbón, rosado"
+  },
+  {
+    "id": "prod_0030",
+    "nombre": "Papas Chips Piter",
+    "descripcion": "Papas Chips Piter disponible para delivery.",
+    "categoria": "Snacks y Frituras",
+    "precio_usd": 1.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/papas_chips_piter_71g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "papas-chips-piter-71g",
+    "palabras_clave": "papas, chips, piter, 71g"
+  },
+  {
+    "id": "prod_0031",
+    "nombre": "Tostón Salseritos",
+    "descripcion": "Tostón Salseritos disponible para delivery.",
+    "categoria": "Snacks y Frituras",
+    "precio_usd": 4.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/toston_salseritos_270g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "toston-salseritos-270g",
+    "palabras_clave": "tostón, salseritos, 270g"
+  },
+  {
+    "id": "prod_0032",
+    "nombre": "Chicharrones Gralo",
+    "descripcion": "Chicharrones Gralo disponible para delivery.",
+    "categoria": "Snacks y Frituras",
+    "precio_usd": 2.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/chicharrones_gralo_40g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "chicharrones-gralo-40g",
+    "palabras_clave": "chicharrones, gralo, 40g"
+  },
+  {
+    "id": "prod_0033",
+    "nombre": "FRIJOL PICO NEGRO PANTERA",
+    "descripcion": "FRIJOL PICO NEGRO PANTERA disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 1.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/frijol_pico_negro_pantera_454g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591794000503-producto-frijol-pico-negro-pantera-454g-precio",
+    "palabras_clave": "código:, producto:, frijol, pico, negro"
+  },
+  {
+    "id": "prod_0034",
+    "nombre": "ARVEJAS VERDE PARTIDA PANTERA",
+    "descripcion": "ARVEJAS VERDE PARTIDA PANTERA disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 1.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/arvejas_verde_partida_pantera_400gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591794000855-producto-arvejas-verde-partida-pantera-400gr-precio",
+    "palabras_clave": "código:, producto:, arvejas, verde, partida"
+  },
+  {
+    "id": "prod_0035",
+    "nombre": "MAIZ PARA COTUFA MARY",
+    "descripcion": "MAIZ PARA COTUFA MARY disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 1.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/maiz_para_cotufa_mary_400gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591473004976-producto-maiz-para-cotufa-mary-400gr-precio",
+    "palabras_clave": "código:, producto:, maiz, para, cotufa"
+  },
+  {
+    "id": "prod_0036",
+    "nombre": "MAIZ PARA COTUFAS PANTERA",
+    "descripcion": "MAIZ PARA COTUFAS PANTERA disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 2.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/maiz_para_cotufas_pantera_500g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591794090092-producto-maiz-para-cotufas-pantera-500g-precio",
+    "palabras_clave": "código:, producto:, maiz, para, cotufas"
+  },
+  {
+    "id": "prod_0037",
+    "nombre": "ARROZ PRIMOR CLASICO",
+    "descripcion": "ARROZ PRIMOR CLASICO disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/arroz_primor_clasico_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591002000127-producto-arroz-primor-clasico-1kg-precio",
+    "palabras_clave": "código:, producto:, arroz, primor, clasico"
+  },
+  {
+    "id": "prod_0038",
+    "nombre": "ARROZ MARY TRADICIONAL",
+    "descripcion": "ARROZ MARY TRADICIONAL disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/arroz_mary_tradicional_900gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591473005362-producto-arroz-mary-tradicional-900gr-precio",
+    "palabras_clave": "código:, producto:, arroz, mary, tradicional"
+  },
+  {
+    "id": "prod_0039",
+    "nombre": "ARROZ FAVORITO TIPO1",
+    "descripcion": "ARROZ FAVORITO TIPO1 disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/arroz_favorito_tipo1_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7599450000027-producto-arroz-favorito-tipo1-1kg-precio",
+    "palabras_clave": "código:, producto:, arroz, favorito, tipo1"
+  },
+  {
+    "id": "prod_0040",
+    "nombre": "FIDEO CAPRI",
+    "descripcion": "FIDEO CAPRI disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/fideo_capri_250gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591151123401-producto-fideo-capri-250gr-precio",
+    "palabras_clave": "código:, producto:, fideo, capri, 250gr"
+  },
+  {
+    "id": "prod_0041",
+    "nombre": "RENATA EXPRESS SABOR A CARNE",
+    "descripcion": "RENATA EXPRESS SABOR A CARNE disponible para delivery.",
+    "categoria": "Carnicería",
+    "precio_usd": 1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/renata_express_sabor_a_carne_85g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7896022201906-producto-renata-express-sabor-a-carne-85g-precio",
+    "palabras_clave": "código:, producto:, renata, express, sabor"
+  },
+  {
+    "id": "prod_0042",
+    "nombre": "PASTA PARA PASTICHO SINDONI",
+    "descripcion": "PASTA PARA PASTICHO SINDONI disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pasta_para_pasticho_sindoni_250g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591674001231-producto-pasta-para-pasticho-sindoni-250g-precio",
+    "palabras_clave": "código:, producto:, pasta, para, pasticho"
+  },
+  {
+    "id": "prod_0043",
+    "nombre": "PASTA DEDALES PRIMOR",
+    "descripcion": "PASTA DEDALES PRIMOR disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 2.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pasta_dedales_primor_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591002000851-producto-pasta-dedales-primor-1kg-precio",
+    "palabras_clave": "código:, producto:, pasta, dedales, primor"
+  },
+  {
+    "id": "prod_0044",
+    "nombre": "PASTA TORNILLO PRIMOR",
+    "descripcion": "PASTA TORNILLO PRIMOR disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 2.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pasta_tornillo_primor_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591002000318-producto-pasta-tornillo-primor-1kg-precio",
+    "palabras_clave": "código:, producto:, pasta, tornillo, primor"
+  },
+  {
+    "id": "prod_0045",
+    "nombre": "PASTA MARY PLUMA SUPERIOR",
+    "descripcion": "PASTA MARY PLUMA SUPERIOR disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 2.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pasta_mary_pluma_superior_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7597417000462-producto-pasta-mary-pluma-superior-1kg-precio",
+    "palabras_clave": "código:, producto:, pasta, mary, pluma"
+  },
+  {
+    "id": "prod_0046",
+    "nombre": "PASTA PLUMITAS EXTRA ESPECIAL PRIMOR",
+    "descripcion": "PASTA PLUMITAS EXTRA ESPECIAL PRIMOR disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pasta_plumitas_extra_especial_primor_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591002400750-producto-pasta-plumitas-extra-especial-primor-1kg-precio",
+    "palabras_clave": "código:, producto:, pasta, plumitas, extra"
+  },
+  {
+    "id": "prod_0047",
+    "nombre": "PASTA PLUMITAS PRIMOR",
+    "descripcion": "PASTA PLUMITAS PRIMOR disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 2.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pasta_plumitas_primor_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591002000295-producto-pasta-plumitas-primor-1kg-precio",
+    "palabras_clave": "código:, producto:, pasta, plumitas, primor"
+  },
+  {
+    "id": "prod_0048",
+    "nombre": "PASTA DELLA NONNA PREMIUM PLUMAS",
+    "descripcion": "PASTA DELLA NONNA PREMIUM PLUMAS disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 2.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pasta_della_nonna_premium_plumas_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7599450000133-producto-pasta-della-nonna-premium-plumas-1kg-precio",
+    "palabras_clave": "código:, producto:, pasta, della, nonna"
+  },
+  {
+    "id": "prod_0049",
+    "nombre": "PASTA DELLA NONNA PREMIUM TORNILLO",
+    "descripcion": "PASTA DELLA NONNA PREMIUM TORNILLO disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 2.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pasta_della_nonna_premium_tornillo_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7599450000157-producto-pasta-della-nonna-premium-tornillo-1kg-precio",
+    "palabras_clave": "código:, producto:, pasta, della, nonna"
+  },
+  {
+    "id": "prod_0050",
+    "nombre": "PASTA DELLA NONNA PREMIUM VERMICELLI",
+    "descripcion": "PASTA DELLA NONNA PREMIUM VERMICELLI disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 2.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pasta_della_nonna_premium_vermicelli_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7599450000119-producto-pasta-della-nonna-premium-vermicelli-1kg-precio",
+    "palabras_clave": "código:, producto:, pasta, della, nonna"
+  },
+  {
+    "id": "prod_0051",
+    "nombre": "PASTA GALO ESPAGUETE",
+    "descripcion": "PASTA GALO ESPAGUETE disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pasta_galo_espaguete_500gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7896022200756-producto-pasta-galo-espaguete-500gr-precio",
+    "palabras_clave": "código:, producto:, pasta, galo, espaguete"
+  },
+  {
+    "id": "prod_0052",
+    "nombre": "PASTA GALO PARAFUSO",
+    "descripcion": "PASTA GALO PARAFUSO disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pasta_galo_parafuso_500gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7896022200634-producto-pasta-galo-parafuso-500gr-precio",
+    "palabras_clave": "código:, producto:, pasta, galo, parafuso"
+  },
+  {
+    "id": "prod_0053",
+    "nombre": "PASTA PRIMOR VERMICELLI",
+    "descripcion": "PASTA PRIMOR VERMICELLI disponible en diferentes presentaciones.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 2.1,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/pasta_primor_vermicelli_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "pasta-primor-vermicelli",
+    "palabras_clave": "código:, producto:, pasta, primor, vermicelli",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "1KG",
+        "price_usd": 2.1,
+        "description": "PASTA PRIMOR VERMICELLI - 1KG"
+      },
+      {
+        "id": "size_2",
+        "name": "500GR",
+        "price_usd": 1.1,
+        "description": "PASTA PRIMOR VERMICELLI - 500GR"
+      }
+    ]
+  },
+  {
+    "id": "prod_0054",
+    "nombre": "PASTA EXTRA ESPECIAL VERMICELLI PRIMOR",
+    "descripcion": "PASTA EXTRA ESPECIAL VERMICELLI PRIMOR disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pasta_extra_especial_vermicelli_primor_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591002400767-producto-pasta-extra-especial-vermicelli-primor-1kg-precio",
+    "palabras_clave": "código:, producto:, pasta, extra, especial"
+  },
+  {
+    "id": "prod_0055",
+    "nombre": "HARINA DE TRIGO TODO USO MARY",
+    "descripcion": "HARINA DE TRIGO TODO USO MARY disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/harina_de_trigo_todo_uso_mary_900gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7597417000691-producto-harina-de-trigo-todo-uso-mary-900gr-precio",
+    "palabras_clave": "código:, producto:, harina, trigo, todo"
+  },
+  {
+    "id": "prod_0056",
+    "nombre": "HARINA DE TRIGO LEUDANTE MARY",
+    "descripcion": "HARINA DE TRIGO LEUDANTE MARY disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/harina_de_trigo_leudante_mary_900gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7597417000707-producto-harina-de-trigo-leudante-mary-900gr-precio",
+    "palabras_clave": "código:, producto:, harina, trigo, leudante"
+  },
+  {
+    "id": "prod_0057",
+    "nombre": "HARINANA HARINA DE YUCA BLANCA",
+    "descripcion": "HARINANA HARINA DE YUCA BLANCA disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 5.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/harinana_harina_de_yuca_blanca_500gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7597079000022-producto-harinana-harina-de-yuca-blanca-500gr-precio",
+    "palabras_clave": "código:, producto:, harinana, harina, yuca"
+  },
+  {
+    "id": "prod_0058",
+    "nombre": "HARINA DE TRIGO REPOSTERA AVEIRO",
+    "descripcion": "HARINA DE TRIGO REPOSTERA AVEIRO disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/harina_de_trigo_repostera_aveiro_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7599404000592-producto-harina-de-trigo-repostera-aveiro-1kg-precio",
+    "palabras_clave": "código:, producto:, harina, trigo, repostera"
+  },
+  {
+    "id": "prod_0059",
+    "nombre": "HARINA DE MAIZ BLANCO LUCHAREPA",
+    "descripcion": "HARINA DE MAIZ BLANCO LUCHAREPA disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/harina_de_maiz_blanco_lucharepa_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591827031511-producto-harina-de-maiz-blanco-lucharepa-1kg-precio",
+    "palabras_clave": "código:, producto:, harina, maiz, blanco"
+  },
+  {
+    "id": "prod_0060",
+    "nombre": "HARINA PAN BLANCA",
+    "descripcion": "HARINA PAN BLANCA disponible en diferentes presentaciones.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 3.2,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/harina_pan_blanca_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "harina-pan-blanca",
+    "palabras_clave": "código:, producto:, harina, pan, blanca",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "2KG",
+        "price_usd": 3.2,
+        "description": "HARINA PAN BLANCA - 2KG"
+      },
+      {
+        "id": "size_2",
+        "name": "1KG",
+        "price_usd": 1.7,
+        "description": "HARINA PAN BLANCA - 1KG"
+      }
+    ]
+  },
+  {
+    "id": "prod_0061",
+    "nombre": "PAN AREPITAS DULCE",
+    "descripcion": "PAN AREPITAS DULCE disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 3.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pan_arepitas_dulce_500gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591002200206-producto-pan-arepitas-dulce-500gr-precio",
+    "palabras_clave": "código:, producto:, pan, arepitas, dulce"
+  },
+  {
+    "id": "prod_0062",
+    "nombre": "ACEITE DE SOYA VATEL",
+    "descripcion": "ACEITE DE SOYA VATEL disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 4.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/aceite_de_soya_vatel_800ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591049002262-producto-aceite-de-soya-vatel-800ml-precio",
+    "palabras_clave": "código:, producto:, aceite, soya, vatel"
+  },
+  {
+    "id": "prod_0063",
+    "nombre": "ACEITE MAZEITE",
+    "descripcion": "ACEITE MAZEITE disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 5.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/aceite_mazeite_1ltr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591002000745-producto-aceite-mazeite-1ltr-precio",
+    "palabras_clave": "código:, producto:, aceite, mazeite, 1ltr"
+  },
+  {
+    "id": "prod_0064",
+    "nombre": "VINAGRE MAVESA",
+    "descripcion": "VINAGRE MAVESA disponible en diferentes presentaciones.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.7,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/vinagre_mavesa_1ltr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "vinagre-mavesa",
+    "palabras_clave": "código:, producto:, vinagre, mavesa, 500ml",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "500ML",
+        "price_usd": 1.7,
+        "description": "VINAGRE MAVESA - 500ML"
+      },
+      {
+        "id": "size_2",
+        "name": "1LTR",
+        "price_usd": 2.6,
+        "description": "VINAGRE MAVESA - 1LTR"
+      }
+    ]
+  },
+  {
+    "id": "prod_0065",
+    "nombre": "ACEITE DE COCO COCAY",
+    "descripcion": "ACEITE DE COCO COCAY disponible en diferentes presentaciones.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 5.4,
+    "stock": 200,
+    "imagen_urls": [],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "aceite-de-coco-cocay",
+    "palabras_clave": "código:, producto:, aceite, coco, cocay",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "250ML",
+        "price_usd": 5.4,
+        "description": "ACEITE DE COCO COCAY - 250ML"
+      },
+      {
+        "id": "size_2",
+        "name": "1LT",
+        "price_usd": 19.8,
+        "description": "ACEITE DE COCO COCAY - 1LT"
+      }
+    ]
+  },
+  {
+    "id": "prod_0066",
+    "nombre": "ESENCIA DE VAINILLA MACCORMICK",
+    "descripcion": "ESENCIA DE VAINILLA MACCORMICK disponible para delivery.",
+    "categoria": "Repostería",
+    "precio_usd": 5.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/esencia_de_vainilla_maccormick_150ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591141601506-producto-esencia-de-vainilla-maccormick-150ml-precio",
+    "palabras_clave": "código:, producto:, esencia, vainilla, maccormick"
+  },
+  {
+    "id": "prod_0067",
+    "nombre": "MERMELADA MOUNIT EL BAIT",
+    "descripcion": "MERMELADA MOUNIT EL BAIT disponible para delivery.",
+    "categoria": "Repostería",
+    "precio_usd": 5.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/mermelada_mounit_el_bait_380gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-259944-parcialmente-tapado-producto-mermelada-mounit-el-bait-380gr-precio",
+    "palabras_clave": "código:, ...259944, (parcialmente, tapado), producto:"
+  },
+  {
+    "id": "prod_0068",
+    "nombre": "CEREZAS EN ALMIBAR OSOLE",
+    "descripcion": "CEREZAS EN ALMIBAR OSOLE disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 5.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/cerezas_en_almibar_osole_190gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7595826004453-producto-cerezas-en-almibar-osole-190gr-precio",
+    "palabras_clave": "código:, producto:, cerezas, almibar, osole"
+  },
+  {
+    "id": "prod_0069",
+    "nombre": "ACEITUNAS NEGRAS EN RODAJAS OSOLE",
+    "descripcion": "ACEITUNAS NEGRAS EN RODAJAS OSOLE disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 4.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/aceitunas_negras_en_rodajas_osole_340gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-29-parcial-producto-aceitunas-negras-en-rodajas-osole-340gr-precio",
+    "palabras_clave": "código:, ...29, (parcial), producto:, aceitunas"
+  },
+  {
+    "id": "prod_0070",
+    "nombre": "SALSA BBQ HONEY MUSTARD MCCORMICK",
+    "descripcion": "SALSA BBQ HONEY MUSTARD MCCORMICK disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 3.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_bbq_honey_mustard_mccormick.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591141102010-producto-salsa-bbq-honey-mustard-mccormick-precio",
+    "palabras_clave": "código:, producto:, salsa, bbq, honey"
+  },
+  {
+    "id": "prod_0071",
+    "nombre": "MOSTAZA HEINZ",
+    "descripcion": "MOSTAZA HEINZ disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 2.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/mostaza_heinz_195gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591112041010-producto-mostaza-heinz-195gr-precio",
+    "palabras_clave": "código:, producto:, mostaza, heinz, 195gr"
+  },
+  {
+    "id": "prod_0072",
+    "nombre": "SALSA PICANTE FRITZ",
+    "descripcion": "SALSA PICANTE FRITZ disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 3.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_picante_fritz_250g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591902001422-producto-salsa-picante-fritz-250g-precio",
+    "palabras_clave": "código:, producto:, salsa, picante, fritz"
+  },
+  {
+    "id": "prod_0073",
+    "nombre": "SALSA DE MAIZ FRITZ",
+    "descripcion": "SALSA DE MAIZ FRITZ disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 4.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_de_maiz_fritz_240gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591902001330-producto-salsa-de-maiz-fritz-240gr-precio",
+    "palabras_clave": "código:, producto:, salsa, maiz, fritz"
+  },
+  {
+    "id": "prod_0074",
+    "nombre": "SALSA QUESO CHEDDAR FRITZ",
+    "descripcion": "SALSA QUESO CHEDDAR FRITZ disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 4.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_queso_cheddar_fritz_240gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591902001477-producto-salsa-queso-cheddar-fritz-240gr-precio",
+    "palabras_clave": "código:, producto:, salsa, queso, cheddar"
+  },
+  {
+    "id": "prod_0075",
+    "nombre": "SALSA TARTARA FRITZ",
+    "descripcion": "SALSA TARTARA FRITZ disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 4.15,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_tartara_fritz_240gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-parcial-producto-salsa-tartara-fritz-240gr-precio",
+    "palabras_clave": "código:, ..., (parcial), producto:, salsa"
+  },
+  {
+    "id": "prod_0076",
+    "nombre": "SALSA PICANTE AJI CHIREL",
+    "descripcion": "SALSA PICANTE AJI CHIREL disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 3.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_picante_aji_chirel_250ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-200-interno-producto-salsa-picante-aji-chirel-250ml-precio",
+    "palabras_clave": "código:, (interno), producto:, salsa, picante"
+  },
+  {
+    "id": "prod_0077",
+    "nombre": "SALSA TIPO CHEDDAR 220GR NERANO",
+    "descripcion": "SALSA TIPO CHEDDAR 220GR NERANO disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 2.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_tipo_cheddar_220gr_nerano.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7896041151596-producto-salsa-tipo-cheddar-220gr-nerano-precio",
+    "palabras_clave": "código:, producto:, salsa, tipo, cheddar"
+  },
+  {
+    "id": "prod_0078",
+    "nombre": "SWEET RELISH HEINZ",
+    "descripcion": "SWEET RELISH HEINZ disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 7.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/sweet_relish_heinz_769ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-01358900-producto-sweet-relish-heinz-769ml-precio",
+    "palabras_clave": "código:, producto:, sweet, relish, heinz"
+  },
+  {
+    "id": "prod_0079",
+    "nombre": "SALSA PARA PASTA MEDITERRANEA",
+    "descripcion": "SALSA PARA PASTA MEDITERRANEA disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 2.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_para_pasta_mediterranea_340gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7595826003920-producto-salsa-para-pasta-mediterranea-340gr-precio",
+    "palabras_clave": "código:, producto:, salsa, para, pasta"
+  },
+  {
+    "id": "prod_0080",
+    "nombre": "SALSA PARA PASTAS ACEITUNAS 340GR OSOLE",
+    "descripcion": "SALSA PARA PASTAS ACEITUNAS 340GR OSOLE disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 2.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_para_pastas_aceitunas_340gr_osole.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7595826006754-producto-salsa-para-pastas-aceitunas-340gr-osole-precio",
+    "palabras_clave": "código:, producto:, salsa, para, pastas"
+  },
+  {
+    "id": "prod_0081",
+    "nombre": "SALSA PARA PASTA AL VODKA OSOLE",
+    "descripcion": "SALSA PARA PASTA AL VODKA OSOLE disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 2.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_para_pasta_al_vodka_osole_340gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7595826003944-producto-salsa-para-pasta-al-vodka-osole-340gr-precio",
+    "palabras_clave": "código:, producto:, salsa, para, pasta"
+  },
+  {
+    "id": "prod_0082",
+    "nombre": "PURE DE TOMATE POMI",
+    "descripcion": "PURE DE TOMATE POMI disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 5.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pure_de_tomate_pomi_700g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-8032793344377-producto-pure-de-tomate-pomi-700g-precio",
+    "palabras_clave": "código:, producto:, pure, tomate, pomi"
+  },
+  {
+    "id": "prod_0083",
+    "nombre": "PURE DE TOMATE HEINZ",
+    "descripcion": "PURE DE TOMATE HEINZ disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pure_de_tomate_heinz_490g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591112021845-producto-pure-de-tomate-heinz-490g-precio",
+    "palabras_clave": "código:, producto:, pure, tomate, heinz"
+  },
+  {
+    "id": "prod_0084",
+    "nombre": "SALSA PARA PIZZA HEINZ",
+    "descripcion": "SALSA PARA PIZZA HEINZ disponible para delivery.",
+    "categoria": "Congelados",
+    "precio_usd": 4.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_para_pizza_heinz_480gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591112028042-producto-salsa-para-pizza-heinz-480gr-precio",
+    "palabras_clave": "código:, producto:, salsa, para, pizza"
+  },
+  {
+    "id": "prod_0085",
+    "nombre": "TOMATES PELADOS OLE LTA",
+    "descripcion": "TOMATES PELADOS OLE LTA disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 2.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/tomates_pelados_ole_lta_400g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7595826008406-producto-tomates-pelados-ole-lta-400g-precio",
+    "palabras_clave": "código:, producto:, tomates, pelados, ole"
+  },
+  {
+    "id": "prod_0086",
+    "nombre": "KETCHUP HEINZ",
+    "descripcion": "KETCHUP HEINZ disponible en diferentes presentaciones.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 3.5,
+    "stock": 300,
+    "imagen_urls": [
+      "productos/ketchup_heinz_198gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "ketchup-heinz",
+    "palabras_clave": "código:, producto:, ketchup, heinz, 567gr",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "567GR",
+        "price_usd": 3.5,
+        "description": "KETCHUP HEINZ - 567GR"
+      },
+      {
+        "id": "size_2",
+        "name": "397GR",
+        "price_usd": 3.2,
+        "description": "KETCHUP HEINZ - 397GR"
+      },
+      {
+        "id": "size_3",
+        "name": "198GR",
+        "price_usd": 1.99,
+        "description": "KETCHUP HEINZ - 198GR"
+      }
+    ]
+  },
+  {
+    "id": "prod_0087",
+    "nombre": "SALSA DE TOMATE PAMPERO",
+    "descripcion": "SALSA DE TOMATE PAMPERO disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 1.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_de_tomate_pampero_198g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-75919184-producto-salsa-de-tomate-pampero-198g-precio",
+    "palabras_clave": "código:, producto:, salsa, tomate, pampero"
+  },
+  {
+    "id": "prod_0088",
+    "nombre": "RIKESA CHEDDAR 330GR SQUEEZE",
+    "descripcion": "RIKESA CHEDDAR 330GR SQUEEZE disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 6.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/rikesa_cheddar_330gr_squeeze.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-75930271-producto-rikesa-cheddar-330gr-squeeze-precio",
+    "palabras_clave": "código:, producto:, rikesa, cheddar, 330gr"
+  },
+  {
+    "id": "prod_0089",
+    "nombre": "RIKESA TOCINETA",
+    "descripcion": "RIKESA TOCINETA disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 6.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/rikesa_tocineta_300gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7590006200168-producto-rikesa-tocineta-300gr-precio",
+    "palabras_clave": "código:, producto:, rikesa, tocineta, 300gr"
+  },
+  {
+    "id": "prod_0090",
+    "nombre": "RIKESA CHEDDAR",
+    "descripcion": "RIKESA CHEDDAR disponible en diferentes presentaciones.",
+    "categoria": "Lácteos",
+    "precio_usd": 6.1,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/rikesa_cheddar_200gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "rikesa-cheddar",
+    "palabras_clave": "código:, producto:, rikesa, cheddar, 300gr",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "300GR",
+        "price_usd": 6.1,
+        "description": "RIKESA CHEDDAR - 300GR"
+      },
+      {
+        "id": "size_2",
+        "name": "200GR",
+        "price_usd": 4.6,
+        "description": "RIKESA CHEDDAR - 200GR"
+      }
+    ]
+  },
+  {
+    "id": "prod_0091",
+    "nombre": "RIKESA PARMESANO",
+    "descripcion": "RIKESA PARMESANO disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 4.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/rikesa_parmesano_200gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-75970420-producto-rikesa-parmesano-200gr-precio",
+    "palabras_clave": "código:, producto:, rikesa, parmesano, 200gr"
+  },
+  {
+    "id": "prod_0092",
+    "nombre": "MAYONESA MAVESA",
+    "descripcion": "MAYONESA MAVESA disponible en diferentes presentaciones.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 4.2,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/mayonesa_mavesa_445gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "mayonesa-mavesa",
+    "palabras_clave": "código:, producto:, mayonesa, mavesa, 445gr",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "445GR",
+        "price_usd": 4.2,
+        "description": "MAYONESA MAVESA - 445GR"
+      },
+      {
+        "id": "size_2",
+        "name": "910GR",
+        "price_usd": 8.9,
+        "description": "MAYONESA MAVESA - 910GR"
+      }
+    ]
+  },
+  {
+    "id": "prod_0093",
+    "nombre": "MARGARINA NELLY",
+    "descripcion": "MARGARINA NELLY disponible en diferentes presentaciones.",
+    "categoria": "Lácteos",
+    "precio_usd": 1.8,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/margarina_nelly_250g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "margarina-nelly",
+    "palabras_clave": "código:, producto:, margarina, nelly, 250g",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "250G",
+        "price_usd": 1.8,
+        "description": "MARGARINA NELLY - 250G"
+      },
+      {
+        "id": "size_2",
+        "name": "500G",
+        "price_usd": 3.3,
+        "description": "MARGARINA NELLY - 500G"
+      }
+    ]
+  },
+  {
+    "id": "prod_0094",
+    "nombre": "MARGARINA MAVESA",
+    "descripcion": "MARGARINA MAVESA disponible en diferentes presentaciones.",
+    "categoria": "Lácteos",
+    "precio_usd": 1.9,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/margarina_mavesa_250g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "margarina-mavesa",
+    "palabras_clave": "código:, producto:, margarina, mavesa, 250g",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "250G",
+        "price_usd": 1.9,
+        "description": "MARGARINA MAVESA - 250G"
+      },
+      {
+        "id": "size_2",
+        "name": "500GR",
+        "price_usd": 3.6,
+        "description": "MARGARINA MAVESA - 500GR"
+      }
+    ]
+  },
+  {
+    "id": "prod_0095",
+    "nombre": "MAIZINA AMERICANA",
+    "descripcion": "MAIZINA AMERICANA disponible en diferentes presentaciones.",
+    "categoria": "Lácteos",
+    "precio_usd": 4,
+    "stock": 400,
+    "imagen_urls": [
+      "productos/maizina_americana_120gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "maizina-americana",
+    "palabras_clave": "código:, producto:, maizina, americana, 400gr",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "400GR",
+        "price_usd": 4,
+        "description": "MAIZINA AMERICANA - 400GR"
+      },
+      {
+        "id": "size_2",
+        "name": "200G",
+        "price_usd": 2.4,
+        "description": "MAIZINA AMERICANA - 200G"
+      },
+      {
+        "id": "size_3",
+        "name": "90GR",
+        "price_usd": 1.2,
+        "description": "MAIZINA AMERICANA - 90GR"
+      },
+      {
+        "id": "size_4",
+        "name": "120GR",
+        "price_usd": 1.3,
+        "description": "MAIZINA AMERICANA - 120GR"
+      }
+    ]
+  },
+  {
+    "id": "prod_0096",
+    "nombre": "TODDY",
+    "descripcion": "TODDY disponible en diferentes presentaciones.",
+    "categoria": "Lácteos",
+    "precio_usd": 6.55,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/toddy_200gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "toddy",
+    "palabras_clave": "código:, producto:, toddy, 400g, precio:",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "400G",
+        "price_usd": 6.55,
+        "description": "TODDY - 400G"
+      },
+      {
+        "id": "size_2",
+        "name": "200GR",
+        "price_usd": 3.3,
+        "description": "TODDY - 200GR"
+      }
+    ]
+  },
+  {
+    "id": "prod_0097",
+    "nombre": "TODDY BOLSA",
+    "descripcion": "TODDY BOLSA disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 1.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/toddy_bolsa_100gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7590006700118-producto-toddy-bolsa-100gr-precio",
+    "palabras_clave": "código:, producto:, toddy, bolsa, 100gr"
+  },
+  {
+    "id": "prod_0098",
+    "nombre": "MAYONESA KRAFT",
+    "descripcion": "MAYONESA KRAFT disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 2.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/mayonesa_kraft_175g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7622201512279-producto-mayonesa-kraft-175g-precio",
+    "palabras_clave": "código:, producto:, mayonesa, kraft, 175g"
+  },
+  {
+    "id": "prod_0099",
+    "nombre": "MAYONESA DOÑA TITA",
+    "descripcion": "MAYONESA DOÑA TITA disponible en diferentes presentaciones.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 1.9,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/mayonesa_dona_tita_175gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "mayonesa-dona-tita",
+    "palabras_clave": "código:, producto:, mayonesa, doña, tita",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "175GR",
+        "price_usd": 1.9,
+        "description": "MAYONESA DOÑA TITA - 175GR"
+      },
+      {
+        "id": "size_2",
+        "name": "445GR",
+        "price_usd": 3.5,
+        "description": "MAYONESA DOÑA TITA - 445GR"
+      }
+    ]
+  },
+  {
+    "id": "prod_0100",
+    "nombre": "ACEITUNAS VERDES DESHUESADAS",
+    "descripcion": "ACEITUNAS VERDES DESHUESADAS disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 8.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/aceitunas_verdes_deshuesadas_830gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7595826005245-producto-aceitunas-verdes-deshuesadas-830gr-precio",
+    "palabras_clave": "código:, producto:, aceitunas, verdes, deshuesadas"
+  },
+  {
+    "id": "prod_0101",
+    "nombre": "PEPINILLOS AGRIDULCES NERANO",
+    "descripcion": "PEPINILLOS AGRIDULCES NERANO disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 4.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pepinillos_agridulces_nerano_500gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7896041152012-producto-pepinillos-agridulces-nerano-500gr-precio",
+    "palabras_clave": "código:, producto:, pepinillos, agridulces, nerano"
+  },
+  {
+    "id": "prod_0102",
+    "nombre": "ALCAPARRAS LORETO",
+    "descripcion": "ALCAPARRAS LORETO disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 3.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/alcaparras_loreto_240gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-8413552007731-producto-alcaparras-loreto-240gr-precio",
+    "palabras_clave": "código:, producto:, alcaparras, loreto, 240gr"
+  },
+  {
+    "id": "prod_0103",
+    "nombre": "ACEITUNAS VERDES ENTERAS 240GR FRASCO",
+    "descripcion": "ACEITUNAS VERDES ENTERAS 240GR FRASCO disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 2.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/aceitunas_verdes_enteras_240gr_frasco.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7595826005207-producto-aceitunas-verdes-enteras-240gr-frasco-precio",
+    "palabras_clave": "código:, producto:, aceitunas, verdes, enteras"
+  },
+  {
+    "id": "prod_0104",
+    "nombre": "MELAZA DE UVAS DARNA",
+    "descripcion": "MELAZA DE UVAS DARNA disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/melaza_de_uvas_darna_250ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-5281029421426-producto-melaza-de-uvas-darna-250ml-precio",
+    "palabras_clave": "código:, producto:, melaza, uvas, darna"
+  },
+  {
+    "id": "prod_0105",
+    "nombre": "VINAGRE DE SIDRA DE MANZANA",
+    "descripcion": "VINAGRE DE SIDRA DE MANZANA disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 8.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/vinagre_de_sidra_de_manzana_500ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-742326411-parcial-producto-vinagre-de-sidra-de-manzana-500ml-precio",
+    "palabras_clave": "código:, ...742326411, (parcial), producto:, vinagre"
+  },
+  {
+    "id": "prod_0106",
+    "nombre": "VINAGRE DE MANZANA EL BAIT MOUNIT",
+    "descripcion": "VINAGRE DE MANZANA EL BAIT MOUNIT disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 5.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/vinagre_de_manzana_el_bait_mounit_1ltr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-5281029255434-producto-vinagre-de-manzana-el-bait-mounit-1ltr-precio",
+    "palabras_clave": "código:, producto:, vinagre, manzana, bait"
+  },
+  {
+    "id": "prod_0107",
+    "nombre": "SALSA DE AJO IBERIA",
+    "descripcion": "SALSA DE AJO IBERIA disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_de_ajo_iberia_300ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591221281123-producto-salsa-de-ajo-iberia-300ml-precio",
+    "palabras_clave": "código:, producto:, salsa, ajo, iberia"
+  },
+  {
+    "id": "prod_0108",
+    "nombre": "VINO TINTO DOÑA TITA",
+    "descripcion": "VINO TINTO DOÑA TITA disponible para delivery.",
+    "categoria": "Bebidas Alcohólicas",
+    "precio_usd": 5.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/vino_tinto_dona_tita_700ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7599241000076-producto-vino-tinto-dona-tita-700ml-precio",
+    "palabras_clave": "código:, producto:, vino, tinto, doña"
+  },
+  {
+    "id": "prod_0109",
+    "nombre": "SALSA INGLESA MCCORMICK",
+    "descripcion": "SALSA INGLESA MCCORMICK disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 2.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_inglesa_mccormick_150ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591141300102-producto-salsa-inglesa-mccormick-150ml-precio",
+    "palabras_clave": "código:, producto:, salsa, inglesa, mccormick"
+  },
+  {
+    "id": "prod_0110",
+    "nombre": "SALSA INGLESA OLE",
+    "descripcion": "SALSA INGLESA OLE disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 1.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/salsa_inglesa_ole_150ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7595826008192-parcial-producto-salsa-inglesa-ole-150ml-precio",
+    "palabras_clave": "código:, ...7595826008192, (parcial), producto:, salsa"
+  },
+  {
+    "id": "prod_0111",
+    "nombre": "ADOBO QUE RICOS SON",
+    "descripcion": "ADOBO QUE RICOS SON disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 2.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/adobo_que_ricos_son_200gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7598926000974-producto-adobo-que-ricos-son-200gr-precio",
+    "palabras_clave": "código:, producto:, adobo, que, ricos"
+  },
+  {
+    "id": "prod_0112",
+    "nombre": "SABROSEADOR QUE RICOS SON",
+    "descripcion": "SABROSEADOR QUE RICOS SON disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 3.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/sabroseador_que_ricos_son_140gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-26000967-parcial-producto-sabroseador-que-ricos-son-140gr-precio",
+    "palabras_clave": "código:, ...26000967, (parcial), producto:, sabroseador"
+  },
+  {
+    "id": "prod_0113",
+    "nombre": "CANELA MOLIDA QUE RICOS SON",
+    "descripcion": "CANELA MOLIDA QUE RICOS SON disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 5.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/canela_molida_que_ricos_son_125gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-26001025-parcial-producto-canela-molida-que-ricos-son-125gr-precio",
+    "palabras_clave": "código:, ...26001025, (parcial), producto:, canela"
+  },
+  {
+    "id": "prod_0114",
+    "nombre": "GARBANZO CHTAURA",
+    "descripcion": "GARBANZO CHTAURA disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 2.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/garbanzo_chtaura_400gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-5281029282515-producto-garbanzo-chtaura-400gr-precio",
+    "palabras_clave": "código:, producto:, garbanzo, chtaura, 400gr"
+  },
+  {
+    "id": "prod_0115",
+    "nombre": "PALMITOS ENTERO MARY LTA",
+    "descripcion": "PALMITOS ENTERO MARY LTA disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 6.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/palmitos_entero_mary_lta_400gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591473003597-producto-palmitos-entero-mary-lta-400gr-precio",
+    "palabras_clave": "código:, producto:, palmitos, entero, mary"
+  },
+  {
+    "id": "prod_0116",
+    "nombre": "GUISANTES OSOLE 280GR LATA",
+    "descripcion": "GUISANTES OSOLE 280GR LATA disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 1.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/guisantes_osole_280gr_lata.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7595826007713-producto-guisantes-osole-280gr-lata-precio",
+    "palabras_clave": "código:, producto:, guisantes, osole, 280gr"
+  },
+  {
+    "id": "prod_0117",
+    "nombre": "MAIZ Y GUISANTES OSOLE LTA",
+    "descripcion": "MAIZ Y GUISANTES OSOLE LTA disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/maiz_y_guisantes_osole_lta_280gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7595826007690-producto-maiz-y-guisantes-osole-lta-280gr-precio",
+    "palabras_clave": "código:, producto:, maiz, guisantes, osole"
+  },
+  {
+    "id": "prod_0118",
+    "nombre": "MAIZ DULCE OSOLE 280GR LATA",
+    "descripcion": "MAIZ DULCE OSOLE 280GR LATA disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 2.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/maiz_dulce_osole_280gr_lata.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7595826007737-producto-maiz-dulce-osole-280gr-lata-precio",
+    "palabras_clave": "código:, producto:, maiz, dulce, osole"
+  },
+  {
+    "id": "prod_0119",
+    "nombre": "MAIZ Y GUISANTES OLE 250GR VIDRIO",
+    "descripcion": "MAIZ Y GUISANTES OLE 250GR VIDRIO disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 2.35,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/maiz_y_guisantes_ole_250gr_vidrio.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7891032013402-producto-maiz-y-guisantes-ole-250gr-vidrio-precio",
+    "palabras_clave": "código:, producto:, maiz, guisantes, ole"
+  },
+  {
+    "id": "prod_0120",
+    "nombre": "MAIZ DULCE AREL LTA",
+    "descripcion": "MAIZ DULCE AREL LTA disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 2.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/maiz_dulce_arel_lta_227gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-693222000154-parcial-producto-maiz-dulce-arel-lta-227gr-precio",
+    "palabras_clave": "código:, ...693222000154, (parcial), producto:, maiz"
+  },
+  {
+    "id": "prod_0121",
+    "nombre": "SARDINAS EN ACEITE ALVARIGUA",
+    "descripcion": "SARDINAS EN ACEITE ALVARIGUA disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/sardinas_en_aceite_alvarigua_170gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591710707172-producto-sardinas-en-aceite-alvarigua-170gr-precio",
+    "palabras_clave": "código:, producto:, sardinas, aceite, alvarigua"
+  },
+  {
+    "id": "prod_0122",
+    "nombre": "SARDINA EN SALSA DE TOMATE MARGARITA",
+    "descripcion": "SARDINA EN SALSA DE TOMATE MARGARITA disponible para delivery.",
+    "categoria": "Salsas y Condimentos",
+    "precio_usd": 1.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/sardina_en_salsa_de_tomate_margarita.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591002700201-producto-sardina-en-salsa-de-tomate-margarita-precio",
+    "palabras_clave": "código:, producto:, sardina, salsa, tomate"
+  },
+  {
+    "id": "prod_0123",
+    "nombre": "PEPITONAS PICANTES MARGARITA",
+    "descripcion": "PEPITONAS PICANTES MARGARITA disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 2.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pepitonas_picantes_margarita_140g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591002700058-producto-pepitonas-picantes-margarita-140g-precio",
+    "palabras_clave": "código:, producto:, pepitonas, picantes, margarita"
+  },
+  {
+    "id": "prod_0124",
+    "nombre": "ATUN MARGARITA NATURAL",
+    "descripcion": "ATUN MARGARITA NATURAL disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 2.75,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/atun_margarita_natural_140gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591002700096-producto-atun-margarita-natural-140gr-precio",
+    "palabras_clave": "código:, producto:, atun, margarita, natural"
+  },
+  {
+    "id": "prod_0125",
+    "nombre": "ATUN DESMENUZADO EN ACEITE CALIFORNIA",
+    "descripcion": "ATUN DESMENUZADO EN ACEITE CALIFORNIA disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 1.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/atun_desmenuzado_en_aceite_california.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591002700348-producto-atun-desmenuzado-en-aceite-california-precio",
+    "palabras_clave": "código:, producto:, atun, desmenuzado, aceite"
+  },
+  {
+    "id": "prod_0126",
+    "nombre": "ATUN ENTERO EN ACEITE BUBBA",
+    "descripcion": "ATUN ENTERO EN ACEITE BUBBA disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 2.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/atun_entero_en_aceite_bubba_170gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-6912290003309-producto-atun-entero-en-aceite-bubba-170gr-precio",
+    "palabras_clave": "código:, producto:, atun, entero, aceite"
+  },
+  {
+    "id": "prod_0127",
+    "nombre": "ATUN ENTERO EN ACEITE DE OLIVA BUBBA",
+    "descripcion": "ATUN ENTERO EN ACEITE DE OLIVA BUBBA disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/atun_entero_en_aceite_de_oliva_bubba_170gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-36912290003514-producto-atun-entero-en-aceite-de-oliva-bubba-170gr-precio",
+    "palabras_clave": "código:, producto:, atun, entero, aceite"
+  },
+  {
+    "id": "prod_0128",
+    "nombre": "ATUN ENSALADA MEXICANA MARGARITA",
+    "descripcion": "ATUN ENSALADA MEXICANA MARGARITA disponible para delivery.",
+    "categoria": "Conservas",
+    "precio_usd": 4.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/atun_ensalada_mexicana_margarita.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-75922214-producto-atun-ensalada-mexicana-margarita-precio",
+    "palabras_clave": "código:, producto:, atun, ensalada, mexicana"
+  },
+  {
+    "id": "prod_0129",
+    "nombre": "PERRARINA TOP DOG PET VITALIM",
+    "descripcion": "PERRARINA TOP DOG PET VITALIM disponible para delivery.",
+    "categoria": "Mascotas",
+    "precio_usd": 9.5,
+    "stock": 100,
+    "imagen_urls": [],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7594000800690-producto-perrarina-top-dog-pet-vitalim-2kg-precio",
+    "palabras_clave": "código:, producto:, perrarina, top, dog"
+  },
+  {
+    "id": "prod_0130",
+    "nombre": "[K-NINA] ADULTOS POLLO Y VEGETALES",
+    "descripcion": "[K-NINA] ADULTOS POLLO Y VEGETALES disponible para delivery.",
+    "categoria": "Carnicería",
+    "precio_usd": 12,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/k_nina_adultos_pollo_y_vegetales_2kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-01016605189-parcial-producto-k-nina-adultos-pollo-y-vegetales-2kg-precio",
+    "palabras_clave": "código:, ...01016605189, (parcial), producto:, [k-nina]"
+  },
+  {
+    "id": "prod_0131",
+    "nombre": "K-NINA ADULTO CARNE CEREAL ARROZ",
+    "descripcion": "K-NINA ADULTO CARNE CEREAL ARROZ disponible para delivery.",
+    "categoria": "Carnicería",
+    "precio_usd": 12,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/k_nina_adulto_carne_cereal_arroz_2kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591016605172-producto-k-nina-adulto-carne-cereal-arroz-2kg-precio",
+    "palabras_clave": "código:, producto:, k-nina, adulto, carne"
+  },
+  {
+    "id": "prod_0132",
+    "nombre": "GATSY CARNE Y ARROZ",
+    "descripcion": "GATSY CARNE Y ARROZ disponible para delivery.",
+    "categoria": "Carnicería",
+    "precio_usd": 26.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/gatsy_carne_y_arroz_3kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "codigo-7591016605776-producto-gatsy-carne-y-arroz-3kg-precio",
+    "palabras_clave": "código:, producto:, gatsy, carne, arroz"
+  },
+  {
+    "id": "prod_0133",
+    "nombre": "COLONIA RINTI 240ML USO VETERINARIO",
+    "descripcion": "COLONIA RINTI 240ML USO VETERINARIO disponible para delivery.",
+    "categoria": "Mascotas",
+    "precio_usd": 11.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/colonia_rinti_240ml_uso_veterinario.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "122-codigo-7591635000563-producto-colonia-rinti-240ml-uso-veterinario-precio",
+    "palabras_clave": "122., código:, producto:, colonia, rinti"
+  },
+  {
+    "id": "prod_0134",
+    "nombre": "POLVO ANTIPULGAS RINTI",
+    "descripcion": "POLVO ANTIPULGAS RINTI disponible para delivery.",
+    "categoria": "Mascotas",
+    "precio_usd": 11,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/polvo_antipulgas_rinti_100gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "123-codigo-7591635000600-producto-polvo-antipulgas-rinti-100gr-precio",
+    "palabras_clave": "123., código:, producto:, polvo, antipulgas"
+  },
+  {
+    "id": "prod_0135",
+    "nombre": "ESPUMA BAÑO SECO RINTI",
+    "descripcion": "ESPUMA BAÑO SECO RINTI disponible para delivery.",
+    "categoria": "Mascotas",
+    "precio_usd": 19.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/espuma_bano_seco_rinti_220ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "124-codigo-7591635001041-producto-espuma-bano-seco-rinti-220ml-precio",
+    "palabras_clave": "124., código:, producto:, espuma, baño"
+  },
+  {
+    "id": "prod_0136",
+    "nombre": "RINGO PERRARINA ORIGINAL",
+    "descripcion": "RINGO PERRARINA ORIGINAL disponible para delivery.",
+    "categoria": "Mascotas",
+    "precio_usd": 2.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/ringo_perrarina_original_500gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "125-codigo-7703090975199-producto-ringo-perrarina-original-500gr-precio",
+    "palabras_clave": "125., código:, producto:, ringo, perrarina"
+  },
+  {
+    "id": "prod_0137",
+    "nombre": "RINGO PERRARINA CACHORROS",
+    "descripcion": "RINGO PERRARINA CACHORROS disponible para delivery.",
+    "categoria": "Mascotas",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/ringo_perrarina_cachorros_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "126-codigo-7703090094357-producto-ringo-perrarina-cachorros-1kg-precio",
+    "palabras_clave": "126., código:, producto:, ringo, perrarina"
+  },
+  {
+    "id": "prod_0138",
+    "nombre": "GATARINA DONKAT ADULTOS",
+    "descripcion": "GATARINA DONKAT ADULTOS disponible para delivery.",
+    "categoria": "Mascotas",
+    "precio_usd": 8.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/gatarina_donkat_adultos_1_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "127-codigo-7702084057446-producto-gatarina-donkat-adultos-11kg-precio",
+    "palabras_clave": "127., código:, producto:, gatarina, donkat"
+  },
+  {
+    "id": "prod_0139",
+    "nombre": "GATARINA DONKAT GATICOS",
+    "descripcion": "GATARINA DONKAT GATICOS disponible para delivery.",
+    "categoria": "Mascotas",
+    "precio_usd": 8.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/gatarina_donkat_gaticos_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "128-codigo-7702084057132-producto-gatarina-donkat-gaticos-1kg-precio",
+    "palabras_clave": "128., código:, producto:, gatarina, donkat"
+  },
+  {
+    "id": "prod_0140",
+    "nombre": "GATARINA OHMAIGAT",
+    "descripcion": "GATARINA OHMAIGAT disponible para delivery.",
+    "categoria": "Mascotas",
+    "precio_usd": 17,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/gatarina_donkat_adultos_1_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "129-codigo-7702084057101-producto-gatarina-ohmaigat-15kg-precio",
+    "palabras_clave": "129., código:, producto:, gatarina, ohmaigat"
+  },
+  {
+    "id": "prod_0141",
+    "nombre": "MIRRINGO GATICOS CACHORROS",
+    "descripcion": "MIRRINGO GATICOS CACHORROS disponible en diferentes presentaciones.",
+    "categoria": "Mascotas",
+    "precio_usd": 6.8,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/mirringo_gaticos_cachorros_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "mirringo-gaticos-cachorros",
+    "palabras_clave": "130., código:, producto:, mirringo, gaticos",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "1KG",
+        "price_usd": 6.8,
+        "description": "MIRRINGO GATICOS CACHORROS - 1KG"
+      },
+      {
+        "id": "size_2",
+        "name": "500GR",
+        "price_usd": 4.5,
+        "description": "MIRRINGO GATICOS CACHORROS - 500GR"
+      }
+    ]
+  },
+  {
+    "id": "prod_0142",
+    "nombre": "MIRRINGO GATARINA ADULTOS",
+    "descripcion": "MIRRINGO GATARINA ADULTOS disponible en diferentes presentaciones.",
+    "categoria": "Mascotas",
+    "precio_usd": 4.3,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/mirringo_gatarina_adultos_1kg.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "mirringo-gatarina-adultos",
+    "palabras_clave": "132., código:, producto:, mirringo, gatarina",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "500GR",
+        "price_usd": 4.3,
+        "description": "MIRRINGO GATARINA ADULTOS - 500GR"
+      },
+      {
+        "id": "size_2",
+        "name": "1KG",
+        "price_usd": 7.7,
+        "description": "MIRRINGO GATARINA ADULTOS - 1KG"
+      }
+    ]
+  },
+  {
+    "id": "prod_0143",
+    "nombre": "PAPEL SUTIL 4R 300H DOBLE",
+    "descripcion": "PAPEL SUTIL 4R 300H DOBLE disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/papel_sutil_4r_300h_doble.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "134-codigo-7591169000497-producto-papel-sutil-4r-300h-doble-precio",
+    "palabras_clave": "134., código:, producto:, papel, sutil"
+  },
+  {
+    "id": "prod_0144",
+    "nombre": "PAPEL HIG.SUPER SUPLEX 300H PAVECA",
+    "descripcion": "PAPEL HIG.SUPER SUPLEX 300H PAVECA disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 0.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/papel_hig_super_suplex_300h_paveca.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "135-codigo-7591098000926-producto-papel-higsuper-suplex-300h-paveca-precio",
+    "palabras_clave": "135., código:, producto:, papel, hig.super"
+  },
+  {
+    "id": "prod_0145",
+    "nombre": "PAPEL ROSAL 180 HOJAS",
+    "descripcion": "PAPEL ROSAL 180 HOJAS disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 1.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/papel_rosal_180_hojas.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "136-codigo-7591098000919-producto-papel-rosal-180-hojas-precio",
+    "palabras_clave": "136., código:, producto:, papel, rosal"
+  },
+  {
+    "id": "prod_0146",
+    "nombre": "PAPEL HIGIENICO TI-SUF 4ROLLOS",
+    "descripcion": "PAPEL HIGIENICO TI-SUF 4ROLLOS disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 4.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/papel_higienico_ti_suf_4rollos.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "137-codigo-8690536025060-producto-papel-higienico-ti-suf-4rollos-precio",
+    "palabras_clave": "137., código:, producto:, papel, higienico"
+  },
+  {
+    "id": "prod_0147",
+    "nombre": "PAPEL CARICIAS 300H 4R",
+    "descripcion": "PAPEL CARICIAS 300H 4R disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 2.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/papel_caricias_300h_4r.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "138-codigo-7598669002945-producto-papel-caricias-300h-4r-precio",
+    "palabras_clave": "138., código:, producto:, papel, caricias"
+  },
+  {
+    "id": "prod_0148",
+    "nombre": "PAPEL SCOTT RINDE MAX 4ROLLOS",
+    "descripcion": "PAPEL SCOTT RINDE MAX 4ROLLOS disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 3.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/papel_scott_rinde_max_4rollos.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "139-codigo-7702425808034-producto-papel-scott-rinde-max-4rollos-precio",
+    "palabras_clave": "139., código:, producto:, papel, scott"
+  },
+  {
+    "id": "prod_0149",
+    "nombre": "PAPEL ROSAL 400H",
+    "descripcion": "PAPEL ROSAL 400H disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/papel_rosal_400h.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "140-codigo-7591098170230-producto-papel-rosal-400h-precio",
+    "palabras_clave": "140., código:, producto:, papel, rosal"
+  },
+  {
+    "id": "prod_0150",
+    "nombre": "PAPEL HIGIENICO GADUSOFTY 215H 4R",
+    "descripcion": "PAPEL HIGIENICO GADUSOFTY 215H 4R disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 1.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/papel_higienico_gadusofty_215h_4r.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "141-codigo-7599963000538-producto-papel-higienico-gadusofty-215h-4r-precio",
+    "palabras_clave": "141., código:, producto:, papel, higienico"
+  },
+  {
+    "id": "prod_0151",
+    "nombre": "DESINFECTANTE LAS LLAVES",
+    "descripcion": "DESINFECTANTE LAS LLAVES disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 3.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/desinfectante_las_llaves_500ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "142-codigo-7590006301384-producto-desinfectante-las-llaves-500ml-precio",
+    "palabras_clave": "142., código:, producto:, desinfectante, las"
+  },
+  {
+    "id": "prod_0152",
+    "nombre": "MATA OLORES VALP",
+    "descripcion": "MATA OLORES VALP disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 2.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/mata_olores_valp_675ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "143-codigo-7594000762530-producto-mata-olores-valp-675ml-precio",
+    "palabras_clave": "143., código:, producto:, mata, olores"
+  },
+  {
+    "id": "prod_0153",
+    "nombre": "AJAX ANTIBACTERIAL",
+    "descripcion": "AJAX ANTIBACTERIAL disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 4.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/ajax_antibacterial_500ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "144-codigo-75095018622-producto-ajax-antibacterial-500ml-precio",
+    "palabras_clave": "144., código:, producto:, ajax, antibacterial"
+  },
+  {
+    "id": "prod_0154",
+    "nombre": "INSECT. MATA HORMIGAS 30GR PLAGATOX",
+    "descripcion": "INSECT. MATA HORMIGAS 30GR PLAGATOX disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 2.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/insect_mata_hormigas_30gr_plagatox.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "145-codigo-7591224002879-producto-insect-mata-hormigas-30gr-plagatox-precio",
+    "palabras_clave": "145., código:, producto:, insect., mata"
+  },
+  {
+    "id": "prod_0155",
+    "nombre": "LIMPIADOR AMBIENTE NATURAL PLAGATOX",
+    "descripcion": "LIMPIADOR AMBIENTE NATURAL PLAGATOX disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 6.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/limpiador_ambiente_natural_plagatox.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "146-codigo-7591224006334-producto-limpiador-ambiente-natural-plagatox-precio",
+    "palabras_clave": "146., código:, producto:, limpiador, ambiente"
+  },
+  {
+    "id": "prod_0156",
+    "nombre": "INSECTICIDA LIQ. ZANCUDOS PLAGATOX",
+    "descripcion": "INSECTICIDA LIQ. ZANCUDOS PLAGATOX disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 9.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/insecticida_liq_zancudos_plagatox.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "147-codigo-7591224005740-producto-insecticida-liq-zancudos-plagatox-precio",
+    "palabras_clave": "147., código:, producto:, insecticida, liq."
+  },
+  {
+    "id": "prod_0157",
+    "nombre": "ACEITE DE MADERA PLEDGE",
+    "descripcion": "ACEITE DE MADERA PLEDGE disponible para delivery.",
+    "categoria": "Abarrotes y Despensa",
+    "precio_usd": 13.3,
+    "stock": 100,
+    "imagen_urls": [],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "148-codigo-7501032915261-producto-aceite-de-madera-pledge-500ml-precio",
+    "palabras_clave": "148., código:, producto:, aceite, madera"
+  },
+  {
+    "id": "prod_0158",
+    "nombre": "VARITAS GLADE",
+    "descripcion": "VARITAS GLADE disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 13.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/aromatizante_de_ambiente_glade_230ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "149-codigo-7894650940129-producto-varitas-glade-100ml-precio",
+    "palabras_clave": "149., código:, producto:, varitas, glade"
+  },
+  {
+    "id": "prod_0159",
+    "nombre": "AROMATIZANTE GLADE CAR",
+    "descripcion": "AROMATIZANTE GLADE CAR disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 4.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/aromatizante_glade_car_70gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "150-codigo-7501032908706-producto-aromatizante-glade-car-70gr-precio",
+    "palabras_clave": "150., código:, producto:, aromatizante, glade"
+  },
+  {
+    "id": "prod_0160",
+    "nombre": "AROMATIZANTE DE AMBIENTE GLADE",
+    "descripcion": "AROMATIZANTE DE AMBIENTE GLADE disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 7.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/aromatizante_de_ambiente_glade_230ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "151-codigo-7503046433823-producto-aromatizante-de-ambiente-glade-230ml-precio",
+    "palabras_clave": "151., código:, producto:, aromatizante, ambiente"
+  },
+  {
+    "id": "prod_0161",
+    "nombre": "DETERGENTE LIQUIDO ARIEL",
+    "descripcion": "DETERGENTE LIQUIDO ARIEL disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 10.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/detergente_ariel_con_downy_800gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "152-codigo-7500405172035-producto-detergente-liquido-ariel-800ml-precio",
+    "palabras_clave": "152., código:, producto:, detergente, liquido"
+  },
+  {
+    "id": "prod_0162",
+    "nombre": "SUAVIZANTE DOWNY",
+    "descripcion": "SUAVIZANTE DOWNY disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 3.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/suavizante_downy_360ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "153-codigo-7500435127486-producto-suavizante-downy-360ml-precio",
+    "palabras_clave": "153., código:, producto:, suavizante, downy"
+  },
+  {
+    "id": "prod_0163",
+    "nombre": "VANISH LIQUIDO",
+    "descripcion": "VANISH LIQUIDO disponible en diferentes presentaciones.",
+    "categoria": "Limpieza",
+    "precio_usd": 3.5,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/vanish_liquido_300ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "vanish-liquido",
+    "palabras_clave": "154., código:, producto:, vanish, liquido",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "300ML",
+        "price_usd": 3.5,
+        "description": "VANISH LIQUIDO - 300ML"
+      },
+      {
+        "id": "size_2",
+        "name": "450ML",
+        "price_usd": 4.6,
+        "description": "VANISH LIQUIDO - 450ML"
+      }
+    ]
+  },
+  {
+    "id": "prod_0164",
+    "nombre": "PATO DESINFECTANTE SANITARIO EN GEL",
+    "descripcion": "PATO DESINFECTANTE SANITARIO EN GEL disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pato_desinfectante_sanitario_en_gel_500ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "156-codigo-7501032902735-producto-pato-desinfectante-sanitario-en-gel-500ml-precio",
+    "palabras_clave": "156., código:, producto:, pato, desinfectante"
+  },
+  {
+    "id": "prod_0165",
+    "nombre": "DIABLO ROJO",
+    "descripcion": "DIABLO ROJO disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 6.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/diablo_rojo_300gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "157-codigo-7591980000348-producto-diablo-rojo-300gr-precio",
+    "palabras_clave": "157., código:, producto:, diablo, rojo"
+  },
+  {
+    "id": "prod_0166",
+    "nombre": "LIMPIADOR DE POCETAS OSIREX",
+    "descripcion": "LIMPIADOR DE POCETAS OSIREX disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 4.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/limpiador_de_pocetas_osirex_360ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "158-codigo-7591224002756-producto-limpiador-de-pocetas-osirex-360ml-precio",
+    "palabras_clave": "158., código:, producto:, limpiador, pocetas"
+  },
+  {
+    "id": "prod_0167",
+    "nombre": "LIMPIA HORNOS OSIREX",
+    "descripcion": "LIMPIA HORNOS OSIREX disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 6.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/limpia_hornos_osirex_265gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "159-codigo-7591224000332-producto-limpia-hornos-osirex-265gr-precio",
+    "palabras_clave": "159., código:, producto:, limpia, hornos"
+  },
+  {
+    "id": "prod_0168",
+    "nombre": "SUAVIZANTE ALIVE",
+    "descripcion": "SUAVIZANTE ALIVE disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 1.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/suavizante_alive_200ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "160-codigo-597597009651-producto-suavizante-alive-200ml-precio",
+    "palabras_clave": "160., código:, producto:, suavizante, alive"
+  },
+  {
+    "id": "prod_0169",
+    "nombre": "HOJA DE SEGUETA 1 UND RETIRAR POR CAJA",
+    "descripcion": "HOJA DE SEGUETA 1 UND RETIRAR POR CAJA disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/hoja_de_segueta_1_und_retirar_por_caja.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "161-codigo-490-producto-hoja-de-segueta-1-und-retirar-por-caja-precio",
+    "palabras_clave": "161., código:, producto:, hoja, segueta"
+  },
+  {
+    "id": "prod_0170",
+    "nombre": "CUCHILLA OSTER",
+    "descripcion": "CUCHILLA OSTER disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 3.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/cuchilla_oster.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "162-codigo-034264025677-producto-cuchilla-oster-precio",
+    "palabras_clave": "162., código:, producto:, cuchilla, oster"
+  },
+  {
+    "id": "prod_0171",
+    "nombre": "VELAS DE ORACION BIPA",
+    "descripcion": "VELAS DE ORACION BIPA disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 2.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/velas_de_oracion_bipa_5und.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "163-codigo-7590022003781-producto-velas-de-oracion-bipa-5und-precio",
+    "palabras_clave": "163., código:, producto:, velas, oracion"
+  },
+  {
+    "id": "prod_0172",
+    "nombre": "FORMULA MECANICA 70-6 SQ 354CM",
+    "descripcion": "FORMULA MECANICA 70-6 SQ 354CM disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 10.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/formula_mecanica_70_6_sq_354cm.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "164-codigo-7591260070061-producto-formula-mecanica-70-6-sq-354cm-precio",
+    "palabras_clave": "164., código:, producto:, formula, mecanica"
+  },
+  {
+    "id": "prod_0173",
+    "nombre": "Probador de Corriente AC 100-500V",
+    "descripcion": "Probador de Corriente AC 100-500V disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/probador_de_corriente_ac_100_500v.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "probador-de-corriente-ac-100-500v",
+    "palabras_clave": "probador, corriente, 100-500v"
+  },
+  {
+    "id": "prod_0174",
+    "nombre": "Bolsas Plásticas Calidex 60Lts 6Uni",
+    "descripcion": "Bolsas Plásticas Calidex 60Lts 6Uni disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/bolsas_plasticas_calidex_60lts_6uni.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "bolsas-plasticas-calidex-60lts-6uni",
+    "palabras_clave": "bolsas, plásticas, calidex, 60lts, 6uni"
+  },
+  {
+    "id": "prod_0175",
+    "nombre": "Bolsas Ziploc 50 Und SCJohnson",
+    "descripcion": "Bolsas Ziploc 50 Und SCJohnson disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 4.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/bolsas_ziploc_50_und_scjohnson.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "bolsas-ziploc-50-und-scjohnson",
+    "palabras_clave": "bolsas, ziploc, und, scjohnson"
+  },
+  {
+    "id": "prod_0176",
+    "nombre": "Papel Aluminio Aluhogar 15 Mtrs",
+    "descripcion": "Papel Aluminio Aluhogar 15 Mtrs disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 2.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/papel_aluminio_aluhogar_15_mtrs.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "papel-aluminio-aluhogar-15-mtrs",
+    "palabras_clave": "papel, aluminio, aluhogar, mtrs"
+  },
+  {
+    "id": "prod_0177",
+    "nombre": "Papel Aluminio Reynolds 5Mtx30Cm",
+    "descripcion": "Papel Aluminio Reynolds 5Mtx30Cm disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 3.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/papel_aluminio_reynolds_5mtx30cm.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "papel-aluminio-reynolds-5mtx30cm",
+    "palabras_clave": "papel, aluminio, reynolds, 5mtx30cm"
+  },
+  {
+    "id": "prod_0178",
+    "nombre": "Esponja Acerada Calidex",
+    "descripcion": "Esponja Acerada Calidex disponible para delivery.",
+    "categoria": "Hogar",
+    "precio_usd": 3.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/esponja_acerada_calidex.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "esponja-acerada-calidex",
+    "palabras_clave": "esponja, acerada, calidex"
+  },
+  {
+    "id": "prod_0179",
+    "nombre": "Lavaplatos Axion Multiuso",
+    "descripcion": "Lavaplatos Axion Multiuso disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 2.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/lavaplatos_axion_multiuso_235gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "lavaplatos-axion-multiuso-235gr",
+    "palabras_clave": "lavaplatos, axion, multiuso, 235gr"
+  },
+  {
+    "id": "prod_0180",
+    "nombre": "Lavaplatos Liq. Aliclean 350ml Alive",
+    "descripcion": "Lavaplatos Liq. Aliclean 350ml Alive disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 3.15,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/lavaplatos_liq_aliclean_350ml_alive.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "lavaplatos-liq-aliclean-350ml-alive",
+    "palabras_clave": "lavaplatos, liq., aliclean, 350ml, alive"
+  },
+  {
+    "id": "prod_0181",
+    "nombre": "Jabón Líquido Multiuso Valp",
+    "descripcion": "Jabón Líquido Multiuso Valp disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 5.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/jabon_liquido_multiuso_valp_675ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "jabon-liquido-multiuso-valp-675ml",
+    "palabras_clave": "jabón, líquido, multiuso, valp, 675ml"
+  },
+  {
+    "id": "prod_0182",
+    "nombre": "Shampoo Pantene Bambú",
+    "descripcion": "Shampoo Pantene Bambú disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 7.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/shampoo_pantene_bambu_200ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shampoo-pantene-bambu-200ml",
+    "palabras_clave": "shampoo, pantene, bambú, 200ml"
+  },
+  {
+    "id": "prod_0183",
+    "nombre": "Acondicionador Keratina Pantene",
+    "descripcion": "Acondicionador Keratina Pantene disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 19.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/acondicionador_keratina_pantene.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "acondicionador-keratina-pantene",
+    "palabras_clave": "acondicionador, keratina, pantene"
+  },
+  {
+    "id": "prod_0184",
+    "nombre": "Acondicionador Reconst. Aminoácido",
+    "descripcion": "Acondicionador Reconst. Aminoácido disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 12.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/acondicionador_reconst_aminoacido.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "acondicionador-reconst-aminoacido",
+    "palabras_clave": "acondicionador, reconst., aminoácido"
+  },
+  {
+    "id": "prod_0185",
+    "nombre": "Jabón Barra Cream Lan 3Pack",
+    "descripcion": "Jabón Barra Cream Lan 3Pack disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 3.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/jabon_barra_cream_lan_3pack_270gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "jabon-barra-cream-lan-3pack-270gr",
+    "palabras_clave": "jabón, barra, cream, lan, 3pack"
+  },
+  {
+    "id": "prod_0186",
+    "nombre": "Jabón Barra Covex Tripack 345gr Dalan",
+    "descripcion": "Jabón Barra Covex Tripack 345gr Dalan disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/jabon_barra_covex_tripack_345gr_dalan.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "jabon-barra-covex-tripack-345gr-dalan",
+    "palabras_clave": "jabón, barra, covex, tripack, 345gr"
+  },
+  {
+    "id": "prod_0187",
+    "nombre": "Pañales Oki Pants XXG",
+    "descripcion": "Pañales Oki Pants XXG disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 8.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/panales_oki_pants_xxg_25und.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "panales-oki-pants-xxg-25und",
+    "palabras_clave": "pañales, oki, pants, xxg, 25und"
+  },
+  {
+    "id": "prod_0188",
+    "nombre": "Pañales Adultos Unisex Securezza",
+    "descripcion": "Pañales Adultos Unisex Securezza disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 12.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/panales_adultos_unisex_securezza.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "panales-adultos-unisex-securezza",
+    "palabras_clave": "pañales, adultos, unisex, securezza"
+  },
+  {
+    "id": "prod_0189",
+    "nombre": "Desodorante Lady SS Omega3 Aerosol",
+    "descripcion": "Desodorante Lady SS Omega3 Aerosol disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 9.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/desodorante_lady_ss_omega3_aerosol_91g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "desodorante-lady-ss-omega3-aerosol-91g",
+    "palabras_clave": "desodorante, lady, omega3, aerosol, 91g"
+  },
+  {
+    "id": "prod_0190",
+    "nombre": "Desodorante Deo Axe",
+    "descripcion": "Desodorante Deo Axe disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 6.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/desodorante_deo_axe_150ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "desodorante-deo-axe-150ml",
+    "palabras_clave": "desodorante, deo, axe, 150ml"
+  },
+  {
+    "id": "prod_0191",
+    "nombre": "Cream Gel Fijador Rolda Men",
+    "descripcion": "Cream Gel Fijador Rolda Men disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/cream_gel_fijador_rolda_men_250gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "cream-gel-fijador-rolda-men-250gr",
+    "palabras_clave": "cream, gel, fijador, rolda, men"
+  },
+  {
+    "id": "prod_0192",
+    "nombre": "Gel Fijador Rolda",
+    "descripcion": "Gel Fijador Rolda disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 4.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/cream_gel_fijador_rolda_men_250gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "gel-fijador-rolda-250gr",
+    "palabras_clave": "gel, fijador, rolda, 250gr"
+  },
+  {
+    "id": "prod_0193",
+    "nombre": "Gel Xtreme",
+    "descripcion": "Gel Xtreme disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 3.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/gel_xtreme_250gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "gel-xtreme-250gr",
+    "palabras_clave": "gel, xtreme, 250gr"
+  },
+  {
+    "id": "prod_0194",
+    "nombre": "Crema Dental Kids OralB",
+    "descripcion": "Crema Dental Kids OralB disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/crema_dental_kids_oralb_100gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "crema-dental-kids-oralb-100gr",
+    "palabras_clave": "crema, dental, kids, oralb, 100gr"
+  },
+  {
+    "id": "prod_0195",
+    "nombre": "Enjuague Bucal Colgate Plax Ice",
+    "descripcion": "Enjuague Bucal Colgate Plax Ice disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 5.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/enjuague_bucal_colgate_plax_ice_250ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "enjuague-bucal-colgate-plax-ice-250ml",
+    "palabras_clave": "enjuague, bucal, colgate, plax, ice"
+  },
+  {
+    "id": "prod_0196",
+    "nombre": "Crema Dental Close Up",
+    "descripcion": "Crema Dental Close Up disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 2.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/crema_dental_close_up_90gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "crema-dental-close-up-90gr",
+    "palabras_clave": "crema, dental, close, 90gr"
+  },
+  {
+    "id": "prod_0197",
+    "nombre": "Crema Dental con Bicarbonato Oral B",
+    "descripcion": "Crema Dental con Bicarbonato Oral B disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 4.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/crema_dental_con_bicarbonato_oral_b.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "crema-dental-con-bicarbonato-oral-b",
+    "palabras_clave": "crema, dental, con, bicarbonato, oral"
+  },
+  {
+    "id": "prod_0198",
+    "nombre": "Crema Dental 3D White Oral B",
+    "descripcion": "Crema Dental 3D White Oral B disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 2.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/crema_dental_3d_white_oral_b_70gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "crema-dental-3d-white-oral-b-70gr",
+    "palabras_clave": "crema, dental, white, oral, 70gr"
+  },
+  {
+    "id": "prod_0199",
+    "nombre": "Colgate Plax",
+    "descripcion": "Colgate Plax disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 5.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/colgate_plax_100ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "colgate-plax-100ml",
+    "palabras_clave": "colgate, plax, 100ml"
+  },
+  {
+    "id": "prod_0200",
+    "nombre": "Agua Oxigenada Pasarela Vol.10/20",
+    "descripcion": "Agua Oxigenada Pasarela Vol.10/20 disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 2.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/agua_oxigenada_pasarela_vol_10_20.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "agua-oxigenada-pasarela-vol1020",
+    "palabras_clave": "agua, oxigenada, pasarela, vol.10/20"
+  },
+  {
+    "id": "prod_0201",
+    "nombre": "Oxigenta Loción Reveladora Igora",
+    "descripcion": "Oxigenta Loción Reveladora Igora disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 1.8,
+    "stock": 100,
+    "imagen_urls": [],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "oxigenta-locion-reveladora-igora-50ml",
+    "palabras_clave": "oxigenta, loción, reveladora, igora, 50ml"
+  },
+  {
+    "id": "prod_0202",
+    "nombre": "Tintes Maxton Kit Completo",
+    "descripcion": "Tintes Maxton Kit Completo disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 7.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/tintes_maxton_kit_completo.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "tintes-maxton-kit-completo",
+    "palabras_clave": "tintes, maxton, kit, completo"
+  },
+  {
+    "id": "prod_0203",
+    "nombre": "Tintes Igora Vital 7 Aceites Kit Completo",
+    "descripcion": "Tintes Igora Vital 7 Aceites Kit Completo disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 10.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/tintes_igora_vital_7_aceites_kit_completo.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "tintes-igora-vital-7-aceites-kit-completo",
+    "palabras_clave": "tintes, igora, vital, aceites, kit"
+  },
+  {
+    "id": "prod_0204",
+    "nombre": "Acondicionador 3MM Restauración",
+    "descripcion": "Acondicionador 3MM Restauración disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 14.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/acondicionador_3mm_restauracion_170ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "acondicionador-3mm-restauracion-170ml",
+    "palabras_clave": "acondicionador, 3mm, restauración, 170ml"
+  },
+  {
+    "id": "prod_0205",
+    "nombre": "Acondicionador Antiquiebre B3",
+    "descripcion": "Acondicionador Antiquiebre B3 disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 10.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/acondicionador_antiquiebre_b3.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "acondicionador-antiquiebre-b3",
+    "palabras_clave": "acondicionador, antiquiebre"
+  },
+  {
+    "id": "prod_0206",
+    "nombre": "Crema de Peinar Anticaída Pantene",
+    "descripcion": "Crema de Peinar Anticaída Pantene disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 10,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/crema_de_peinar_anticaida_pantene.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "crema-de-peinar-anticaida-pantene",
+    "palabras_clave": "crema, peinar, anticaída, pantene"
+  },
+  {
+    "id": "prod_0207",
+    "nombre": "Crema para Peinar Keratina",
+    "descripcion": "Crema para Peinar Keratina disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 6.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/crema_para_peinar_keratina_160ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "crema-para-peinar-keratina-160ml",
+    "palabras_clave": "crema, para, peinar, keratina, 160ml"
+  },
+  {
+    "id": "prod_0208",
+    "nombre": "Shampoo Pantene Colágeno",
+    "descripcion": "Shampoo Pantene Colágeno disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 13.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/shampoo_pantene_colageno_300ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shampoo-pantene-colageno-300ml",
+    "palabras_clave": "shampoo, pantene, colágeno, 300ml"
+  },
+  {
+    "id": "prod_0209",
+    "nombre": "Shampoo Sedal",
+    "descripcion": "Shampoo Sedal disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/shampoo_sedal_340ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shampoo-sedal-340ml",
+    "palabras_clave": "shampoo, sedal, 340ml"
+  },
+  {
+    "id": "prod_0210",
+    "nombre": "Shampoo Sedal Control Caspa",
+    "descripcion": "Shampoo Sedal Control Caspa disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 9.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/shampoo_sedal_control_caspa_340ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shampoo-sedal-control-caspa-340ml",
+    "palabras_clave": "shampoo, sedal, control, caspa, 340ml"
+  },
+  {
+    "id": "prod_0211",
+    "nombre": "Crema para Peinar Sedal",
+    "descripcion": "Crema para Peinar Sedal disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 8.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/crema_para_peinar_sedal_300ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "crema-para-peinar-sedal-300ml",
+    "palabras_clave": "crema, para, peinar, sedal, 300ml"
+  },
+  {
+    "id": "prod_0212",
+    "nombre": "Shampoo Drene",
+    "descripcion": "Shampoo Drene disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 8.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/shampoo_drene_370ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shampoo-drene-370ml",
+    "palabras_clave": "shampoo, drene, 370ml"
+  },
+  {
+    "id": "prod_0213",
+    "nombre": "Acondicionador Drene",
+    "descripcion": "Acondicionador Drene disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 8.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/acondicionador_drene_370ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "acondicionador-drene-370ml",
+    "palabras_clave": "acondicionador, drene, 370ml"
+  },
+  {
+    "id": "prod_0214",
+    "nombre": "Gel de Ducha Dalan",
+    "descripcion": "Gel de Ducha Dalan disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/gel_de_ducha_dalan_450ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "gel-de-ducha-dalan-450ml",
+    "palabras_clave": "gel, ducha, dalan, 450ml"
+  },
+  {
+    "id": "prod_0215",
+    "nombre": "Shampoo Dalan",
+    "descripcion": "Shampoo Dalan disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 5.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/shampoo_dalan_450ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shampoo-dalan-450ml",
+    "palabras_clave": "shampoo, dalan, 450ml"
+  },
+  {
+    "id": "prod_0216",
+    "nombre": "Shampoo 2en1 Palmolive Optims",
+    "descripcion": "Shampoo 2en1 Palmolive Optims disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 15.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/shampoo_2en1_palmolive_optims_700ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shampoo-2en1-palmolive-optims-700ml",
+    "palabras_clave": "shampoo, 2en1, palmolive, optims, 700ml"
+  },
+  {
+    "id": "prod_0217",
+    "nombre": "Pre-Tratamiento Capilar BBCream",
+    "descripcion": "Pre-Tratamiento Capilar BBCream disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 6.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pre_tratamiento_capilar_bbcream.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "pre-tratamiento-capilar-bbcream",
+    "palabras_clave": "pre-tratamiento, capilar, bbcream"
+  },
+  {
+    "id": "prod_0218",
+    "nombre": "Pre-Tratamiento Color Protección",
+    "descripcion": "Pre-Tratamiento Color Protección disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 6.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/pre_tratamiento_color_proteccion.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "pre-tratamiento-color-proteccion",
+    "palabras_clave": "pre-tratamiento, color, protección"
+  },
+  {
+    "id": "prod_0219",
+    "nombre": "Shampoo Dove Nutrición Tri-Óleos",
+    "descripcion": "Shampoo Dove Nutrición Tri-Óleos disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 12.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/shampoo_dove_nutricion_tri_oleos.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shampoo-dove-nutricion-tri-oleos",
+    "palabras_clave": "shampoo, dove, nutrición, tri-óleos"
+  },
+  {
+    "id": "prod_0220",
+    "nombre": "Shampoo Savital",
+    "descripcion": "Shampoo Savital disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 9.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/shampoo_savital_510ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shampoo-savital-510ml",
+    "palabras_clave": "shampoo, savital, 510ml"
+  },
+  {
+    "id": "prod_0221",
+    "nombre": "Shampoo Bio Every Night",
+    "descripcion": "Shampoo Bio Every Night disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 8.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/shampoo_bio_every_night_365ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shampoo-bio-every-night-365ml",
+    "palabras_clave": "shampoo, bio, every, night, 365ml"
+  },
+  {
+    "id": "prod_0222",
+    "nombre": "Crema para Peinar Bio Every Night",
+    "descripcion": "Crema para Peinar Bio Every Night disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/crema_para_peinar_bio_every_night_300ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "crema-para-peinar-bio-every-night-300ml",
+    "palabras_clave": "crema, para, peinar, bio, every"
+  },
+  {
+    "id": "prod_0223",
+    "nombre": "Tratamiento Capilar Every Night",
+    "descripcion": "Tratamiento Capilar Every Night disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/tratamiento_capilar_every_night_350gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "tratamiento-capilar-every-night-350gr",
+    "palabras_clave": "tratamiento, capilar, every, night, 350gr"
+  },
+  {
+    "id": "prod_0224",
+    "nombre": "Crema para Peinar Rolda",
+    "descripcion": "Crema para Peinar Rolda disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 5.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/crema_para_peinar_rolda_300ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "crema-para-peinar-rolda-300ml",
+    "palabras_clave": "crema, para, peinar, rolda, 300ml"
+  },
+  {
+    "id": "prod_0225",
+    "nombre": "Loción Corporal Vaseline",
+    "descripcion": "Loción Corporal Vaseline disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 5.2,
+    "stock": 100,
+    "imagen_urls": [],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "locion-corporal-vaseline-200ml",
+    "palabras_clave": "loción, corporal, vaseline, 200ml"
+  },
+  {
+    "id": "prod_0226",
+    "nombre": "Crema Corporal Every Night",
+    "descripcion": "Crema Corporal Every Night disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 4.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/crema_corporal_every_night_200ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "crema-corporal-every-night-200ml",
+    "palabras_clave": "crema, corporal, every, night, 200ml"
+  },
+  {
+    "id": "prod_0227",
+    "nombre": "Crema Corporal Nivea",
+    "descripcion": "Crema Corporal Nivea disponible para delivery.",
+    "categoria": "Lácteos",
+    "precio_usd": 5.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/crema_corporal_nivea_100ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "crema-corporal-nivea-100ml",
+    "palabras_clave": "crema, corporal, nivea, 100ml"
+  },
+  {
+    "id": "prod_0228",
+    "nombre": "Agua Micelar Nivea",
+    "descripcion": "Agua Micelar Nivea disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 17.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/agua_micelar_nivea_400ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "agua-micelar-nivea-400ml",
+    "palabras_clave": "agua, micelar, nivea, 400ml"
+  },
+  {
+    "id": "prod_0229",
+    "nombre": "Jabón Azul Vale",
+    "descripcion": "Jabón Azul Vale disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 0.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/jabon_azul_vale_200gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "jabon-azul-vale-200gr",
+    "palabras_clave": "jabón, azul, vale, 200gr"
+  },
+  {
+    "id": "prod_0230",
+    "nombre": "Toallas Abunda. Nocturnas Alive 8uni",
+    "descripcion": "Toallas Abunda. Nocturnas Alive 8uni disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 2.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/toallas_abunda_nocturnas_alive_8uni.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "toallas-abunda-nocturnas-alive-8uni",
+    "palabras_clave": "toallas, abunda., nocturnas, alive, 8uni"
+  },
+  {
+    "id": "prod_0231",
+    "nombre": "Toalla Delgada Diva Día y Noche",
+    "descripcion": "Toalla Delgada Diva Día y Noche disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 2.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/toalla_delgada_diva_dia_y_noche_10und.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "toalla-delgada-diva-dia-y-noche-10und",
+    "palabras_clave": "toalla, delgada, diva, día, noche"
+  },
+  {
+    "id": "prod_0232",
+    "nombre": "Toallas Always Ultra Suave Día 10und",
+    "descripcion": "Toallas Always Ultra Suave Día 10und disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 3.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/toallas_always_ultra_suave_dia_10und_45gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "toallas-always-ultra-suave-dia-10und-45gr",
+    "palabras_clave": "toallas, always, ultra, suave, día"
+  },
+  {
+    "id": "prod_0233",
+    "nombre": "Toallas Always Noche F Abund. 22und 3D",
+    "descripcion": "Toallas Always Noche F Abund. 22und 3D disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 8.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/toallas_always_noche_f_abund_22und_3d_277gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "toallas-always-noche-f-abund-22und-3d-277gr",
+    "palabras_clave": "toallas, always, noche, abund., 22und"
+  },
+  {
+    "id": "prod_0234",
+    "nombre": "Protect. Diario Sin Perfume Always",
+    "descripcion": "Protect. Diario Sin Perfume Always disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 4.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/protect_diario_sin_perfume_always_40und.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "protect-diario-sin-perfume-always-40und",
+    "palabras_clave": "protect., diario, sin, perfume, always"
+  },
+  {
+    "id": "prod_0235",
+    "nombre": "Toallas Regular Always",
+    "descripcion": "Toallas Regular Always disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 5.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/toallas_regular_always.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "toallas-regular-always",
+    "palabras_clave": "toallas, regular, always"
+  },
+  {
+    "id": "prod_0236",
+    "nombre": "Protector Diario Largos Always",
+    "descripcion": "Protector Diario Largos Always disponible para delivery.",
+    "categoria": "Higiene Personal",
+    "precio_usd": 4.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/protect_diario_sin_perfume_always_40und.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "protector-diario-largos-always-50und",
+    "palabras_clave": "protector, diario, largos, always, 50und"
+  },
+  {
+    "id": "prod_0237",
+    "nombre": "Vale Detergente en Polvo",
+    "descripcion": "Vale Detergente en Polvo disponible en diferentes presentaciones.",
+    "categoria": "Limpieza",
+    "precio_usd": 3.4,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/vale_detergente_en_polvo_400g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "vale-detergente-en-polvo",
+    "palabras_clave": "vale, detergente, polvo, 900gr",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "900GR",
+        "price_usd": 3.4,
+        "description": "Vale Detergente en Polvo - 900GR"
+      },
+      {
+        "id": "size_2",
+        "name": "400G",
+        "price_usd": 1.6,
+        "description": "Vale Detergente en Polvo - 400G"
+      }
+    ]
+  },
+  {
+    "id": "prod_0238",
+    "nombre": "Detergente en Polvo Premio",
+    "descripcion": "Detergente en Polvo Premio disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 2.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/detergente_en_polvo_premio_800gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "detergente-en-polvo-premio-800gr",
+    "palabras_clave": "detergente, polvo, premio, 800gr"
+  },
+  {
+    "id": "prod_0239",
+    "nombre": "Ace Detergente en Polvo",
+    "descripcion": "Ace Detergente en Polvo disponible en diferentes presentaciones.",
+    "categoria": "Limpieza",
+    "precio_usd": 2.2,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/ace_detergente_en_polvo_400gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "ace-detergente-en-polvo",
+    "palabras_clave": "ace, detergente, polvo, 400gr",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "400GR",
+        "price_usd": 2.2,
+        "description": "Ace Detergente en Polvo - 400GR"
+      },
+      {
+        "id": "size_2",
+        "name": "800GR",
+        "price_usd": 4.3,
+        "description": "Ace Detergente en Polvo - 800GR"
+      }
+    ]
+  },
+  {
+    "id": "prod_0240",
+    "nombre": "Detergente Ariel con Downy",
+    "descripcion": "Detergente Ariel con Downy disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 4.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/detergente_ariel_con_downy_800gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "detergente-ariel-con-downy-800gr",
+    "palabras_clave": "detergente, ariel, con, downy, 800gr"
+  },
+  {
+    "id": "prod_0241",
+    "nombre": "Detergente L.Activa Las Llaves",
+    "descripcion": "Detergente L.Activa Las Llaves disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 3.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/desinfectante_las_llaves_500ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "detergente-lactiva-las-llaves-900gr",
+    "palabras_clave": "detergente, l.activa, las, llaves, 900gr"
+  },
+  {
+    "id": "prod_0242",
+    "nombre": "Detergente en Polvo Las Llaves",
+    "descripcion": "Detergente en Polvo Las Llaves disponible para delivery.",
+    "categoria": "Limpieza",
+    "precio_usd": 4.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/detergente_en_polvo_las_llaves_900gr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "detergente-en-polvo-las-llaves-900gr",
+    "palabras_clave": "detergente, polvo, las, llaves, 900gr"
+  },
+  {
+    "id": "prod_0243",
+    "nombre": "Tequeños Fiestero 50und Teque Trof",
+    "descripcion": "Tequeños Fiestero 50und Teque Trof disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 6.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/tequenos_fiestero_50und_teque_trof.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "tequenos-fiestero-50und-teque-trof",
+    "palabras_clave": "tequeños, fiestero, 50und, teque, trof"
+  },
+  {
+    "id": "prod_0244",
+    "nombre": "Rikomalt 250ml Parmalat",
+    "descripcion": "Rikomalt 250ml Parmalat disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 2.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/rikomalt_250ml_parmalat.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "rikomalt-250ml-parmalat",
+    "palabras_clave": "rikomalt, 250ml, parmalat"
+  },
+  {
+    "id": "prod_0245",
+    "nombre": "Aguafiel",
+    "descripcion": "Aguafiel disponible en diferentes presentaciones.",
+    "categoria": "Bebidas",
+    "precio_usd": 0.65,
+    "stock": 200,
+    "imagen_urls": [
+      "productos/aguafiel_1_5_l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "aguafiel",
+    "palabras_clave": "aguafiel, 600ml",
+    "sizes": [
+      {
+        "id": "size_1",
+        "name": "600ML",
+        "price_usd": 0.65,
+        "description": "Aguafiel - 600ML"
+      },
+      {
+        "id": "size_2",
+        "name": "1.5 L",
+        "price_usd": 1.35,
+        "description": "Aguafiel - 1.5 L"
+      }
+    ]
+  },
+  {
+    "id": "prod_0246",
+    "nombre": "Green Spot",
+    "descripcion": "Green Spot disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 1.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/bebida_green_spot_500ml.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "green-spot-500ml",
+    "palabras_clave": "green, spot, 500ml"
+  },
+  {
+    "id": "prod_0247",
+    "nombre": "Jugo Parmalat",
+    "descripcion": "Jugo Parmalat disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 2.45,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/jugo_parmalat_1ltr.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "jugo-parmalat-1ltr",
+    "palabras_clave": "jugo, parmalat, 1ltr"
+  },
+  {
+    "id": "prod_0248",
+    "nombre": "Yogurt 1Lt Parmalat",
+    "descripcion": "Yogurt 1Lt Parmalat disponible para delivery.",
+    "categoria": "Bebidas",
+    "precio_usd": 4.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos/yogurt_1lt_parmalat.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": false,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "yogurt-1lt-parmalat",
+    "palabras_clave": "yogurt, 1lt, parmalat"
+  }
+]

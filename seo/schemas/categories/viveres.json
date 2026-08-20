@@ -1,0 +1,14 @@
+{
+  "@context": "https://schema.org",
+  "@type": "MenuSection",
+  "name": "Víveres y Supermercado",
+  "description": "Charcutería, harina, arroz, aceite, enlatados y todo lo que necesitas para resolver el mercado.",
+  "url": "https://marketcoffeesweet.com/catalog?category=Viveres",
+  "hasMenuSection": [],
+  "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "0.50",
+    "highPrice": "20.00"
+  }
+}

@@ -11,26 +11,7 @@
   "theme_color": "#2D6A4F",
   "background_color": "#2D6A4F",
   "prefer_related_applications": false,
-  "icons": [
-    {
-      "src": "/coffe/icon.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/coffe/icon.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/coffe/icon.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ],
+  "icons": [],
   "categories": ["food", "restaurants"],
   "shortcuts": [
     {
@@ -38,7 +19,7 @@
       "short_name": "Menú",
       "url": "/coffe/?tab=catalog",
       "description": "Explora nuestros productos de mercado, panadería y comida rápida.",
-      "icons": [{"src": "/coffe/icon.png", "sizes": "192x192"}]
+      "icons": []
     }
   ]
 }

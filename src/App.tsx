@@ -5,6 +5,7 @@ import { Catalog } from './pages/Catalog';
 import { Checkout } from './pages/Checkout';
 import Admin from './pages/admin/index';
 import { UserProfile } from './pages/UserProfile';
+import { NotFound } from './pages/NotFound';
 import { Navigation } from './components/Navigation';
 import { BottomNav } from './components/BottomNav';
 import { FoodItem } from './types/store';
@@ -185,8 +186,12 @@ function AppContent() {
   };
 
   // Route/Tab controllers - si es admin/operador autenticado O si la URL es /admin, abrir directo en su panel
-  const isAdminUrl = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const isAdminUrl = pathname.startsWith('/admin') || pathname.startsWith('/coffe/admin');
+  const isHome = pathname === '/' || pathname === '/coffe' || pathname === '/coffe/' || pathname === '';
+  const is404Url = !isHome && !isAdminUrl;
   const [tab, setTab] = useState<'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout'>((isAdminAuthenticated || isAdminUrl) ? 'admin' : 'home');
+  const [is404, setIs404] = useState(is404Url);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -219,10 +224,16 @@ function AppContent() {
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname;
-      if (path.startsWith('/admin')) {
+      const isNowAdmin = path.startsWith('/admin') || path.startsWith('/coffe/admin');
+      const isNowHome = path === '/' || path === '/coffe' || path === '/coffe/' || path === '';
+      if (isNowAdmin) {
         setTab('admin');
+        setIs404(false);
+      } else if (!isNowHome) {
+        setIs404(true);
       } else {
         setTab('home');
+        setIs404(false);
       }
     };
     window.addEventListener('popstate', handlePopState);
@@ -349,6 +360,10 @@ function AppContent() {
 
           {tab === 'profile' && (
             <UserProfile setTab={setTab} deferredPrompt={deferredPrompt} onInstallClick={handleInstallClick} />
+          )}
+
+          {is404 && (
+            <NotFound onGoHome={() => { window.history.pushState({}, '', '/'); setTab('home'); setIs404(false); }} />
           )}
         </main>
 

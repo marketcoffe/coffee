@@ -1,0 +1,14 @@
+{
+  "@context": "https://schema.org",
+  "@type": "MenuSection",
+  "name": "Chucherías y Snacks",
+  "description": "Papitas, golosinas, chocolates, snacks y todo para picar entre horas.",
+  "url": "https://marketcoffeesweet.com/catalog?category=Chucherias",
+  "hasMenuSection": [],
+  "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "0.25",
+    "highPrice": "5.00"
+  }
+}

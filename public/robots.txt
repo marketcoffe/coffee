@@ -1,8 +1,6 @@
-# robots.txt — SEO Technical
+# robots.txt — Market Coffee Sweet
 User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /api/
-Disallow: /checkout
 
-Sitemap: https://foodapp.com.ve/sitemap.xml
+Sitemap: https://marketcoffeesweet.com/sitemap.xml

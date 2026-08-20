@@ -1,83 +1,45 @@
-// schemas.js — SEO Premium JSON-LD para White Label
+// schemas.js — SEO JSON-LD para Market Coffee Sweet
 /* global window */
+
+const SITE_URL = 'https://marketcoffeesweet.com';
 
 export function getOrganizationSchema(config) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": config.site_nombre,
-    "url": config.site_url || (typeof window !== 'undefined' ? window.location.origin : ''),
-    "logo": config.logo_url,
-    "description": config.seo_home_description,
+    "@id": `${SITE_URL}/#organization`,
+    "name": "Market Coffee Sweet",
+    "url": SITE_URL,
+    "logo": {
+      "@type": "ImageObject",
+      "url": config.logo_url || `${SITE_URL}/logo.png`,
+      "width": 512,
+      "height": 512
+    },
+    "description": "Panadería, comida rápida, víveres y delivery en El Trigal, Valencia.",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": config.direccion_fisica,
+      "streetAddress": config.direccion_fisica || "Av. Principal El Trigal, justo al frente de Patio Trigal",
       "addressLocality": "Valencia",
       "addressRegion": "Carabobo",
+      "postalCode": "2001",
       "addressCountry": "VE"
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": config.coordenadas_tienda?.lat,
-      "longitude": config.coordenadas_tienda?.lng
+      "latitude": config.coordenadas_tienda?.lat || 10.2185,
+      "longitude": config.coordenadas_tienda?.lng || -68.0021
     },
     "sameAs": [
-      config.instagram_url,
-      config.twitter_url,
-      config.facebook_url,
-      config.tiktok_url,
-      config.youtube_url
-    ].filter(Boolean),
+      "https://www.instagram.com/marketcoffeesweet",
+      "https://www.tiktok.com/@marketcoffeesweet"
+    ],
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": config.telefono_soporte,
+      "telephone": config.telefono_soporte || "+584121234567",
       "contactType": "customer service",
-      "availableLanguage": "Spanish"
-    }
-  };
-}
-
-export function getRestaurantSchema(config) {
-  return {
-    "@context": "https://schema.org",
-    "@type": config.jsonld_type || "Restaurant",
-    "name": config.site_nombre,
-    "image": config.banners?.[0] || config.logo_url,
-    "url": config.site_url || (typeof window !== 'undefined' ? window.location.origin : ''),
-    "description": config.seo_home_description,
-    "priceRange": config.jsonld_priceRange || "$$",
-    "servesCuisine": config.jsonld_servesCuisine || ["Comida Rápida", "Hamburguesas", "Pizzas"],
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": config.direccion_fisica,
-      "addressLocality": "Valencia",
-      "addressRegion": "Carabobo",
-      "addressCountry": "VE"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": config.coordenadas_tienda?.lat,
-      "longitude": config.coordenadas_tienda?.lng
-    },
-    "hasMenu": {
-      "@type": "Menu",
-      "url": `${config.site_url || (typeof window !== 'undefined' ? window.location.origin : '')}/catalog`
-    },
-    "acceptsReservations": config.tiene_mesas ? "True" : "False",
-    "potentialAction": {
-      "@type": "OrderAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": `${config.site_url || (typeof window !== 'undefined' ? window.location.origin : '')}/checkout`,
-        "actionPlatform": [
-          "http://schema.org/DesktopWebPlatform",
-          "http://schema.org/MobileWebPlatform"
-        ]
-      },
-      "result": {
-        "@type": "Order",
-        "orderStatus": "http://schema.org/Orderplaced"
-      }
+      "availableLanguage": "Spanish",
+      "areaServed": "VE"
     }
   };
 }
@@ -85,70 +47,190 @@ export function getRestaurantSchema(config) {
 export function getLocalBusinessSchema(config) {
   return {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "name": config.site_nombre,
-    "image": config.banners?.[0] || config.logo_url,
-    "url": config.site_url || (typeof window !== 'undefined' ? window.location.origin : ''),
-    "telephone": config.telefono_soporte,
+    "@type": ["Bakery", "GroceryStore", "FastFoodRestaurant"],
+    "@id": `${SITE_URL}/#localbusiness`,
+    "name": "Market Coffee Sweet",
+    "url": SITE_URL,
+    "telephone": config.telefono_soporte || "+584121234567",
     "priceRange": config.jsonld_priceRange || "$$",
+    "image": [
+      config.banners?.[0] || config.logo_url || `${SITE_URL}/fachada.jpg`,
+      config.logo_url || `${SITE_URL}/logo.png`
+    ],
+    "logo": config.logo_url || `${SITE_URL}/logo.png`,
+    "description": "Panadería fresca, hamburguesas, shawarmas, víveres, frutas, verduras, bebidas y agua potable con delivery en El Trigal, Valencia.",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": config.direccion_fisica,
+      "streetAddress": config.direccion_fisica || "Av. Principal El Trigal, justo al frente de Patio Trigal",
       "addressLocality": "Valencia",
       "addressRegion": "Carabobo",
+      "postalCode": "2001",
       "addressCountry": "VE"
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": config.coordenadas_tienda?.lat,
-      "longitude": config.coordenadas_tienda?.lng
+      "latitude": config.coordenadas_tienda?.lat || 10.2185,
+      "longitude": config.coordenadas_tienda?.lng || -68.0021
+    },
+    "areaServed": [
+      { "@type": "Place", "name": "El Trigal" },
+      { "@type": "Place", "name": "La Trigaleña" },
+      { "@type": "Place", "name": "Prebo" },
+      { "@type": "Place", "name": "La Viña" },
+      { "@type": "Place", "name": "Mañongo" },
+      { "@type": "AdministrativeArea", "name": "Valencia" },
+      { "@type": "AdministrativeArea", "name": "Naguanagua" },
+      { "@type": "AdministrativeArea", "name": "San Diego" }
+    ],
+    "servesCuisine": config.jsonld_servesCuisine || [
+      "Panadería",
+      "Comida Rápida",
+      "Hamburguesas",
+      "Shawarma",
+      "Perros Calientes",
+      "Víveres",
+      "Bebidas"
+    ],
+    "hasMenu": {
+      "@type": "Menu",
+      "url": SITE_URL
     },
     "openingHoursSpecification": [
       {
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-        "opens": "10:00",
+        "opens": "07:00",
         "closes": "22:00"
       }
     ],
+    "acceptsReservations": "False",
     "sameAs": [
-      config.instagram_url,
-      config.facebook_url,
-      config.twitter_url
-    ].filter(Boolean)
+      "https://www.instagram.com/marketcoffeesweet",
+      "https://www.tiktok.com/@marketcoffeesweet"
+    ]
+  };
+}
+
+export function getRestaurantSchema(config) {
+  return {
+    "@context": "https://schema.org",
+    "@type": config.jsonld_type || "FastFoodRestaurant",
+    "@id": `${SITE_URL}/#localbusiness`,
+    "name": "Market Coffee Sweet",
+    "image": config.banners?.[0] || config.logo_url || `${SITE_URL}/fachada.jpg`,
+    "url": SITE_URL,
+    "description": "Panadería fresca, hamburguesas, shawarmas, víveres, frutas, verduras, bebidas y agua potable con delivery en El Trigal, Valencia.",
+    "priceRange": config.jsonld_priceRange || "$$",
+    "servesCuisine": config.jsonld_servesCuisine || [
+      "Panadería",
+      "Comida Rápida",
+      "Hamburguesas",
+      "Shawarma",
+      "Perros Calientes",
+      "Víveres",
+      "Bebidas"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": config.direccion_fisica || "Av. Principal El Trigal, justo al frente de Patio Trigal",
+      "addressLocality": "Valencia",
+      "addressRegion": "Carabobo",
+      "postalCode": "2001",
+      "addressCountry": "VE"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": config.coordenadas_tienda?.lat || 10.2185,
+      "longitude": config.coordenadas_tienda?.lng || -68.0021
+    },
+    "hasMenu": {
+      "@type": "Menu",
+      "url": SITE_URL
+    },
+    "acceptsReservations": config.tiene_mesas ? "True" : "False"
   };
 }
 
 export function getProductSchema(product, config) {
-  return {
+  const siteUrl = config.site_url || SITE_URL;
+
+  const categoryMap = {
+    'Mercado': 'Víveres y Supermercado',
+    'Panaderia': 'Panadería y Pastelería',
+    'Panadería': 'Panadería y Pastelería',
+    'Comida Rapida': 'Comida Rápida',
+    'Comida Rápida': 'Comida Rápida',
+    'Bebidas': 'Bebidas y Licores',
+    'Frutas y Verduras': 'Frutas y Verduras Frescas',
+    'Snacks': 'Chucherías y Snacks',
+    'Chucherias': 'Chucherías y Snacks',
+    'Agua Potable': 'Agua Potable',
+    'Licores': 'Bebidas y Licores',
+    'Limpieza': 'Víveres y Supermercado',
+    'Higiene': 'Víveres y Supermercado'
+  };
+
+  const categoryPath = product.subcategoria
+    ? `${categoryMap[product.categoria] || product.categoria} > ${product.subcategoria}`
+    : (categoryMap[product.categoria] || product.categoria);
+
+  const getAvailability = () => {
+    if (product.disponibilidad === 'Agotado') return 'https://schema.org/OutOfStock';
+    if (product.disponibilidad === 'En Reposición') return 'https://schema.org/PreOrder';
+    if (product.stock > 0) return 'https://schema.org/InStock';
+    return 'https://schema.org/OutOfStock';
+  };
+
+  const schema = {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": product.nombre,
-    "description": product.descripcion,
-    "image": product.imagen_urls?.[0],
+    "description": product.descripcion
+      ? `${product.descripcion}. Ingredientes: ${(product.ingredientes || []).join(', ')}.`
+      : `${product.nombre} de Market Coffee Sweet. Delivery en Valencia, El Trigal y alrededores.`,
+    "image": product.imagen_urls?.filter(Boolean).length > 0
+      ? product.imagen_urls.filter(Boolean)
+      : [`${siteUrl}/logo.png`],
+    "url": siteUrl,
     "brand": {
       "@type": "Brand",
-      "name": config.site_nombre
+      "name": "Market Coffee Sweet",
+      "url": siteUrl
     },
+    "category": categoryPath,
     "offers": {
       "@type": "Offer",
-      "url": `${config.site_url || (typeof window !== 'undefined' ? window.location.origin : '')}/product/${product.id}`,
+      "url": siteUrl,
       "priceCurrency": "USD",
       "price": product.precio_usd,
-      "availability": product.stock > 0
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
+      "availability": getAvailability(),
+      "itemCondition": "https://schema.org/NewCondition",
       "seller": {
         "@type": "Organization",
-        "name": config.site_nombre
+        "@id": `${SITE_URL}/#organization`,
+        "name": "Market Coffee Sweet"
       }
     },
     "aggregateRating": product.averageRating ? {
       "@type": "AggregateRating",
       "ratingValue": product.averageRating,
-      "reviewCount": product.reviewCount || 1
+      "reviewCount": product.reviewCount || 1,
+      "bestRating": 5,
+      "worstRating": 1
     } : undefined
   };
+
+  if (product.es_promo && product.precio_anterior_usd) {
+    schema.offers = {
+      ...schema.offers,
+      "@type": "AggregateOffer",
+      "lowPrice": product.precio_usd,
+      "highPrice": product.precio_anterior_usd,
+      "priceValidUntil": product.promo_end_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    };
+  }
+
+  return schema;
 }
 
 export function getFAQSchema(faqItems) {
@@ -168,7 +250,6 @@ export function getFAQSchema(faqItems) {
 }
 
 export function getBreadcrumbSchema(config, items) {
-  const origin = config.site_url || (typeof window !== 'undefined' ? window.location.origin : '');
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -176,25 +257,21 @@ export function getBreadcrumbSchema(config, items) {
       "@type": "ListItem",
       "position": index + 1,
       "name": item.name,
-      "item": item.url || `${origin}${item.path}`
+      "item": item.url || SITE_URL
     }))
   };
 }
 
 export function getWebsiteSchema(config) {
-  const origin = config.site_url || (typeof window !== 'undefined' ? window.location.origin : '');
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": config.site_nombre,
-    "url": origin,
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": `${origin}/catalog?q={search_term_string}`
-      },
-      "query-input": "required name=search_term_string"
+    "@id": `${SITE_URL}/#website`,
+    "name": "Market Coffee Sweet",
+    "url": SITE_URL,
+    "description": "Panadería, comida rápida, víveres y delivery en El Trigal, Valencia.",
+    "publisher": {
+      "@id": `${SITE_URL}/#organization`
     }
   };
 }

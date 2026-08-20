@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { FoodItem, Order, StoreConfig, InAppNotification, OrderItem, AppUser, Coupon, CartItem, SelectedOption, ProductReview, FlashSale, LoyaltyTransaction, LoyaltyTier, Promotion, RewardItem, UserRole } from '../types/store';
 import { supabase } from './supabaseClient';
+import productsData from '../data/products.json';
 
 interface AppContextProps {
   foodItems: FoodItem[];
@@ -121,7 +122,7 @@ interface AppContextProps {
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
-// INITIAL PRODUCTS DATA - Market Coffee (3 en 1: Mercado, Panaderia, Comida Rapida)
+  // INITIAL PRODUCTS DATA - Market Coffee Sweet
 const DEFAULT_PRODUCTS: FoodItem[] = [
   // ═══════════════════════════════════════════════════
   // MERCADO - Frutas y Verduras
@@ -622,18 +623,48 @@ const DEFAULT_PRODUCTS: FoodItem[] = [
     categoria: 'Panaderia', subcategoria: 'Dulces', precio_usd: 1.00, stock: 60, imagen_urls: ['https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&q=80&w=500'],
     es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
     ingredientes: ['Gelatina'], option_groups: []
-  }
+  },
+  // ═══════════════════════════════════════════════════
+  // PRODUCTOS IMPORTADOS DESDE CSV
+  // ═══════════════════════════════════════════════════
+  ...(productsData as any[]).map((p: any) => ({
+    id: p.id,
+    nombre: p.nombre,
+    descripcion: p.descripcion,
+    categoria: p.categoria,
+    subcategoria: '',
+    precio_usd: p.precio_usd,
+    stock: p.stock,
+    imagen_urls: p.imagen_urls || [],
+    es_promo: p.es_promo || false,
+    es_nuevo: p.es_nuevo || false,
+    es_mas_vendido: p.es_mas_vendido || false,
+    delivery_gratis: false,
+    ingredientes: [],
+    option_groups: p.sizes ? [{
+      id: `og-${p.id}`,
+      nombre: 'Presentación',
+      min_select: 1,
+      max_select: 1,
+      options: p.sizes.map((s: any) => ({
+        id: s.id,
+        nombre: s.name,
+        precio_usd: s.price_usd,
+        activo: true
+      }))
+    }] : []
+  }))
 ];
 
 const DEFAULT_CONFIG: StoreConfig = {
   site_nombre: 'Market Coffee Sweet',
   telefono_soporte: '+584124058904',
-  direccion_fisica: 'Av. Principal, Local #12, Valencia',
-  coordenadas_tienda: { lat: 10.198300, lng: -68.004400 },
+  direccion_fisica: 'Av. Principal El Trigal, justo al frente de Patio Trigal, Valencia, Carabobo',
+  coordenadas_tienda: { lat: 10.2185, lng: -68.0021 },
   banners: [
-    'https://images.unsplash.com/photo-1784676527659-0f2e1a2fed48?w=1500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTA5fHxwYW4lMjBhcnRlc2FuYWx8ZW58MHwwfDB8fHwy',
-    'https://images.unsplash.com/photo-1653222470894-f0c46e707ae4?w=1500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8ODV8fGZydXRhcyUyMHklMjB2ZXJkdXJhc3xlbnwwfDB8MHx8fDI%3D',
-    'https://images.unsplash.com/photo-1643224191254-7d8dae331966?w=1500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGhhbWJ1cmd1ZXNhJTIwY29tYm98ZW58MHwwfDB8fHwy'
+    '/imagen/combo-banner.webp',
+    '/imagen/panaderia-banner.webp',
+    '/imagen/charcuteria-banner.webp'
   ],
   zelle_enabled: true,
   zelle_data: 'pagos@marketcoffee.com.ve',
@@ -649,48 +680,84 @@ const DEFAULT_CONFIG: StoreConfig = {
   transferencia_discount_percent: 0,
   tasa_cambio: 612.43,
   logo_url: '/coffe/logo.png',
-  theme_color: '#2D6A4F',
-  mensaje_bienvenida: 'Tu mercado, panaderia y comida rapida favorita. Todo en un solo lugar con delivery express.',
+  theme_color: '#6E472A',
+  secondary_color: '#A4D045',
+  mensaje_bienvenida: 'Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado.',
   delivery_gratis: false,
   costo_delivery_km: 1.5,
   recogida_en_local: true,
   entrega_por_zonas: true,
   delivery_zonas: [
-    { id: 'z1', name: 'Cercano (0-3 km)', cost: 2.00, minKm: 0, maxKm: 3 },
-    { id: 'z2', name: 'Medio (3-8 km)', cost: 4.50, minKm: 3, maxKm: 8 },
-    { id: 'z3', name: 'Lejano (8-18 km)', cost: 7.00, minKm: 8, maxKm: 18 },
+    { id: 'z1', name: 'El Trigal (0-3 km)', cost: 2.00, minKm: 0, maxKm: 3 },
+    { id: 'z2', name: 'La Trigaleña / Prebo (3-8 km)', cost: 4.50, minKm: 3, maxKm: 8 },
+    { id: 'z3', name: 'La Viña / Mañongo / Naguanagua / San Diego (8-18 km)', cost: 7.00, minKm: 8, maxKm: 18 },
   ],
   favicon_url: '',
   pwa_icon_url: '',
   splash_logo_url: '',
   banner_texts: [
-    'Mercado, Panaderia y Comida Rapida',
+    'Panadería, Comida Rápida y Víveres',
     'Combos que Enamoran',
     'Pan Fresco todos los dias'
   ],
   banner_titles: [
-    'Mercado, Panaderia y Comida Rapida',
+    'Panadería, Comida Rápida y Víveres',
     'Combos Especiales para ti',
     'Pan Artesanal Fresco'
   ],
   banner_descriptions: [
-    'Frutas, verduras, lacteos y todo para tu hogar',
-    'Hamburguesas, shawarma, perros calientes y mas',
-    'Pan de guayaba, campesino, palmeritas y dulces'
+    'Pan fresco, tortas, dulces y pastelería del día',
+    'Hamburguesas, shawarma, perros calientes y más',
+    'Frutas, verduras, víveres y todo para tu hogar'
   ],
+  hero_title: 'Market Coffee Sweet',
+  hero_subtitle: 'Tu minimarket de confianza en El Trigal, Valencia. Panadería fresca, comida rápida, víveres y más con delivery a domicilio.',
+  hero_cta_text: 'Ver Catálogo',
   hero_cta_url: '',
   categories: [
-    'Mercado',
+    'Abarrotes y Despensa',
+    'Bebidas',
+    'Carnicería',
+    'Charcutería y Embutidos',
+    'Conservas',
+    'Higiene Personal',
+    'Hogar',
+    'Lácteos',
+    'Limpieza',
+    'Mascotas',
+    'Salsas y Condimentos',
+    'Snacks y Frituras',
     'Panaderia',
     'Comida Rapida',
-    'Combos',
+    'Viveres',
+    'Repostería',
   ],
   subcategories: {
-    'Mercado': ['Frutas y Verduras', 'Lacteos y Embutidos', 'Abarrotes', 'Snacks', 'Bebidas', 'Limpieza e Higiene'],
-    'Panaderia': ['Panes', 'Pasteleria', 'Dulces'],
-    'Comida Rapida': ['Hamburguesas', 'Shawarmas', 'Perros Calientes', 'Bebidas'],
-    'Combos': ['Combo Individual', 'Combo Familiar', 'Combo Especial'],
+    'Abarrotes y Despensa': ['Arroces', 'Pastas', 'Harinas', 'Aceites', 'Cereales'],
+    'Bebidas': ['Agua', 'Jugos', 'Té', 'Gaseosas', 'Lácteos', 'Alcohólicas'],
+    'Carnicería': ['Cerdo', 'Res', 'Pollo', 'Embutidos'],
+    'Charcutería y Embutidos': ['Chorizo', 'Morcilla', 'Embutidos'],
+    'Conservas': ['Atún', 'Sardinas', 'Aceitunas', 'Salsas', 'Vegetales'],
+    'Higiene Personal': ['Shampoo', 'Acondicionador', 'Cuidado Dental', 'Desodorantes', 'Toallas'],
+    'Hogar': ['Papel', 'Bolsas', 'Velas', 'Aromatizantes'],
+    'Lácteos': ['Margarina', 'Mayonesa', 'Mantequilla'],
+    'Limpieza': ['Detergentes', 'Desinfectantes', 'Suavizantes', 'Limpiadores'],
+    'Mascotas': ['Perros', 'Gatos', 'Higiene'],
+    'Salsas y Condimentos': ['Ketchup', 'Mostaza', 'Mayonesa', 'Salsas'],
+    'Snacks y Frituras': ['Papas', 'Tostones', 'Chicharrones'],
+    'Panaderia': ['Panes', 'Pasteleria', 'Dulces', 'Tortas'],
+    'Comida Rapida': ['Hamburguesas', 'Shawarmas', 'Perros Calientes', 'Club House'],
+    'Viveres': ['Charcuteria', 'Harina y Granos', 'Aceites y Enlatados', 'Limpieza e Higiene'],
+    'Repostería': ['Harinas', 'Chocolate', 'Vainilla'],
   },
+  seo_home_title: 'Market Coffee Sweet | Panadería, Comida Rápida y Víveres en Valencia',
+  seo_home_description: 'Tu minimarket de confianza en El Trigal, Valencia. Panadería fresca, comida rápida (hamburguesas, shawarmas, perros calientes), víveres, frutas, verduras, bebidas y agua potable con delivery a domicilio.',
+  seo_home_keywords: 'panadería, comida rápida, hamburguesas, shawarmas, víveres, delivery, Valencia, El Trigal, Prebo, La Viña, Mañongo, Naguanagua, San Diego, minimarket, pan fresco, agua potable',
+  seo_catalog_title: 'Catálogo de Productos',
+  seo_catalog_description: 'Explora nuestro catálogo completo: panadería fresca, comida rápida, víveres, frutas, verduras, bebidas y más con delivery en Valencia y alrededores.',
+  jsonld_type: 'FastFoodRestaurant',
+  jsonld_priceRange: '$$',
+  jsonld_servesCuisine: ['Panadería', 'Comida Rápida', 'Hamburguesas', 'Shawarma', 'Víveres', 'Bebidas'],
   push_webhook_url: import.meta.env.VITE_PUSH_WEBHOOK_URL || '',
   push_webhook_secret: '',
   esta_abierta: true,
@@ -723,24 +790,27 @@ const DEFAULT_CONFIG: StoreConfig = {
   },
   brand_stat1_value: '20min',
   brand_stat1_label: 'Entrega Promedio',
-  brand_stat2_value: '3-en-1',
-  brand_stat2_label: 'Mercado + Panaderia + Comida',
-  brand_users_count: '+5k',
-  brand_section_title: 'Mas que un mercado,',
-  brand_section_subtitle: 'es tu tienda favorita.',
+  brand_stat2_value: '7+',
+  brand_stat2_label: 'Categorías',
+  brand_users_count: '',
+  brand_section_title: 'Es tu tienda favorita.',
+  brand_section_subtitle: 'Todo lo que necesitas, cerca de ti.',
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Persistence state loaders
+  const PRODUCTS_VERSION = '2.0';
   const [products, setProducts] = useState<FoodItem[]>(() => {
+    const savedVersion = localStorage.getItem('trv_products_version');
     const saved = localStorage.getItem('trv_products');
-    if (saved) {
+    if (saved && savedVersion === PRODUCTS_VERSION) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       } catch { /* fallback */ }
     }
-    // Si no hay productos guardados o está vacío, usar defaults
+    // Si version cambia o no hay productos, usar defaults
+    localStorage.setItem('trv_products_version', PRODUCTS_VERSION);
     localStorage.setItem('trv_products', JSON.stringify(DEFAULT_PRODUCTS));
     return DEFAULT_PRODUCTS;
   });

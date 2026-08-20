@@ -1,0 +1,134 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://marketcoffeesweet.com/#organization",
+      "name": "Market Coffee Sweet",
+      "url": "https://marketcoffeesweet.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://marketcoffeesweet.com/logo.png",
+        "width": 512,
+        "height": 512
+      },
+      "description": "Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Av. Principal El Trigal, justo al frente de Patio Trigal",
+        "addressLocality": "Valencia",
+        "addressRegion": "Carabobo",
+        "postalCode": "2001",
+        "addressCountry": "VE"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 10.2185,
+        "longitude": -68.0021
+      },
+      "sameAs": [
+        "https://www.instagram.com/marketcoffeesweet",
+        "https://www.tiktok.com/@marketcoffeesweet"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+584121234567",
+        "contactType": "customer service",
+        "availableLanguage": "Spanish",
+        "areaServed": "VE"
+      }
+    },
+    {
+      "@type": ["Bakery", "GroceryStore", "FastFoodRestaurant"],
+      "@id": "https://marketcoffeesweet.com/#localbusiness",
+      "name": "Market Coffee Sweet",
+      "url": "https://marketcoffeesweet.com",
+      "telephone": "+584121234567",
+      "priceRange": "$$",
+      "image": [
+        "https://marketcoffeesweet.com/fachada.jpg",
+        "https://marketcoffeesweet.com/logo.png"
+      ],
+      "logo": "https://marketcoffeesweet.com/logo.png",
+      "description": "Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado. Ubicados en El Trigal, Valencia, frente a Patio Trigal.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Av. Principal El Trigal, justo al frente de Patio Trigal",
+        "addressLocality": "Valencia",
+        "addressRegion": "Carabobo",
+        "postalCode": "2001",
+        "addressCountry": "VE"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 10.2185,
+        "longitude": -68.0021
+      },
+      "areaServed": [
+        { "@type": "Place", "name": "El Trigal", "sameAs": "https://es.wikipedia.org/wiki/El_Trigal" },
+        { "@type": "Place", "name": "La Trigaleña" },
+        { "@type": "Place", "name": "Prebo" },
+        { "@type": "Place", "name": "La Viña" },
+        { "@type": "Place", "name": "Mañongo" },
+        { "@type": "AdministrativeArea", "name": "Valencia", "sameAs": "https://es.wikipedia.org/wiki/Valencia_(Venezuela)" },
+        { "@type": "AdministrativeArea", "name": "Naguanagua", "sameAs": "https://es.wikipedia.org/wiki/Naguanagua" },
+        { "@type": "AdministrativeArea", "name": "San Diego", "sameAs": "https://es.wikipedia.org/wiki/San_Diego_(Carabobo)" }
+      ],
+      "servesCuisine": [
+        "Panadería",
+        "Comida Rápida",
+        "Hamburguesas",
+        "Shawarma",
+        "Perros Calientes",
+        "Víveres",
+        "Bebidas"
+      ],
+      "hasMenu": {
+        "@type": "Menu",
+        "url": "https://marketcoffeesweet.com/catalog"
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "07:00",
+          "closes": "22:00"
+        }
+      ],
+      "acceptsReservations": "False",
+      "potentialAction": {
+        "@type": "OrderAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://marketcoffeesweet.com/checkout",
+          "actionPlatform": [
+            "http://schema.org/DesktopWebPlatform",
+            "http://schema.org/MobileWebPlatform"
+          ]
+        },
+        "result": {
+          "@type": "Order",
+          "orderStatus": "http://schema.org/Orderplaced"
+        }
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://marketcoffeesweet.com/#website",
+      "name": "Market Coffee Sweet",
+      "url": "https://marketcoffeesweet.com",
+      "description": "Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado.",
+      "publisher": {
+        "@id": "https://marketcoffeesweet.com/#organization"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://marketcoffeesweet.com/catalog?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+  ]
+}
