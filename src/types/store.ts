@@ -326,6 +326,7 @@ export interface StoreConfig {
     lng: number;
   };
   banners: string[];
+  banners_mobile?: string[];
   zelle_enabled: boolean;
   zelle_data: string;
   zelle_discount_percent: number;

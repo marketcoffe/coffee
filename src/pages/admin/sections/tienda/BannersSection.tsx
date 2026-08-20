@@ -11,32 +11,36 @@ const BannersSection: React.FC = () => {
 
   const handleAddBanner = () => {
     const newBanners = [...(config.banners || []), ''];
+    const newBannersMobile = [...(config.banners_mobile || []), ''];
     const newTexts = [...(config.banner_texts || []), ''];
     const newTitles = [...(config.banner_titles || []), ''];
     const newDescs = [...(config.banner_descriptions || []), ''];
-    updateConfig({ banners: newBanners, banner_texts: newTexts, banner_titles: newTitles, banner_descriptions: newDescs });
+    updateConfig({ banners: newBanners, banners_mobile: newBannersMobile, banner_texts: newTexts, banner_titles: newTitles, banner_descriptions: newDescs });
   };
 
   const handleRemoveBanner = (index: number) => {
     const newBanners = (config.banners || []).filter((_, i) => i !== index);
+    const newBannersMobile = (config.banners_mobile || []).filter((_, i) => i !== index);
     const newTexts = (config.banner_texts || []).filter((_, i) => i !== index);
     const newTitles = (config.banner_titles || []).filter((_, i) => i !== index);
     const newDescs = (config.banner_descriptions || []).filter((_, i) => i !== index);
-    updateConfig({ banners: newBanners, banner_texts: newTexts, banner_titles: newTitles, banner_descriptions: newDescs });
+    updateConfig({ banners: newBanners, banners_mobile: newBannersMobile, banner_texts: newTexts, banner_titles: newTitles, banner_descriptions: newDescs });
   };
 
   const handleMoveBanner = (index: number, direction: 'up' | 'down') => {
     const banners = [...(config.banners || [])];
+    const bannersMobile = [...(config.banners_mobile || [])];
     const texts = [...(config.banner_texts || [])];
     const titles = [...(config.banner_titles || [])];
     const descs = [...(config.banner_descriptions || [])];
     const newIndex = direction === 'up' ? index - 1 : index + 1;
     if (newIndex < 0 || newIndex >= banners.length) return;
     [banners[index], banners[newIndex]] = [banners[newIndex], banners[index]];
+    [bannersMobile[index], bannersMobile[newIndex]] = [bannersMobile[newIndex], bannersMobile[index]];
     [texts[index], texts[newIndex]] = [texts[newIndex], texts[index]];
     [titles[index], titles[newIndex]] = [titles[newIndex], titles[index]];
     [descs[index], descs[newIndex]] = [descs[newIndex], descs[index]];
-    updateConfig({ banners, banner_texts: texts, banner_titles: titles, banner_descriptions: descs });
+    updateConfig({ banners, banners_mobile: bannersMobile, banner_texts: texts, banner_titles: titles, banner_descriptions: descs });
   };
 
   return (
@@ -71,6 +75,7 @@ const BannersSection: React.FC = () => {
         const bannerDesc = isHero ? (config.hero_subtitle || config.mensaje_bienvenida || '') : (config.banner_descriptions?.[index] || '');
         const bannerCtaText = isHero ? (config.hero_cta_text || '') : '';
         const bannerCtaUrl = isHero ? (config.hero_cta_url || '') : '';
+        const bannerMobile = config.banners_mobile?.[index] || '';
 
         return (
           <div key={index} className="admin-card p-4">
@@ -95,7 +100,7 @@ const BannersSection: React.FC = () => {
             </div>
 
             <div className="mb-3">
-              <label className="text-xs font-semibold" style={{ color: 'var(--ios-text-secondary)' }}>Imagen del Banner</label>
+              <label className="text-xs font-semibold" style={{ color: 'var(--ios-text-secondary)' }}>Imagen del Banner (Escritorio)</label>
               <div className="mt-1">
                 <ImageField
                   value={banner || ''}
@@ -107,6 +112,27 @@ const BannersSection: React.FC = () => {
                   bucket="settings"
                   folder={`banners/${isHero ? 'hero' : 'secondary'}`}
                   maxSize={1200}
+                  previewSize="lg"
+                />
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <label className="text-xs font-semibold" style={{ color: 'var(--ios-text-secondary)' }}>Imagen para Móvil (opcional)</label>
+              <p className="text-[10px] mb-1" style={{ color: 'var(--ios-text-tertiary)' }}>
+                Si se deja vacía, se usará la imagen de escritorio.
+              </p>
+              <div className="mt-1">
+                <ImageField
+                  value={bannerMobile}
+                  onChange={url => {
+                    const newBannersMobile = [...(config.banners_mobile || [])];
+                    newBannersMobile[index] = url;
+                    updateConfig({ banners_mobile: newBannersMobile });
+                  }}
+                  bucket="settings"
+                  folder={`banners/${isHero ? 'hero-mobile' : 'secondary-mobile'}`}
+                  maxSize={800}
                   previewSize="lg"
                 />
               </div>
@@ -172,8 +198,8 @@ const BannersSection: React.FC = () => {
                 margin: bannerPreviewMode === 'mobile' ? '0 auto' : '0',
               }}>
                 <div className="relative" style={{ aspectRatio: bannerPreviewMode === 'mobile' ? '9/14' : '2/1' }}>
-                  {banner ? (
-                    <img src={banner} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                  {(bannerPreviewMode === 'mobile' ? (bannerMobile || banner) : banner) ? (
+                    <img src={bannerPreviewMode === 'mobile' ? (bannerMobile || banner) : banner} alt="" className="absolute inset-0 w-full h-full object-cover" />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'var(--ios-bg)' }}>
                       <Image size={32} style={{ color: 'var(--ios-text-tertiary)' }} />
@@ -218,7 +244,7 @@ const BannersSection: React.FC = () => {
       </button>
 
       <p className="text-xs text-center" style={{ color: 'var(--ios-text-tertiary)' }}>
-        Formatos: JPG, PNG, WebP · Tamanio recomendado: 1200x600px
+        Formatos: JPG, PNG, WebP · Escritorio: 1200x600px · Móvil: 600x800px
       </p>
     </div>
   );

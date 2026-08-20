@@ -52,6 +52,9 @@ CREATE TABLE IF NOT EXISTS store_config (
     banner_url_1 TEXT NOT NULL DEFAULT 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=1200',
     banner_url_2 TEXT NOT NULL DEFAULT 'https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&q=80&w=1200',
     banner_url_3 TEXT NOT NULL DEFAULT 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=1200',
+    banner_url_1_mobile TEXT,
+    banner_url_2_mobile TEXT,
+    banner_url_3_mobile TEXT,
     banner_texts TEXT[] DEFAULT ARRAY[]::TEXT[],
 
     -- Colores

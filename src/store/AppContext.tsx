@@ -1500,6 +1500,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           tasa_cambio: dbConfig.tasa_cambio || prev.tasa_cambio,
           coordenadas_tienda: { lat: dbConfig.tienda_lat, lng: dbConfig.tienda_lng },
           banners: [dbConfig.banner_url_1, dbConfig.banner_url_2, dbConfig.banner_url_3].filter(Boolean),
+          banners_mobile: [dbConfig.banner_url_1_mobile, dbConfig.banner_url_2_mobile, dbConfig.banner_url_3_mobile].filter(Boolean),
           pagomovil_data: dbConfig.pagomovil_data,
           pagomovil_enabled: dbConfig.pagomovil_enabled ?? prev.pagomovil_enabled,
           pagomovil_discount_percent: dbConfig.pagomovil_discount_percent ?? prev.pagomovil_discount_percent,
@@ -2618,6 +2619,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 if (value[0] !== undefined) updatePayload.banner_url_1 = value[0];
                 if (value[1] !== undefined) updatePayload.banner_url_2 = value[1];
                 if (value[2] !== undefined) updatePayload.banner_url_3 = value[2];
+              } else if (key === 'banners_mobile' && Array.isArray(value)) {
+                if (value[0] !== undefined) updatePayload.banner_url_1_mobile = value[0];
+                if (value[1] !== undefined) updatePayload.banner_url_2_mobile = value[1];
+                if (value[2] !== undefined) updatePayload.banner_url_3_mobile = value[2];
               } else {
                 updatePayload[key] = value;
               }

@@ -271,7 +271,12 @@ export const Home: React.FC<HomeProps> = ({
 
             return (
               <div key={idx} className="relative w-full h-full shrink-0 snap-start">
-                <img alt="" className="absolute inset-0 w-full h-full object-cover" src={banner} loading={idx === 0 ? 'eager' : 'lazy'} />
+                <picture>
+                  {config.banners_mobile?.[idx] && (
+                    <source media="(max-width: 767px)" srcSet={config.banners_mobile[idx]} />
+                  )}
+                  <img alt="" className="absolute inset-0 w-full h-full object-cover" src={banner} loading={idx === 0 ? 'eager' : 'lazy'} />
+                </picture>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
                 <div className="absolute bottom-8 left-5 right-5 md:bottom-16 md:left-16 md:right-auto md:max-w-2xl">
                   {isHero && (
@@ -748,6 +753,13 @@ export const Home: React.FC<HomeProps> = ({
           </div>
         </section>
       )}
+
+      {/* ═══ BANNER COMIDA RÁPIDA ═══ */}
+      <section className="px-4 md:px-8 max-w-[1440px] mx-auto w-full">
+        <div className="rounded-2xl overflow-hidden cursor-pointer group" onClick={() => { setSelectedCategory('Comida Rapida'); setTab('catalog'); }}>
+          <img src="/imagen/banner-menu.webp" alt="Comida Rápida" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
+        </div>
+      </section>
 
       {/* ═══ 5C. COMIDA RÁPIDA ═══ */}
       {comidaRapidaItems.length > 0 && (
