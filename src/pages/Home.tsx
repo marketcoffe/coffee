@@ -64,7 +64,7 @@ interface HomeProps {
 export const Home: React.FC<HomeProps> = ({
   setTab, setSelectedCategory, setSelectedSubcategory,
   onViewProductDetails, navigateToCatalog: _navigateToCatalog,
-  onInstallClick, onAdminClick, isAdminAuthenticated
+  deferredPrompt, onInstallClick, onAdminClick, isAdminAuthenticated
 }) => {
   const { foodItems, config, cart, addToCart, getProductAverageRating, isDarkMode, promotions } = useApp();
   const { showToast } = useToast();
@@ -99,6 +99,7 @@ export const Home: React.FC<HomeProps> = ({
   const [openFaq, setOpenFaq] = useState<string | null>(null);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showIOSInstallModal, setShowIOSInstallModal] = useState(false);
 
   const activeSedes = useMemo(() => (config.sedes || []).filter(s => s.activa), [config.sedes]);
   const [selectedSedeId, setSelectedSedeId] = useState<string>(() => {
@@ -932,7 +933,13 @@ export const Home: React.FC<HomeProps> = ({
                 Instálala directamente desde tu navegador y estate al tanto de nuestras promociones exclusivas. Sin descargas pesadas, directo a tu pantalla de inicio.
               </p>
               <div className="flex flex-col sm:flex-row gap-2">
-                <button onClick={onInstallClick} className="h-10 bg-black text-white rounded-lg px-5 flex items-center justify-center gap-2 border border-white/10 hover:bg-white/10 transition-colors font-bold text-xs">
+                <button onClick={() => {
+                  if (deferredPrompt) {
+                    onInstallClick?.();
+                  } else {
+                    setShowIOSInstallModal(true);
+                  }
+                }} className="h-10 bg-black text-white rounded-lg px-5 flex items-center justify-center gap-2 border border-white/10 hover:bg-white/10 transition-colors font-bold text-xs">
                   <Download size={16} />
                   Instalar App Web
                 </button>
@@ -1311,7 +1318,53 @@ export const Home: React.FC<HomeProps> = ({
         </div>
       )}
 
-      {/* ═══ 13. FLOATING CART ═══ */}
+      {/* ═══ 14. iOS INSTALL MODAL ═══ */}
+      {showIOSInstallModal && (
+        <div className="fixed inset-0 z-[200] flex items-end md:items-center justify-center">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowIOSInstallModal(false)} />
+          <div className="relative w-full md:max-w-sm bg-white rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
+            <div className="flex items-center justify-between p-4 border-b border-slate-100">
+              <div>
+                <p className="font-bold text-slate-900">Instalar la App</p>
+                <p className="text-[11px] text-slate-500">Sigue estos pasos para agregarla a tu pantalla de inicio.</p>
+              </div>
+              <button onClick={() => setShowIOSInstallModal(false)} className="p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors cursor-pointer">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-white text-xs" style={{ backgroundColor: tc }}>1</div>
+                <div>
+                  <p className="text-sm font-bold text-slate-800">Toca el botón de compartir</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Toca el ícono de compartir (cuadro con flecha arriba) en la barra inferior de Safari.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-white text-xs" style={{ backgroundColor: tc }}>2</div>
+                <div>
+                  <p className="text-sm font-bold text-slate-800">Selecciona "Agregar a pantalla de inicio"</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Desplázate hacia abajo y toca la opción "Agregar a pantalla de inicio".</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-white text-xs" style={{ backgroundColor: tc }}>3</div>
+                <div>
+                  <p className="text-sm font-bold text-slate-800">Confirma tocando "Agregar"</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Toca "Agregar" en la esquina superior derecha. ¡Listo! La app aparecerá en tu pantalla de inicio.</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-3 border-t border-slate-100">
+              <button onClick={() => setShowIOSInstallModal(false)} className="w-full py-3 rounded-xl font-bold text-sm text-white transition-colors cursor-pointer" style={{ backgroundColor: tc }}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ 15. FLOATING CART ═══ */}
       <FloatingCartButton itemCount={cartCount} total={cartTotal} onClick={() => setTab('checkout')} themeColor={tc} />
     </div>
   );
