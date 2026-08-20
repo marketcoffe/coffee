@@ -10,12 +10,12 @@ self.addEventListener('fetch', function(event) {
     if (url.pathname.startsWith('/api/')) return;
     event.respondWith(
       caches.open('workbox-precache-v2').then(function(cache) {
-        return cache.match('/coffe/index.html').then(function(cached) {
+        return cache.match('/index.html').then(function(cached) {
           if (cached) return cached;
-          return caches.match('/coffe/index.html').then(function(c2) {
+          return caches.match('/index.html').then(function(c2) {
             if (c2) return c2;
             return fetch(event.request, { redirect: 'follow' }).catch(function() {
-              return caches.match('/coffe/offline.html');
+              return caches.match('/offline.html');
             });
           });
         });
@@ -63,8 +63,8 @@ self.addEventListener('push', function(event) {
 
     const title     = payload.titulo  || payload.title  || 'Marketo Supermercado';
     const body      = payload.mensaje || payload.body   || '';
-    const icon      = payload.icon   || payload.badge || '/coffe/icon.png';
-    const badge     = '/coffe/icon.png';
+    const icon      = payload.icon   || payload.badge || '/icon.png';
+    const badge     = '/icon.png';
     const image     = payload.imagen_url || payload.image || undefined;
     const urlToOpen = payload.link_url || payload.url || '/';
     const tag       = payload.tag || ('marketcoffee-' + String(payload.id || Date.now()));
@@ -72,7 +72,7 @@ self.addEventListener('push', function(event) {
     // una notificacion de estado mientras la anterior aun esta en pantalla
     // (con requireInteraction). El dedup logico sigue por `payload.tag`.
     const displayTag = tag + '::' + Date.now();
-    const soundUrl  = payload.sound_url || payload.sound || '/coffe/sounds/notification.mp3';
+    const soundUrl  = payload.sound_url || payload.sound || '/sounds/notification.mp3';
 
     const tagKey = tag;
     if (recentlyShown.has(tagKey)) {
@@ -129,7 +129,7 @@ self.addEventListener('notificationclick', function(event) {
 
     // Track click event via fetch
     if (notifId) {
-      fetch('/coffe/api/marketing/track-event', {
+      fetch('/api/marketing/track-event', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

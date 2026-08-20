@@ -10,7 +10,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ config, onComplete }
   const [phase, setPhase] = useState<'init' | 'logo' | 'text' | 'fade'>('init');
 
   const themeColor = config.theme_color || '#FF6B35';
-  const logoUrl = config.splash_logo_url || config.pwa_icon_url || config.logo_url || '/coffe/logo.png';
+  const logoUrl = config.splash_logo_url || config.pwa_icon_url || config.logo_url || '/logo.png';
   const siteName = config.site_nombre || 'Market Coffee Sweet';
   const welcomeMsg = config.mensaje_bienvenida || 'La mejor comida con delivery express.';
 
@@ -105,7 +105,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ config, onComplete }
             filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.25))',
           }}
           onError={(e) => {
-            (e.target as HTMLImageElement).src = '/coffe/logo.png';
+            (e.target as HTMLImageElement).src = '/logo.png';
           }}
         />
       </div>

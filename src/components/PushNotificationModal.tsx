@@ -96,8 +96,8 @@ export const PushNotificationModal: React.FC = () => {
         navigator.serviceWorker.ready.then(reg => {
           reg.showNotification('¡Notificaciones Activas! 🔔', {
             body: '¡Genial! Ahora recibirás alertas en tiempo real sobre tus pedidos y ofertas frescas de ' + (config.site_nombre || 'nuestra tienda') + '.',
-            icon: '/coffe/icon.png',
-            badge: '/coffe/icon.png',
+            icon: '/icon.png',
+            badge: '/icon.png',
             vibrate: [200, 100, 200],
             tag: 'welcome-trv'
           } as NotificationOptions);

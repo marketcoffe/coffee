@@ -131,7 +131,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
     }, 500);
 
     // Apple Touch Icon dinámico
-    const appleTouchUrl = config.pwa_icon_url || config.logo_url || config.favicon_url || '/coffe/icon.png';
+    const appleTouchUrl = config.pwa_icon_url || config.logo_url || config.favicon_url || '/icon.png';
     let appleLink = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement | null;
     if (!appleLink) {
       appleLink = document.createElement('link');
@@ -147,7 +147,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
         iconLink.setAttribute('rel', 'icon');
         document.head.appendChild(iconLink);
       }
-      iconLink.setAttribute('href', config.favicon_url || config.pwa_icon_url || config.logo_url || '/coffe/icon.png');
+      iconLink.setAttribute('href', config.favicon_url || config.pwa_icon_url || config.logo_url || '/icon.png');
     }
 
     let themeMeta = document.querySelector('meta[name="theme-color"]');

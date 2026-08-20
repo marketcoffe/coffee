@@ -1,10 +1,10 @@
 {
-  "id": "/coffe/",
+  "id": "/",
   "name": "Market Coffee - Mercado, Panaderia & Comida Rapida",
   "short_name": "Market Coffee",
   "description": "Tu mercado, panaderia y comida rapida favorita. Frutas, verduras, pan fresco, hamburguesas y mas.",
-  "start_url": "/coffe/",
-  "scope": "/coffe/",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait",
@@ -17,7 +17,7 @@
     {
       "name": "Menú del Día",
       "short_name": "Menú",
-      "url": "/coffe/?tab=catalog",
+      "url": "/?tab=catalog",
       "description": "Explora nuestros productos de mercado, panadería y comida rápida.",
       "icons": []
     }

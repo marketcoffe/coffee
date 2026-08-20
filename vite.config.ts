@@ -7,7 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
-    base: '/coffe/',
+    base: '/',
     plugins: [
       react(),
       tailwindcss(),
@@ -18,11 +18,11 @@ export default defineConfig(({mode}) => {
         includeAssets: ['icon.png', 'logo.png', 'sounds/notification.mp3', 'manifest-admin.json'],
         manifest: false,
         workbox: {
-          importScripts: ['/coffe/sw-push.js'],
-          navigateFallback: '/coffe/index.html',
-          navigateFallbackDenylist: [/^\/coffe\/api\//],
+          importScripts: ['/sw-push.js'],
+          navigateFallback: '/index.html',
+          navigateFallbackDenylist: [/^\/api\//],
           additionalManifestEntries: [
-            { url: '/coffe/offline.html', revision: null },
+            { url: '/offline.html', revision: null },
           ],
           runtimeCaching: [
             {

@@ -116,14 +116,14 @@ function AppContent() {
     }
 
     // Update apple-touch-icon
-    const appleTouchUrl = config.pwa_icon_url || config.logo_url || config.favicon_url || '/coffe/icon.png';
+    const appleTouchUrl = config.pwa_icon_url || config.logo_url || config.favicon_url || '/icon.png';
     const appleLink = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement | null;
     if (appleLink) appleLink.setAttribute('href', appleTouchUrl);
 
     // Rebuild manifest blob URL with current config
     const manifestLink = document.getElementById('pwa-manifest') as HTMLLinkElement | null;
     if (manifestLink && config.pwa_icon_url) {
-      const isOnAdmin = window.location.pathname.startsWith('/coffe/admin') || window.location.pathname.startsWith('/admin');
+      const isOnAdmin = window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/admin');
       const baseManifestUrl = isOnAdmin ? './manifest-admin.json' : './manifest.json';
       const origin = window.location.origin;
       fetch(baseManifestUrl).then(r => r.json()).then((baseManifest: WebAppManifest) => {
@@ -187,8 +187,8 @@ function AppContent() {
 
   // Route/Tab controllers - si es admin/operador autenticado O si la URL es /admin, abrir directo en su panel
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
-  const isAdminUrl = pathname.startsWith('/admin') || pathname.startsWith('/coffe/admin');
-  const isHome = pathname === '/' || pathname === '/coffe' || pathname === '/coffe/' || pathname === '';
+  const isAdminUrl = pathname.startsWith('/admin') || pathname.startsWith('/admin');
+  const isHome = pathname === '/' || pathname === '/coffe' || pathname === '/' || pathname === '';
   const is404Url = !isHome && !isAdminUrl;
   const [tab, setTab] = useState<'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout'>((isAdminAuthenticated || isAdminUrl) ? 'admin' : 'home');
   const [is404, setIs404] = useState(is404Url);
@@ -224,8 +224,8 @@ function AppContent() {
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname;
-      const isNowAdmin = path.startsWith('/admin') || path.startsWith('/coffe/admin');
-      const isNowHome = path === '/' || path === '/coffe' || path === '/coffe/' || path === '';
+      const isNowAdmin = path.startsWith('/admin') || path.startsWith('/admin');
+      const isNowHome = path === '/' || path === '/coffe' || path === '/' || path === '';
       if (isNowAdmin) {
         setTab('admin');
         setIs404(false);

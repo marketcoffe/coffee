@@ -679,7 +679,7 @@ const DEFAULT_CONFIG: StoreConfig = {
   transferencia_data: 'Banesco Cuenta Corriente - 0134-1122-33-4455667788 - Market Coffee C.A. - RIF J-50123456-7',
   transferencia_discount_percent: 0,
   tasa_cambio: 612.43,
-  logo_url: '/coffe/logo.png',
+  logo_url: '/logo.png',
   theme_color: '#6E472A',
   secondary_color: '#A4D045',
   mensaje_bienvenida: 'Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado.',
@@ -1146,8 +1146,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               navigator.serviceWorker.ready.then(reg => {
                 reg.showNotification(`${config.site_nombre || 'App'}: Actualización de Pedido`, {
                   body: `Tu pedido ${updated.id} ahora está: ${updated.status}${extras ? `\n${extras}` : ''}`,
-                  icon: '/coffe/icon.png',
-                  badge: '/coffe/icon.png',
+                  icon: '/icon.png',
+                  badge: '/icon.png',
                   tag: `order-update-${updated.id}`,
                   renotify: true,
                   vibrate: [200, 100, 200],
@@ -1170,8 +1170,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             navigator.serviceWorker.ready.then(reg => {
               reg.showNotification('¡NUEVO PEDIDO! 🛒', {
                 body: `Cliente: ${newOrder.cliente_nombre} — Total: $${newOrder.total_usd?.toFixed(2)}`,
-                icon: '/coffe/icon.png',
-                badge: '/coffe/icon.png',
+                icon: '/icon.png',
+                badge: '/icon.png',
                 tag: `new-order-${newOrder.id}`,
                 renotify: true,
                 vibrate: [200, 100, 200],
