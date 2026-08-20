@@ -10,20 +10,7 @@
   "theme_color": "#FF6B35",
   "background_color": "#FF6B35",
   "prefer_related_applications": false,
-  "icons": [
-    {
-      "src": "/icon.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    }
-  ],
+  "icons": [],
   "categories": ["business", "productivity"],
   "shortcuts": [
     {
@@ -31,21 +18,21 @@
       "short_name": "Dashboard",
       "url": "/admin",
       "description": "Panel principal con métricas y resumen",
-      "icons": [{"src": "/icon.png", "sizes": "192x192"}]
+      "icons": []
     },
     {
       "name": "Órdenes",
       "short_name": "Órdenes",
       "url": "/admin?tab=orders",
       "description": "Gestionar pedidos activos e historial",
-      "icons": [{"src": "/icon.png", "sizes": "192x192"}]
+      "icons": []
     },
     {
       "name": "Productos",
       "short_name": "Productos",
       "url": "/admin?tab=products",
       "description": "Administrar catálogo de productos",
-      "icons": [{"src": "/icon.png", "sizes": "192x192"}]
+      "icons": []
     }
   ]
 }
