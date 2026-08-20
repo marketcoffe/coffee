@@ -252,7 +252,7 @@ export const Home: React.FC<HomeProps> = ({
       <SEOHead title={`${config.site_nombre || 'Market Coffee Sweet'} - Mercado, Panaderia & Comida Rapida`} type="home" />
 
       {/* ═══ 1. HERO — Horizontal Swipe Carousel ═══ */}
-      <section className="relative w-full overflow-hidden h-[50vh] min-h-[320px] max-h-[600px] md:h-[80vh] md:min-h-[600px] md:max-h-[800px]">
+      <section className="relative w-full overflow-hidden h-[65vh] min-h-[320px] max-h-[600px] md:h-[80vh] md:min-h-[600px] md:max-h-[800px]">
         <div
           ref={heroScrollRef}
           onScroll={handleHeroScroll}
