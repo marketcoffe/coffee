@@ -500,19 +500,19 @@ export const Home: React.FC<HomeProps> = ({
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {activePromotions.map((promo) => (
-              <div key={promo.id} className="flex-shrink-0 w-72 rounded-2xl overflow-hidden border border-[#e4beb1]/10" style={{ background: cardBg }}>
+              <div key={promo.id} className="flex-shrink-0 min-w-[155px] rounded-xl overflow-hidden border" style={{ background: cardBg, borderColor: cardBorder }}>
                 {promo.image_url && (
-                  <img src={promo.image_url} alt={promo.title} className="w-full h-32 object-cover" />
+                  <img src={promo.image_url} alt={promo.title} className="w-full h-28 object-cover" />
                 )}
-                <div className="p-3">
-                  <h4 className="font-bold text-sm" style={{ color: text1 }}>{promo.title}</h4>
-                  <p className="text-xs mt-1" style={{ color: text2 }}>{promo.message}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: `${tc}20`, color: tc }}>
+                <div className="p-2.5">
+                  <h4 className="font-bold text-xs truncate" style={{ color: text1 }}>{promo.title}</h4>
+                  <p className="text-[10px] mt-0.5 line-clamp-2" style={{ color: text2 }}>{promo.message}</p>
+                  <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${tc}20`, color: tc }}>
                       {promo.discount_type === 'percent' ? `${promo.discount_value}% OFF` : promo.discount_type === 'fixed' ? `$${promo.discount_value} OFF` : promo.discount_type === '2x1' ? '2x1' : 'Combo'}
                     </span>
                     {promo.coupon_code && (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                      <span className="text-[8px] font-mono px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600">
                         {promo.coupon_code}
                       </span>
                     )}
@@ -548,14 +548,18 @@ export const Home: React.FC<HomeProps> = ({
               const discount = item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd
                 ? Math.round(((item.precio_anterior_usd - item.precio_usd) / item.precio_anterior_usd) * 100) : 0;
               return (
-                <div key={item.id} className="rounded-2xl border overflow-hidden group cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5"
-                  style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+                <div key={item.id} className="relative rounded-2xl border-2 overflow-hidden group cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5"
+                  style={{ backgroundColor: cardBg, borderColor: tc, boxShadow: `0 0 20px ${tc}25` }}
                   onClick={() => onViewProductDetails(item)}>
-                  <div className="relative h-40 overflow-hidden">
+                  <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-white font-bold text-[9px]"
+                    style={{ backgroundColor: tc }}>
+                    <Zap size={10} fill="currentColor" /> FLASH
+                  </div>
+                  <div className="relative h-36 overflow-hidden">
                     <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    {discount > 0 && <div className="absolute top-2 left-2 bg-red-500 text-white font-bold px-2 py-0.5 rounded-lg text-[10px]">-{discount}%</div>}
+                    {discount > 0 && <div className="absolute top-2 right-2 bg-red-500 text-white font-bold px-2 py-0.5 rounded-lg text-[10px]">-{discount}%</div>}
                     {item.estimated_prep_time && (
-                      <div className="absolute top-2 right-2 bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                      <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
                         <Clock size={10} /> {item.estimated_prep_time}min
                       </div>
                     )}
@@ -597,12 +601,16 @@ export const Home: React.FC<HomeProps> = ({
               const discount = item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd
                 ? Math.round(((item.precio_anterior_usd - item.precio_usd) / item.precio_anterior_usd) * 100) : 0;
               return (
-                <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer"
-                  style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+                <div key={item.id} className="relative min-w-[155px] rounded-xl border-2 overflow-hidden shrink-0 cursor-pointer"
+                  style={{ backgroundColor: cardBg, borderColor: tc, boxShadow: `0 0 12px ${tc}20` }}
                   onClick={() => onViewProductDetails(item)}>
+                  <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-white font-bold text-[8px]"
+                    style={{ backgroundColor: tc }}>
+                    <Zap size={8} fill="currentColor" /> FLASH
+                  </div>
                   <div className="relative h-28">
                     <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover" />
-                    {discount > 0 && <div className="absolute top-1.5 left-1.5 bg-red-500 text-white font-bold px-1.5 py-0.5 rounded-md text-[9px]">-{discount}%</div>}
+                    {discount > 0 && <div className="absolute top-1.5 right-1.5 bg-red-500 text-white font-bold px-1.5 py-0.5 rounded-md text-[9px]">-{discount}%</div>}
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow"
                       style={{ backgroundColor: tc, color: '#fff' }}>
@@ -682,7 +690,7 @@ export const Home: React.FC<HomeProps> = ({
               const prods = combo.product_ids.map(id => activeItems.find(p => p.id === id)).filter(Boolean) as FoodItem[];
               const img = combo.imagen_url || prods[0]?.imagen_urls?.[0] || '';
               return (
-                <div key={combo.id} className="flex min-w-[240px] rounded-xl border overflow-hidden h-32 shrink-0"
+                <div key={combo.id} className="flex min-w-[155px] rounded-xl border overflow-hidden h-32 shrink-0"
                   style={{ backgroundColor: cardBg, borderColor: cardBorder }}>
                   <div className="w-1/3">
                     {img ? <img src={img} alt={combo.nombre} className="w-full h-full object-cover" />

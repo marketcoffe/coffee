@@ -187,6 +187,11 @@ const DEFAULT_CONFIG: StoreConfig = {
     '/imagen/panaderia-banner.webp',
     '/imagen/charcuteria-banner.webp'
   ],
+  banners_mobile: [
+    '/imagen/banner1_movil.jpg',
+    '/imagen/banner3_movil.jpg',
+    '/imagen/charcuteria-banner.webp'
+  ],
   zelle_enabled: true,
   zelle_data: 'pagos@marketcoffee.com.ve',
   zelle_discount_percent: 0,
