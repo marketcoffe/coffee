@@ -4,11 +4,11 @@
     "nombre": "Morcilla La Montserratina 4 Und",
     "descripcion": "Morcilla La Montserratina 4 Und de marca reconocida, ideal para preparar platos deliciosos en familia. Presentación práctica y frescura garantizada. Precio: $5.9 con delivery a domicilio en El Trigal, Valencia.",
     "categoria": "Charcutería y Embutidos",
-    "subcategoria": "",
+    "subcategoria": "Morcilla",
     "precio_usd": 5.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/morcilla_la_montserratina_4und.webp"
+      "productos2/morcilla_la_montserratina_4und.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -26,7 +26,7 @@
     "precio_usd": 6.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/tequenos_fiestero_teque_trof_50_und.webp"
+      "productos2/tequenos_fiestero_teque_trof_50_und.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -40,11 +40,11 @@
     "nombre": "Chorizo Ahumado La Montserratina 5 Und",
     "descripcion": "Chorizo Ahumado La Montserratina 5 Und de marca reconocida, ideal para preparar platos deliciosos en familia. Presentación práctica y frescura garantizada. Precio: $8.5 con delivery a domicilio en El Trigal, Valencia.",
     "categoria": "Charcutería y Embutidos",
-    "subcategoria": "",
+    "subcategoria": "Chorizo",
     "precio_usd": 8.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/chorizo_ahumado_la_montserratina_5und.webp"
+      "productos2/chorizo_ahumado_la_montserratina_5und.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -62,7 +62,7 @@
     "precio_usd": 12.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/pork_belly_parrillero_ricci.webp"
+      "productos2/pork_belly_parrillero_ricci.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -80,7 +80,7 @@
     "precio_usd": 12.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -98,7 +98,7 @@
     "precio_usd": 11.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -116,7 +116,7 @@
     "precio_usd": 12.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/lomo_de_cerdo_sin_cuero_ricci.webp"
+      "productos2/lomo_de_cerdo_sin_cuero_ricci.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -134,7 +134,7 @@
     "precio_usd": 12.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/punta_trasera_de_cerdo_ricci.webp"
+      "productos2/punta_trasera_de_cerdo_ricci.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -152,7 +152,7 @@
     "precio_usd": 14.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/carne_de_hamburguesas_ricci.webp"
+      "productos2/carne_de_hamburguesas_ricci.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -166,11 +166,11 @@
     "nombre": "Chorizo con Ajo La Montserratina 5 Und",
     "descripcion": "Chorizo con Ajo La Montserratina 5 Und de marca reconocida, ideal para preparar platos deliciosos en familia. Presentación práctica y frescura garantizada. Precio: $8.5 con delivery a domicilio en El Trigal, Valencia.",
     "categoria": "Charcutería y Embutidos",
-    "subcategoria": "",
+    "subcategoria": "Chorizo",
     "precio_usd": 8.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/chorizo_con_ajo_la_montserratina_5und.webp"
+      "productos2/chorizo_con_ajo_la_montserratina_5und.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -183,12 +183,12 @@
     "id": "prod_0011",
     "nombre": "Masa para Pastelitos Romys 1kg",
     "descripcion": "Masa para Pastelitos Romys 1kg para tus preparaciones de repostería. Ingrediente esencial para bizcochos, postres y masas. Precio: $2, delivery a domicilio.",
-    "categoria": "Repostería",
+    "categoria": "Dulces y Postres",
     "subcategoria": "Harinas",
     "precio_usd": 2,
     "stock": 100,
     "imagen_urls": [
-      "productos/masa_para_pastelitos_romys_1kg.webp"
+      "productos2/masa_para_pastelitos_romys_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -201,12 +201,12 @@
     "id": "prod_0012",
     "nombre": "Rikomalt Parmalat 250ml",
     "descripcion": "Rikomalt Parmalat 250ml para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $2.1, pedidos por WhatsApp o delivery a domicilio.",
-    "categoria": "Bebidas",
-    "subcategoria": "",
+    "categoria": "Lácteos",
+    "subcategoria": "Yogurt",
     "precio_usd": 2.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/rikomalt_parmalat_250ml.webp"
+      "productos2/rikomalt_parmalat_250ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -220,11 +220,11 @@
     "nombre": "Té Crystal 1.5 Lt",
     "descripcion": "Té Crystal 1.5 Lt para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $2.8, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Té",
     "precio_usd": 2.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/te_crystal_1_5lt.webp"
+      "productos2/te_crystal_1_5lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -238,11 +238,11 @@
     "nombre": "Agua Aguafiel 600ml",
     "descripcion": "Agua Aguafiel 600ml para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $0.65, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Agua",
     "precio_usd": 0.65,
     "stock": 100,
     "imagen_urls": [
-      "productos/aguafiel_600ml.webp"
+      "productos2/aguafiel_600ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -256,11 +256,11 @@
     "nombre": "Jugo Natulac 250ml",
     "descripcion": "Jugo Natulac 250ml para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $1.4, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Jugos",
     "precio_usd": 1.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/jugo_natulac_250ml.webp"
+      "productos2/jugo_natulac_250ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -274,11 +274,11 @@
     "nombre": "Bebida Green Spot 500ml",
     "descripcion": "Bebida Green Spot 500ml para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $1.7, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Gaseosas",
     "precio_usd": 1.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/bebida_green_spot_500ml.webp"
+      "productos2/bebida_green_spot_500ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -296,7 +296,7 @@
     "precio_usd": 2.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/te_negro_limon_durazno_500ml.webp"
+      "productos2/te_negro_limon_durazno_500ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -310,11 +310,11 @@
     "nombre": "Té Crystal 500ml",
     "descripcion": "Té Crystal 500ml para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $1.4, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Té",
     "precio_usd": 1.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/te_crystal_500ml.webp"
+      "productos2/te_crystal_500ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -332,7 +332,7 @@
     "precio_usd": 2.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/chicha_el_chichero_500ml.webp"
+      "productos2/chicha_el_chichero_500ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -346,11 +346,11 @@
     "nombre": "Naranjada Natulac 1 Lt",
     "descripcion": "Naranjada Natulac 1 Lt para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $3.6, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Jugos",
     "precio_usd": 3.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/naranjada_natulac_1lt.webp"
+      "productos2/naranjada_natulac_1lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -364,11 +364,11 @@
     "nombre": "Agua Aguafiel 1.5 Lt",
     "descripcion": "Agua Aguafiel 1.5 Lt para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $1.35, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Agua",
     "precio_usd": 1.35,
     "stock": 100,
     "imagen_urls": [
-      "productos/agua_aguafiel_1_5_lt.webp"
+      "productos2/agua_aguafiel_1_5_lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -382,11 +382,11 @@
     "nombre": "Jugo Natulac 1 Lt",
     "descripcion": "Jugo Natulac 1 Lt para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $2.9, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Jugos",
     "precio_usd": 2.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/jugo_natulac_1lt.webp"
+      "productos2/jugo_natulac_1lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -400,11 +400,11 @@
     "nombre": "Frutys Bebida Tropical 1.5 Lt",
     "descripcion": "Frutys Bebida Tropical 1.5 Lt para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $1.5, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Gaseosas",
     "precio_usd": 1.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/frutys_bebida_tropical_1_5lt.webp"
+      "productos2/frutys_bebida_tropical_1_5lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -418,11 +418,11 @@
     "nombre": "Néctar La Pastoreña 1 Lt",
     "descripcion": "Néctar La Pastoreña 1 Lt para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $3.99, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Jugos",
     "precio_usd": 3.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/nectar_la_pastorena_1lt.webp"
+      "productos2/nectar_la_pastorena_1lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -436,11 +436,11 @@
     "nombre": "Jugo Frooti 350ml",
     "descripcion": "Jugo Frooti 350ml para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $1.3, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Jugos",
     "precio_usd": 1.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/jugo_frooti_350ml.webp"
+      "productos2/jugo_frooti_350ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -458,7 +458,7 @@
     "precio_usd": 2.45,
     "stock": 100,
     "imagen_urls": [
-      "productos/leche_parmalat_1_lt.webp"
+      "productos2/leche_parmalat_1_lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -472,11 +472,11 @@
     "nombre": "Naranjada Ricci 200ml",
     "descripcion": "Naranjada Ricci 200ml para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $1, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Jugos",
     "precio_usd": 1,
     "stock": 100,
     "imagen_urls": [
-      "productos/naranjada_ricci_200ml.webp"
+      "productos2/naranjada_ricci_200ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -490,11 +490,11 @@
     "nombre": "Naranjada Natulac 250ml",
     "descripcion": "Naranjada Natulac 250ml para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $1.7, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Jugos",
     "precio_usd": 1.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/naranjada_natulac_250ml.webp"
+      "productos2/naranjada_natulac_250ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -508,11 +508,11 @@
     "nombre": "Té Durazno/Limón Parmalat 1.5 Lt",
     "descripcion": "Té Durazno/Limón Parmalat 1.5 Lt para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $4.5, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Té",
     "precio_usd": 4.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/te_durazno_limon_parmalat_1_5lt.webp"
+      "productos2/te_durazno_limon_parmalat_1_5lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -526,11 +526,11 @@
     "nombre": "Té Parmalat 1 Lt",
     "descripcion": "Té Parmalat 1 Lt para refrescar tu día. Bebida fresca y deliciosa, ideal para acompañar cualquier comida. Precio: $4.8, pedidos por WhatsApp o delivery a domicilio.",
     "categoria": "Bebidas",
-    "subcategoria": "",
+    "subcategoria": "Té",
     "precio_usd": 4.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/te_parmalat_1_lt.webp"
+      "productos2/te_parmalat_1_lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -544,11 +544,11 @@
     "nombre": "Migurt 750g",
     "descripcion": "Migurt 750g fresco y de calidad para tu alimentación diaria. Ideal para desayunos, meriendas y recetas. Disponible por $8.3 con delivery.",
     "categoria": "Lácteos",
-    "subcategoria": "",
+    "subcategoria": "Yogurt",
     "precio_usd": 8.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/migurt_750g.webp"
+      "productos2/migurt_750g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -562,11 +562,11 @@
     "nombre": "Carbón Vegetal Brixia Fidelis 2kg",
     "descripcion": "Carbón Vegetal Brixia Fidelis 2kg básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $4.3, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Carbón / Parrilla",
     "precio_usd": 4.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -580,11 +580,11 @@
     "nombre": "Carbón Rosado",
     "descripcion": "Carbón Rosado básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $10.8, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Carbón / Parrilla",
     "precio_usd": 10.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/carbon_rosado.webp"
+      "productos2/carbon_rosado.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -598,11 +598,11 @@
     "nombre": "Papas Chips Piter 71g",
     "descripcion": "Papas Chips Piter 71g perfecto para picar entre horas. Snack crujiente y sabroso, ideal para compartir. Precio: $1.9 con delivery a domicilio.",
     "categoria": "Snacks y Frituras",
-    "subcategoria": "",
+    "subcategoria": "Snacks y Frituras",
     "precio_usd": 1.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/papas_chips_piter_71g.webp"
+      "productos2/papas_chips_piter_71g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -616,11 +616,11 @@
     "nombre": "Tostón Salseritos 270g",
     "descripcion": "Tostón Salseritos 270g perfecto para picar entre horas. Snack crujiente y sabroso, ideal para compartir. Precio: $4.99 con delivery a domicilio.",
     "categoria": "Snacks y Frituras",
-    "subcategoria": "",
+    "subcategoria": "Snacks y Frituras",
     "precio_usd": 4.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/toston_salseritos_270g.webp"
+      "productos2/toston_salseritos_270g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -634,11 +634,11 @@
     "nombre": "Chicharrones Gralo 40g",
     "descripcion": "Chicharrones Gralo 40g perfecto para picar entre horas. Snack crujiente y sabroso, ideal para compartir. Precio: $2.8 con delivery a domicilio.",
     "categoria": "Snacks y Frituras",
-    "subcategoria": "",
+    "subcategoria": "Snacks y Frituras",
     "precio_usd": 2.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/chicharrones_gralo_40g.webp"
+      "productos2/chicharrones_gralo_40g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -656,7 +656,7 @@
     "precio_usd": 1.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/frijol_pico_negro_pantera_454g.webp"
+      "productos2/frijol_pico_negro_pantera_454g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -670,11 +670,11 @@
     "nombre": "Arvejas Verde Partida Pantera 400gr",
     "descripcion": "Arvejas Verde Partida Pantera 400gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $1.8, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "",
+    "subcategoria": "Conservas",
     "precio_usd": 1.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/arvejas_verde_partida_pantera_400gr.webp"
+      "productos2/arvejas_verde_partida_pantera_400gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -688,11 +688,11 @@
     "nombre": "Maiz para Cotufa Mary 400gr",
     "descripcion": "Maiz para Cotufa Mary 400gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $1.6, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Snacks",
     "precio_usd": 1.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/maiz_para_cotufa_mary_400gr.webp"
+      "productos2/maiz_para_cotufa_mary_400gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -706,11 +706,11 @@
     "nombre": "Maiz para Cotufas Pantera 500g",
     "descripcion": "Maiz para Cotufas Pantera 500g básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $2.2, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Snacks",
     "precio_usd": 2.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/maiz_para_cotufas_pantera_500g.webp"
+      "productos2/maiz_para_cotufas_pantera_500g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -728,7 +728,7 @@
     "precio_usd": 1.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/arroz_primor_clasico_1kg.webp"
+      "productos2/arroz_primor_clasico_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -746,7 +746,7 @@
     "precio_usd": 1.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/arroz_mary_tradicional_900gr.webp"
+      "productos2/arroz_mary_tradicional_900gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -764,7 +764,7 @@
     "precio_usd": 1.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/arroz_favorito_tipo1_1kg.webp"
+      "productos2/arroz_favorito_tipo1_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -782,7 +782,7 @@
     "precio_usd": 1.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/fideo_capri_250gr.webp"
+      "productos2/fideo_capri_250gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -800,7 +800,7 @@
     "precio_usd": 1,
     "stock": 100,
     "imagen_urls": [
-      "productos/renata_express_sabor_a_carne_85g.webp"
+      "productos2/renata_express_sabor_a_carne_85g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -818,7 +818,7 @@
     "precio_usd": 1.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_para_pasticho_sindoni_250g.webp"
+      "productos2/pasta_para_pasticho_sindoni_250g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -836,7 +836,7 @@
     "precio_usd": 2.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_dedales_primor_1kg.webp"
+      "productos2/pasta_dedales_primor_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -854,7 +854,7 @@
     "precio_usd": 2.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_tornillo_primor_1kg.webp"
+      "productos2/pasta_tornillo_primor_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -872,7 +872,7 @@
     "precio_usd": 2.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_mary_pluma_superior_1kg.webp"
+      "productos2/pasta_mary_pluma_superior_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -890,7 +890,7 @@
     "precio_usd": 2,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_plumitas_extra_especial_primor_1kg.webp"
+      "productos2/pasta_plumitas_extra_especial_primor_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -908,7 +908,7 @@
     "precio_usd": 2.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_plumitas_primor_1kg.webp"
+      "productos2/pasta_plumitas_primor_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -926,7 +926,7 @@
     "precio_usd": 2.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_della_nonna_premium_plumas_1kg.webp"
+      "productos2/pasta_della_nonna_premium_plumas_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -944,7 +944,7 @@
     "precio_usd": 2.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_della_nonna_premium_tornillo_1kg.webp"
+      "productos2/pasta_della_nonna_premium_tornillo_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -962,7 +962,7 @@
     "precio_usd": 2.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_della_nonna_premium_vermicelli_1kg.webp"
+      "productos2/pasta_della_nonna_premium_vermicelli_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -980,7 +980,7 @@
     "precio_usd": 1.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_galo_espaguete_500gr.webp"
+      "productos2/pasta_galo_espaguete_500gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -998,7 +998,7 @@
     "precio_usd": 1.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_galo_parafuso_500gr.webp"
+      "productos2/pasta_galo_parafuso_500gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1016,7 +1016,7 @@
     "precio_usd": 2.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_primor_vermicelli_1kg.webp"
+      "productos2/pasta_primor_vermicelli_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1034,7 +1034,7 @@
     "precio_usd": 1.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_primor_vermicelli_500gr.webp"
+      "productos2/pasta_primor_vermicelli_500gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1052,7 +1052,7 @@
     "precio_usd": 1.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/pasta_extra_especial_vermicelli_primor_1kg.webp"
+      "productos2/pasta_extra_especial_vermicelli_primor_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1070,7 +1070,7 @@
     "precio_usd": 1.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/harina_de_trigo_todo_uso_mary_900gr.webp"
+      "productos2/harina_de_trigo_todo_uso_mary_900gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1088,7 +1088,7 @@
     "precio_usd": 1.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/harina_de_trigo_leudante_mary_900gr.webp"
+      "productos2/harina_de_trigo_leudante_mary_900gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1106,7 +1106,7 @@
     "precio_usd": 5.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/harinana_harina_de_yuca_blanca_500gr.webp"
+      "productos2/harinana_harina_de_yuca_blanca_500gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1124,7 +1124,7 @@
     "precio_usd": 1.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/harina_de_trigo_repostera_aveiro_1kg.webp"
+      "productos2/harina_de_trigo_repostera_aveiro_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1142,7 +1142,7 @@
     "precio_usd": 1.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/harina_de_maiz_blanco_lucharepa_1kg.webp"
+      "productos2/harina_de_maiz_blanco_lucharepa_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1160,7 +1160,7 @@
     "precio_usd": 3.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/harina_pan_blanca_2kg.webp"
+      "productos2/harina_pan_blanca_2kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1178,7 +1178,7 @@
     "precio_usd": 1.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/harina_pan_blanca_1kg.webp"
+      "productos2/harina_pan_blanca_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1192,11 +1192,11 @@
     "nombre": "Pan Arepitas Dulce 500gr",
     "descripcion": "Pan Arepitas Dulce 500gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $3.1, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "",
+    "subcategoria": "Panaderia",
     "precio_usd": 3.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/pan_arepitas_dulce_500gr.webp"
+      "productos2/pan_arepitas_dulce_500gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1214,7 +1214,7 @@
     "precio_usd": 4.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1232,7 +1232,7 @@
     "precio_usd": 5.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_mazeite_1ltr.webp"
+      "productos2/aceite_mazeite_1ltr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1250,7 +1250,7 @@
     "precio_usd": 1.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/vinagre_mavesa_500ml.webp"
+      "productos2/vinagre_mavesa_500ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1268,7 +1268,7 @@
     "precio_usd": 5.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1286,7 +1286,7 @@
     "precio_usd": 19.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1304,7 +1304,7 @@
     "precio_usd": 2.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/vinagre_mavesa_1ltr.webp"
+      "productos2/vinagre_mavesa_1ltr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1322,7 +1322,7 @@
     "precio_usd": 5.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/esencia_de_vainilla_maccormick_150ml.webp"
+      "productos2/esencia_de_vainilla_maccormick_150ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1336,11 +1336,11 @@
     "nombre": "Mermelada Mounit el Bait 380gr",
     "descripcion": "Mermelada Mounit el Bait 380gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $5.3, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "",
+    "subcategoria": "Conservas",
     "precio_usd": 5.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/mermelada_mounit_el_bait_380gr.webp"
+      "productos2/mermelada_mounit_el_bait_380gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1354,11 +1354,11 @@
     "nombre": "Cerezas en Almibar Osole 190gr",
     "descripcion": "Cerezas en Almibar Osole 190gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $5.4, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "",
+    "subcategoria": "Conservas",
     "precio_usd": 5.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/cerezas_en_almibar_osole_190gr.webp"
+      "productos2/cerezas_en_almibar_osole_190gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1372,11 +1372,11 @@
     "nombre": "Aceitunas Negras en Rodajas Osole 340gr",
     "descripcion": "Aceitunas Negras en Rodajas Osole 340gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $4.2, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "",
+    "subcategoria": "Conservas",
     "precio_usd": 4.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceitunas_negras_en_rodajas_osole_340gr.webp"
+      "productos2/aceitunas_negras_en_rodajas_osole_340gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1394,7 +1394,7 @@
     "precio_usd": 3.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_bbq_honey_mustard_mccormick.webp"
+      "productos2/salsa_bbq_honey_mustard_mccormick.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1412,7 +1412,7 @@
     "precio_usd": 2.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/mostaza_heinz_195gr.webp"
+      "productos2/mostaza_heinz_195gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1430,7 +1430,7 @@
     "precio_usd": 3.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_picante_fritz_250g.webp"
+      "productos2/salsa_picante_fritz_250g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1448,7 +1448,7 @@
     "precio_usd": 4.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_de_maiz_fritz_240gr.webp"
+      "productos2/salsa_de_maiz_fritz_240gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1466,7 +1466,7 @@
     "precio_usd": 4.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_queso_cheddar_fritz_240gr.webp"
+      "productos2/salsa_queso_cheddar_fritz_240gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1484,7 +1484,7 @@
     "precio_usd": 4.15,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_tartara_fritz_240gr.webp"
+      "productos2/salsa_tartara_fritz_240gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1502,7 +1502,7 @@
     "precio_usd": 3.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_picante_aji_chirel_250ml.webp"
+      "productos2/salsa_picante_aji_chirel_250ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1520,7 +1520,7 @@
     "precio_usd": 2.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_tipo_cheddar_220gr_nerano.webp"
+      "productos2/salsa_tipo_cheddar_220gr_nerano.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1538,7 +1538,7 @@
     "precio_usd": 7.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/sweet_relish_heinz_769ml.webp"
+      "productos2/sweet_relish_heinz_769ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1556,7 +1556,7 @@
     "precio_usd": 2.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_para_pasta_mediterranea_340gr.webp"
+      "productos2/salsa_para_pasta_mediterranea_340gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1574,7 +1574,7 @@
     "precio_usd": 2.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_para_pastas_aceitunas_340gr_osole.webp"
+      "productos2/salsa_para_pastas_aceitunas_340gr_osole.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1592,7 +1592,7 @@
     "precio_usd": 2.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_para_pasta_al_vodka_osole_340gr.webp"
+      "productos2/salsa_para_pasta_al_vodka_osole_340gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1610,7 +1610,7 @@
     "precio_usd": 5.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/pure_de_tomate_pomi_700g.webp"
+      "productos2/pure_de_tomate_pomi_700g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1628,7 +1628,7 @@
     "precio_usd": 5,
     "stock": 100,
     "imagen_urls": [
-      "productos/pure_de_tomate_heinz_490g.webp"
+      "productos2/pure_de_tomate_heinz_490g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1646,7 +1646,7 @@
     "precio_usd": 4.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_para_pizza_heinz_480gr.webp"
+      "productos2/salsa_para_pizza_heinz_480gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1664,7 +1664,7 @@
     "precio_usd": 2.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/tomates_pelados_ole_lta_400g.webp"
+      "productos2/tomates_pelados_ole_lta_400g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1682,7 +1682,7 @@
     "precio_usd": 3.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/ketchup_heinz_567gr.webp"
+      "productos2/ketchup_heinz_567gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1700,7 +1700,7 @@
     "precio_usd": 3.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/ketchup_heinz_397gr.webp"
+      "productos2/ketchup_heinz_397gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1718,7 +1718,7 @@
     "precio_usd": 1.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/ketchup_heinz_198gr.webp"
+      "productos2/ketchup_heinz_198gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1736,7 +1736,7 @@
     "precio_usd": 1.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_de_tomate_pampero_198g.webp"
+      "productos2/salsa_de_tomate_pampero_198g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1754,7 +1754,7 @@
     "precio_usd": 6.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/rikesa_cheddar_330gr_squeeze.webp"
+      "productos2/rikesa_cheddar_330gr_squeeze.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1772,7 +1772,7 @@
     "precio_usd": 6.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/rikesa_tocineta_300gr.webp"
+      "productos2/rikesa_tocineta_300gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1790,7 +1790,7 @@
     "precio_usd": 6.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/rikesa_cheddar_300gr.webp"
+      "productos2/rikesa_cheddar_300gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1808,7 +1808,7 @@
     "precio_usd": 4.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/rikesa_cheddar_200gr.webp"
+      "productos2/rikesa_cheddar_200gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1826,7 +1826,7 @@
     "precio_usd": 4.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/rikesa_parmesano_200gr.webp"
+      "productos2/rikesa_parmesano_200gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1844,7 +1844,7 @@
     "precio_usd": 4.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/mayonesa_mavesa_445gr.webp"
+      "productos2/mayonesa_mavesa_445gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1862,7 +1862,7 @@
     "precio_usd": 8.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/mayonesa_mavesa_910gr.webp"
+      "productos2/mayonesa_mavesa_910gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1876,11 +1876,11 @@
     "nombre": "Margarina Nelly 250g",
     "descripcion": "Margarina Nelly 250g básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $1.8, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Mantequilla",
     "precio_usd": 1.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/margarina_nelly_250g.webp"
+      "productos2/margarina_nelly_250g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1894,11 +1894,11 @@
     "nombre": "Margarina Nelly 500g",
     "descripcion": "Margarina Nelly 500g básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $3.3, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Mantequilla",
     "precio_usd": 3.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/margarina_nelly_500g.webp"
+      "productos2/margarina_nelly_500g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1912,11 +1912,11 @@
     "nombre": "Margarina Mavesa 250g",
     "descripcion": "Margarina Mavesa 250g básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $1.9, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Mantequilla",
     "precio_usd": 1.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/margarina_mavesa_250g.webp"
+      "productos2/margarina_mavesa_250g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1930,11 +1930,11 @@
     "nombre": "Margarina Mavesa 500gr",
     "descripcion": "Margarina Mavesa 500gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $3.6, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Mantequilla",
     "precio_usd": 3.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/margarina_mavesa_500gr.webp"
+      "productos2/margarina_mavesa_500gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1948,11 +1948,11 @@
     "nombre": "Maizina Americana 400gr",
     "descripcion": "Maizina Americana 400gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $4, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Harinas",
     "precio_usd": 4,
     "stock": 100,
     "imagen_urls": [
-      "productos/maizina_americana_400gr.webp"
+      "productos2/maizina_americana_400gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1966,11 +1966,11 @@
     "nombre": "Maizina Americana 200g",
     "descripcion": "Maizina Americana 200g básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $2.4, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Harinas",
     "precio_usd": 2.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/maizina_americana_200g.webp"
+      "productos2/maizina_americana_200g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -1984,11 +1984,11 @@
     "nombre": "Maizina Americana 90gr",
     "descripcion": "Maizina Americana 90gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $1.2, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Harinas",
     "precio_usd": 1.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/maizina_americana_90gr.webp"
+      "productos2/maizina_americana_90gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2002,11 +2002,11 @@
     "nombre": "Maizina Americana 120gr",
     "descripcion": "Maizina Americana 120gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $1.3, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Harinas",
     "precio_usd": 1.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/maizina_americana_120gr.webp"
+      "productos2/maizina_americana_120gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2020,11 +2020,11 @@
     "nombre": "Toddy 400g",
     "descripcion": "Toddy 400g básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $6.55, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Chocolate",
     "precio_usd": 6.55,
     "stock": 100,
     "imagen_urls": [
-      "productos/toddy_400g.webp"
+      "productos2/toddy_400g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2038,11 +2038,11 @@
     "nombre": "Toddy 200gr",
     "descripcion": "Toddy 200gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $3.3, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Chocolate",
     "precio_usd": 3.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/toddy_200gr.webp"
+      "productos2/toddy_200gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2056,11 +2056,11 @@
     "nombre": "Toddy Bolsa 100gr",
     "descripcion": "Toddy Bolsa 100gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $1.8, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "Especias",
+    "subcategoria": "Chocolate",
     "precio_usd": 1.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/toddy_bolsa_100gr.webp"
+      "productos2/toddy_bolsa_100gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2078,7 +2078,7 @@
     "precio_usd": 2.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/mayonesa_kraft_175g.webp"
+      "productos2/mayonesa_kraft_175g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2096,7 +2096,7 @@
     "precio_usd": 1.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/mayonesa_dona_tita_175gr.webp"
+      "productos2/mayonesa_dona_tita_175gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2114,7 +2114,7 @@
     "precio_usd": 3.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/mayonesa_dona_tita_445gr.webp"
+      "productos2/mayonesa_dona_tita_445gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2128,11 +2128,11 @@
     "nombre": "Aceitunas Verdes Deshuesadas 830gr",
     "descripcion": "Aceitunas Verdes Deshuesadas 830gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $8.5, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "",
+    "subcategoria": "Conservas",
     "precio_usd": 8.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceitunas_verdes_deshuesadas_830gr.webp"
+      "productos2/aceitunas_verdes_deshuesadas_830gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2150,7 +2150,7 @@
     "precio_usd": 4.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/pepinillos_agridulces_nerano_500gr.webp"
+      "productos2/pepinillos_agridulces_nerano_500gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2164,11 +2164,11 @@
     "nombre": "Alcaparras Loreto 240gr",
     "descripcion": "Alcaparras Loreto 240gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $3.3, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "",
+    "subcategoria": "Conservas",
     "precio_usd": 3.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/alcaparras_loreto_240gr.webp"
+      "productos2/alcaparras_loreto_240gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2182,11 +2182,11 @@
     "nombre": "Aceitunas Verdes Enteras 240gr Frasco",
     "descripcion": "Aceitunas Verdes Enteras 240gr Frasco básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $2.6, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "",
+    "subcategoria": "Conservas",
     "precio_usd": 2.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceitunas_verdes_enteras_240gr_frasco.webp"
+      "productos2/aceitunas_verdes_enteras_240gr_frasco.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2204,7 +2204,7 @@
     "precio_usd": 5,
     "stock": 100,
     "imagen_urls": [
-      "productos/melaza_de_uvas_darna_250ml.webp"
+      "productos2/melaza_de_uvas_darna_250ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2222,7 +2222,7 @@
     "precio_usd": 8.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/vinagre_de_sidra_de_manzana_500ml.webp"
+      "productos2/vinagre_de_sidra_de_manzana_500ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2240,7 +2240,7 @@
     "precio_usd": 5.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/vinagre_de_manzana_el_bait_mounit_1ltr.webp"
+      "productos2/vinagre_de_manzana_el_bait_mounit_1ltr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2258,7 +2258,7 @@
     "precio_usd": 3,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_de_ajo_iberia_300ml.webp"
+      "productos2/salsa_de_ajo_iberia_300ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2276,7 +2276,7 @@
     "precio_usd": 5.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/vino_tinto_dona_tita_700ml.webp"
+      "productos2/vino_tinto_dona_tita_700ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2294,7 +2294,7 @@
     "precio_usd": 2.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_inglesa_mccormick_150ml.webp"
+      "productos2/salsa_inglesa_mccormick_150ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2312,7 +2312,7 @@
     "precio_usd": 1.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/salsa_inglesa_ole_150ml.webp"
+      "productos2/salsa_inglesa_ole_150ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2330,7 +2330,7 @@
     "precio_usd": 2.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/adobo_que_ricos_son_200gr.webp"
+      "productos2/adobo_que_ricos_son_200gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2348,7 +2348,7 @@
     "precio_usd": 3.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/sabroseador_que_ricos_son_140gr.webp"
+      "productos2/sabroseador_que_ricos_son_140gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2366,7 +2366,7 @@
     "precio_usd": 5.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/canela_molida_que_ricos_son_125gr.webp"
+      "productos2/canela_molida_que_ricos_son_125gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2384,7 +2384,7 @@
     "precio_usd": 2.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/garbanzo_chtaura_400gr.webp"
+      "productos2/garbanzo_chtaura_400gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2398,11 +2398,11 @@
     "nombre": "Palmitos Entero Mary Lta 400gr",
     "descripcion": "Palmitos Entero Mary Lta 400gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $6.8, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "",
+    "subcategoria": "Conservas",
     "precio_usd": 6.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/palmitos_entero_mary_lta_400gr.webp"
+      "productos2/palmitos_entero_mary_lta_400gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2416,11 +2416,11 @@
     "nombre": "Guisantes Osole 280gr Lata",
     "descripcion": "Guisantes Osole 280gr Lata básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $1.8, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "",
+    "subcategoria": "Conservas",
     "precio_usd": 1.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/guisantes_osole_280gr_lata.webp"
+      "productos2/guisantes_osole_280gr_lata.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2434,11 +2434,11 @@
     "nombre": "Maiz y Guisantes Osole Lta 280gr",
     "descripcion": "Maiz y Guisantes Osole Lta 280gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $2, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "",
+    "subcategoria": "Conservas",
     "precio_usd": 2,
     "stock": 100,
     "imagen_urls": [
-      "productos/maiz_y_guisantes_osole_lta_280gr.webp"
+      "productos2/maiz_y_guisantes_osole_lta_280gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2456,7 +2456,7 @@
     "precio_usd": 2.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/maiz_dulce_osole_280gr_lata.webp"
+      "productos2/maiz_dulce_osole_280gr_lata.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2474,7 +2474,7 @@
     "precio_usd": 2.35,
     "stock": 100,
     "imagen_urls": [
-      "productos/maiz_y_guisantes_ole_250gr_vidrio.webp"
+      "productos2/maiz_y_guisantes_ole_250gr_vidrio.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2492,7 +2492,7 @@
     "precio_usd": 2.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/maiz_dulce_arel_lta_227gr.webp"
+      "productos2/maiz_dulce_arel_lta_227gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2505,12 +2505,12 @@
     "id": "prod_0142",
     "nombre": "Sardinas en Aceite Alvarigua 170gr",
     "descripcion": "Sardinas en Aceite Alvarigua 170gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $1, disponible para delivery en El Trigal y alrededores.",
-    "categoria": "Viveres",
-    "subcategoria": "Aceites",
+    "categoria": "Conservas",
+    "subcategoria": "Sardinas",
     "precio_usd": 1,
     "stock": 100,
     "imagen_urls": [
-      "productos/sardinas_en_aceite_alvarigua_170gr.webp"
+      "productos2/sardinas_en_aceite_alvarigua_170gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2528,7 +2528,7 @@
     "precio_usd": 1.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/sardina_en_salsa_de_tomate_margarita.webp"
+      "productos2/sardina_en_salsa_de_tomate_margarita.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2542,11 +2542,11 @@
     "nombre": "Pepitonas Picantes Margarita 140g",
     "descripcion": "Pepitonas Picantes Margarita 140g básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $2.3, disponible para delivery en El Trigal y alrededores.",
     "categoria": "Viveres",
-    "subcategoria": "",
+    "subcategoria": "Enlatados",
     "precio_usd": 2.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/pepitonas_picantes_margarita_140g.webp"
+      "productos2/pepitonas_picantes_margarita_140g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2564,7 +2564,7 @@
     "precio_usd": 2.75,
     "stock": 100,
     "imagen_urls": [
-      "productos/atun_margarita_natural_140gr.webp"
+      "productos2/atun_margarita_natural_140gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2582,7 +2582,7 @@
     "precio_usd": 1.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/atun_desmenuzado_en_aceite_california.webp"
+      "productos2/atun_desmenuzado_en_aceite_california.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2600,7 +2600,7 @@
     "precio_usd": 2.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/atun_entero_en_aceite_bubba_170gr.webp"
+      "productos2/atun_entero_en_aceite_bubba_170gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2618,7 +2618,7 @@
     "precio_usd": 3,
     "stock": 100,
     "imagen_urls": [
-      "productos/atun_entero_en_aceite_de_oliva_bubba_170gr.webp"
+      "productos2/atun_entero_en_aceite_de_oliva_bubba_170gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2636,7 +2636,7 @@
     "precio_usd": 4.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/atun_ensalada_mexicana_margarita.webp"
+      "productos2/atun_ensalada_mexicana_margarita.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2654,7 +2654,7 @@
     "precio_usd": 9.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2672,7 +2672,7 @@
     "precio_usd": 12,
     "stock": 100,
     "imagen_urls": [
-      "productos/k_nina_adultos_pollo_y_vegetales_2kg.webp"
+      "productos2/k_nina_adultos_pollo_y_vegetales_2kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2690,7 +2690,7 @@
     "precio_usd": 12,
     "stock": 100,
     "imagen_urls": [
-      "productos/k_nina_adulto_carne_cereal_arroz_2kg.webp"
+      "productos2/k_nina_adulto_carne_cereal_arroz_2kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2708,7 +2708,7 @@
     "precio_usd": 26.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/gatsy_carne_y_arroz_3kg.webp"
+      "productos2/gatsy_carne_y_arroz_3kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2726,7 +2726,7 @@
     "precio_usd": 11.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/colonia_rinti_240ml_uso_veterinario.webp"
+      "productos2/colonia_rinti_240ml_uso_veterinario.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2744,7 +2744,7 @@
     "precio_usd": 11,
     "stock": 100,
     "imagen_urls": [
-      "productos/polvo_antipulgas_rinti_100gr.webp"
+      "productos2/polvo_antipulgas_rinti_100gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2762,7 +2762,7 @@
     "precio_usd": 19.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/espuma_bano_seco_rinti_220ml.webp"
+      "productos2/espuma_bano_seco_rinti_220ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2780,7 +2780,7 @@
     "precio_usd": 2.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/ringo_perrarina_original_500gr.webp"
+      "productos2/ringo_perrarina_original_500gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2798,7 +2798,7 @@
     "precio_usd": 5,
     "stock": 100,
     "imagen_urls": [
-      "productos/ringo_perrarina_cachorros_1kg.webp"
+      "productos2/ringo_perrarina_cachorros_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2816,7 +2816,7 @@
     "precio_usd": 8.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/gatarina_donkat_adultos_1_1kg.webp"
+      "productos2/gatarina_donkat_adultos_1_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2834,7 +2834,7 @@
     "precio_usd": 8.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/gatarina_donkat_gaticos_1kg.webp"
+      "productos2/gatarina_donkat_gaticos_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2852,7 +2852,7 @@
     "precio_usd": 17,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2870,7 +2870,7 @@
     "precio_usd": 6.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/mirringo_gaticos_cachorros_1kg.webp"
+      "productos2/mirringo_gaticos_cachorros_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2888,7 +2888,7 @@
     "precio_usd": 4.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/mirringo_gaticos_cachorros_500gr.webp"
+      "productos2/mirringo_gaticos_cachorros_500gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2906,7 +2906,7 @@
     "precio_usd": 4.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/mirringo_gatarina_adultos_500gr.webp"
+      "productos2/mirringo_gatarina_adultos_500gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2924,7 +2924,7 @@
     "precio_usd": 7.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/mirringo_gatarina_adultos_1kg.webp"
+      "productos2/mirringo_gatarina_adultos_1kg.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2942,7 +2942,7 @@
     "precio_usd": 4,
     "stock": 100,
     "imagen_urls": [
-      "productos/papel_sutil_4r_300h_doble.webp"
+      "productos2/papel_sutil_4r_300h_doble.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2960,7 +2960,7 @@
     "precio_usd": 0.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/papel_hig_super_suplex_300h_paveca.webp"
+      "productos2/papel_hig_super_suplex_300h_paveca.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2978,7 +2978,7 @@
     "precio_usd": 1.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/papel_rosal_180_hojas.webp"
+      "productos2/papel_rosal_180_hojas.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -2996,7 +2996,7 @@
     "precio_usd": 4.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/papel_higienico_ti_suf_4rollos.webp"
+      "productos2/papel_higienico_ti_suf_4rollos.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3014,7 +3014,7 @@
     "precio_usd": 2.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/papel_caricias_300h_4r.webp"
+      "productos2/papel_caricias_300h_4r.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3032,7 +3032,7 @@
     "precio_usd": 3.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/papel_scott_rinde_max_4rollos.webp"
+      "productos2/papel_scott_rinde_max_4rollos.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3050,7 +3050,7 @@
     "precio_usd": 4,
     "stock": 100,
     "imagen_urls": [
-      "productos/papel_rosal_400h.webp"
+      "productos2/papel_rosal_400h.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3068,7 +3068,7 @@
     "precio_usd": 1.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/papel_higienico_gadusofty_215h_4r.webp"
+      "productos2/papel_higienico_gadusofty_215h_4r.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3086,7 +3086,7 @@
     "precio_usd": 3.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/desinfectante_las_llaves_500ml.webp"
+      "productos2/desinfectante_las_llaves_500ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3104,7 +3104,7 @@
     "precio_usd": 2.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/mata_olores_valp_675ml.webp"
+      "productos2/mata_olores_valp_675ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3117,12 +3117,12 @@
     "id": "prod_0176",
     "nombre": "Ajax Antibacterial 500ml",
     "descripcion": "Ajax Antibacterial 500ml básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $4.5, disponible para delivery en El Trigal y alrededores.",
-    "categoria": "Viveres",
-    "subcategoria": "",
+    "categoria": "Limpieza",
+    "subcategoria": "Limpiadores",
     "precio_usd": 4.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/ajax_antibacterial_500ml.webp"
+      "productos2/ajax_antibacterial_500ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3135,12 +3135,12 @@
     "id": "prod_0177",
     "nombre": "Insect. Mata Hormigas 30gr Plagatox",
     "descripcion": "Insect. Mata Hormigas 30gr Plagatox básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $2.4, disponible para delivery en El Trigal y alrededores.",
-    "categoria": "Viveres",
-    "subcategoria": "",
+    "categoria": "Hogar",
+    "subcategoria": "Insecticidas",
     "precio_usd": 2.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/insect_mata_hormigas_30gr_plagatox.webp"
+      "productos2/insect_mata_hormigas_30gr_plagatox.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3158,7 +3158,7 @@
     "precio_usd": 6.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/limpiador_ambiente_natural_plagatox.webp"
+      "productos2/limpiador_ambiente_natural_plagatox.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3171,12 +3171,12 @@
     "id": "prod_0179",
     "nombre": "Insecticida Liq. Zancudos Plagatox",
     "descripcion": "Insecticida Liq. Zancudos Plagatox básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $9.5, disponible para delivery en El Trigal y alrededores.",
-    "categoria": "Viveres",
-    "subcategoria": "",
+    "categoria": "Hogar",
+    "subcategoria": "Insecticidas",
     "precio_usd": 9.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/insecticida_liq_zancudos_plagatox.webp"
+      "productos2/insecticida_liq_zancudos_plagatox.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3189,12 +3189,12 @@
     "id": "prod_0180",
     "nombre": "Aceite de Madera Pledge 500ml",
     "descripcion": "Aceite de Madera Pledge 500ml básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $13.3, disponible para delivery en El Trigal y alrededores.",
-    "categoria": "Viveres",
-    "subcategoria": "Aceites",
+    "categoria": "Hogar",
+    "subcategoria": "Limpieza",
     "precio_usd": 13.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3212,7 +3212,7 @@
     "precio_usd": 13.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3230,7 +3230,7 @@
     "precio_usd": 4.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/aromatizante_glade_car_70gr.webp"
+      "productos2/aromatizante_glade_car_70gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3248,7 +3248,7 @@
     "precio_usd": 7.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/aromatizante_de_ambiente_glade_230ml.webp"
+      "productos2/aromatizante_de_ambiente_glade_230ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3266,7 +3266,7 @@
     "precio_usd": 10.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3284,7 +3284,7 @@
     "precio_usd": 3.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/suavizante_downy_360ml.webp"
+      "productos2/suavizante_downy_360ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3302,7 +3302,7 @@
     "precio_usd": 3.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/vanish_liquido_300ml.webp"
+      "productos2/vanish_liquido_300ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3320,7 +3320,7 @@
     "precio_usd": 4.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/vanish_liquido_450ml.webp"
+      "productos2/vanish_liquido_450ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3338,7 +3338,7 @@
     "precio_usd": 7,
     "stock": 100,
     "imagen_urls": [
-      "productos/pato_desinfectante_sanitario_en_gel_500ml.webp"
+      "productos2/pato_desinfectante_sanitario_en_gel_500ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3356,7 +3356,7 @@
     "precio_usd": 6.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/diablo_rojo_300gr.webp"
+      "productos2/diablo_rojo_300gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3374,7 +3374,7 @@
     "precio_usd": 4.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/limpiador_de_pocetas_osirex_360ml.webp"
+      "productos2/limpiador_de_pocetas_osirex_360ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3392,7 +3392,7 @@
     "precio_usd": 6.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/limpia_hornos_osirex_265gr.webp"
+      "productos2/limpia_hornos_osirex_265gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3410,7 +3410,7 @@
     "precio_usd": 1.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/suavizante_alive_200ml.webp"
+      "productos2/suavizante_alive_200ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3428,7 +3428,7 @@
     "precio_usd": 1,
     "stock": 100,
     "imagen_urls": [
-      "productos/hoja_de_segueta_1_und_retirar_por_caja.webp"
+      "productos2/hoja_de_segueta_1_und_retirar_por_caja.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3446,7 +3446,7 @@
     "precio_usd": 3.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/cuchilla_oster.webp"
+      "productos2/cuchilla_oster.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3459,12 +3459,12 @@
     "id": "prod_0195",
     "nombre": "Velas de Oracion Bipa 5und",
     "descripcion": "Velas de Oracion Bipa 5und básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $2.4, disponible para delivery en El Trigal y alrededores.",
-    "categoria": "Viveres",
-    "subcategoria": "",
+    "categoria": "Hogar",
+    "subcategoria": "Velas",
     "precio_usd": 2.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/velas_de_oracion_bipa_5und.webp"
+      "productos2/velas_de_oracion_bipa_5und.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3482,7 +3482,7 @@
     "precio_usd": 10.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/formula_mecanica_70_6_sq_354cm.webp"
+      "productos2/formula_mecanica_70_6_sq_354cm.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3500,7 +3500,7 @@
     "precio_usd": 2,
     "stock": 100,
     "imagen_urls": [
-      "productos/probador_de_corriente_ac_100_500v.webp"
+      "productos2/probador_de_corriente_ac_100_500v.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3518,7 +3518,7 @@
     "precio_usd": 2,
     "stock": 100,
     "imagen_urls": [
-      "productos/bolsas_plasticas_calidex_60lts_6uni.webp"
+      "productos2/bolsas_plasticas_calidex_60lts_6uni.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3536,7 +3536,7 @@
     "precio_usd": 4.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/bolsas_ziploc_50_und_scjohnson.webp"
+      "productos2/bolsas_ziploc_50_und_scjohnson.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3554,7 +3554,7 @@
     "precio_usd": 2.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/papel_aluminio_aluhogar_15_mtrs.webp"
+      "productos2/papel_aluminio_aluhogar_15_mtrs.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3572,7 +3572,7 @@
     "precio_usd": 3.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/papel_aluminio_reynolds_5mtx30cm.webp"
+      "productos2/papel_aluminio_reynolds_5mtx30cm.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3590,7 +3590,7 @@
     "precio_usd": 3.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/esponja_acerada_calidex.webp"
+      "productos2/esponja_acerada_calidex.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3608,7 +3608,7 @@
     "precio_usd": 2.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/lavaplatos_axion_multiuso_235gr.webp"
+      "productos2/lavaplatos_axion_multiuso_235gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3626,7 +3626,7 @@
     "precio_usd": 3.15,
     "stock": 100,
     "imagen_urls": [
-      "productos/lavaplatos_liq_aliclean_350ml_alive.webp"
+      "productos2/lavaplatos_liq_aliclean_350ml_alive.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3644,7 +3644,7 @@
     "precio_usd": 5.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/jabon_liquido_multiuso_valp_675ml.webp"
+      "productos2/jabon_liquido_multiuso_valp_675ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3662,7 +3662,7 @@
     "precio_usd": 7.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/shampoo_pantene_bambu_200ml.webp"
+      "productos2/shampoo_pantene_bambu_200ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3680,7 +3680,7 @@
     "precio_usd": 19.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/acondicionador_keratina_pantene.webp"
+      "productos2/acondicionador_keratina_pantene.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3698,7 +3698,7 @@
     "precio_usd": 12.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/acondicionador_reconst_aminoacido.webp"
+      "productos2/acondicionador_reconst_aminoacido.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3716,7 +3716,7 @@
     "precio_usd": 3.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/jabon_barra_cream_lan_3pack_270gr.webp"
+      "productos2/jabon_barra_cream_lan_3pack_270gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3734,7 +3734,7 @@
     "precio_usd": 4,
     "stock": 100,
     "imagen_urls": [
-      "productos/jabon_barra_covex_tripack_345gr_dalan.webp"
+      "productos2/jabon_barra_covex_tripack_345gr_dalan.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3752,7 +3752,7 @@
     "precio_usd": 8.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/panales_oki_pants_xxg_25und.webp"
+      "productos2/panales_oki_pants_xxg_25und.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3765,12 +3765,12 @@
     "id": "prod_0212",
     "nombre": "Pañales Adultos Unisex Securezza",
     "descripcion": "Pañales Adultos Unisex Securezza básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $12.5, disponible para delivery en El Trigal y alrededores.",
-    "categoria": "Viveres",
-    "subcategoria": "",
+    "categoria": "Higiene Personal",
+    "subcategoria": "Pañales",
     "precio_usd": 12.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/panales_adultos_unisex_securezza.webp"
+      "productos2/panales_adultos_unisex_securezza.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3788,7 +3788,7 @@
     "precio_usd": 9.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/desodorante_lady_ss_omega3_aerosol_91g.webp"
+      "productos2/desodorante_lady_ss_omega3_aerosol_91g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3806,7 +3806,7 @@
     "precio_usd": 6.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/desodorante_deo_axe_150ml.webp"
+      "productos2/desodorante_deo_axe_150ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3824,7 +3824,7 @@
     "precio_usd": 5,
     "stock": 100,
     "imagen_urls": [
-      "productos/cream_gel_fijador_rolda_men_250gr.webp"
+      "productos2/cream_gel_fijador_rolda_men_250gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3842,7 +3842,7 @@
     "precio_usd": 4.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/gel_fijador_rolda_250gr.webp"
+      "productos2/gel_fijador_rolda_250gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3860,7 +3860,7 @@
     "precio_usd": 3.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/gel_xtreme_250gr.webp"
+      "productos2/gel_xtreme_250gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3878,7 +3878,7 @@
     "precio_usd": 5,
     "stock": 100,
     "imagen_urls": [
-      "productos/crema_dental_kids_oralb_100gr.webp"
+      "productos2/crema_dental_kids_oralb_100gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3896,7 +3896,7 @@
     "precio_usd": 5.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/enjuague_bucal_colgate_plax_ice_250ml.webp"
+      "productos2/enjuague_bucal_colgate_plax_ice_250ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3914,7 +3914,7 @@
     "precio_usd": 2.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/crema_dental_close_up_90gr.webp"
+      "productos2/crema_dental_close_up_90gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3932,7 +3932,7 @@
     "precio_usd": 4.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/crema_dental_con_bicarbonato_oral_b.webp"
+      "productos2/crema_dental_con_bicarbonato_oral_b.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3950,7 +3950,7 @@
     "precio_usd": 2.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/crema_dental_3d_white_oral_b_70gr.webp"
+      "productos2/crema_dental_3d_white_oral_b_70gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3968,7 +3968,7 @@
     "precio_usd": 5.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/colgate_plax_100ml.webp"
+      "productos2/colgate_plax_100ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -3986,7 +3986,7 @@
     "precio_usd": 2.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/agua_oxigenada_pasarela_vol_10_20.webp"
+      "productos2/agua_oxigenada_pasarela_vol_10_20.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4004,7 +4004,7 @@
     "precio_usd": 1.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4022,7 +4022,7 @@
     "precio_usd": 7.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/tintes_maxton_kit_completo.webp"
+      "productos2/tintes_maxton_kit_completo.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4040,7 +4040,7 @@
     "precio_usd": 10.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/tintes_igora_vital_7_aceites_kit_completo.webp"
+      "productos2/tintes_igora_vital_7_aceites_kit_completo.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4058,7 +4058,7 @@
     "precio_usd": 14.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/acondicionador_3mm_restauracion_170ml.webp"
+      "productos2/acondicionador_3mm_restauracion_170ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4076,7 +4076,7 @@
     "precio_usd": 10.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/acondicionador_antiquiebre_b3.webp"
+      "productos2/acondicionador_antiquiebre_b3.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4094,7 +4094,7 @@
     "precio_usd": 10,
     "stock": 100,
     "imagen_urls": [
-      "productos/crema_de_peinar_anticaida_pantene.webp"
+      "productos2/crema_de_peinar_anticaida_pantene.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4112,7 +4112,7 @@
     "precio_usd": 6.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/crema_para_peinar_keratina_160ml.webp"
+      "productos2/crema_para_peinar_keratina_160ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4130,7 +4130,7 @@
     "precio_usd": 13.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/shampoo_pantene_colageno_300ml.webp"
+      "productos2/shampoo_pantene_colageno_300ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4148,7 +4148,7 @@
     "precio_usd": 9,
     "stock": 100,
     "imagen_urls": [
-      "productos/shampoo_sedal_340ml.webp"
+      "productos2/shampoo_sedal_340ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4166,7 +4166,7 @@
     "precio_usd": 9.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/shampoo_sedal_control_caspa_340ml.webp"
+      "productos2/shampoo_sedal_control_caspa_340ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4184,7 +4184,7 @@
     "precio_usd": 8.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/crema_para_peinar_sedal_300ml.webp"
+      "productos2/crema_para_peinar_sedal_300ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4202,7 +4202,7 @@
     "precio_usd": 8.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/shampoo_drene_370ml.webp"
+      "productos2/shampoo_drene_370ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4220,7 +4220,7 @@
     "precio_usd": 8.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/acondicionador_drene_370ml.webp"
+      "productos2/acondicionador_drene_370ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4238,7 +4238,7 @@
     "precio_usd": 7,
     "stock": 100,
     "imagen_urls": [
-      "productos/gel_de_ducha_dalan_450ml.webp"
+      "productos2/gel_de_ducha_dalan_450ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4256,7 +4256,7 @@
     "precio_usd": 5.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/shampoo_dalan_450ml.webp"
+      "productos2/shampoo_dalan_450ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4274,7 +4274,7 @@
     "precio_usd": 15.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/shampoo_2en1_palmolive_optims_700ml.webp"
+      "productos2/shampoo_2en1_palmolive_optims_700ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4292,7 +4292,7 @@
     "precio_usd": 6.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/pre_tratamiento_capilar_bbcream.webp"
+      "productos2/pre_tratamiento_capilar_bbcream.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4310,7 +4310,7 @@
     "precio_usd": 6.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/pre_tratamiento_color_proteccion.webp"
+      "productos2/pre_tratamiento_color_proteccion.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4328,7 +4328,7 @@
     "precio_usd": 12.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/shampoo_dove_nutricion_tri_oleos.webp"
+      "productos2/shampoo_dove_nutricion_tri_oleos.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4346,7 +4346,7 @@
     "precio_usd": 9.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/shampoo_savital_510ml.webp"
+      "productos2/shampoo_savital_510ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4364,7 +4364,7 @@
     "precio_usd": 8.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/shampoo_bio_every_night_365ml.webp"
+      "productos2/shampoo_bio_every_night_365ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4382,7 +4382,7 @@
     "precio_usd": 5,
     "stock": 100,
     "imagen_urls": [
-      "productos/crema_para_peinar_bio_every_night_300ml.webp"
+      "productos2/crema_para_peinar_bio_every_night_300ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4400,7 +4400,7 @@
     "precio_usd": 7,
     "stock": 100,
     "imagen_urls": [
-      "productos/tratamiento_capilar_every_night_350gr.webp"
+      "productos2/tratamiento_capilar_every_night_350gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4418,7 +4418,7 @@
     "precio_usd": 5.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/crema_para_peinar_rolda_300ml.webp"
+      "productos2/crema_para_peinar_rolda_300ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4431,12 +4431,12 @@
     "id": "prod_0249",
     "nombre": "Loción Corporal Vaseline 200ml",
     "descripcion": "Loción Corporal Vaseline 200ml básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $5.2, disponible para delivery en El Trigal y alrededores.",
-    "categoria": "Viveres",
-    "subcategoria": "",
+    "categoria": "Higiene Personal",
+    "subcategoria": "Cuidado de la Piel",
     "precio_usd": 5.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4454,7 +4454,7 @@
     "precio_usd": 4.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/crema_corporal_every_night_200ml.webp"
+      "productos2/crema_corporal_every_night_200ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4472,7 +4472,7 @@
     "precio_usd": 5.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/crema_corporal_nivea_100ml.webp"
+      "productos2/crema_corporal_nivea_100ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4490,7 +4490,7 @@
     "precio_usd": 17.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/agua_micelar_nivea_400ml.webp"
+      "productos2/agua_micelar_nivea_400ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4503,12 +4503,12 @@
     "id": "prod_0253",
     "nombre": "Jabón Azul Vale 200gr",
     "descripcion": "Jabón Azul Vale 200gr básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $0.9, disponible para delivery en El Trigal y alrededores.",
-    "categoria": "Viveres",
-    "subcategoria": "",
+    "categoria": "Higiene Personal",
+    "subcategoria": "Jabones",
     "precio_usd": 0.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/jabon_azul_vale_200gr.webp"
+      "productos2/jabon_azul_vale_200gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4526,7 +4526,7 @@
     "precio_usd": 2.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/toallas_abunda_nocturnas_alive_8uni.webp"
+      "productos2/toallas_abunda_nocturnas_alive_8uni.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4544,7 +4544,7 @@
     "precio_usd": 2.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/toalla_delgada_diva_dia_y_noche_10und.webp"
+      "productos2/toalla_delgada_diva_dia_y_noche_10und.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4562,7 +4562,7 @@
     "precio_usd": 3.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/toallas_always_ultra_suave_dia_10und_45gr.webp"
+      "productos2/toallas_always_ultra_suave_dia_10und_45gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4580,7 +4580,7 @@
     "precio_usd": 8.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/toallas_always_noche_f_abund_22und_3d_277gr.webp"
+      "productos2/toallas_always_noche_f_abund_22und_3d_277gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4598,7 +4598,7 @@
     "precio_usd": 4.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/protect_diario_sin_perfume_always_40und.webp"
+      "productos2/protect_diario_sin_perfume_always_40und.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4616,7 +4616,7 @@
     "precio_usd": 5.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/toallas_regular_always.webp"
+      "productos2/toallas_regular_always.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4634,7 +4634,7 @@
     "precio_usd": 4.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/aceite_de_soya_vatel_800ml.webp"
+      "productos2/aceite_de_soya_vatel_800ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4652,7 +4652,7 @@
     "precio_usd": 3.4,
     "stock": 100,
     "imagen_urls": [
-      "productos/vale_detergente_en_polvo_900gr.webp"
+      "productos2/vale_detergente_en_polvo_900gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4670,7 +4670,7 @@
     "precio_usd": 2.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/detergente_en_polvo_premio_800gr.webp"
+      "productos2/detergente_en_polvo_premio_800gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4688,7 +4688,7 @@
     "precio_usd": 1.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/vale_detergente_en_polvo_400g.webp"
+      "productos2/vale_detergente_en_polvo_400g.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4706,7 +4706,7 @@
     "precio_usd": 2.2,
     "stock": 100,
     "imagen_urls": [
-      "productos/ace_detergente_en_polvo_400gr.webp"
+      "productos2/ace_detergente_en_polvo_400gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4724,7 +4724,7 @@
     "precio_usd": 4.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/detergente_ariel_con_downy_800gr.webp"
+      "productos2/detergente_ariel_con_downy_800gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4742,7 +4742,7 @@
     "precio_usd": 4.3,
     "stock": 100,
     "imagen_urls": [
-      "productos/ace_detergente_en_polvo_800gr.webp"
+      "productos2/ace_detergente_en_polvo_800gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4760,7 +4760,7 @@
     "precio_usd": 3.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/detergente_l_activa_las_llaves_900gr.webp"
+      "productos2/detergente_l_activa_las_llaves_900gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4778,7 +4778,7 @@
     "precio_usd": 4.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/detergente_en_polvo_las_llaves_900gr.webp"
+      "productos2/detergente_en_polvo_las_llaves_900gr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4796,7 +4796,7 @@
     "precio_usd": 8.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/chorizo_con_ajo_la_montserratina_5und.webp"
+      "productos2/chorizo_con_ajo_la_montserratina_5und.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4814,7 +4814,7 @@
     "precio_usd": 5.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/morcilla_la_montserratina_4und.webp"
+      "productos2/morcilla_la_montserratina_4und.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4827,12 +4827,12 @@
     "id": "prod_0271",
     "nombre": "Tequeños Fiestero 50und Teque Trof",
     "descripcion": "Tequeños Fiestero 50und Teque Trof básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $6.1, disponible para delivery en El Trigal y alrededores.",
-    "categoria": "Viveres",
-    "subcategoria": "",
+    "categoria": "Charcutería y Embutidos",
+    "subcategoria": "Congelados",
     "precio_usd": 6.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/tequenos_fiestero_50und_teque_trof.webp"
+      "productos2/tequenos_fiestero_50und_teque_trof.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4850,7 +4850,7 @@
     "precio_usd": 8.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/chorizo_ahumado_la_montserratina_5und.webp"
+      "productos2/chorizo_ahumado_la_montserratina_5und.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4868,7 +4868,7 @@
     "precio_usd": 2.1,
     "stock": 100,
     "imagen_urls": [
-      "productos/rikomalt_250ml_parmalat.webp"
+      "productos2/rikomalt_250ml_parmalat.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4886,7 +4886,7 @@
     "precio_usd": 2.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/te_crystal_1_5lt.webp"
+      "productos2/te_crystal_1_5lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4899,12 +4899,12 @@
     "id": "prod_0275",
     "nombre": "Aguafiel 600ml",
     "descripcion": "Aguafiel 600ml básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $0.65, disponible para delivery en El Trigal y alrededores.",
-    "categoria": "Viveres",
-    "subcategoria": "",
+    "categoria": "Bebidas",
+    "subcategoria": "Agua",
     "precio_usd": 0.65,
     "stock": 100,
     "imagen_urls": [
-      "productos/aguafiel_600ml.webp"
+      "productos2/aguafiel_600ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4922,7 +4922,7 @@
     "precio_usd": 1.7,
     "stock": 100,
     "imagen_urls": [
-      "productos/green_spot_500ml.webp"
+      "productos2/bebida_green_spot_500ml.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4940,7 +4940,7 @@
     "precio_usd": 2.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/te_negro_limon_durazno.webp"
+      "productos2/te_negro_limon_durazno.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4958,7 +4958,7 @@
     "precio_usd": 3.6,
     "stock": 100,
     "imagen_urls": [
-      "productos/naranjada_natulac_1lt.webp"
+      "productos2/naranjada_natulac_1lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4971,12 +4971,12 @@
     "id": "prod_0279",
     "nombre": "Aguafiel 1.5 L",
     "descripcion": "Aguafiel 1.5 L básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $1.35, disponible para delivery en El Trigal y alrededores.",
-    "categoria": "Viveres",
-    "subcategoria": "",
+    "categoria": "Bebidas",
+    "subcategoria": "Agua",
     "precio_usd": 1.35,
     "stock": 100,
     "imagen_urls": [
-      "productos/aguafiel_1_5_l.webp"
+      "productos2/aguafiel_1_5_l.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -4994,7 +4994,7 @@
     "precio_usd": 2.9,
     "stock": 100,
     "imagen_urls": [
-      "productos/jugo_natulac_1lt.webp"
+      "productos2/jugo_natulac_1lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -5012,7 +5012,7 @@
     "precio_usd": 1.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/frutys_bebida_tropical_1_5lt.webp"
+      "productos2/frutys_bebida_tropical_1_5lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -5025,12 +5025,12 @@
     "id": "prod_0282",
     "nombre": "Néctar La Pastoreña 1Lt",
     "descripcion": "Néctar La Pastoreña 1Lt básico para tu despensa. Producto de consumo diario, calidad garantizada. Precio: $3.99, disponible para delivery en El Trigal y alrededores.",
-    "categoria": "Viveres",
-    "subcategoria": "",
+    "categoria": "Bebidas",
+    "subcategoria": "Jugos",
     "precio_usd": 3.99,
     "stock": 100,
     "imagen_urls": [
-      "productos/nectar_la_pastorena_1lt.webp"
+      "productos2/nectar_la_pastorena_1lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -5048,7 +5048,7 @@
     "precio_usd": 2.45,
     "stock": 100,
     "imagen_urls": [
-      "productos/jugo_parmalat_1ltr.webp"
+      "productos2/jugo_parmalat_1ltr.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -5066,7 +5066,7 @@
     "precio_usd": 4.5,
     "stock": 100,
     "imagen_urls": [
-      "productos/te_durazno_limon_parmalat_1_5lt.webp"
+      "productos2/te_durazno_limon_parmalat_1_5lt.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -5084,7 +5084,7 @@
     "precio_usd": 4.8,
     "stock": 100,
     "imagen_urls": [
-      "productos/yogurt_1lt_parmalat.webp"
+      "productos2/yogurt_1lt_parmalat.webp"
     ],
     "es_promo": false,
     "es_mas_vendido": false,
@@ -5092,5 +5092,2249 @@
     "slug": "yogurt-1lt-parmalat",
     "palabras_clave": "Yogurt, Parmalat, lácteos, yogurt",
     "es_nuevo": false
+  },
+  {
+    "id": "p1_001",
+    "nombre": "Ración de Papa Pequeña",
+    "descripcion": "Ración de papas fritas pequeñas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Menú",
+    "precio_usd": 3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/racion_de_papa_pequena.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "racion_de_papa_pequena"
+  },
+  {
+    "id": "p1_002",
+    "nombre": "Ración de Papa Grande",
+    "descripcion": "Ración de papas fritas grandes",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Menú",
+    "precio_usd": 4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/racion_de_papa_grande.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "racion_de_papa_grande"
+  },
+  {
+    "id": "p1_003",
+    "nombre": "Salchipapa Grande",
+    "descripcion": "Salchipapa tamaño grande",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Menú",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/salchipapa_grande.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "salchipapa_grande"
+  },
+  {
+    "id": "p1_004",
+    "nombre": "Tender de Pollo con Papas Fritas",
+    "descripcion": "Tenders de pollo acompañados con papas fritas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Menú",
+    "precio_usd": 4.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/tender_de_pollo_con_papas_fritas.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "tender_de_pollo_con_papas_fritas"
+  },
+  {
+    "id": "p1_005",
+    "nombre": "Burguer Kids",
+    "descripcion": "Hamburguesa tamaño infantil",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Menú",
+    "precio_usd": 4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/burguer_kids.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "burguer_kids"
+  },
+  {
+    "id": "p1_006",
+    "nombre": "Ración de Tequeños",
+    "descripcion": "Ración de tequeños",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Menú",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/racion_de_tequenos.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "racion_de_tequenos"
+  },
+  {
+    "id": "p1_007",
+    "nombre": "1 Combo",
+    "descripcion": "2 piezas de pollo, ración de ensalada, papas fritas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Menú",
+    "precio_usd": 6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/1_combo.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "1_combo"
+  },
+  {
+    "id": "p1_008",
+    "nombre": "2 Combo",
+    "descripcion": "4 piezas de pollo, ración de ensalada, papas fritas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Menú",
+    "precio_usd": 10,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/2_combo.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "2_combo"
+  },
+  {
+    "id": "p1_009",
+    "nombre": "Alitas BBQ",
+    "descripcion": "Ración de alitas bañadas en salsa BBQ",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Menú",
+    "precio_usd": 7,
+    "stock": 100,
+    "imagen_urls": [
+      "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=500"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "alitas_bbq"
+  },
+  {
+    "id": "p1_010",
+    "nombre": "Refresco 355ml",
+    "descripcion": "Refresco de 355ml",
+    "categoria": "Bebidas",
+    "subcategoria": "Refrescos",
+    "precio_usd": 0,
+    "stock": 100,
+    "imagen_urls": [
+      "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=500"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "refresco_355ml"
+  },
+  {
+    "id": "p1_011",
+    "nombre": "Refresco 1LT",
+    "descripcion": "Refresco de 1 litro",
+    "categoria": "Bebidas",
+    "subcategoria": "Refrescos",
+    "precio_usd": 0,
+    "stock": 100,
+    "imagen_urls": [
+      "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=500"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "refresco_1lt"
+  },
+  {
+    "id": "p1_012",
+    "nombre": "Refresco 1.5LT",
+    "descripcion": "Refresco de 1.5 litros",
+    "categoria": "Bebidas",
+    "subcategoria": "Refrescos",
+    "precio_usd": 0,
+    "stock": 100,
+    "imagen_urls": [
+      "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=500"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "refresco_1_5lt"
+  },
+  {
+    "id": "p1_013",
+    "nombre": "Refresco 2LT",
+    "descripcion": "Refresco de 2 litros",
+    "categoria": "Bebidas",
+    "subcategoria": "Refrescos",
+    "precio_usd": 0,
+    "stock": 100,
+    "imagen_urls": [
+      "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=500"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "refresco_2lt"
+  },
+  {
+    "id": "p1_014",
+    "nombre": "Yukery 250 ml",
+    "descripcion": "Jugo Yukery de 250ml",
+    "categoria": "Bebidas",
+    "subcategoria": "Jugos",
+    "precio_usd": 0,
+    "stock": 100,
+    "imagen_urls": [
+      "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=500"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "yukery_250_ml"
+  },
+  {
+    "id": "p1_015",
+    "nombre": "Jugos Naturales",
+    "descripcion": "Jugos naturales varios sabores",
+    "categoria": "Bebidas",
+    "subcategoria": "Jugos",
+    "precio_usd": 0,
+    "stock": 100,
+    "imagen_urls": [
+      "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=500"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "jugos_naturales"
+  },
+  {
+    "id": "p1_016",
+    "nombre": "Lipton 500 ml",
+    "descripcion": "Té frío Lipton de 500ml",
+    "categoria": "Bebidas",
+    "subcategoria": "Té Frío",
+    "precio_usd": 0,
+    "stock": 100,
+    "imagen_urls": [
+      "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=500"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "lipton_500_ml"
+  },
+  {
+    "id": "p1_017",
+    "nombre": "Lipton 1.5 L",
+    "descripcion": "Té frío Lipton de 1.5 litros",
+    "categoria": "Bebidas",
+    "subcategoria": "Té Frío",
+    "precio_usd": 0,
+    "stock": 100,
+    "imagen_urls": [
+      "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=500"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "lipton_1_5_l"
+  },
+  {
+    "id": "p1_018",
+    "nombre": "Yukery 500ml",
+    "descripcion": "Jugo Yukery de 500ml",
+    "categoria": "Bebidas",
+    "subcategoria": "Jugos",
+    "precio_usd": 0,
+    "stock": 100,
+    "imagen_urls": [
+      "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=500"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "yukery_500ml"
+  },
+  {
+    "id": "p1_019",
+    "nombre": "Pizza Tradicional",
+    "descripcion": "Jamón, aceitunas, cebolla, pimentón, orégano, maíz, queso mozzarella",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Pizza",
+    "precio_usd": 9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/pizza_tradicional.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "pizza_tradicional"
+  },
+  {
+    "id": "p1_020",
+    "nombre": "Pizza Margarita",
+    "descripcion": "Queso mozzarella, salsa y orégano",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Pizza",
+    "precio_usd": 6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/pizza_margarita.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "pizza_margarita"
+  },
+  {
+    "id": "p1_021",
+    "nombre": "Pizza Primavera",
+    "descripcion": "Queso mozzarella, jamón, tocineta, maíz",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Pizza",
+    "precio_usd": 8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/pizza_primavera.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "pizza_primavera"
+  },
+  {
+    "id": "p1_022",
+    "nombre": "Pizza Vegetariana",
+    "descripcion": "Queso mozzarella, maíz, cebolla, champiñón, pimentón, aceitunas negras",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Pizza",
+    "precio_usd": 7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/pizza_vegetariana.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "pizza_vegetariana"
+  },
+  {
+    "id": "p1_023",
+    "nombre": "Pizza Pepperoni",
+    "descripcion": "Queso mozzarella, pepperoni, jamón",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Pizza",
+    "precio_usd": 10,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/pizza_pepperoni.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "pizza_pepperoni"
+  },
+  {
+    "id": "p1_024",
+    "nombre": "Arepa Frita o Asada (Unidad)",
+    "descripcion": "Arepa individual (frita o asada)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Arepas",
+    "precio_usd": 4.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/arepa_frita_o_asada_unidad.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "arepa_frita_o_asada_unidad"
+  },
+  {
+    "id": "p1_025",
+    "nombre": "Arepas Fritas o Asadas (2x8$)",
+    "descripcion": "Promoción de 2 arepas (fritas o asadas)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Arepas",
+    "precio_usd": 8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/arepas_fritas_o_asadas_2x8.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "arepas_fritas_o_asadas_2x8"
+  },
+  {
+    "id": "p1_026",
+    "nombre": "Combo 2 Contornos Arepas",
+    "descripcion": "2 arepas con contornos a elegir: mechada, pollo, pernil, chorizo, tajada, reina pepiada, queso amarillo, ensalada cocida, queso blanco, salchicha",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Arepas",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/combo_2_contornos_arepas.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "combo_2_contornos_arepas"
+  },
+  {
+    "id": "p1_027",
+    "nombre": "Empanadas",
+    "descripcion": "Sabores a elegir: mechada, pollo, pernil, tajada, queso amarillo, queso blanco, jamón",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Empanadas",
+    "precio_usd": 2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/empanadas.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "empanadas"
+  },
+  {
+    "id": "p1_028",
+    "nombre": "Combo Familiar N°1",
+    "descripcion": "1 combo de hamburguesa + 1 combo shawarma de pollo",
+    "categoria": "Combos Familiares",
+    "subcategoria": "Combos Familiares",
+    "precio_usd": 23,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/combo_familiar_n1.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "combo_familiar_n1"
+  },
+  {
+    "id": "p1_029",
+    "nombre": "Combo N°1 Familiar",
+    "descripcion": "1 combo de Hamburguesa + 1 combo Shawarma de pollo + 1 combo de Perro pequeño + 1 refresco de 2L",
+    "categoria": "Combos Familiares",
+    "subcategoria": "Combos Familiares",
+    "precio_usd": 23,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/combo_n1_familiar.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "combo_n1_familiar"
+  },
+  {
+    "id": "p1_030",
+    "nombre": "Combo N°2 Familiar",
+    "descripcion": "2 pizzas primaveras + 1 refresco de 2L",
+    "categoria": "Combos Familiares",
+    "subcategoria": "Combos Familiares",
+    "precio_usd": 17,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/combo_n2_familiar.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "combo_n2_familiar"
+  },
+  {
+    "id": "p1_031",
+    "nombre": "Combo N°3 Familiar",
+    "descripcion": "1 Tender de pollo + 1 Combo de hamburguesa + 1 combo de Perro Grande + 1 refresco de 1.5L",
+    "categoria": "Combos Familiares",
+    "subcategoria": "Combos Familiares",
+    "precio_usd": 20,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/combo_n3_familiar.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "combo_n3_familiar"
+  },
+  {
+    "id": "p1_032",
+    "nombre": "Perro Caliente Pequeño (2x4$)",
+    "descripcion": "Repollo, cebolla, papas, queso amarillo (2 unidades por 4$)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Perros Calientes",
+    "precio_usd": 4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/perro_caliente_pequeno_2x4.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "perro_caliente_pequeno_2x4"
+  },
+  {
+    "id": "p1_033",
+    "nombre": "Perro Caliente Grande (1x3$)",
+    "descripcion": "Repollo, cebolla, papas, queso amarillo (Unidad)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Perros Calientes",
+    "precio_usd": 3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/perro_caliente_grande_1x3.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "perro_caliente_grande_1x3"
+  },
+  {
+    "id": "p1_034",
+    "nombre": "Perro Caliente Grande (2x5$)",
+    "descripcion": "Repollo, cebolla, papas, queso amarillo (Promoción 2 unidades)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Perros Calientes",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/perro_caliente_grande_2x5.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "perro_caliente_grande_2x5"
+  },
+  {
+    "id": "p1_035",
+    "nombre": "Perro Caliente Polaco (1x3$)",
+    "descripcion": "Repollo, cebolla, papas, queso amarillo (Unidad)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Perros Calientes",
+    "precio_usd": 3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/perro_caliente_polaco_1x3.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "perro_caliente_polaco_1x3"
+  },
+  {
+    "id": "p1_036",
+    "nombre": "Perro Caliente Polaco (2x5$)",
+    "descripcion": "Repollo, cebolla, papas, queso amarillo (Promoción 2 unidades)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Perros Calientes",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/perro_caliente_polaco_2x5.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "perro_caliente_polaco_2x5"
+  },
+  {
+    "id": "p1_037",
+    "nombre": "Perro Caliente Pequeño Especial (1x3$)",
+    "descripcion": "Repollo, cebolla, papas, queso amarillo, maíz, tocineta (Unidad)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Perros Calientes",
+    "precio_usd": 3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/perro_caliente_pequeno_especial_1x3.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "perro_caliente_pequeno_especial_1x3"
+  },
+  {
+    "id": "p1_038",
+    "nombre": "Perro Caliente Pequeño Especial (2x6$)",
+    "descripcion": "Repollo, cebolla, papas, queso amarillo, maíz, tocineta (Promoción 2 unidades)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Perros Calientes",
+    "precio_usd": 6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/perro_caliente_pequeno_especial_2x6.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "perro_caliente_pequeno_especial_2x6"
+  },
+  {
+    "id": "p1_039",
+    "nombre": "Perro Caliente Grande Especial (1x4.5$)",
+    "descripcion": "Repollo, cebolla, papas, queso amarillo, maíz, tocineta (Unidad)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Perros Calientes",
+    "precio_usd": 4.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/perro_caliente_grande_especial_1x4_5.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "perro_caliente_grande_especial_1x4_5"
+  },
+  {
+    "id": "p1_040",
+    "nombre": "Perro Caliente Grande Especial (2x8$)",
+    "descripcion": "Repollo, cebolla, papas, queso amarillo, maíz, tocineta (Promoción 2 unidades)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Perros Calientes",
+    "precio_usd": 8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/perro_caliente_grande_especial_2x8.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "perro_caliente_grande_especial_2x8"
+  },
+  {
+    "id": "p1_041",
+    "nombre": "Mini Pepito de Pollo (1x5$)",
+    "descripcion": "Tomate, lechuga, papas, queso amarillo (Unidad)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Pepitos",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/mini_pepito_de_pollo_1x5.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "mini_pepito_de_pollo_1x5"
+  },
+  {
+    "id": "p1_042",
+    "nombre": "Mini Pepito de Pollo (2x7$)",
+    "descripcion": "Tomate, lechuga, papas, queso amarillo (Promoción 2 unidades)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Pepitos",
+    "precio_usd": 7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/mini_pepito_de_pollo_2x7.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "mini_pepito_de_pollo_2x7"
+  },
+  {
+    "id": "p1_043",
+    "nombre": "Mini Pepito de Pollo Crispy o Mixto (1x5$)",
+    "descripcion": "Tomate, lechuga, papas, queso amarillo (Unidad)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Pepitos",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/mini_pepito_de_pollo_crispy_o_mixto_1x5.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "mini_pepito_de_pollo_crispy_o_mixto_1x5"
+  },
+  {
+    "id": "p1_044",
+    "nombre": "Mini Pepito de Pollo Crispy o Mixto (2x10$)",
+    "descripcion": "Tomate, lechuga, papas, queso amarillo (Promoción 2 unidades)",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Pepitos",
+    "precio_usd": 10,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/mini_pepito_de_pollo_crispy_o_mixto_2x10.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "mini_pepito_de_pollo_crispy_o_mixto_2x10"
+  },
+  {
+    "id": "p1_045",
+    "nombre": "Pepito Granjero de Pollo o Mixto",
+    "descripcion": "Tomate, lechuga, papas, queso amarillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Pepitos",
+    "precio_usd": 8.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/pepito_granjero_de_pollo_o_mixto.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "pepito_granjero_de_pollo_o_mixto"
+  },
+  {
+    "id": "p1_046",
+    "nombre": "Salchipapa Mixta",
+    "descripcion": "Papas fritas con salchicha y carnes mixtas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Pepitos",
+    "precio_usd": 8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/salchipapa_mixta.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "salchipapa_mixta"
+  },
+  {
+    "id": "p1_047",
+    "nombre": "Hamburguesa Pollo a la Plancha (1 Unid)",
+    "descripcion": "Papas, lechuga, tomate, queso amarillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_pollo_a_la_plancha_1_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_pollo_a_la_plancha_1_unid"
+  },
+  {
+    "id": "p1_048",
+    "nombre": "Hamburguesa Pollo a la Plancha (2x9$)",
+    "descripcion": "Papas, lechuga, tomate, queso amarillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_pollo_a_la_plancha_2x9.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_pollo_a_la_plancha_2x9"
+  },
+  {
+    "id": "p1_049",
+    "nombre": "Hamburguesa Pernil (1 Unid)",
+    "descripcion": "Papas, lechuga, tomate, queso amarillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_pernil_1_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_pernil_1_unid"
+  },
+  {
+    "id": "p1_050",
+    "nombre": "Hamburguesa Pernil (2x9$)",
+    "descripcion": "Papas, lechuga, tomate, queso amarillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_pernil_2x9.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_pernil_2x9"
+  },
+  {
+    "id": "p1_051",
+    "nombre": "Hamburguesa Carne (1 Unid)",
+    "descripcion": "Papas, lechuga, tomate, queso amarillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_carne_1_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_carne_1_unid"
+  },
+  {
+    "id": "p1_052",
+    "nombre": "Hamburguesa Carne (2x9$)",
+    "descripcion": "Papas, lechuga, tomate, queso amarillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_carne_2x9.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_carne_2x9"
+  },
+  {
+    "id": "p1_053",
+    "nombre": "Hamburguesa Chuleta (1 Unid)",
+    "descripcion": "Papas, lechuga, tomate, queso amarillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_chuleta_1_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_chuleta_1_unid"
+  },
+  {
+    "id": "p1_054",
+    "nombre": "Hamburguesa Chuleta (2x9$)",
+    "descripcion": "Papas, lechuga, tomate, queso amarillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_chuleta_2x9.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_chuleta_2x9"
+  },
+  {
+    "id": "p1_055",
+    "nombre": "Hamburguesa Pollo Crispy (1 Unid)",
+    "descripcion": "Papas, lechuga, tomate, queso amarillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_pollo_crispy_1_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_pollo_crispy_1_unid"
+  },
+  {
+    "id": "p1_056",
+    "nombre": "Hamburguesa Pollo Crispy (2x9$)",
+    "descripcion": "Papas, lechuga, tomate, queso amarillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_pollo_crispy_2x9.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_pollo_crispy_2x9"
+  },
+  {
+    "id": "p1_057",
+    "nombre": "Hamburguesa Sweet (1 Unid)",
+    "descripcion": "Pollo empanizado, acompañado de salsa y ensalada de la casa, pepinillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_sweet_1_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_sweet_1_unid"
+  },
+  {
+    "id": "p1_058",
+    "nombre": "Hamburguesa Sweet (2x9$)",
+    "descripcion": "Pollo empanizado, acompañado de salsa y ensalada de la casa, pepinillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_sweet_2x9.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_sweet_2x9"
+  },
+  {
+    "id": "p1_059",
+    "nombre": "Hamburguesa Parrillera (1 Unid)",
+    "descripcion": "Pollo, chorizo, carne, lechuga, tomate y salsas de la casa",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_parrillera_1_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_parrillera_1_unid"
+  },
+  {
+    "id": "p1_060",
+    "nombre": "Hamburguesa Parrillera (2x9$)",
+    "descripcion": "Pollo, chorizo, carne, lechuga, tomate y salsas de la casa",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_parrillera_2x9.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_parrillera_2x9"
+  },
+  {
+    "id": "p1_061",
+    "nombre": "Hamburguesa Especial",
+    "descripcion": "Papas, lechuga, tomate, jamón, queso amarillo, tocineta, huevo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 6.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_especial.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_especial"
+  },
+  {
+    "id": "p1_062",
+    "nombre": "Hamburguesa Doble Proteína",
+    "descripcion": "Papas, tomate, lechuga, full queso amarillo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_doble_proteina.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_doble_proteina"
+  },
+  {
+    "id": "p1_063",
+    "nombre": "Hamburguesa Doble Proteína Especial",
+    "descripcion": "Papas, tomate, lechuga, tocineta, jamón, full queso amarillo, huevo",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Hamburguesas",
+    "precio_usd": 10,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/hamburguesa_doble_proteina_especial.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "hamburguesa_doble_proteina_especial"
+  },
+  {
+    "id": "p1_064",
+    "nombre": "Shawarma de Pollo (1 Unid)",
+    "descripcion": "Tomate, lechuga, pepinillo, salsas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 5.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/shawarma_de_pollo_1_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shawarma_de_pollo_1_unid"
+  },
+  {
+    "id": "p1_065",
+    "nombre": "Shawarma de Pollo (2x9$)",
+    "descripcion": "Tomate, lechuga, pepinillo, salsas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/shawarma_de_pollo_2x9.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shawarma_de_pollo_2x9"
+  },
+  {
+    "id": "p1_066",
+    "nombre": "Shawarma Mixto (1 Unid)",
+    "descripcion": "Tomate, lechuga, pepinillo, salsas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 5.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/shawarma_mixto_1_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shawarma_mixto_1_unid"
+  },
+  {
+    "id": "p1_067",
+    "nombre": "Shawarma Mixto (2x10$)",
+    "descripcion": "Tomate, lechuga, pepinillo, salsas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 10,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/shawarma_mixto_2x10.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shawarma_mixto_2x10"
+  },
+  {
+    "id": "p1_068",
+    "nombre": "Shawarma de Kibbe",
+    "descripcion": "Tomate, lechuga, pepinillo, salsas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 5.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/shawarma_de_kibbe.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shawarma_de_kibbe"
+  },
+  {
+    "id": "p1_069",
+    "nombre": "Shawarma de Falafel (1 Unid)",
+    "descripcion": "Tomate, lechuga, pepinillo, salsas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 5.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/shawarma_de_falafel_1_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shawarma_de_falafel_1_unid"
+  },
+  {
+    "id": "p1_070",
+    "nombre": "Shawarma de Falafel (2x8$)",
+    "descripcion": "Tomate, lechuga, pepinillo, salsas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/shawarma_de_falafel_2x8.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shawarma_de_falafel_2x8"
+  },
+  {
+    "id": "p1_071",
+    "nombre": "Shawarma de Carne",
+    "descripcion": "Tomate, lechuga, pepinillo, salsas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/shawarma_de_carne.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shawarma_de_carne"
+  },
+  {
+    "id": "p1_072",
+    "nombre": "Shawarma Doble Pollo (1 Unid)",
+    "descripcion": "Tomate, lechuga, pepinillo, salsas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/shawarma_doble_pollo_1_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shawarma_doble_pollo_1_unid"
+  },
+  {
+    "id": "p1_073",
+    "nombre": "Shawarma Doble Pollo (2x12$)",
+    "descripcion": "Tomate, lechuga, pepinillo, salsas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 12,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/shawarma_doble_pollo_2x12.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shawarma_doble_pollo_2x12"
+  },
+  {
+    "id": "p1_074",
+    "nombre": "Shawarma Doble Mixto (1 Unid)",
+    "descripcion": "Tomate, lechuga, pepinillo, salsas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 8.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/shawarma_doble_mixto_1_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shawarma_doble_mixto_1_unid"
+  },
+  {
+    "id": "p1_075",
+    "nombre": "Shawarma Doble Mixto (2x15$)",
+    "descripcion": "Tomate, lechuga, pepinillo, salsas",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 15,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/shawarma_doble_mixto_2x15.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "shawarma_doble_mixto_2x15"
+  },
+  {
+    "id": "p1_076",
+    "nombre": "Ración de Falafel (3 Unidades)",
+    "descripcion": "3 piezas de falafel",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/racion_de_falafel_3_unidades.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "racion_de_falafel_3_unidades"
+  },
+  {
+    "id": "p1_077",
+    "nombre": "Kibbe (Unidad)",
+    "descripcion": "1 pieza de kibbe",
+    "categoria": "Comida Rapida",
+    "subcategoria": "Shawarmas",
+    "precio_usd": 1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/kibbe_unidad.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "kibbe_unidad"
+  },
+  {
+    "id": "p1_078",
+    "nombre": "Mortadela Extra Ricci",
+    "descripcion": "Mortadela Extra Ricci",
+    "categoria": "Charcutería",
+    "subcategoria": "Mortadela",
+    "precio_usd": 8.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/mortadela_extra_ricci.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "mortadela_extra_ricci"
+  },
+  {
+    "id": "p1_079",
+    "nombre": "Chorifrito Plumrose",
+    "descripcion": "Chorifrito Plumrose",
+    "categoria": "Charcutería",
+    "subcategoria": "Embutidos",
+    "precio_usd": 9.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/chorifrito_plumrose.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "chorifrito_plumrose"
+  },
+  {
+    "id": "p1_080",
+    "nombre": "Pechuga de Pavo Superior Molli",
+    "descripcion": "Pechuga de pavo marca Superior Molli",
+    "categoria": "Charcutería",
+    "subcategoria": "Pavo",
+    "precio_usd": 10.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/pechuga_de_pavo_superior_molli.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "pechuga_de_pavo_superior_molli"
+  },
+  {
+    "id": "p1_081",
+    "nombre": "Queso Parmesano Quenaca (200g)",
+    "descripcion": "Queso parmesano Quenaca presentación 200g",
+    "categoria": "Charcutería",
+    "subcategoria": "Quesos Madurados",
+    "precio_usd": 10.14,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/queso_parmesano_quenaca_200g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "queso_parmesano_quenaca_200g"
+  },
+  {
+    "id": "p1_082",
+    "nombre": "Queso Manchego Quenaca (200g)",
+    "descripcion": "Queso manchego Quenaca presentación 200g",
+    "categoria": "Charcutería",
+    "subcategoria": "Quesos Madurados",
+    "precio_usd": 11.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/queso_manchego_quenaca_200g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "queso_manchego_quenaca_200g"
+  },
+  {
+    "id": "p1_083",
+    "nombre": "Queso Pecorino Quenaca (200g)",
+    "descripcion": "Queso pecorino Quenaca presentación 200g",
+    "categoria": "Charcutería",
+    "subcategoria": "Quesos Madurados",
+    "precio_usd": 8.74,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/queso_pecorino_quenaca_200g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "queso_pecorino_quenaca_200g"
+  },
+  {
+    "id": "p1_084",
+    "nombre": "Jamón Española Alimex",
+    "descripcion": "Jamón Española marca Alimex",
+    "categoria": "Charcutería",
+    "subcategoria": "Jamón",
+    "precio_usd": 12.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/jamon_espanola_alimex.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "jamon_espanola_alimex"
+  },
+  {
+    "id": "p1_085",
+    "nombre": "Jamón Superior Tnt",
+    "descripcion": "Jamón Superior marca Tnt",
+    "categoria": "Charcutería",
+    "subcategoria": "Jamón",
+    "precio_usd": 11.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/jamon_superior_tnt.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "jamon_superior_tnt"
+  },
+  {
+    "id": "p1_086",
+    "nombre": "Pavo Superior Tnt",
+    "descripcion": "Pavo Superior marca Tnt",
+    "categoria": "Charcutería",
+    "subcategoria": "Pavo",
+    "precio_usd": 11.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/pavo_superior_tnt.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "pavo_superior_tnt"
+  },
+  {
+    "id": "p1_087",
+    "nombre": "Mortadela Especial Tnt",
+    "descripcion": "Mortadela Especial marca Tnt",
+    "categoria": "Charcutería",
+    "subcategoria": "Mortadela",
+    "precio_usd": 7.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/mortadela_especial_tnt.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "mortadela_especial_tnt"
+  },
+  {
+    "id": "p1_088",
+    "nombre": "Queso Amarillo Colonia Doña Flora",
+    "descripcion": "Queso amarillo tipo Colonia marca Doña Flora",
+    "categoria": "Charcutería",
+    "subcategoria": "Quesos Amarillos",
+    "precio_usd": 17.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/queso_amarillo_colonia_dona_flora.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "queso_amarillo_colonia_dona_flora"
+  },
+  {
+    "id": "p1_089",
+    "nombre": "Queso Gouda Campo Rico",
+    "descripcion": "Queso Gouda marca Campo Rico",
+    "categoria": "Charcutería",
+    "subcategoria": "Quesos Amarillos",
+    "precio_usd": 20.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/queso_gouda_campo_rico.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "queso_gouda_campo_rico"
+  },
+  {
+    "id": "p1_090",
+    "nombre": "Queso Mozzarella Paisa",
+    "descripcion": "Queso Mozzarella marca Paisa",
+    "categoria": "Charcutería",
+    "subcategoria": "Quesos Blancos / Madurados",
+    "precio_usd": 27.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/queso_mozzarella_paisa.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "queso_mozzarella_paisa"
+  },
+  {
+    "id": "p1_091",
+    "nombre": "Queso Especial Los Frailes",
+    "descripcion": "Queso especial marca Los Frailes",
+    "categoria": "Charcutería",
+    "subcategoria": "Quesos",
+    "precio_usd": 25.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/queso_especial_los_frailes.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "queso_especial_los_frailes"
+  },
+  {
+    "id": "p1_092",
+    "nombre": "Salchicha Winner Ricci Grande (14 unid)",
+    "descripcion": "Salchicha Winner Ricci paquete grande 14 unidades",
+    "categoria": "Charcutería",
+    "subcategoria": "Salchichas / Embutidos",
+    "precio_usd": 8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/salchicha_winner_ricci_grande_14_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "salchicha_winner_ricci_grande_14_unid"
+  },
+  {
+    "id": "p1_093",
+    "nombre": "Salchicha Winner Ricci Pequeña (6 unid)",
+    "descripcion": "Salchicha Winner Ricci paquete pequeño 6 unidades",
+    "categoria": "Charcutería",
+    "subcategoria": "Salchichas / Embutidos",
+    "precio_usd": 3.15,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/salchicha_winner_ricci_pequena_6_unid.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "salchicha_winner_ricci_pequena_6_unid"
+  },
+  {
+    "id": "p1_094",
+    "nombre": "Queso Parmesano Ducal (100g)",
+    "descripcion": "Queso Parmesano marca Ducal 100g",
+    "categoria": "Charcutería",
+    "subcategoria": "Quesos Madurados",
+    "precio_usd": 6.4,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/queso_parmesano_ducal_100g.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "queso_parmesano_ducal_100g"
+  },
+  {
+    "id": "p1_095",
+    "nombre": "Licor Cocorum Bagheera",
+    "descripcion": "Licor sabor a coco Bagheera",
+    "categoria": "Licores",
+    "subcategoria": "Licores Dulces / Coctelería",
+    "precio_usd": 15,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/licor_cocorum_bagheera.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "licor_cocorum_bagheera"
+  },
+  {
+    "id": "p1_096",
+    "nombre": "Licor Demandis Amaretto",
+    "descripcion": "Licor Amaretto marca Demandis",
+    "categoria": "Licores",
+    "subcategoria": "Licores Dulces / Coctelería",
+    "precio_usd": 15,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/licor_demandis_amaretto.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "licor_demandis_amaretto"
+  },
+  {
+    "id": "p1_097",
+    "nombre": "Licor Demandis Blue Curaçao",
+    "descripcion": "Licor Blue Curaçao marca Demandis",
+    "categoria": "Licores",
+    "subcategoria": "Licores Dulces / Coctelería",
+    "precio_usd": 15,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/licor_demandis_blue_curacao.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "licor_demandis_blue_curacao"
+  },
+  {
+    "id": "p1_098",
+    "nombre": "Vino Doña Tita",
+    "descripcion": "Vino marca Doña Tita",
+    "categoria": "Licores",
+    "subcategoria": "Vinos",
+    "precio_usd": 5.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/vino_dona_tita.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "vino_dona_tita"
+  },
+  {
+    "id": "p1_099",
+    "nombre": "Vino Casillero del Diablo Sauvignon Blanc",
+    "descripcion": "Vino blanco Sauvignon Blanc Casillero del Diablo",
+    "categoria": "Licores",
+    "subcategoria": "Vinos Blancos",
+    "precio_usd": 14.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/vino_casillero_del_diablo_sauvignon_blanc.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "vino_casillero_del_diablo_sauvignon_blanc"
+  },
+  {
+    "id": "p1_100",
+    "nombre": "Breeze Ice Vodka Guaraná",
+    "descripcion": "Bebida a base de vodka sabor guaraná Breeze Ice",
+    "categoria": "Licores",
+    "subcategoria": "Bebidas Preparadas / Cocteles",
+    "precio_usd": 4.1,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/breeze_ice_vodka_guarana.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "breeze_ice_vodka_guarana"
+  },
+  {
+    "id": "p1_101",
+    "nombre": "Vino Talamanca Sauvignon Blanc",
+    "descripcion": "Vino blanco Sauvignon Blanc Talamanca (Chile)",
+    "categoria": "Licores",
+    "subcategoria": "Vinos Blancos",
+    "precio_usd": 9.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/vino_talamanca_sauvignon_blanc.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "vino_talamanca_sauvignon_blanc"
+  },
+  {
+    "id": "p1_102",
+    "nombre": "Vino Medalla Real Cabernet Sauvignon Santa Rita",
+    "descripcion": "Vino tinto Cabernet Sauvignon Medalla Real Reserva Santa Rita",
+    "categoria": "Licores",
+    "subcategoria": "Vinos Tintos",
+    "precio_usd": 17.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/vino_medalla_real_cabernet_sauvignon_santa_rita.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "vino_medalla_real_cabernet_sauvignon_santa_rita"
+  },
+  {
+    "id": "p1_103",
+    "nombre": "Vino Medalla Real Chardonnay Santa Rita",
+    "descripcion": "Vino blanco Chardonnay Medalla Real Reserva Santa Rita",
+    "categoria": "Licores",
+    "subcategoria": "Vinos Blancos",
+    "precio_usd": 17.6,
+    "stock": 100,
+    "imagen_urls": [
+      "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=500"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "vino_medalla_real_chardonnay_santa_rita"
+  },
+  {
+    "id": "p1_104",
+    "nombre": "Vino 3 Medallas Chardonnay Santa Rita",
+    "descripcion": "Vino blanco Chardonnay 3 Medallas Santa Rita",
+    "categoria": "Licores",
+    "subcategoria": "Vinos Blancos",
+    "precio_usd": 12,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/vino_3_medallas_chardonnay_santa_rita.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "vino_3_medallas_chardonnay_santa_rita"
+  },
+  {
+    "id": "p1_105",
+    "nombre": "Vino Santa Rita 120 Rosé",
+    "descripcion": "Vino rosado Reserva Especial Santa Rita 120",
+    "categoria": "Licores",
+    "subcategoria": "Vinos Rosados",
+    "precio_usd": 15,
+    "stock": 100,
+    "imagen_urls": [
+      "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=500"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "vino_santa_rita_120_rose"
+  },
+  {
+    "id": "p1_106",
+    "nombre": "Vino Perlino Prosecco Rosé",
+    "descripcion": "Vino espumoso Perlino Prosecco Rosé",
+    "categoria": "Licores",
+    "subcategoria": "Vinos Espumosos",
+    "precio_usd": 27,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/vino_perlino_prosecco_rose.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "vino_perlino_prosecco_rose"
+  },
+  {
+    "id": "p1_107",
+    "nombre": "Cava Anna de Codorníu Blanc de Blancs",
+    "descripcion": "Cava Brut Blanc de Blancs Anna de Codorníu",
+    "categoria": "Licores",
+    "subcategoria": "Vinos Espumosos / Cava",
+    "precio_usd": 35,
+    "stock": 100,
+    "imagen_urls": [
+      "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=500"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "cava_anna_de_codorniu_blanc_de_blancs"
+  },
+  {
+    "id": "p1_108",
+    "nombre": "Cava Codorníu Ars Collecta Grand Rosé",
+    "descripcion": "Cava Grand Rosé Reserva Ars Collecta Codorníu",
+    "categoria": "Licores",
+    "subcategoria": "Vinos Espumosos / Cava",
+    "precio_usd": 70,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/cava_codorniu_ars_collecta_grand_rose.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "cava_codorniu_ars_collecta_grand_rose"
+  },
+  {
+    "id": "p1_109",
+    "nombre": "Cava Codorníu Ars Collecta Blanc de Blancs",
+    "descripcion": "Cava Blanc de Blancs Reserva Ars Collecta Codorníu",
+    "categoria": "Licores",
+    "subcategoria": "Vinos Espumosos / Cava",
+    "precio_usd": 70,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/cava_codorniu_ars_collecta_blanc_de_blancs.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "cava_codorniu_ars_collecta_blanc_de_blancs"
+  },
+  {
+    "id": "p1_110",
+    "nombre": "Cava Codorníu Cuvée Clásico Semi Sec",
+    "descripcion": "Cava Cuvée Clásico Semi Sec Organic Codorníu",
+    "categoria": "Licores",
+    "subcategoria": "Vinos Espumosos / Cava",
+    "precio_usd": 26.8,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/cava_codorniu_cuvee_clasico_semi_sec.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "cava_codorniu_cuvee_clasico_semi_sec"
+  },
+  {
+    "id": "p1_111",
+    "nombre": "Licor Manager's Blend de Whisky",
+    "descripcion": "Licor elaborado con blend de whisky Manager's",
+    "categoria": "Licores",
+    "subcategoria": "Whiskies / Licores de Whisky",
+    "precio_usd": 8.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/licor_manager_s_blend_de_whisky.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "licor_managers_blend_de_whisky"
+  },
+  {
+    "id": "p1_112",
+    "nombre": "Antioqueño Anisado Premium Botella Negra",
+    "descripcion": "Aguardiente Antioqueño Anisado Sin Azúcar",
+    "categoria": "Licores",
+    "subcategoria": "Aguardiente / Anís",
+    "precio_usd": 12,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/antioqueno_anisado_premium_botella_negra.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "antioqueno_anisado_premium_botella_negra"
+  },
+  {
+    "id": "p1_113",
+    "nombre": "Gordon's Vodka Parchita 0.7L",
+    "descripcion": "Licor de vodka sabor a parchita Gordon's 0.7L",
+    "categoria": "Licores",
+    "subcategoria": "Vodka",
+    "precio_usd": 13.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/gordon_s_vodka_parchita_0_7l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "gordons_vodka_parchita_0_7l"
+  },
+  {
+    "id": "p1_114",
+    "nombre": "Gordon's Vodka Uva 0.7L",
+    "descripcion": "Licor de vodka sabor a uva Gordon's 0.7L",
+    "categoria": "Licores",
+    "subcategoria": "Vodka",
+    "precio_usd": 13.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/gordon_s_vodka_uva_0_7l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "gordons_vodka_uva_0_7l"
+  },
+  {
+    "id": "p1_115",
+    "nombre": "Gordon's Vodka 0.7L",
+    "descripcion": "Vodka Gordon's Original 0.7L",
+    "categoria": "Licores",
+    "subcategoria": "Vodka",
+    "precio_usd": 13.99,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/gordon_s_vodka_0_7l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "gordons_vodka_0_7l"
+  },
+  {
+    "id": "p1_116",
+    "nombre": "Smirnoff Vodka No. 21",
+    "descripcion": "Vodka Smirnoff Recipe No. 21",
+    "categoria": "Licores",
+    "subcategoria": "Vodka",
+    "precio_usd": 18.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/smirnoff_vodka_no_21.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "smirnoff_vodka_no_21"
+  },
+  {
+    "id": "p1_117",
+    "nombre": "Anís Baduelra 1L",
+    "descripcion": "Anís marca Baduelra 30°GL 1 Litro",
+    "categoria": "Licores",
+    "subcategoria": "Aguardiente / Anís",
+    "precio_usd": 7.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/anis_baduelra_1l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "anis_baduelra_1l"
+  },
+  {
+    "id": "p1_118",
+    "nombre": "Anís Ibiza Empaque Doypack 1L",
+    "descripcion": "Anís marca Ibiza bolsa/doypack 1 Litro",
+    "categoria": "Licores",
+    "subcategoria": "Aguardiente / Anís",
+    "precio_usd": 5.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/anis_ibiza_empaque_doypack_1l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "anis_ibiza_empaque_doypack_1l"
+  },
+  {
+    "id": "p1_119",
+    "nombre": "Anís Ibiza Botella",
+    "descripcion": "Anís marca Ibiza en botella",
+    "categoria": "Licores",
+    "subcategoria": "Aguardiente / Anís",
+    "precio_usd": 6.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/anis_ibiza_botella.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "anis_ibiza_botella"
+  },
+  {
+    "id": "p1_120",
+    "nombre": "Antioqueño Anisado Botella Transparente",
+    "descripcion": "Aguardiente Antioqueño Anisado 1.5L / Botella Transparente",
+    "categoria": "Licores",
+    "subcategoria": "Aguardiente / Anís",
+    "precio_usd": 11.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/antioqueno_anisado_botella_transparente.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "antioqueno_anisado_botella_transparente"
+  },
+  {
+    "id": "p1_121",
+    "nombre": "Ron Cacique 500 0.75L",
+    "descripcion": "Ron extra añejo Cacique 0.75L",
+    "categoria": "Licores",
+    "subcategoria": "Ron",
+    "precio_usd": 16.2,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/ron_cacique_500_0_75l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "ron_cacique_500_0_75l"
+  },
+  {
+    "id": "p1_122",
+    "nombre": "Ron Cacique Añejo 0.75L",
+    "descripcion": "Ron añejo Cacique 0.75L",
+    "categoria": "Licores",
+    "subcategoria": "Ron",
+    "precio_usd": 12,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/ron_cacique_anejo_0_75l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "ron_cacique_anejo_0_75l"
+  },
+  {
+    "id": "p1_123",
+    "nombre": "Ron Cacique Leyenda 0.75L",
+    "descripcion": "Ron extra añejo Cacique Leyenda 0.75L",
+    "categoria": "Licores",
+    "subcategoria": "Ron Premium / Extra Añejo",
+    "precio_usd": 30.3,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/ron_cacique_leyenda_0_75l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "ron_cacique_leyenda_0_75l"
+  },
+  {
+    "id": "p1_124",
+    "nombre": "Ron Cacique Añejo 1.75L",
+    "descripcion": "Ron añejo Cacique presentación 1.75L",
+    "categoria": "Licores",
+    "subcategoria": "Ron",
+    "precio_usd": 16.5,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/ron_cacique_anejo_1_75l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "ron_cacique_anejo_1_75l"
+  },
+  {
+    "id": "p1_125",
+    "nombre": "Whisky Grant's 12 Años 0.75L",
+    "descripcion": "Whisky escocés Grant's 12 años 0.75L",
+    "categoria": "Licores",
+    "subcategoria": "Whiskies",
+    "precio_usd": 33,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/whisky_grant_s_12_anos_0_75l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "whisky_grants_12_anos_0_75l"
+  },
+  {
+    "id": "p1_126",
+    "nombre": "Whisky Grant's Triple Wood 1L",
+    "descripcion": "Whisky escocés Grant's Triple Wood 1 Litro",
+    "categoria": "Licores",
+    "subcategoria": "Whiskies",
+    "precio_usd": 29.6,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/whisky_grant_s_triple_wood_1l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "whisky_grants_triple_wood_1l"
+  },
+  {
+    "id": "p1_127",
+    "nombre": "Whisky Black & White 1L",
+    "descripcion": "Whisky escocés Blended Black & White 1 Litro",
+    "categoria": "Licores",
+    "subcategoria": "Whiskies",
+    "precio_usd": 25.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/whisky_black_white_1l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "whisky_black_white_1l"
+  },
+  {
+    "id": "p1_128",
+    "nombre": "Whisky Buchanan's De Luxe 12 Años 0.75L",
+    "descripcion": "Whisky escocés Buchanan's De Luxe 12 Años 0.75L",
+    "categoria": "Licores",
+    "subcategoria": "Whiskies Premium",
+    "precio_usd": 45,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/whisky_buchanan_s_de_luxe_12_anos_0_75l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "whisky_buchanans_de_luxe_12_anos_0_75l"
+  },
+  {
+    "id": "p1_129",
+    "nombre": "Whisky Old Parr 12 Años 0.75L",
+    "descripcion": "Whisky escocés Grand Old Parr 12 Años 0.75L",
+    "categoria": "Licores",
+    "subcategoria": "Whiskies Premium",
+    "precio_usd": 40.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/whisky_old_parr_12_anos_0_75l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "whisky_old_parr_12_anos_0_75l"
+  },
+  {
+    "id": "p1_130",
+    "nombre": "Whisky Grand Old Parr Silver 0.75L",
+    "descripcion": "Whisky escocés Old Parr Silver Chill Filtered 0.75L",
+    "categoria": "Licores",
+    "subcategoria": "Whiskies Premium",
+    "precio_usd": 28.9,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/whisky_grand_old_parr_silver_0_75l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "whisky_grand_old_parr_silver_0_75l"
+  },
+  {
+    "id": "p1_131",
+    "nombre": "Whisky Old Parr Tropical 0.75L",
+    "descripcion": "Licor a base de whisky Old Parr sabor Tropical (Mandarina y Yuzu) 0.75L",
+    "categoria": "Licores",
+    "subcategoria": "Whiskies / Licores de Whisky",
+    "precio_usd": 30,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/whisky_old_parr_tropical_0_75l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "whisky_old_parr_tropical_0_75l"
+  },
+  {
+    "id": "p1_132",
+    "nombre": "Whisky Johnnie Walker Black Label 12 Años 0.70L",
+    "descripcion": "Whisky escocés Johnnie Walker Black Label 12 Años 0.70L",
+    "categoria": "Licores",
+    "subcategoria": "Whiskies Premium",
+    "precio_usd": 42.7,
+    "stock": 100,
+    "imagen_urls": [
+      "productos1/whisky_johnnie_walker_black_label_12_anos_0_70l.webp"
+    ],
+    "es_promo": false,
+    "es_nuevo": true,
+    "es_mas_vendido": false,
+    "activo": true,
+    "slug": "whisky_johnnie_walker_black_label_12_anos_0_70l"
   }
 ]

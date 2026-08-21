@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import { FoodItem, Order, StoreConfig, InAppNotification, OrderItem, AppUser, Coupon, CartItem, SelectedOption, ProductReview, FlashSale, LoyaltyTransaction, LoyaltyTier, Promotion, RewardItem, UserRole } from '../types/store';
 import { supabase } from './supabaseClient';
 import productsData from '../data/products.json';
+import panProductsData from '../data/productos-pan-imported.json';
 
 interface AppContextProps {
   foodItems: FoodItem[];
@@ -125,506 +126,6 @@ const AppContext = createContext<AppContextProps | undefined>(undefined);
   // INITIAL PRODUCTS DATA - Market Coffee Sweet
 const DEFAULT_PRODUCTS: FoodItem[] = [
   // ═══════════════════════════════════════════════════
-  // MERCADO - Frutas y Verduras
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'mrc-001', nombre: 'Manzana Roja (lb)', descripcion: 'Manzana roja fresca, crujiente y dulce. Perfecta para snack saludable.',
-    categoria: 'Mercado', subcategoria: 'Frutas y Verduras', precio_usd: 1.80, stock: 100, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRaDAOBQk2ZpCHOXrAPwn36yBdb5gnvQd5MTg59JTDTw&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Manzana roja'], option_groups: []
-  },
-  {
-    id: 'mrc-002', nombre: 'Platano (lb)', descripcion: 'Platano maduro natural, ideal para cocinar o comer fresco.',
-    categoria: 'Mercado', subcategoria: 'Frutas y Verduras', precio_usd: 0.80, stock: 150, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSnjREoq0RzI_spDUNL8Irtra2INJm1nS5_jPGEprn2g&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Platano'], option_groups: []
-  },
-  {
-    id: 'mrc-003', nombre: 'Naranja (lb)', descripcion: 'Naranja jugosa y fresca, ideal para jugo natural.',
-    categoria: 'Mercado', subcategoria: 'Frutas y Verduras', precio_usd: 1.20, stock: 120, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlwY41x7xRzv9aWkF5J4StGKlOFQ3_KKMl6Akp12SC9A&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Naranja'], option_groups: []
-  },
-  {
-    id: 'mrc-004', nombre: 'Tomate (lb)', descripcion: 'Tomate rojo maduro, fresco del dia.',
-    categoria: 'Mercado', subcategoria: 'Frutas y Verduras', precio_usd: 1.50, stock: 80, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcIqO5SZx0LNnmfGv-YkN1LZDqE1FPVN9yVSuT0mi7ew&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Tomate'], option_groups: []
-  },
-  {
-    id: 'mrc-005', nombre: 'Cebolla (lb)', descripcion: 'Cebolla blanca fresca para tus preparaciones.',
-    categoria: 'Mercado', subcategoria: 'Frutas y Verduras', precio_usd: 1.00, stock: 90, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrn_Fs4e0jslUNFVVBbV3UmtI86n0_TLf4RxWmqEXidQ&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Cebolla'], option_groups: []
-  },
-  {
-    id: 'mrc-006', nombre: 'Papa (lb)', descripcion: 'Papa fresca para freir, hervir o asar.',
-    categoria: 'Mercado', subcategoria: 'Frutas y Verduras', precio_usd: 1.30, stock: 100, imagen_urls: ['https://images.unsplash.com/photo-1518977676601-b53f82ber0a?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Papa'], option_groups: []
-  },
-  {
-    id: 'mrc-007', nombre: 'Lechuga (unidad)', descripcion: 'Lechuga fresca y crocante, base perfecta para ensaladas.',
-    categoria: 'Mercado', subcategoria: 'Frutas y Verduras', precio_usd: 0.90, stock: 60, imagen_urls: ['https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Lechuga'], option_groups: []
-  },
-  {
-    id: 'mrc-008', nombre: 'Aguacate (unidad)', descripcion: 'Aguacate maduro, cremoso y perfecto para guacamole.',
-    categoria: 'Mercado', subcategoria: 'Frutas y Verduras', precio_usd: 1.50, stock: 50, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpOH-G48dBFGBQrJczw4Dnir6wITvFnfD6tO0BUgQctQ&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Aguacate'], option_groups: []
-  },
-  {
-    id: 'mrc-009', nombre: 'Limon (lb)', descripcion: 'Limon fresco para cocinar, jugo o aderezos.',
-    categoria: 'Mercado', subcategoria: 'Frutas y Verduras', precio_usd: 1.00, stock: 80, imagen_urls: ['https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Limon'], option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
-  // MERCADO - Lacteos y Embutidos
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'mrc-010', nombre: 'Queso Blanco (lb)', descripcion: 'Queso blanco fresco, ideal para arepas y cachapas.',
-    categoria: 'Mercado', subcategoria: 'Lacteos y Embutidos', precio_usd: 3.50, stock: 40, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyoaF1w8AwuG4KQXimxqcTTiLPUIaRFEabk8I2IGHv0w&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Queso blanco'], option_groups: []
-  },
-  {
-    id: 'mrc-011', nombre: 'Queso Manchego (lb)', descripcion: 'Queso manchego maduro, sabor intenso y textura firme.',
-    categoria: 'Mercado', subcategoria: 'Lacteos y Embutidos', precio_usd: 4.50, stock: 30, imagen_urls: ['https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Queso manchego'], option_groups: []
-  },
-  {
-    id: 'mrc-012', nombre: 'Queso Crema (250g)', descripcion: 'Queso crema suave y untuoso, perfecto para reposteria.',
-    categoria: 'Mercado', subcategoria: 'Lacteos y Embutidos', precio_usd: 2.20, stock: 45, imagen_urls: ['https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Queso crema'], option_groups: []
-  },
-  {
-    id: 'mrc-013', nombre: 'Leche Entera (1L)', descripcion: 'Leche entera pasteurizada, fresca y nutritiva.',
-    categoria: 'Mercado', subcategoria: 'Lacteos y Embutidos', precio_usd: 1.80, stock: 60, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_QWvVr7x4ULEhrACSJFd9FuCUvsJKzOIo2Qfbg18hWg&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Leche entera'], option_groups: []
-  },
-  {
-    id: 'mrc-014', nombre: 'Mantequilla (200g)', descripcion: 'Mantequilla natural, ideal para cocinar y Untar.',
-    categoria: 'Mercado', subcategoria: 'Lacteos y Embutidos', precio_usd: 2.00, stock: 40, imagen_urls: ['https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Mantequilla'], option_groups: []
-  },
-  {
-    id: 'mrc-015', nombre: 'Jamón de Pierna (lb)', descripcion: 'Jamón de pierna premium, en lonchas finas.',
-    categoria: 'Mercado', subcategoria: 'Lacteos y Embutidos', precio_usd: 4.00, stock: 35, imagen_urls: ['https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Jamón de pierna'], option_groups: []
-  },
-  {
-    id: 'mrc-016', nombre: 'Salchichon (lb)', descripcion: 'Salchichon artesanal, sabor tradicional.',
-    categoria: 'Mercado', subcategoria: 'Lacteos y Embutidos', precio_usd: 3.50, stock: 30, imagen_urls: ['https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Salchichon'], option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
-  // MERCADO - Abarrotes
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'mrc-017', nombre: 'Harina de Maiz (1kg)', descripcion: 'Harina de maiz precocida, ideal para arepas.',
-    categoria: 'Mercado', subcategoria: 'Abarrotes', precio_usd: 1.50, stock: 100, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWrsw5avRY3rKvW4hjxGP-wObM-LFQHGf4I_5UAya6Kg&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Harina de maiz'], option_groups: []
-  },
-  {
-    id: 'mrc-018', nombre: 'Harina de Trigo (1kg)', descripcion: 'Harina de trigo todo uso, para panes y reposteria.',
-    categoria: 'Mercado', subcategoria: 'Abarrotes', precio_usd: 1.30, stock: 80, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFxAhF6I1oAorrIINtHHyY47Qp5knSBoaJ3z1eKT2zdQ&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Harina de trigo'], option_groups: []
-  },
-  {
-    id: 'mrc-019', nombre: 'Arroz (1kg)', descripcion: 'Arroz granecho de primera calidad.',
-    categoria: 'Mercado', subcategoria: 'Abarrotes', precio_usd: 1.20, stock: 120, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKdYTGzYwlGmQ5tSYY85wZKg03X0V835ISMM34pGImEA&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Arroz'], option_groups: []
-  },
-  {
-    id: 'mrc-020', nombre: 'Aceite Vegetal (1L)', descripcion: 'Aceite vegetal refinado para freir y cocinar.',
-    categoria: 'Mercado', subcategoria: 'Abarrotes', precio_usd: 2.50, stock: 60, imagen_urls: ['https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Aceite vegetal'], option_groups: []
-  },
-  {
-    id: 'mrc-021', nombre: 'Azucar (1kg)', descripcion: 'Azucar refinada blanca.',
-    categoria: 'Mercado', subcategoria: 'Abarrotes', precio_usd: 1.00, stock: 100, imagen_urls: ['https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Azucar'], option_groups: []
-  },
-  {
-    id: 'mrc-022', nombre: 'Atun (lata)', descripcion: 'Atun en agua, proteina sana y practica.',
-    categoria: 'Mercado', subcategoria: 'Abarrotes', precio_usd: 1.80, stock: 70, imagen_urls: ['https://images.unsplash.com/photo-1534604973900-c43f59309207?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Atun'], option_groups: []
-  },
-  {
-    id: 'mrc-023', nombre: 'Salsa de Tomate', descripcion: 'Salsa de tomate natural para pasta y pizza.',
-    categoria: 'Mercado', subcategoria: 'Abarrotes', precio_usd: 1.20, stock: 60, imagen_urls: ['https://images.unsplash.com/photo-1472476443507-c7a5948772fc?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Salsa de tomate'], option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
-  // MERCADO - Snacks
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'mrc-024', nombre: 'Doritos Nacho', descripcion: 'Tortillas de maiz sabor nacho, crujientes y picantes.',
-    categoria: 'Mercado', subcategoria: 'Snacks', precio_usd: 1.20, stock: 80, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ40Fc02hMN3crakYUavnulncOHF9ZdlUYSOQT70kdl3A&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Doritos nacho'], option_groups: []
-  },
-  {
-    id: 'mrc-025', nombre: 'Cheetos Crunchy', descripcion: 'Snack de queso crujiente, sabor irresistile.',
-    categoria: 'Mercado', subcategoria: 'Snacks', precio_usd: 1.20, stock: 70, imagen_urls: ['https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Cheetos'], option_groups: []
-  },
-  {
-    id: 'mrc-026', nombre: 'Papas Margarita (100g)', descripcion: 'Papas fritas clasicas, sal y sabor natural.',
-    categoria: 'Mercado', subcategoria: 'Snacks', precio_usd: 0.90, stock: 90, imagen_urls: ['https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Papas fritas'], option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
-  // MERCADO - Bebidas de Market
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'mrc-027', nombre: 'Coca-Cola 500ml', descripcion: 'Refresco de cola 500ml bien frio.',
-    categoria: 'Mercado', subcategoria: 'Bebidas', precio_usd: 1.50, stock: 150, imagen_urls: ['https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Coca-Cola 500ml'], option_groups: []
-  },
-  {
-    id: 'mrc-028', nombre: 'Agua Mineral 500ml', descripcion: 'Agua mineral natural sin gas.',
-    categoria: 'Mercado', subcategoria: 'Bebidas', precio_usd: 1.00, stock: 200, imagen_urls: ['https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Agua mineral'], option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
-  // MERCADO - Limpieza & Higiene
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'mrc-029', nombre: 'Papel Higienico (4 rollos)', descripcion: 'Papel higienico suave, rollos individuales.',
-    categoria: 'Mercado', subcategoria: 'Limpieza e Higiene', precio_usd: 2.50, stock: 60, imagen_urls: ['https://images.unsplash.com/photo-1584556812952-90061e065e34?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Papel higienico'], option_groups: []
-  },
-  {
-    id: 'mrc-030', nombre: 'Jabon de Manos', descripcion: 'Jabon liquido antibacterial para manos.',
-    categoria: 'Mercado', subcategoria: 'Limpieza e Higiene', precio_usd: 1.80, stock: 50, imagen_urls: ['https://images.unsplash.com/photo-1584556812952-90061e065e34?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Jabon de manos'], option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
-  // PANADERIA - Panes
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'pnd-001', nombre: 'Pan Campesino', descripcion: 'Pan campesino artesanal, crujiente por fuera y suave por dentro.',
-    categoria: 'Panaderia', subcategoria: 'Panes', precio_usd: 0.50, stock: 100, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQimXcXbyBdjCHLJlkUp7j9wU3BR1VtJw3dbFVRljTl-Q&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Harina de trigo', 'Agua', 'Sal', 'Levadura'], option_groups: []
-  },
-  {
-    id: 'pnd-002', nombre: 'Pan Canilla', descripcion: 'Pan de canilla suave y esponjoso, ideal para desayuno.',
-    categoria: 'Panaderia', subcategoria: 'Panes', precio_usd: 0.30, stock: 150, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoiQjBLL1Y9ebaTbT1T2TI13ZXqh2VM4pveX2K0B1eaQ&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Harina de trigo', 'Leche', 'Mantequilla', 'Levadura'], option_groups: []
-  },
-  {
-    id: 'pnd-003', nombre: 'Pan de Guayaba', descripcion: 'Pan dulce relleno de guayaba, horneado artesanalmente.',
-    categoria: 'Panaderia', subcategoria: 'Panes', precio_usd: 0.75, stock: 80, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsAypaleIOSqzdR3MkeK2Jmz0ypVeOhWvJyE8gjN5Ykw&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Harina', 'Guayaba', 'Mantequilla', 'Azucar'], option_groups: []
-  },
-  {
-    id: 'pnd-004', nombre: 'Arequipe con Queso', descripcion: 'Pan relleno de arequipe y queso blanco, combo perfecto.',
-    categoria: 'Panaderia', subcategoria: 'Panes', precio_usd: 0.80, stock: 60, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTT1SUAsA1OGQxTfLuoI1pJwaoKVNf-4ZkKeYQha8mJjQ&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Pan', 'Arequipe', 'Queso blanco'], option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
-  // PANADERIA - Pasteleria
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'pnd-005', nombre: 'Palmeritas (6 uds)', descripcion: 'Palmeras de hojaldre crujientes y dulces, 6 unidades.',
-    categoria: 'Panaderia', subcategoria: 'Pasteleria', precio_usd: 1.50, stock: 50, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzwVjFvQxqmTlNLG_FB3631xclD0zLI831wtK07wyDBQ&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Masa hojaldre', 'Azucar', 'Mantequilla'], option_groups: []
-  },
-  {
-    id: 'pnd-006', nombre: 'Torta de Jamon y Queso', descripcion: 'Torta salada de jamon, queso y huevo, receta de la casa.',
-    categoria: 'Panaderia', subcategoria: 'Pasteleria', precio_usd: 2.50, stock: 30, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJpDAmZ_PgY8s8GppGYRfHbLrZvqDc7iAKbQ67gax6uw&s=10'],
-    es_promo: false, es_nuevo: true, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Masa', 'Jamón', 'Queso', 'Huevo'], option_groups: []
-  },
-  {
-    id: 'pnd-007', nombre: 'Torta de Mantecada', descripcion: 'Torta dulce de mantecada esponjosa, sabor tradicional.',
-    categoria: 'Panaderia', subcategoria: 'Pasteleria', precio_usd: 2.00, stock: 35, imagen_urls: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQATNuc48jj6IlXRSzaoa7qc5j86wXSOca4OmtgOEbV7g&s=10'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Harina', 'Mantequilla', 'Azúcar', 'Huevo'], option_groups: []
-  },
-  {
-    id: 'pnd-008', nombre: 'Tres Leches (porcion)', descripcion: 'Porcion de torta tres leches, cremosa y deliciosa.',
-    categoria: 'Panaderia', subcategoria: 'Pasteleria', precio_usd: 3.00, stock: 25, imagen_urls: ['https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Bizcocho', 'Leche condensada', 'Leche evaporada', 'Crema'], option_groups: []
-  },
-  {
-    id: 'pnd-009', nombre: 'Bollos (6 uds)', descripcion: 'Bollos dulces suaves, ideal para el desayuno o merienda.',
-    categoria: 'Panaderia', subcategoria: 'Pasteleria', precio_usd: 1.20, stock: 60, imagen_urls: ['https://images.unsplash.com/photo-1509365390695-33aee754301f?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Harina', 'Azúcar', 'Mantequilla', 'Levadura'], option_groups: []
-  },
-  {
-    id: 'pnd-010', nombre: 'Ensaimada (unidad)', descripcion: 'Ensaimada Mallorquina con azúcar glass, esponjosa.',
-    categoria: 'Panaderia', subcategoria: 'Pasteleria', precio_usd: 1.50, stock: 40, imagen_urls: ['https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: true, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Masa fermentada', 'Manteca', 'Azúcar glass'], option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
-  // COMIDA RAPIDA - Hamburguesas
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'cra-001', nombre: 'Hamburguesa Clasica', descripcion: 'Hamburguesa de carne 100% res, lechuga, tomate, queso y salsa especial.',
-    categoria: 'Comida Rapida', subcategoria: 'Hamburguesas', precio_usd: 5.50, stock: 60, imagen_urls: ['https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Pan brioche', 'Carne 150g', 'Queso Americano', 'Lechuga', 'Tomate', 'Salsa especial'],
-    option_groups: [
-      { id: 'og-size-cra-001', nombre: 'Tamaño', min_select: 1, max_select: 1, options: [
-        { id: 'opt-sgl-cra-001', nombre: 'Single', precio_usd: 0 },
-        { id: 'opt-dbl-cra-001', nombre: 'Double', precio_usd: 2.50 }
-      ]},
-      { id: 'og-ext-cra-001', nombre: 'Extras', min_select: 0, max_select: 3, options: [
-        { id: 'opt-qso-cra-001', nombre: 'Extra Queso', precio_usd: 0.75 },
-        { id: 'opt-bcn-cra-001', nombre: 'Tocino', precio_usd: 1.00 },
-        { id: 'opt-hvo-cra-001', nombre: 'Huevo Frito', precio_usd: 0.75 }
-      ]}
-    ]
-  },
-  {
-    id: 'cra-002', nombre: 'Hamburguesa Doble', descripcion: 'Doble carne smash, doble queso, cebolla crispy y salsa BBQ.',
-    categoria: 'Comida Rapida', subcategoria: 'Hamburguesas', precio_usd: 8.50, stock: 50, imagen_urls: ['https://images.unsplash.com/photo-1553979459-d2229ba7433b?auto=format&fit=crop&q=80&w=500'],
-    es_promo: true, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Pan brioche', 'Doble carne smash', 'Doble queso', 'Cebolla crispy', 'Salsa BBQ'],
-    option_groups: [
-      { id: 'og-ext-cra-002', nombre: 'Extras', min_select: 0, max_select: 3, options: [
-        { id: 'opt-qso-cra-002', nombre: 'Extra Queso', precio_usd: 0.75 },
-        { id: 'opt-bcn-cra-002', nombre: 'Bacon Extra', precio_usd: 1.50 }
-      ]}
-    ]
-  },
-  {
-    id: 'cra-003', nombre: 'Hamburguesa Pollo', descripcion: 'Pechuga de pollo empanizada crujiente con lechuga y mayonesa.',
-    categoria: 'Comida Rapida', subcategoria: 'Hamburguesas', precio_usd: 5.00, stock: 40, imagen_urls: ['https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Pan brioche', 'Pechuga empanizada', 'Lechuga', 'Mayonesa'],
-    option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
-  // COMIDA RAPIDA - Shawarma
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'cra-004', nombre: 'Shawarma de Pollo', descripcion: 'Shawarma de pollo con vegetales frescos, salsa de ajo y tahini.',
-    categoria: 'Comida Rapida', subcategoria: 'Shawarmas', precio_usd: 6.00, stock: 50, imagen_urls: ['https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Pan pita', 'Pollo', 'Lechuga', 'Tomate', 'Cebolla', 'Salsa de ajo'],
-    option_groups: [
-      { id: 'og-sal-cra-004', nombre: 'Salsa', min_select: 1, max_select: 2, options: [
-        { id: 'opt-aio-cra-004', nombre: 'Salsa de Ajo', precio_usd: 0 },
-        { id: 'opt-tah-cra-004', nombre: 'Tahini', precio_usd: 0 },
-        { id: 'opt-pic-cra-004', nombre: 'Picante', precio_usd: 0 }
-      ]}
-    ]
-  },
-  {
-    id: 'cra-005', nombre: 'Shawarma de Res', descripcion: 'Shawarma de res marinada con especias, vegetales y salsa especial.',
-    categoria: 'Comida Rapida', subcategoria: 'Shawarmas', precio_usd: 7.00, stock: 40, imagen_urls: ['https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: true, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Pan pita', 'Res marinada', 'Lechuga', 'Tomate', 'Cebolla morada', 'Salsa especial'],
-    option_groups: [
-      { id: 'og-sal-cra-005', nombre: 'Salsa', min_select: 1, max_select: 2, options: [
-        { id: 'opt-aio-cra-005', nombre: 'Salsa de Ajo', precio_usd: 0 },
-        { id: 'opt-esp-cra-005', nombre: 'Salsa Especial', precio_usd: 0 },
-        { id: 'opt-pic-cra-005', nombre: 'Picante', precio_usd: 0 }
-      ]}
-    ]
-  },
-  {
-    id: 'cra-006', nombre: 'Shawarma Mixto', descripcion: 'Shawarma de pollo y res combinados, doble sabor.',
-    categoria: 'Comida Rapida', subcategoria: 'Shawarmas', precio_usd: 7.50, stock: 35, imagen_urls: ['https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: true, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Pan pita', 'Pollo', 'Res', 'Vegetales', 'Salsa de ajo'],
-    option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
-  // COMIDA RAPIDA - Perros Calientes
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'cra-007', nombre: 'Perro Clasico', descripcion: 'Salchicha en pan suave con ketchup, mostaza y mayonesa.',
-    categoria: 'Comida Rapida', subcategoria: 'Perros Calientes', precio_usd: 3.50, stock: 80, imagen_urls: ['https://images.unsplash.com/photo-1612392062126-d7f2b1e8c8a8?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Pan de perro', 'Salchicha', 'Ketchup', 'Mostaza', 'Mayonesa'],
-    option_groups: [
-      { id: 'og-top-cra-007', nombre: 'Toppings', min_select: 0, max_select: 3, options: [
-        { id: 'opt-cbn-cra-007', nombre: 'Cebolla', precio_usd: 0.25 },
-        { id: 'opt-qso-cra-007', nombre: 'Queso Rallado', precio_usd: 0.50 },
-        { id: 'opt-tst-cra-007', nombre: 'Tostones', precio_usd: 0.75 }
-      ]}
-    ]
-  },
-  {
-    id: 'cra-008', nombre: 'Perro Especial', descripcion: 'Salchicha premium con cebolla caramelizada, queso derretido y salsa de la casa.',
-    categoria: 'Comida Rapida', subcategoria: 'Perros Calientes', precio_usd: 4.50, stock: 60, imagen_urls: ['https://images.unsplash.com/photo-1612392062126-d7f2b1e8c8a8?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Pan de perro', 'Salchicha premium', 'Cebolla caramelizada', 'Queso', 'Salsa de la casa'],
-    option_groups: [
-      { id: 'og-top-cra-008', nombre: 'Toppings', min_select: 0, max_select: 3, options: [
-        { id: 'opt-bcn-cra-008', nombre: 'Tocino', precio_usd: 0.75 },
-        { id: 'opt-chr-cra-008', nombre: 'Chorizo', precio_usd: 1.00 },
-        { id: 'opt-jlp-cra-008', nombre: 'Jalapeños', precio_usd: 0.50 }
-      ]}
-    ]
-  },
-  {
-    id: 'cra-009', nombre: 'Perro Completo', descripcion: 'Perro cargado con papas fritas, queso, guacamole y salsa picante.',
-    categoria: 'Comida Rapida', subcategoria: 'Perros Calientes', precio_usd: 5.50, stock: 40, imagen_urls: ['https://images.unsplash.com/photo-1612392062126-d7f2b1e8c8a8?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: true, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Pan de perro', 'Salchicha', 'Papas fritas', 'Queso', 'Guacamole', 'Salsa picante'],
-    option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
-  // COMBOS
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'cra-010', nombre: 'Combo Hamburguesa + Bebida', descripcion: 'Hamburguesa Clasica + Bebida 500ml a elegir.',
-    categoria: 'Combos', subcategoria: 'Combo Individual', precio_usd: 7.50, stock: 50, imagen_urls: ['https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=500'],
-    es_promo: true, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Hamburguesa a elegir', 'Bebida 500ml'],
-    option_groups: [
-      { id: 'og-dri-cra-010', nombre: 'Bebida', min_select: 1, max_select: 1, options: [
-        { id: 'opt-col-cra-010', nombre: 'Coca-Cola 500ml', precio_usd: 0 },
-        { id: 'opt-spr-cra-010', nombre: 'Sprite 500ml', precio_usd: 0 },
-        { id: 'opt-fan-cra-010', nombre: 'Fanta 500ml', precio_usd: 0 }
-      ]}
-    ]
-  },
-  {
-    id: 'cra-011', nombre: 'Combo Shawarma + Papas', descripcion: 'Shawarma a elegir + Papas Fritas + Bebida 500ml.',
-    categoria: 'Combos', subcategoria: 'Combo Individual', precio_usd: 9.50, stock: 40, imagen_urls: ['https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: true, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Shawarma a elegir', 'Papas fritas', 'Bebida 500ml'],
-    option_groups: [
-      { id: 'og-shw-cra-011', nombre: 'Shawarma', min_select: 1, max_select: 1, options: [
-        { id: 'opt-plo-cra-011', nombre: 'Pollo', precio_usd: 0 },
-        { id: 'opt-res-cra-011', nombre: 'Res', precio_usd: 1.00 },
-        { id: 'opt-mix-cra-011', nombre: 'Mixto', precio_usd: 1.50 }
-      ]},
-      { id: 'og-dri-cra-011', nombre: 'Bebida', min_select: 1, max_select: 1, options: [
-        { id: 'opt-col-cra-011', nombre: 'Coca-Cola 500ml', precio_usd: 0 },
-        { id: 'opt-spr-cra-011', nombre: 'Sprite 500ml', precio_usd: 0 }
-      ]}
-    ]
-  },
-  {
-    id: 'cra-012', nombre: 'Combo Perro + Papas', descripcion: 'Perro Caliente a elegir + Papas Fritas + Bebida 500ml.',
-    categoria: 'Combos', subcategoria: 'Combo Individual', precio_usd: 6.50, stock: 50, imagen_urls: ['https://images.unsplash.com/photo-1612392062126-d7f2b1e8c8a8?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Perro a elegir', 'Papas fritas', 'Bebida 500ml'],
-    option_groups: [
-      { id: 'og-dri-cra-012', nombre: 'Bebida', min_select: 1, max_select: 1, options: [
-        { id: 'opt-col-cra-012', nombre: 'Coca-Cola 500ml', precio_usd: 0 },
-        { id: 'opt-fan-cra-012', nombre: 'Fanta 500ml', precio_usd: 0 }
-      ]}
-    ]
-  },
-  {
-    id: 'cra-013', nombre: 'Combo Doble Hamburguesa', descripcion: 'Doble Hamburguesa + Papas Grandes + 2 Bebidas 500ml.',
-    categoria: 'Combos', subcategoria: 'Combo Familiar', precio_usd: 14.90, stock: 30, imagen_urls: ['https://images.unsplash.com/photo-1553979459-d2229ba7433b?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Doble Hamburguesa', 'Papas Grandes', '2 Bebidas'],
-    option_groups: [
-      { id: 'og-dri-cra-013', nombre: 'Bebidas', min_select: 1, max_select: 1, options: [
-        { id: 'opt-col-cra-013', nombre: '2x Coca-Cola', precio_usd: 0 },
-        { id: 'opt-var-cra-013', nombre: '2x Mixtas', precio_usd: 0 }
-      ]}
-    ]
-  },
-  {
-    id: 'cra-014', nombre: 'Combo Familiar', descripcion: '2 Hamburguesas + 2 Perros + Papas Familiares + 4 Bebidas.',
-    categoria: 'Combos', subcategoria: 'Combo Familiar', precio_usd: 24.90, stock: 20, imagen_urls: ['https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=500'],
-    es_promo: true, es_nuevo: false, es_mas_vendido: false, delivery_gratis: true,
-    ingredientes: ['2 Hamburguesas', '2 Perros', 'Papas familiares', '4 Bebidas'],
-    option_groups: []
-  },
-  {
-    id: 'cra-015', nombre: 'Combo Infantil', descripcion: 'Hamburguesa small + Papas pequenas + Jugo + Juguete.',
-    categoria: 'Combos', subcategoria: 'Combo Especial', precio_usd: 6.50, stock: 40, imagen_urls: ['https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Hamburguesa small', 'Papas pequeñas', 'Jugo', 'Juguete sorpresa'],
-    option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
-  // COMIDA RAPIDA - Bebidas
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'cra-016', nombre: 'Limonada Natural', descripcion: 'Limonada fresca preparada al momento con limon natural.',
-    categoria: 'Comida Rapida', subcategoria: 'Bebidas', precio_usd: 2.00, stock: 60, imagen_urls: ['https://images.unsplash.com/photo-1621263764928-df1444c5e859?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Limón', 'Agua', 'Azúcar', 'Hielo'],
-    option_groups: [
-      { id: 'og-ext-cra-016', nombre: 'Extra', min_select: 0, max_select: 1, options: [
-        { id: 'opt-lev-cra-016', nombre: 'Leche (Limonada con Leche)', precio_usd: 0.50 }
-      ]}
-    ]
-  },
-  {
-    id: 'cra-017', nombre: 'Milkshake Vainilla', descripcion: 'Malteada cremosa de vainilla con crema batida.',
-    categoria: 'Comida Rapida', subcategoria: 'Bebidas', precio_usd: 4.00, stock: 40, imagen_urls: ['https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Helado de vainilla', 'Leche', 'Crema batida'],
-    option_groups: [
-      { id: 'og-sab-cra-017', nombre: 'Sabor', min_select: 1, max_select: 1, options: [
-        { id: 'opt-van-cra-017', nombre: 'Vainilla', precio_usd: 0 },
-        { id: 'opt-chc-cra-017', nombre: 'Chocolate', precio_usd: 0 },
-        { id: 'opt-frs-cra-017', nombre: 'Fresa', precio_usd: 0 }
-      ]}
-    ]
-  },
-  {
-    id: 'cra-018', nombre: 'Agua en Vaso', descripcion: 'Agua natural bien fria en vaso.',
-    categoria: 'Comida Rapida', subcategoria: 'Bebidas', precio_usd: 0.50, stock: 200, imagen_urls: ['https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Agua'], option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
-  // PANADERIA - Dulces
-  // ═══════════════════════════════════════════════════
-  {
-    id: 'cra-019', nombre: 'Dulce de Leche', descripcion: 'Dulce de leche cremoso, postre tipico.',
-    categoria: 'Panaderia', subcategoria: 'Dulces', precio_usd: 1.50, stock: 50, imagen_urls: ['https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: true, delivery_gratis: false,
-    ingredientes: ['Leche', 'Azúcar', 'Vainilla'], option_groups: []
-  },
-  {
-    id: 'cra-020', nombre: 'Torta de Chocolate', descripcion: 'Porcion de torta de chocolate negro, intensa y deliciosa.',
-    categoria: 'Panaderia', subcategoria: 'Dulces', precio_usd: 3.00, stock: 30, imagen_urls: ['https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Chocolate negro', 'Harina', 'Huevo', 'Mantequilla'], option_groups: []
-  },
-  {
-    id: 'cra-021', nombre: 'Gelatina (unidad)', descripcion: 'Gelatina de sabores, fresca y refrescante.',
-    categoria: 'Panaderia', subcategoria: 'Dulces', precio_usd: 1.00, stock: 60, imagen_urls: ['https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&q=80&w=500'],
-    es_promo: false, es_nuevo: false, es_mas_vendido: false, delivery_gratis: false,
-    ingredientes: ['Gelatina'], option_groups: []
-  },
-  // ═══════════════════════════════════════════════════
   // PRODUCTOS IMPORTADOS DESDE CSV
   // ═══════════════════════════════════════════════════
   ...(productsData as any[]).map((p: any) => ({
@@ -632,7 +133,7 @@ const DEFAULT_PRODUCTS: FoodItem[] = [
     nombre: p.nombre,
     descripcion: p.descripcion,
     categoria: p.categoria,
-    subcategoria: '',
+    subcategoria: p.subcategoria || '',
     precio_usd: p.precio_usd,
     stock: p.stock,
     imagen_urls: p.imagen_urls || [],
@@ -653,8 +154,28 @@ const DEFAULT_PRODUCTS: FoodItem[] = [
         activo: true
       }))
     }] : []
+  })),
+  // ═══════════════════════════════════════════════════
+  // PRODUCTOS PAN - Importados desde CSV
+  // ═══════════════════════════════════════════════════
+  ...(panProductsData as any[]).map((p: any) => ({
+    id: p.id,
+    nombre: p.nombre,
+    descripcion: p.descripcion,
+    categoria: p.categoria,
+    subcategoria: p.subcategoria || '',
+    precio_usd: p.precio_usd,
+    stock: p.stock,
+    imagen_urls: p.imagen_urls || [],
+    es_promo: p.es_promo || false,
+    es_nuevo: p.es_nuevo || false,
+    es_mas_vendido: p.es_mas_vendido || false,
+    delivery_gratis: false,
+    ingredientes: p.ingredientes || [],
+    option_groups: []
   }))
 ];
+
 
 const DEFAULT_CONFIG: StoreConfig = {
   site_nombre: 'Market Coffee Sweet',
@@ -717,38 +238,44 @@ const DEFAULT_CONFIG: StoreConfig = {
   categories: [
     'Bebidas',
     'Carnicería',
+    'Charcutería',
     'Charcutería y Embutidos',
+    'Combos Familiares',
     'Comida Rapida',
     'Conservas',
     'Frutas y Verduras',
     'Higiene Personal',
     'Hogar',
     'Lácteos',
+    'Licores',
     'Limpieza',
     'Mascotas',
     'Panaderia',
-    'Repostería',
+    'Dulces y Postres',
     'Salsas y Condimentos',
     'Snacks y Frituras',
     'Viveres',
   ],
   subcategories: {
-    'Bebidas': ['Agua', 'Jugos', 'Té', 'Gaseosas', 'Lácteos', 'Alcohólicas'],
+    'Bebidas': ['Agua', 'Jugos', 'Té', 'Gaseosas', 'Lácteos', 'Alcohólicas', 'Refrescos', 'Té Frío'],
     'Carnicería': ['Cerdo', 'Res', 'Pollo', 'Embutidos'],
-    'Charcutería y Embutidos': ['Chorizo', 'Morcilla', 'Tequeños', 'Congelados'],
-    'Comida Rapida': ['Hamburguesas', 'Shawarmas', 'Perros Calientes', 'Club House'],
-    'Conservas': ['Atún', 'Sardinas', 'Aceitunas', 'Vegetales', 'Legumbres'],
+    'Charcutería': ['Mortadela', 'Embutidos', 'Pavo', 'Quesos Madurados', 'Jamón', 'Quesos Amarillos', 'Quesos Blancos / Madurados', 'Quesos', 'Salchichas / Embutidos'],
+    'Charcutería y Embutidos': ['Chorizo', 'Morcilla', 'Congelados'],
+    'Combos Familiares': ['Combos Familiares'],
+    'Comida Rapida': ['Hamburguesas', 'Shawarmas', 'Perros Calientes', 'Club House', 'Pizza', 'Pepitos', 'Arepas', 'Empanadas', 'Menú'],
+    'Conservas': ['Atún', 'Sardinas', 'Vegetales'],
     'Frutas y Verduras': ['Frutas', 'Verduras', 'Tubérculos', 'Hortalizas'],
-    'Higiene Personal': ['Shampoo', 'Acondicionador', 'Cuidado Dental', 'Desodorantes', 'Toallas', 'Cuidado del Cabello'],
-    'Hogar': ['Papel', 'Bolsas', 'Velas', 'Aromatizantes', 'Utensilios'],
-    'Lácteos': ['Quesos', 'Margarina', 'Mayonesa', 'Mantequilla', 'Yogurt'],
+    'Higiene Personal': ['Shampoo', 'Acondicionador', 'Cuidado Dental', 'Desodorantes', 'Toallas', 'Cuidado del Cabello', 'Pañales', 'Cuidado de la Piel', 'Jabones'],
+    'Hogar': ['Papel', 'Bolsas', 'Velas', 'Aromatizantes', 'Utensilios', 'Insecticidas', 'Limpieza'],
+    'Lácteos': ['Quesos', 'Mantequilla', 'Yogurt'],
+    'Licores': ['Licores Dulces / Coctelería', 'Vinos', 'Vinos Blancos', 'Vinos Tintos', 'Vinos Rosados', 'Vinos Espumosos', 'Vinos Espumosos / Cava', 'Whiskies', 'Whiskies Premium', 'Whiskies / Licores de Whisky', 'Vodka', 'Ron', 'Ron Premium / Extra Añejo', 'Aguardiente / Anís', 'Bebidas Preparadas / Cocteles'],
     'Limpieza': ['Detergentes', 'Desinfectantes', 'Suavizantes', 'Limpiadores'],
     'Mascotas': ['Perros', 'Gatos', 'Higiene'],
-    'Panaderia': ['Panes', 'Pasteleria', 'Dulces', 'Tortas'],
-    'Repostería': ['Harinas', 'Chocolate', 'Vainilla', 'Especias'],
+    'Panaderia': ['Panes', 'Pasteleria', 'Dulces', 'Tortas', 'Cachitos', 'Arepas Rellenas', 'Sándwiches', 'Snacks'],
+    'Dulces y Postres': ['Harinas', 'Vainilla'],
     'Salsas y Condimentos': ['Ketchup', 'Mostaza', 'Mayonesa', 'Salsas', 'Adobos'],
     'Snacks y Frituras': ['Papas', 'Tostones', 'Chicharrones'],
-    'Viveres': ['Arroces', 'Pastas', 'Harinas', 'Aceites', 'Vinagres', 'Enlatados', 'Cereales', 'Especias'],
+    'Viveres': ['Arroces', 'Pastas', 'Harinas', 'Aceites', 'Vinagres', 'Enlatados', 'Especias', 'Carbón / Parrilla', 'Chocolate', 'Conservas', 'Mantequilla', 'Panaderia', 'Snacks'],
   },
   seo_home_title: 'Market Coffee Sweet | Panadería, Comida Rápida y Víveres en Valencia',
   seo_home_description: 'Tu minimarket de confianza en El Trigal, Valencia. Panadería fresca, comida rápida (hamburguesas, shawarmas, perros calientes), víveres, frutas, verduras, bebidas y agua potable con delivery a domicilio.',
@@ -799,7 +326,7 @@ const DEFAULT_CONFIG: StoreConfig = {
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Persistence state loaders
-  const PRODUCTS_VERSION = '2.0';
+  const PRODUCTS_VERSION = '4.0';
   const [products, setProducts] = useState<FoodItem[]>(() => {
     const savedVersion = localStorage.getItem('trv_products_version');
     const saved = localStorage.getItem('trv_products');
