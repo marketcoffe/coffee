@@ -1046,7 +1046,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           transferencia_discount_percent: dbConfig.transferencia_discount_percent ?? prev.transferencia_discount_percent,
           push_webhook_url: dbConfig.push_webhook_url || import.meta.env.VITE_PUSH_WEBHOOK_URL || '',
           push_webhook_secret: '',
-          logo_url: dbConfig.logo_url ?? prev.logo_url,
+          logo_url: dbConfig.logo_url || prev.logo_url,
           theme_color: dbConfig.theme_color || prev.theme_color,
           favicon_url: dbConfig.favicon_url || prev.favicon_url,
           banner_texts: dbConfig.banner_texts || prev.banner_texts,

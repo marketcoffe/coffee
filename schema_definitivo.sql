@@ -36,11 +36,11 @@ CREATE TABLE IF NOT EXISTS store_config (
     id SERIAL PRIMARY KEY,
 
     -- Identidad
-    site_nombre TEXT NOT NULL DEFAULT 'Market Coffee',
+    site_nombre TEXT NOT NULL DEFAULT 'Market Coffee Sweet',
     telefono_soporte TEXT NOT NULL DEFAULT '+584124058904',
-    direccion_fisica TEXT NOT NULL DEFAULT 'Av. Principal, Local #12, Ciudad',
-    tienda_lat NUMERIC(10, 6) NOT NULL DEFAULT 10.198300,
-    tienda_lng NUMERIC(10, 6) NOT NULL DEFAULT -68.004400,
+    direccion_fisica TEXT NOT NULL DEFAULT 'Av. Principal El Trigal, justo al frente de Patio Trigal, Valencia, Carabobo',
+    tienda_lat NUMERIC(10, 6) NOT NULL DEFAULT 10.218500,
+    tienda_lng NUMERIC(10, 6) NOT NULL DEFAULT -68.002100,
     logo_url TEXT DEFAULT '',
     secondary_logo_url TEXT DEFAULT '',
     pwa_icon_url TEXT DEFAULT '',
@@ -49,17 +49,17 @@ CREATE TABLE IF NOT EXISTS store_config (
     site_url TEXT DEFAULT '',
 
     -- Banners
-    banner_url_1 TEXT NOT NULL DEFAULT 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=1200',
-    banner_url_2 TEXT NOT NULL DEFAULT 'https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&q=80&w=1200',
-    banner_url_3 TEXT NOT NULL DEFAULT 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=1200',
-    banner_url_1_mobile TEXT,
-    banner_url_2_mobile TEXT,
-    banner_url_3_mobile TEXT,
-    banner_texts TEXT[] DEFAULT ARRAY[]::TEXT[],
+    banner_url_1 TEXT NOT NULL DEFAULT '/imagen/combo-banner.webp',
+    banner_url_2 TEXT NOT NULL DEFAULT '/imagen/panaderia-banner.webp',
+    banner_url_3 TEXT NOT NULL DEFAULT '/imagen/charcuteria-banner.webp',
+    banner_url_1_mobile TEXT DEFAULT '/imagen/banner1_movil.jpg',
+    banner_url_2_mobile TEXT DEFAULT '/imagen/banner3_movil.jpg',
+    banner_url_3_mobile TEXT DEFAULT '/imagen/charcuteria-banner.webp',
+    banner_texts TEXT[] DEFAULT ARRAY['Panadería, Comida Rápida y Víveres', 'Combos que Enamoran', 'Pan Fresco todos los dias']::TEXT[],
 
     -- Colores
-    theme_color VARCHAR(10) NOT NULL DEFAULT '#FF2D95',
-    secondary_color VARCHAR(10) DEFAULT '#FF6B35',
+    theme_color VARCHAR(10) NOT NULL DEFAULT '#6E472A',
+    secondary_color VARCHAR(10) DEFAULT '#A4D045',
     accent_color VARCHAR(10) DEFAULT '#FFBE0B',
     theme_mode VARCHAR(10) DEFAULT 'light',
 
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS store_config (
     tasa_cambio NUMERIC(10,2) NOT NULL DEFAULT 612.43,
 
     -- Categorias
-    categories TEXT[] DEFAULT ARRAY['Mercado', 'Panaderia', 'Comida Rapida', 'Combos', 'Bebidas', 'Dulces']::TEXT[],
+    categories TEXT[] DEFAULT ARRAY['Bebidas', 'Carnicería', 'Charcutería', 'Charcutería y Embutidos', 'Combos Familiares', 'Comida Rapida', 'Frutas y Verduras', 'Higiene Personal', 'Hogar', 'Lácteos', 'Licores', 'Limpieza', 'Mascotas', 'Panaderia', 'Dulces y Postres', 'Salsas y Condimentos', 'Snacks y Frituras', 'Viveres']::TEXT[],
     categories_images JSONB DEFAULT '{}'::JSONB,
     categories_colors JSONB DEFAULT '{}'::JSONB,
 
@@ -88,17 +88,17 @@ CREATE TABLE IF NOT EXISTS store_config (
     tiene_mesas BOOLEAN NOT NULL DEFAULT FALSE,
     total_mesas INTEGER DEFAULT 0,
     recogida_en_local BOOLEAN NOT NULL DEFAULT TRUE,
-    entrega_por_zonas BOOLEAN NOT NULL DEFAULT FALSE,
+    entrega_por_zonas BOOLEAN NOT NULL DEFAULT TRUE,
     delivery_gratis BOOLEAN NOT NULL DEFAULT FALSE,
     delivery_gratis_threshold NUMERIC(10,2) DEFAULT 0,
-    costo_delivery_km NUMERIC(10,2) DEFAULT 0,
+    costo_delivery_km NUMERIC(10,2) DEFAULT 1.50,
     envio_nacional BOOLEAN NOT NULL DEFAULT FALSE,
     costo_envio_nacional NUMERIC(10,2) DEFAULT 0,
     stock_alert_threshold INTEGER DEFAULT 5,
-    delivery_zonas JSONB DEFAULT '[]'::JSONB,
+    delivery_zonas JSONB DEFAULT '[{"id": "z1", "name": "El Trigal (0-3 km)", "cost": 2.00, "minKm": 0, "maxKm": 3}, {"id": "z2", "name": "La Trigaleña / Prebo (3-8 km)", "cost": 4.50, "minKm": 3, "maxKm": 8}, {"id": "z3", "name": "La Viña / Mañongo / Naguanagua / San Diego (8-18 km)", "cost": 7.00, "minKm": 8, "maxKm": 18}]'::JSONB,
 
     -- Textos / Hero
-    mensaje_bienvenida TEXT DEFAULT 'Tu mercado, panaderia y comida rapida favorita.',
+    mensaje_bienvenida TEXT DEFAULT 'Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado.',
     mensaje_cierre TEXT DEFAULT 'Cerrado por ahora. Volveremos pronto.',
     hero_title TEXT DEFAULT '',
     hero_subtitle TEXT DEFAULT '',
@@ -127,14 +127,14 @@ CREATE TABLE IF NOT EXISTS store_config (
     footer_about_text TEXT DEFAULT '',
 
     -- SEO Premium
-    seo_home_title TEXT DEFAULT '',
-    seo_home_description TEXT DEFAULT '',
-    seo_home_keywords TEXT DEFAULT '',
-    seo_catalog_title TEXT DEFAULT '',
-    seo_catalog_description TEXT DEFAULT '',
-    jsonld_type VARCHAR(50) DEFAULT 'Restaurant',
+    seo_home_title TEXT DEFAULT 'Market Coffee Sweet | Panadería, Comida Rápida y Víveres en Valencia',
+    seo_home_description TEXT DEFAULT 'Tu minimarket de confianza en El Trigal, Valencia. Panadería fresca, comida rápida (hamburguesas, shawarmas, perros calientes), víveres, frutas, verduras, bebidas y agua potable con delivery a domicilio.',
+    seo_home_keywords TEXT DEFAULT 'panadería, comida rápida, hamburguesas, shawarmas, víveres, delivery, Valencia, El Trigal, Prebo, La Viña, Mañongo, Naguanagua, San Diego, minimarket, pan fresco, agua potable',
+    seo_catalog_title TEXT DEFAULT 'Catálogo de Productos',
+    seo_catalog_description TEXT DEFAULT 'Explora nuestro catálogo completo: panadería fresca, comida rápida, víveres, frutas, verduras, bebidas y más con delivery en Valencia y alrededores.',
+    jsonld_type VARCHAR(50) DEFAULT 'FastFoodRestaurant',
     jsonld_priceRange VARCHAR(10) DEFAULT '$$',
-    jsonld_servesCuisine TEXT[] DEFAULT ARRAY['Mercado', 'Panaderia', 'Comida Rapida']::TEXT[],
+    jsonld_servesCuisine TEXT[] DEFAULT ARRAY['Panadería', 'Comida Rápida', 'Hamburguesas', 'Shawarma', 'Víveres', 'Bebidas']::TEXT[],
 
     -- Social
     instagram_url TEXT DEFAULT '',
@@ -645,14 +645,15 @@ FOR EACH ROW
 EXECUTE FUNCTION public.handle_order_status_push_update();
 
 -- 6.4 Funcion para incrementar clics de notificacion
-CREATE OR REPLACE FUNCTION public.increment_notification_click(notif_id TEXT)
+DROP FUNCTION IF EXISTS public.increment_notification_click(TEXT);
+CREATE OR REPLACE FUNCTION public.increment_notification_click(p_notif_id TEXT)
 RETURNS VOID
 SET search_path = public
 LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
   UPDATE public.notifications
   SET click_count = COALESCE(click_count, 0) + 1
-  WHERE id = notif_id;
+  WHERE id = p_notif_id;
 END;
 $$;
 
@@ -939,6 +940,7 @@ BEGIN
     );
 
   DROP POLICY IF EXISTS "notifications_update_allow_all" ON notifications;
+  DROP POLICY IF EXISTS "notifications_update_auth_only" ON notifications;
   CREATE POLICY "notifications_update_auth_only" ON notifications
     FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
 
@@ -1153,10 +1155,22 @@ BEGIN
     END IF;
 END $$;
 
-ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.products;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.store_config;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.products;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.store_config;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ----------------------------------------------------------------------------
 -- 10. MANTENIMIENTO AUTOMATICO
@@ -1561,16 +1575,7 @@ BEGIN
 END;
 $$;
 
--- Incrementar click count de notificacion
-DROP FUNCTION IF EXISTS public.increment_notification_click(TEXT);
-CREATE OR REPLACE FUNCTION public.increment_notification_click(p_notif_id TEXT)
-RETURNS VOID
-SET search_path = public
-LANGUAGE plpgsql SECURITY DEFINER AS $$
-BEGIN
-    UPDATE notifications SET click_count = COALESCE(click_count, 0) + 1 WHERE id = p_notif_id;
-END;
-$$;
+-- Incrementar click count de notificacion (ya definido en 6.4)
 
 -- ----------------------------------------------------------------------------
 -- 10.8 Seed: 8 automatizaciones default

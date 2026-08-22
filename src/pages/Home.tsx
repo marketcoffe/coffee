@@ -1310,7 +1310,7 @@ export const Home: React.FC<HomeProps> = ({
           style={{ borderColor: cardBorder, color: isDarkMode ? '#5a5a7a' : '#8f7065' }}>
           <p>© {new Date().getFullYear()} {config.footer_copyright || config.site_nombre || 'Market Coffee Sweet'}. Todos los derechos reservados.</p>
           <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-center">
-            <span>Razón Social: Coffee Market Sweet C.A.</span>
+            <span>Market Coffee Sweet C.A.</span>
             <span>RIF: J-500338260</span>
             <span>Tel: 0412-3758879</span>
             <span>{config.direccion_fisica || 'Venezuela'}</span>
@@ -1335,7 +1335,7 @@ export const Home: React.FC<HomeProps> = ({
               <div>
                 <h4 className="font-bold text-slate-800 mb-1">2. Descripcion del Servicio</h4>
                 <p>Market Coffee Sweet es una plataforma de pedidos en linea que ofrece productos de mercado, panaderia y comida rapida con servicio de delivery. El servicio esta disponible exclusivamente en la Republica Bolivariana de Venezuela.</p>
-                <p className="mt-2"><strong>Razon Social:</strong> Coffee Market Sweet C.A. | <strong>RIF:</strong> J-500338260</p>
+                <p className="mt-2"><strong>Market Coffee Sweet C.A.</strong> | <strong>RIF:</strong> J-500338260</p>
                 <p><strong>Dominio:</strong> https://marketcoffeesweet.com | <strong>Telefono:</strong> 0412-3758879</p>
               </div>
               <div>
@@ -1424,7 +1424,7 @@ export const Home: React.FC<HomeProps> = ({
               <div>
                 <h4 className="font-bold text-slate-800 mb-1">10. Contacto</h4>
                 <p>Para cualquier consulta sobre esta politica de privacidad o para ejercer sus derechos, puede contactarnos a traves de WhatsApp al numero proporcionado en la plataforma.</p>
-                <p className="mt-2"><strong>Razon Social:</strong> Coffee Market Sweet C.A. | <strong>RIF:</strong> J-500338260</p>
+                <p className="mt-2"><strong>Market Coffee Sweet C.A.</strong> | <strong>RIF:</strong> J-500338260</p>
                 <p><strong>Dominio:</strong> https://marketcoffeesweet.com | <strong>Telefono:</strong> 0412-3758879</p>
               </div>
             </div>
