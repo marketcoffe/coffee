@@ -279,7 +279,7 @@ function AppContent() {
       admin: <SkeletonHome />,
     };
     return (
-      <div className={`min-h-screen w-full flex justify-center ${isDarkMode ? 'dark' : ''}`} style={{ backgroundColor: isDarkMode ? '#0f0f1a' : '#f9f9fb', color: isDarkMode ? '#e8e8f0' : '#1a1c1d' }}>
+      <div className={`min-h-screen w-full flex justify-center ${isDarkMode ? 'dark' : ''}`} style={{ backgroundColor: isDarkMode ? '#111111' : '#f9f9fb', color: isDarkMode ? '#e8e8f0' : '#1a1c1d' }}>
         <div className="w-full">
           {skeletonMap[tab] || <SkeletonHome />}
         </div>
@@ -288,13 +288,13 @@ function AppContent() {
   }
 
     return (
-      <div className={`min-h-screen w-full flex justify-center transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`} style={{ backgroundColor: isDarkMode ? '#0f0f1a' : '#f9f9fb', color: isDarkMode ? '#e8e8f0' : '#1a1c1d' }}>
+      <div className={`min-h-screen w-full flex justify-center transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`} style={{ backgroundColor: isDarkMode ? '#111111' : '#f9f9fb', color: isDarkMode ? '#e8e8f0' : '#1a1c1d' }}>
         {showSplash && <SplashScreen config={config} onComplete={() => setShowSplash(false)} />}
         <SEOHead />
         <OfflineBanner />
         <PushNotificationModal />
 
-        <div className="w-full flex flex-col min-h-screen relative" style={{ backgroundColor: isDarkMode ? '#0f0f1a' : '#f9f9fb' }}>
+        <div className="w-full flex flex-col min-h-screen relative" style={{ backgroundColor: isDarkMode ? '#111111' : '#f9f9fb' }}>
 
         {/* ═══ HEADER DE TIENDA - oculto en panel admin ═══ */}
         {tab !== 'admin' && (

@@ -22,7 +22,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setTab }) => {
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom" style={{
-      background: isDarkMode ? 'rgba(10, 10, 20, 0.85)' : 'rgba(249, 249, 251, 0.85)',
+      background: isDarkMode ? 'rgba(10, 10, 10, 0.85)' : 'rgba(249, 249, 251, 0.85)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
       borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid rgba(228, 190, 177, 0.1)',

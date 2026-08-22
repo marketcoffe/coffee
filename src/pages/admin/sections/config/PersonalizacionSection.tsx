@@ -384,15 +384,15 @@ const PersonalizacionSection: React.FC = () => {
                   {config.logo_url ? (
                     <img src={config.logo_url} alt="Logo" className="w-8 h-8 object-contain" />
                   ) : (
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold" style={{ backgroundColor: config.secondary_color || '#6E472A', color: '#000' }}>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold" style={{ backgroundColor: config.secondary_color || '#6E472A', color: '#fff' }}>
                       {config.site_nombre?.[0] || 'F'}
                     </div>
                   )}
-                  <span className="font-bold text-sm" style={{ color: '#000' }}>{config.site_nombre || 'Tienda'}</span>
+                  <span className="font-bold text-sm" style={{ color: '#fff' }}>{config.site_nombre || 'Tienda'}</span>
                 </div>
                 <div className="flex gap-2">
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-black" style={{ backgroundColor: config.accent_color || '#A4D045' }}>C</div>
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold" style={{ backgroundColor: config.secondary_color || '#6E472A', color: '#000' }}>N</div>
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ backgroundColor: config.accent_color || '#A4D045' }}>C</div>
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold" style={{ backgroundColor: config.secondary_color || '#6E472A', color: '#fff' }}>N</div>
                 </div>
               </div>
               <div className="flex gap-2 p-2 bg-white border-t border-slate-100">

@@ -122,13 +122,13 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ config, onComplete }
           className="text-2xl sm:text-3xl font-extrabold tracking-tight"
           style={{
             fontFamily: 'Plus Jakarta Sans, sans-serif',
-            color: '#000',
+            color: '#fff',
             textShadow: '0 2px 12px rgba(255,255,255,0.3)',
           }}
         >
           {siteName}
         </h1>
-        <p className="text-xs sm:text-sm leading-relaxed max-w-[260px]" style={{ color: 'rgba(0,0,0,0.6)' }}>
+        <p className="text-xs sm:text-sm leading-relaxed max-w-[260px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
           {welcomeMsg}
         </p>
       </div>

@@ -1262,7 +1262,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
                           }}
                           disabled={!canRedeem}
                           className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all ${canRedeem ? 'active:scale-95' : 'bg-[#eeeef0] text-[#8f7065]'}`}
-                          style={canRedeem ? { backgroundColor: themeColor, color: '#000' } : {}}
+                          style={canRedeem ? { backgroundColor: themeColor, color: '#fff' } : {}}
                         >
                           {canRedeem ? 'Canjear' : `Faltan ${reward.points_cost - userPoints}`}
                         </button>

@@ -21,11 +21,11 @@ export const FreeDeliveryBar: React.FC<FreeDeliveryBarProps> = ({
   const remaining = Math.max(0, threshold - currentTotal);
   const progress = Math.min(100, (currentTotal / threshold) * 100);
 
-  const bgColor = isDarkMode ? '#0a0a14' : '#f9f9fb';
+  const bgColor = isDarkMode ? '#0a0a0a' : '#f9f9fb';
   const borderColor = isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(228,190,177,0.1)';
   const textColor = isDarkMode ? '#8b8ba3' : '#5b4137';
   const subTextColor = isDarkMode ? '#6b6b85' : '#8f7065';
-  const barBg = isDarkMode ? '#1a1a2e' : '#e8e8ea';
+  const barBg = isDarkMode ? '#1a1a1a' : '#e8e8ea';
 
   return (
     <div className="px-4 py-2.5 transition-all duration-300 border-b"

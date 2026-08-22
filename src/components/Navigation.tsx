@@ -83,7 +83,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               onClick={() => setSidebarOpen(true)}
               className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 transition-colors cursor-pointer active:scale-95"
               aria-label="Abrir menú de categorías"
-              style={{ color: '#000' }}
+              style={{ color: '#fff' }}
             >
               <Menu size={22} strokeWidth={1.8} />
             </button>
@@ -98,7 +98,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               ) : (
                 <h1
                   className="text-xl font-extrabold tracking-tighter"
-                  style={{ color: '#000', fontFamily: 'Plus Jakarta Sans, sans-serif' }}
+                  style={{ color: '#fff', fontFamily: 'Plus Jakarta Sans, sans-serif' }}
                 >
                   {config.site_nombre || 'Market Coffee Sweet'}
                 </h1>
@@ -121,10 +121,10 @@ export const Navigation: React.FC<NavigationProps> = ({
                   onClick={() => setTab(link.tab)}
                   className={`px-5 py-2 text-[13px] font-semibold tracking-wide rounded-full transition-all cursor-pointer focus:outline-none ${
                     isActive
-                      ? 'text-black shadow-md'
+                      ? 'text-white shadow-md'
                       : 'hover:opacity-80'
                   }`}
-                  style={isActive ? { backgroundColor: 'rgba(0,0,0,0.1)', color: '#000' } : { color: 'rgba(0,0,0,0.7)' }}
+                  style={isActive ? { backgroundColor: 'rgba(255,255,255,0.2)', color: '#fff' } : { color: 'rgba(255,255,255,0.7)' }}
                   aria-current={isActive ? 'page' : undefined}
                 >
                   {link.label}
@@ -141,7 +141,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 transition-colors cursor-pointer"
               aria-label={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
             >
-              {isDarkMode ? <Sun size={20} className="text-amber-300" /> : <Moon size={20} className="text-black" />}
+              {isDarkMode ? <Sun size={20} className="text-amber-300" /> : <Moon size={20} className="text-white" />}
             </button>
 
             {currentUser ? (
@@ -149,7 +149,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                 <button
                   type="button"
                   onClick={() => setTab('profile')}
-                  className="text-[13px] font-semibold tracking-wide text-black/80 hover:text-black transition-colors cursor-pointer rounded-full px-3 py-1.5"
+                  className="text-[13px] font-semibold tracking-wide text-white/80 hover:text-white transition-colors cursor-pointer rounded-full px-3 py-1.5"
                 >
                   HOLA, {currentUser.nombre.split(' ')[0].toUpperCase()}
                 </button>
@@ -158,7 +158,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               <button
                 type="button"
                 onClick={() => setTab('profile')}
-                className="text-[13px] font-semibold tracking-wide text-black/80 hover:text-black transition-colors cursor-pointer rounded-full px-3 py-1.5"
+                className="text-[13px] font-semibold tracking-wide text-white/80 hover:text-white transition-colors cursor-pointer rounded-full px-3 py-1.5"
               >
                 INICIAR SESIÓN
               </button>
@@ -170,7 +170,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 transition-colors cursor-pointer"
               aria-label={`Carrito de compras, ${cartCount} artículos`}
             >
-              <ShoppingCart size={22} style={{ color: '#000' }} strokeWidth={1.5} />
+              <ShoppingCart size={22} style={{ color: '#fff' }} strokeWidth={1.5} />
               {cartCount > 0 && (
                 <span
                   className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold px-1 leading-none"
@@ -202,7 +202,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           className={`absolute top-0 bottom-0 left-0 w-[320px] shadow-2xl flex flex-col transition-transform duration-300 ease-out z-10 ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
-          style={{ backgroundColor: isDarkMode ? '#0f0f1a' : '#ffffff' }}
+          style={{ backgroundColor: isDarkMode ? '#111111' : '#ffffff' }}
         >
           {/* Sidebar Header */}
           <div className="p-5 border-b flex justify-between items-center" style={{ borderColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(228,190,177,0.2)' }}>
@@ -378,7 +378,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             onClick={() => setDrawerOpen(true)}
             className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 transition-colors cursor-pointer active:scale-95"
             aria-label="Abrir menú"
-            style={{ color: '#000' }}
+            style={{ color: '#fff' }}
           >
             <Menu size={22} strokeWidth={1.8} />
           </button>
@@ -393,7 +393,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               ) : (
                 <h1
                   className="text-lg font-extrabold tracking-tighter"
-                  style={{ color: '#000', fontFamily: 'Plus Jakarta Sans, sans-serif' }}
+                  style={{ color: '#fff', fontFamily: 'Plus Jakarta Sans, sans-serif' }}
                 >
                   {config.site_nombre || 'Market Coffee Sweet'}
                 </h1>
@@ -408,7 +408,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-black/10 transition-colors cursor-pointer"
             aria-label={isDarkMode ? 'Modo claro' : 'Modo oscuro'}
           >
-            {isDarkMode ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-black" />}
+            {isDarkMode ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-white" />}
           </button>
           <button
             type="button"
@@ -416,7 +416,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 transition-colors cursor-pointer"
             aria-label={`Carrito de compras, ${cartCount} artículos`}
           >
-            <ShoppingCart size={22} style={{ color: isDarkMode ? '#000' : '#000' }} strokeWidth={1.5} />
+            <ShoppingCart size={22} style={{ color: isDarkMode ? '#fff' : '#fff' }} strokeWidth={1.5} />
             {cartCount > 0 && (
               <span
                 className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold px-1 leading-none"
@@ -447,7 +447,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           className={`absolute top-0 bottom-0 left-0 w-[280px] shadow-2xl flex flex-col transition-transform duration-300 ease-out z-10 ${
             drawerOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
-          style={{ backgroundColor: isDarkMode ? '#0f0f1a' : '#ffffff' }}
+          style={{ backgroundColor: isDarkMode ? '#111111' : '#ffffff' }}
         >
           <div className="p-5 border-b flex justify-between items-center" style={{ borderColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(228,190,177,0.2)' }}>
             <div className="flex items-center gap-3">
@@ -485,7 +485,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                     currentTab === item.tab ? 'font-semibold' : 'hover:opacity-80'
                   }`}
                   style={currentTab === item.tab 
-                    ? { backgroundColor: isDarkMode ? '#1a1a2e' : '#f3f3f5', color: isDarkMode ? '#e8e8f0' : '#1a1c1d' }
+                    ? { backgroundColor: isDarkMode ? '#1a1a1a' : '#f3f3f5', color: isDarkMode ? '#e8e8f0' : '#1a1c1d' }
                     : { color: isDarkMode ? '#a0a0b8' : '#5b4137' }}
                 >
                   <item.icon size={18} /> {item.label}

@@ -229,12 +229,12 @@ export const Home: React.FC<HomeProps> = ({
 
   const getWhatsApp = () => getWhatsAppPhone(config, { sede: selectedSede });
 
-  const bg = isDarkMode ? '#0f0f1a' : '#f9f9fb';
-  const cardBg = isDarkMode ? '#1a1a2e' : '#ffffff';
-  const cardBorder = isDarkMode ? 'rgba(42,42,74,0.6)' : 'rgba(228,190,177,0.15)';
+  const bg = isDarkMode ? '#111111' : '#f9f9fb';
+  const cardBg = isDarkMode ? '#1a1a1a' : '#ffffff';
+  const cardBorder = isDarkMode ? 'rgba(42,42,42,0.6)' : 'rgba(228,190,177,0.15)';
   const text1 = isDarkMode ? '#e8e8f0' : '#1a1c1d';
   const text2 = isDarkMode ? '#a0a0b8' : '#5b4137';
-  const surfaceContainer = isDarkMode ? '#16213e' : '#eeeef0';
+  const surfaceContainer = isDarkMode ? '#222222' : '#eeeef0';
 
   const renderStars = (rating: number, size = 12) => {
     const full = Math.floor(rating);
@@ -552,7 +552,7 @@ export const Home: React.FC<HomeProps> = ({
                 <div key={item.id} className="relative rounded-2xl border-2 overflow-hidden group cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5"
                   style={{ backgroundColor: cardBg, borderColor: tc, boxShadow: `0 0 20px ${tc}25` }}
                   onClick={() => onViewProductDetails(item)}>
-                  <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-black font-bold text-[9px]"
+                  <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-white font-bold text-[9px]"
                     style={{ backgroundColor: tc }}>
                     <Zap size={10} fill="currentColor" /> FLASH
                   </div>
@@ -605,7 +605,7 @@ export const Home: React.FC<HomeProps> = ({
                 <div key={item.id} className="relative min-w-[155px] rounded-xl border-2 overflow-hidden shrink-0 cursor-pointer"
                   style={{ backgroundColor: cardBg, borderColor: tc, boxShadow: `0 0 12px ${tc}20` }}
                   onClick={() => onViewProductDetails(item)}>
-                  <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-black font-bold text-[8px]"
+                  <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-white font-bold text-[8px]"
                     style={{ backgroundColor: tc }}>
                     <Zap size={8} fill="currentColor" /> FLASH
                   </div>
@@ -825,7 +825,7 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* ═══ 6. REPOSTERÍA ═══ */}
       {reposteriaItems.length > 0 && (
-        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full" style={{ backgroundColor: isDarkMode ? '#0f0f1a' : '#fafafa' }}>
+        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full" style={{ backgroundColor: isDarkMode ? '#111111' : '#fafafa' }}>
           <div className="flex justify-between items-end mb-3">
             <div>
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Repostería</h3>
@@ -923,7 +923,7 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* ═══ 8. FRUTAS Y VERDURAS ═══ */}
       {frutasItems.length > 0 && (
-        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full" style={{ backgroundColor: isDarkMode ? '#0f0f1a' : '#fafafa' }}>
+        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full" style={{ backgroundColor: isDarkMode ? '#111111' : '#fafafa' }}>
           <div className="flex justify-between items-end mb-3">
             <div>
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Frutas y Verduras</h3>
@@ -1021,7 +1021,7 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* ═══ 10. BEBIDAS ═══ */}
       {bebidasItems.length > 0 && (
-        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full" style={{ backgroundColor: isDarkMode ? '#0f0f1a' : '#fafafa' }}>
+        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full" style={{ backgroundColor: isDarkMode ? '#111111' : '#fafafa' }}>
           <div className="flex justify-between items-end mb-3">
             <div>
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Bebidas</h3>
@@ -1125,13 +1125,13 @@ export const Home: React.FC<HomeProps> = ({
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
             <div className="flex-1">
               <div className="flex items-center gap-1.5 mb-2">
-                <Sparkles size={16} className="text-black" />
-                <span className="text-black/60 font-semibold text-[10px] uppercase tracking-widest">Exclusivo Móvil</span>
+                <Sparkles size={16} className="text-white" />
+                <span className="text-white/60 font-semibold text-[10px] uppercase tracking-widest">Exclusivo Móvil</span>
               </div>
               <h3 className="text-lg md:text-xl font-extrabold mb-2">
                 Descarga la app en tu móvil
               </h3>
-              <p className="text-black/60 mb-4 text-xs md:text-sm max-w-md">
+              <p className="text-white/60 mb-4 text-xs md:text-sm max-w-md">
                 Instálala directamente desde tu navegador y estate al tanto de nuestras promociones exclusivas. Sin descargas pesadas, directo a tu pantalla de inicio.
               </p>
               <div className="flex flex-col sm:flex-row gap-2">
@@ -1145,14 +1145,14 @@ export const Home: React.FC<HomeProps> = ({
                   <Download size={16} />
                   Instalar App Web
                 </button>
-                <p className="text-[10px] text-black/50 flex items-center gap-1">
+                <p className="text-[10px] text-white/50 flex items-center gap-1">
                   <Smartphone size={12} />
                   Funciona como una app nativa en tu celular
                 </p>
               </div>
             </div>
             <div className="hidden md:flex items-center justify-center w-24 h-24 rounded-2xl bg-black/5 backdrop-blur-sm shrink-0">
-              <Smartphone size={36} className="text-black" />
+              <Smartphone size={36} className="text-white" />
             </div>
           </div>
         </div>
@@ -1160,7 +1160,7 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* ═══ 9. GANA Y ACUMULA PUNTOS ═══ */}
       <section className="py-6 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
-        <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: isDarkMode ? '#1a1a2e' : '#2f3132' }}>
+        <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: isDarkMode ? '#1a1a1a' : '#2f3132' }}>
           <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full blur-3xl opacity-20" style={{ backgroundColor: tc }} />
           <div className="relative z-10">
             <div className="flex items-center gap-1.5 mb-2">
@@ -1180,7 +1180,7 @@ export const Home: React.FC<HomeProps> = ({
                 { icon: '🎁', title: 'Canjea', desc: 'Por productos gratis' },
                 { icon: '🚀', title: 'Niveles VIP', desc: 'Beneficios Premium' },
               ].map((item, i) => (
-                <div key={i} className="rounded-xl p-3 text-center" style={{ backgroundColor: isDarkMode ? '#16213e' : 'rgba(255,255,255,0.08)' }}>
+                <div key={i} className="rounded-xl p-3 text-center" style={{ backgroundColor: isDarkMode ? '#222222' : 'rgba(255,255,255,0.08)' }}>
                   <span className="text-xl mb-1.5 block">{item.icon}</span>
                   <p className="text-white font-bold text-xs mb-0.5">{item.title}</p>
                   <p className="text-white/40 text-[10px]">{item.desc}</p>
@@ -1274,7 +1274,7 @@ export const Home: React.FC<HomeProps> = ({
       </section>
 
       {/* ═══ 12. FOOTER ═══ */}
-      <footer className="py-8 md:py-12 px-4 md:px-8 border-t" style={{ backgroundColor: isDarkMode ? '#0a0a14' : '#f3f3f5', borderColor: cardBorder }}>
+      <footer className="py-8 md:py-12 px-4 md:px-8 border-t" style={{ backgroundColor: isDarkMode ? '#0a0a0a' : '#f3f3f5', borderColor: cardBorder }}>
         <div className="max-w-[1440px] mx-auto grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 mb-8">
           <div className="col-span-2 md:col-span-2 lg:col-span-1">
             {config.logo_url ? <img src={config.logo_url} alt={config.site_nombre} className="h-7 w-auto mb-4" />

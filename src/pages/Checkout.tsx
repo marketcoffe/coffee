@@ -1147,7 +1147,7 @@ ${productosDetailText}
               Continuar <ArrowRight size={16} />
             </button>
           ) : (
-            <button onClick={handleFormSubmit} disabled={isProcessing} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : themeColor, color: '#000' }}>
+            <button onClick={handleFormSubmit} disabled={isProcessing} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : themeColor, color: '#fff' }}>
               {isProcessing ? 'Procesando...' : 'Confirmar Pedido'}
             </button>
           )}

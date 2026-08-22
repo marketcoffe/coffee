@@ -29,9 +29,9 @@ export const Catalog: React.FC<CatalogProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
 
   const c = {
-    bg: isDarkMode ? '#0a0a14' : '#f9f9fb',
-    card: isDarkMode ? '#141428' : '#ffffff',
-    surface: isDarkMode ? '#1a1a2e' : '#eeeef0',
+    bg: isDarkMode ? '#0a0a0a' : '#f9f9fb',
+    card: isDarkMode ? '#161616' : '#ffffff',
+    surface: isDarkMode ? '#1a1a1a' : '#eeeef0',
     border: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
     t1: isDarkMode ? '#f0f0f5' : '#111827',
     t2: isDarkMode ? '#8b8ba3' : '#6b7280',
