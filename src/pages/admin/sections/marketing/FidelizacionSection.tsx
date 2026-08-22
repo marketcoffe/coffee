@@ -395,7 +395,7 @@ const FidelizacionSection: React.FC = () => {
                             <span className="text-[9px] font-bold bg-zinc-200 text-zinc-500 px-1.5 py-0.5 rounded">OFF</span>
                           )}
                         </div>
-                        <p className="text-[11px] text-zinc-500">
+                        <p className="text-[11px] text-zinc-500 truncate">
                           {reward.points_cost} pts
                           {reward.reward_value ? ` · $${reward.reward_value}` : ''}
                           {reward.description ? ` · ${reward.description}` : ''}

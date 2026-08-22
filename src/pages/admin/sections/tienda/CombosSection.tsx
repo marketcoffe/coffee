@@ -167,7 +167,7 @@ const CombosSection: React.FC = () => {
                     <img src={p.imagen_urls[0]} alt="" className="w-10 h-10 rounded-lg object-cover" />
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-slate-800 truncate">{p.nombre}</p>
-                      <p className="text-[10px] text-slate-500">{formatCategories(p)} · ${p.precio_usd.toFixed(2)}</p>
+                      <p className="text-[10px] text-slate-500 truncate">{formatCategories(p)} · ${p.precio_usd.toFixed(2)}</p>
                     </div>
                     {selectedProductIds.includes(p.id) && (
                       <Check size={16} className="text-violet-600" />

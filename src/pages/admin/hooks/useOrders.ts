@@ -29,6 +29,27 @@ export function useOrders(sedeId?: string) {
     }
   }, [updateOrderStatus]);
 
+  const cancelOrder = useCallback(async (order: Order, reason?: string) => {
+    setAdvancingId(order.id);
+    try {
+      await updateOrderStatus(order.id, 'Cancelado', undefined, reason || 'Cancelado por administrador');
+    } finally {
+      setAdvancingId(null);
+    }
+  }, [updateOrderStatus]);
+
+  const bulkAdvance = useCallback(async (orderIds: string[]) => {
+    for (const id of orderIds) {
+      const order = filteredBySede.find(o => o.id === id);
+      if (!order) continue;
+      const statusFlow: Order['status'][] = ['Pendiente', 'Procesando', 'En preparación', 'Listo', 'En camino', 'Entregado'];
+      const currentIdx = statusFlow.indexOf(order.status);
+      if (currentIdx >= 0 && currentIdx < statusFlow.length - 1) {
+        await updateOrderStatus(id, statusFlow[currentIdx + 1]);
+      }
+    }
+  }, [filteredBySede, updateOrderStatus]);
+
   const getOrdersByStatus = useCallback((status: Order['status'] | 'Todos') => {
     if (status === 'Todos') return filteredBySede;
     return filteredBySede.filter(o => o.status === status);
@@ -51,6 +72,8 @@ export function useOrders(sedeId?: string) {
     completedOrders,
     cancelledOrders,
     advanceStatus,
+    cancelOrder,
+    bulkAdvance,
     advancingId,
     getOrdersByStatus,
     getTotalRevenue,

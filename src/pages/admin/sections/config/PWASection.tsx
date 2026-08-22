@@ -72,10 +72,10 @@ const PWASection: React.FC = () => {
               <div className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold"
                 style={{ background: 'rgba(255,255,255,0.15)' }}>{config.site_nombre?.[0] || 'F'}</div>
             )}
-            <p className="text-white text-sm font-extrabold mt-3" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+            <p className="text-white text-sm font-extrabold mt-3 truncate max-w-[180px]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
               {config.site_nombre || 'Mi App'}
             </p>
-            <p className="text-white/70 text-[10px] mt-1">{config.mensaje_bienvenida || 'Tu delivery favorito'}</p>
+            <p className="text-white/70 text-[10px] mt-1 truncate max-w-[180px]">{config.mensaje_bienvenida || 'Tu delivery favorito'}</p>
           </div>
         </div>
         <p className="text-[10px] text-center mt-2" style={{ color: 'var(--ios-text-tertiary)' }}>
@@ -90,7 +90,7 @@ const PWASection: React.FC = () => {
             <div className="h-5 flex items-center justify-end px-3" style={{ background: '#333' }}>
               <span className="text-[7px] text-white/70 font-semibold">9:41</span>
             </div>
-            <div className="grid grid-cols-4 gap-3 p-4" style={{ background: `linear-gradient(180deg, ${config.theme_color || '#A4D045'}30 0%, #f0f0f0 40%)` }}>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4" style={{ background: `linear-gradient(180deg, ${config.theme_color || '#A4D045'}30 0%, #f0f0f0 40%)` }}>
               {[0, 1, 2, 3].map(i => (
                 <div key={i} className="flex flex-col items-center gap-1">
                   {i === 0 ? (

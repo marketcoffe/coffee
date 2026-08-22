@@ -144,7 +144,7 @@ const HistorialPedidosSection: React.FC<HistorialPedidosSectionProps> = ({ scope
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
         {/* Status tabs */}
         <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
           {(['Todos', 'Entregado', 'Cancelado'] as HistoryStatus[]).map(status => {
@@ -191,7 +191,7 @@ const HistorialPedidosSection: React.FC<HistorialPedidosSectionProps> = ({ scope
         />
 
         {/* Search */}
-        <div className="relative flex-1 min-w-[200px]">
+        <div className="relative flex-1 min-w-[140px]">
           <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
@@ -222,26 +222,26 @@ const HistorialPedidosSection: React.FC<HistorialPedidosSectionProps> = ({ scope
                 {/* Summary row */}
                 <div
                   onClick={() => toggleExpand(order.id)}
-                  className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors"
+                  className="flex items-center justify-between px-3 sm:px-4 py-2.5 cursor-pointer hover:bg-slate-50 transition-colors"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-black text-slate-900">#{order.id.slice(-4).toUpperCase()}</span>
-                    <span className={`flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full ${badge.bg} ${badge.color}`}>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-[10px] sm:text-xs font-black text-slate-900 shrink-0">#{order.id.slice(-4).toUpperCase()}</span>
+                    <span className={`flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${badge.bg} ${badge.color} shrink-0`}>
                       {badge.icon}
                       {order.status}
                     </span>
-                    <span className="text-[11px] font-bold text-slate-700">{order.cliente_nombre}</span>
-                    <span className="text-[10px] text-slate-400 hidden sm:inline">{order.cliente_telefono}</span>
+                    <span className="text-[11px] font-bold text-slate-700 truncate">{order.cliente_nombre}</span>
+                    <span className="text-[10px] text-slate-400 hidden sm:inline shrink-0">{order.cliente_telefono}</span>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 shrink-0">
                     <span className="text-[10px] text-slate-400 hidden sm:inline">
                       {order.fecha ? new Date(order.fecha).toLocaleDateString('es-VE') : ''}
                     </span>
-                    <span className="text-xs font-black" style={{ color: themeColor }}>
+                    <span className="text-[10px] sm:text-xs font-black" style={{ color: themeColor }}>
                       ${order.total_usd?.toFixed(2)}
                     </span>
-                    {isExpanded ? <ChevronUp size={14} className="text-slate-400" /> : <ChevronDown size={14} className="text-slate-400" />}
+                    {isExpanded ? <ChevronUp size={13} className="text-slate-400" /> : <ChevronDown size={13} className="text-slate-400" />}
                   </div>
                 </div>
 

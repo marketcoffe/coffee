@@ -144,7 +144,7 @@ const ProductosReportSection: React.FC = () => {
             <div className="space-y-1.5">
               {productsByCategory.map(c => (
                 <div key={c.categoria} className="flex justify-between items-center py-1">
-                  <span className="text-[11px] font-medium text-slate-600">{c.categoria}</span>
+                  <span className="text-[11px] font-medium text-slate-600 truncate">{c.categoria}</span>
                   <span className="text-[11px] font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-full">{c.count}</span>
                 </div>
               ))}

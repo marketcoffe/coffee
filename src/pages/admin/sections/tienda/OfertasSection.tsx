@@ -144,7 +144,7 @@ const OfertasSection: React.FC = () => {
                     )}
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold truncate" style={{ color: 'var(--ios-text)' }}>{p.nombre}</p>
-                      <p className="text-[10px]" style={{ color: 'var(--ios-text-secondary)' }}>{formatCategories(p)} · ${p.precio_usd.toFixed(2)}</p>
+                      <p className="text-[10px] truncate" style={{ color: 'var(--ios-text-secondary)' }}>{formatCategories(p)} · ${p.precio_usd.toFixed(2)}</p>
                     </div>
                     {selectedProductId === p.id && (
                       <Check size={16} style={{ color: themeColor }} />

@@ -94,7 +94,7 @@ const EstadisticasSection: React.FC = () => {
             </div>
             <div>
               <p className="text-[10px] text-slate-400 uppercase font-semibold">{kpi.label}</p>
-              <p className="text-lg font-black text-slate-900">{kpi.value}</p>
+              <p className="text-lg font-black text-slate-900 truncate">{kpi.value}</p>
             </div>
           </div>
         ))}
@@ -122,7 +122,7 @@ const EstadisticasSection: React.FC = () => {
               const pct = orders.length > 0 ? ((pm.count / orders.length) * 100).toFixed(1) : '0';
               return (
                 <div key={pm.metodo} className="flex items-center gap-3">
-                  <span className="w-28 text-[11px] font-semibold text-slate-600 truncate">{pm.metodo}</span>
+                  <span className="w-20 sm:w-28 text-[11px] font-semibold text-slate-600 truncate">{pm.metodo}</span>
                   <div className="flex-1 h-5 bg-slate-100 rounded-full overflow-hidden">
                     <div className="h-full bg-violet-500 rounded-full" style={{ width: `${pct}%` }} />
                   </div>

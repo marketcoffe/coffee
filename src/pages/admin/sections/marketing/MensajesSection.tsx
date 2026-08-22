@@ -159,8 +159,8 @@ const MensajesSection: React.FC = () => {
       </div>
 
       {/* Chat Interface */}
-      <div className="flex gap-4 h-[500px]">
-        <div className="w-1/3 flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      <div className="flex flex-col md:flex-row gap-3 md:gap-4 h-auto md:h-[500px]">
+        <div className="w-full md:w-1/3 flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden max-h-[250px] md:max-h-none">
           <div className="p-3 border-b border-slate-100">
             <h4 className="text-[10px] font-bold text-slate-800 uppercase">
               {activeTab === 'clientes' ? `Clientes (${clientPhones.length})` : activeTab === 'envios' ? `Broadcasts (${groupNotifs.length})` : `Sistema (${systemNotifs.length})`}
@@ -178,7 +178,7 @@ const MensajesSection: React.FC = () => {
                     className={`w-full text-left p-3 border-b border-slate-50 hover:bg-slate-50 transition-all ${activeChatPhone === phone ? 'bg-slate-50 border-l-4 border-l-current' : ''}`}
                     style={activeChatPhone === phone ? { borderLeftColor: themeColor } : {}}>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-800">{phone}</span>
+                      <span className="text-xs font-bold text-slate-800 truncate">{phone}</span>
                       {unread > 0 && <span className="w-5 h-5 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unread}</span>}
                     </div>
                     <p className="text-[10px] text-slate-500 truncate mt-0.5">{last?.mensaje || 'Sin mensajes'}</p>
@@ -214,7 +214,7 @@ const MensajesSection: React.FC = () => {
           </div>
         </div>
 
-        <div className="w-2/3 flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="w-full md:w-2/3 flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden min-h-[300px] md:min-h-0">
           {activeChatPhone ? (
             <>
               <div className="p-3 border-b border-slate-100 bg-slate-50 flex items-center justify-between">

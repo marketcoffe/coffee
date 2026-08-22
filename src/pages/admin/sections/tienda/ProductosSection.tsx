@@ -4,7 +4,7 @@ import { useToast } from '../../../../components/Toast';
 import { FoodItem } from '../../../../types/store';
 import {
   Search, Plus, Eye, Edit3, Trash2, ToggleLeft, ToggleRight,
-  Tag, Package, Download, Upload, Mic, MicOff, Grid, List, X
+  Tag, Package, Download, Upload, Mic, MicOff, Grid, List, X, Check
 } from 'lucide-react';
 import { getCategories, hasCategory, formatCategories } from '../../../../utils/categoryUtils';
 
@@ -29,6 +29,8 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [isListening, setIsListening] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [editingCell, setEditingCell] = useState<{ id: string; field: 'precio_usd' | 'stock' } | null>(null);
+  const [editValue, setEditValue] = useState('');
 
   const categories = useMemo(() => {
     const cats = new Set(foodItems.flatMap(p => getCategories(p)).filter(Boolean));
@@ -89,6 +91,36 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
     deleteFoodItem(product.id);
     setDeleteConfirm(null);
     showToast('success', `${product.nombre} eliminado`);
+  };
+
+  const startEdit = (product: FoodItem, field: 'precio_usd' | 'stock') => {
+    setEditingCell({ id: product.id, field });
+    setEditValue(field === 'precio_usd' ? product.precio_usd.toString() : product.stock.toString());
+  };
+
+  const saveEdit = () => {
+    if (!editingCell) return;
+    const product = foodItems.find(p => p.id === editingCell.id);
+    if (!product) return;
+    if (editingCell.field === 'precio_usd') {
+      const val = parseFloat(editValue);
+      if (!isNaN(val) && val >= 0) {
+        updateFoodItem(editingCell.id, { precio_usd: val });
+        showToast('success', `Precio actualizado: $${val.toFixed(2)}`);
+      }
+    } else {
+      const val = parseInt(editValue, 10);
+      if (!isNaN(val) && val >= 0) {
+        updateFoodItem(editingCell.id, { stock: val });
+        showToast('success', `Stock actualizado: ${val}`);
+      }
+    }
+    setEditingCell(null);
+  };
+
+  const cancelEdit = () => {
+    setEditingCell(null);
+    setEditValue('');
   };
 
   const handleVoiceSearch = () => {
@@ -285,18 +317,64 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
                     </div>
                     <div className="flex items-center gap-3 mt-1">
                       <span className="text-xs text-slate-500">{formatCategories(product)}</span>
-                      <span className={`text-xs font-bold ${getStockColor(product.stock)}`}>
-                        Stock: {product.stock}
-                      </span>
+                      {editingCell?.id === product.id && editingCell.field === 'stock' ? (
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] text-slate-400">Stock:</span>
+                          <input
+                            type="number"
+                            min="0"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onBlur={saveEdit}
+                            onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
+                            className="erp-inline-edit w-14 text-[10px]"
+                            autoFocus
+                          />
+                          <button onClick={saveEdit} className="p-0.5 rounded bg-emerald-100 text-emerald-600 cursor-pointer"><Check size={8} /></button>
+                        </div>
+                      ) : (
+                        <span
+                          className={`text-xs font-bold ${getStockColor(product.stock)} erp-inline-editable cursor-pointer hover:opacity-70`}
+                          onClick={() => startEdit(product, 'stock')}
+                          title="Clic para editar stock"
+                        >
+                          Stock: {product.stock}
+                        </span>
+                      )}
                       <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${badge.color}`}>
                         {badge.label}
                       </span>
                     </div>
                   </div>
 
-                  {/* Price */}
+                  {/* Price - Inline Editable */}
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-black" style={{ color: themeColor }}>${product.precio_usd.toFixed(2)}</p>
+                    {editingCell?.id === product.id && editingCell.field === 'precio_usd' ? (
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-slate-400">$</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onBlur={saveEdit}
+                          onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
+                          className="erp-inline-edit w-20 text-right"
+                          autoFocus
+                        />
+                        <button onClick={saveEdit} className="p-0.5 rounded bg-emerald-100 text-emerald-600 cursor-pointer"><Check size={10} /></button>
+                      </div>
+                    ) : (
+                      <p
+                        className="text-sm font-black erp-inline-editable cursor-pointer hover:opacity-70"
+                        style={{ color: themeColor }}
+                        onClick={() => startEdit(product, 'precio_usd')}
+                        title="Clic para editar precio"
+                      >
+                        ${product.precio_usd.toFixed(2)}
+                      </p>
+                    )}
                     {product.es_promo && product.precio_anterior_usd && product.precio_anterior_usd > product.precio_usd && (
                       <p className="text-[10px] text-slate-400 line-through">${product.precio_anterior_usd.toFixed(2)}</p>
                     )}
@@ -358,10 +436,25 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
                 </div>
                 <div className="p-3">
                   <h3 className="text-xs font-bold text-slate-800 truncate">{product.nombre}</h3>
-                  <p className="text-[10px] text-slate-400">{formatCategories(product)}</p>
+                  <p className="text-[10px] text-slate-400 truncate">{formatCategories(product)}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-sm font-black" style={{ color: themeColor }}>${product.precio_usd.toFixed(2)}</span>
-                    <span className={`text-[10px] font-semibold ${getStockColor(product.stock)}`}>Stock: {product.stock}</span>
+                    {editingCell?.id === product.id && editingCell.field === 'precio_usd' ? (
+                      <div className="flex items-center gap-1">
+                        <span className="text-[10px] text-slate-400">$</span>
+                        <input type="number" step="0.01" min="0" value={editValue} onChange={(e) => setEditValue(e.target.value)} onBlur={saveEdit} onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} className="erp-inline-edit w-16 text-[10px]" autoFocus />
+                      </div>
+                    ) : (
+                      <span className="text-sm font-black erp-inline-editable cursor-pointer hover:opacity-70" style={{ color: themeColor }} onClick={() => startEdit(product, 'precio_usd')} title="Clic para editar">
+                        ${product.precio_usd.toFixed(2)}
+                      </span>
+                    )}
+                    {editingCell?.id === product.id && editingCell.field === 'stock' ? (
+                      <input type="number" min="0" value={editValue} onChange={(e) => setEditValue(e.target.value)} onBlur={saveEdit} onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} className="erp-inline-edit w-12 text-[10px]" autoFocus />
+                    ) : (
+                      <span className={`text-[10px] font-semibold ${getStockColor(product.stock)} erp-inline-editable cursor-pointer hover:opacity-70`} onClick={() => startEdit(product, 'stock')} title="Clic para editar">
+                        Stock: {product.stock}
+                      </span>
+                    )}
                   </div>
                   <div className="flex gap-1 mt-2">
                     <button onClick={() => onEdit(product)} className="flex-1 py-1.5 text-[10px] font-semibold bg-slate-100 rounded-lg cursor-pointer hover:bg-slate-200">Editar</button>

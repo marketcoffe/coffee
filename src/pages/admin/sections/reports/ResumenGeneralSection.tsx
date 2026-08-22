@@ -177,12 +177,12 @@ const ResumenGeneralSection: React.FC = () => {
         ].map(m => (
           <div key={m.label} className="p-4 border border-slate-200 rounded-xl bg-white shadow-sm hover:border-violet-300 transition-all">
             <div className="flex justify-between items-start">
-              <span className="text-[10px] text-slate-500 uppercase tracking-wide font-medium">{m.label}</span>
-              <div className={`p-1.5 rounded-lg bg-${m.accent}-50 text-${m.accent}-600`}>
+              <span className="text-[10px] text-slate-500 uppercase tracking-wide font-medium truncate">{m.label}</span>
+              <div className={`p-1.5 rounded-lg bg-${m.accent}-50 text-${m.accent}-600 shrink-0`}>
                 <m.icon size={14} />
               </div>
             </div>
-            <p className="text-xl font-bold font-mono text-slate-900 mt-1">{m.value}</p>
+            <p className="text-xl font-bold font-mono text-slate-900 mt-1 truncate">{m.value}</p>
           </div>
         ))}
       </div>

@@ -1,33 +1,33 @@
-import React, { Suspense, lazy, useState, useCallback } from 'react';
+import React, { Suspense, lazy, useState, useCallback, useMemo } from 'react';
 import { useApp } from '../../store/AppContext';
 import { useAdminStore } from '../../store/stores/adminStore';
 import { useOrders } from './hooks/useOrders';
 import { Order, FoodItem } from '../../types/store';
 import {
-  BarChart3, ShoppingBag, Utensils, User, Ticket, Settings,
-  X, MessageSquare, Megaphone, Package, Award,
-  LayoutGrid, ChevronLeft, MapPin, Shield, Store,
+  BarChart3, ShoppingBag, X, MessageSquare, Megaphone, Package, Award,
+  LayoutGrid, ChevronLeft, ChevronRight, MapPin, Shield, Store,
   TrendingUp, Smartphone, Activity, Clock, Users, Zap, Tag,
   Truck, CreditCard, Image, Grid, Search, Building2, HelpCircle,
-  Sliders, Palette, FileText, Send
+  Sliders, Palette, Ticket, Settings
 } from 'lucide-react';
 import { SEOHead } from '../../components/SEOHead';
 import ProductoFormSection from './sections/tienda/ProductoFormSection';
 import SidebarNav from './components/SidebarNav';
+import BottomSheet from './components/BottomSheet';
 
-// ── Lazy Imports: Reportes ──
+// Lazy Imports: Reportes
 const ResumenGeneralSection = lazy(() => import('./sections/reports/ResumenGeneralSection'));
 const VentasReportSection = lazy(() => import('./sections/reports/VentasReportSection'));
 const ProductosReportSection = lazy(() => import('./sections/reports/ProductosReportSection'));
 const AppReportSection = lazy(() => import('./sections/reports/AppReportSection'));
 const EstadisticasSection = lazy(() => import('./sections/reports/EstadisticasSection'));
 
-// ── Lazy Imports: Pedidos ──
+// Lazy Imports: Pedidos
 const ComandasSection = lazy(() => import('./sections/pedidos/ComandasSection'));
 const HistorialPedidosSection = lazy(() => import('./sections/pedidos/HistorialPedidosSection'));
 const MapaDeliverySection = lazy(() => import('./sections/pedidos/MapaDeliverySection'));
 
-// ── Lazy Imports: Marketing ──
+// Lazy Imports: Marketing
 const ClientesSection = lazy(() => import('./sections/marketing/ClientesSection'));
 const MensajesSection = lazy(() => import('./sections/marketing/MensajesSection'));
 const PromocionesSection = lazy(() => import('./sections/marketing/PromocionesSection'));
@@ -37,7 +37,7 @@ const SegmentacionSection = lazy(() => import('./sections/marketing/Segmentacion
 const AutomatizacionSection = lazy(() => import('./sections/marketing/AutomatizacionSection'));
 const AnalyticsPushSection = lazy(() => import('./sections/marketing/AnalyticsPushSection'));
 
-// ── Lazy Imports: Tienda ──
+// Lazy Imports: Tienda
 const StoreGeneralSection = lazy(() => import('./sections/tienda/StoreGeneralSection'));
 const ProductosSection = lazy(() => import('./sections/tienda/ProductosSection'));
 const OfertasSection = lazy(() => import('./sections/tienda/OfertasSection'));
@@ -47,7 +47,7 @@ const PaymentsSection = lazy(() => import('./sections/tienda/PaymentsSection'));
 const BannersSection = lazy(() => import('./sections/tienda/BannersSection'));
 const CategoriasSection = lazy(() => import('./sections/tienda/CategoriasSection'));
 
-// ── Lazy Imports: Configuración ──
+// Lazy Imports: Configuracion
 const PersonalizacionSection = lazy(() => import('./sections/config/PersonalizacionSection'));
 const PWASection = lazy(() => import('./sections/config/PWASection'));
 const SEOSection = lazy(() => import('./sections/config/SEOSection'));
@@ -70,31 +70,26 @@ interface AdminIndexProps {
   setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout') => void;
 }
 
-// ── Section Registry (new structure) ──
 const ALL_SECTIONS = [
-  // REPORTES
   { id: 'dashboard',       label: 'Resumen',           icon: BarChart3,       group: 'reportes', groupLabel: 'Reportes' },
   { id: 'sales-report',    label: 'Ventas',            icon: TrendingUp,      group: 'reportes' },
   { id: 'products-report', label: 'Productos Report',  icon: Package,         group: 'reportes' },
   { id: 'app-report',      label: 'App',               icon: Smartphone,      group: 'reportes' },
-  { id: 'analytics',       label: 'Estadísticas',      icon: Activity,        group: 'reportes' },
+  { id: 'analytics',       label: 'Estadisticas',      icon: Activity,        group: 'reportes' },
 
-  // PEDIDOS
   { id: 'orders',          label: 'Comandas',          icon: ShoppingBag,     group: 'pedidos', groupLabel: 'Pedidos' },
   { id: 'order-history',   label: 'Historial',         icon: Clock,           group: 'pedidos' },
   { id: 'delivery-map',    label: 'Mapa Delivery',     icon: MapPin,          group: 'pedidos' },
 
-  // MARKETING
   { id: 'customers',       label: 'Clientes',          icon: Users,           group: 'marketing', groupLabel: 'Marketing' },
   { id: 'messages',        label: 'Mensajes',          icon: MessageSquare,   group: 'marketing' },
   { id: 'promos',          label: 'Promociones',       icon: Megaphone,       group: 'marketing' },
   { id: 'coupons',         label: 'Cupones',           icon: Ticket,          group: 'marketing' },
-  { id: 'loyalty',         label: 'Fidelización',      icon: Award,           group: 'marketing' },
-  { id: 'segments',        label: 'Segmentación',      icon: Users,           group: 'marketing' },
-  { id: 'automations',     label: 'Automatización',    icon: Zap,             group: 'marketing' },
+  { id: 'loyalty',         label: 'Fidelizacion',      icon: Award,           group: 'marketing' },
+  { id: 'segments',        label: 'Segmentacion',      icon: Users,           group: 'marketing' },
+  { id: 'automations',     label: 'Automatizacion',    icon: Zap,             group: 'marketing' },
   { id: 'push-analytics',  label: 'Analytics Push',    icon: BarChart3,       group: 'marketing' },
 
-  // TIENDA
   { id: 'store-general',   label: 'General',           icon: Store,           group: 'tienda', groupLabel: 'Tienda' },
   { id: 'products',        label: 'Productos',         icon: Package,         group: 'tienda' },
   { id: 'store-promos',    label: 'Ofertas',           icon: Tag,             group: 'tienda' },
@@ -102,10 +97,9 @@ const ALL_SECTIONS = [
   { id: 'delivery',        label: 'Delivery',          icon: Truck,           group: 'tienda' },
   { id: 'payments',        label: 'Pagos',             icon: CreditCard,      group: 'tienda' },
   { id: 'banners',         label: 'Banners',           icon: Image,           group: 'tienda' },
-  { id: 'categories',      label: 'Categorías',        icon: Grid,            group: 'tienda' },
+  { id: 'categories',      label: 'Categorias',        icon: Grid,            group: 'tienda' },
 
-  // CONFIGURACIÓN (solo admin)
-  { id: 'branding',        label: 'Personalización',   icon: Palette,         group: 'config', groupLabel: 'Configuración', adminOnly: true },
+  { id: 'branding',        label: 'Personalizacion',   icon: Palette,         group: 'config', groupLabel: 'Configuracion', adminOnly: true },
   { id: 'pwa-config',      label: 'PWA',               icon: Smartphone,      group: 'config', adminOnly: true },
   { id: 'seo',             label: 'SEO',               icon: Search,          group: 'config', adminOnly: true },
   { id: 'branches',        label: 'Sucursales',        icon: Building2,       group: 'config', adminOnly: true },
@@ -117,15 +111,15 @@ const ALL_SECTIONS = [
 
 const BOTTOM_TABS = [
   { id: 'dashboard', label: 'Reportes', icon: BarChart3 },
-  { id: 'orders',    label: 'Pedidos',  icon: ShoppingBag },
+  { id: 'orders',    label: 'Pedidos',  icon: ShoppingBag, hasBadge: true },
   { id: 'products',  label: 'Tienda',   icon: Store },
-  { id: '__more',    label: 'Más',      icon: LayoutGrid },
+  { id: 'customers', label: 'Clientes', icon: Users },
+  { id: '__more',    label: 'Mas',      icon: LayoutGrid },
 ];
 
 export default function AdminIndex({ setTab }: AdminIndexProps) {
-  const { config, updateFoodItem, addFoodItem, userRole, adminScopeSedeId } = useApp();
-  const { activeSection, setActiveSection } = useAdminStore();
-  const { advanceStatus } = useOrders();
+  const { config, orders, updateFoodItem, addFoodItem, userRole, adminScopeSedeId } = useApp();
+  const { activeSection, setActiveSection, sidebarCollapsed, toggleSidebarCollapsed } = useAdminStore();
   const themeColor = config.theme_color || '#A4D045';
   const isAdmin = userRole === 'admin';
   const scopeSedeId = isAdmin ? '' : (adminScopeSedeId || '');
@@ -135,19 +129,21 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   const [openEditor, setOpenEditor] = useState<FoodItem | null>(null);
   const [showProductForm, setShowProductForm] = useState(false);
 
-  const handleStatusAdvance = useCallback((order: Order) => {
-    advanceStatus(order);
-  }, [advanceStatus]);
+  const visibleSections = ALL_SECTIONS.filter(s => isAdmin || !s.adminOnly);
+  const currentSection = visibleSections.find(s => s.id === activeSection);
+  const sectionLabel = currentSection?.label || 'Panel';
+  const sectionGroup = currentSection?.groupLabel || currentSection?.group || '';
+  const SectionIcon = currentSection?.icon;
 
-  const visibleSections = ALL_SECTIONS
-    .filter(s => isAdmin || !s.adminOnly);
-  const sectionLabel = visibleSections.find(s => s.id === activeSection)?.label || 'Panel';
+  const pendingOrdersCount = useMemo(() =>
+    orders.filter(o => o.status === 'Pendiente' || o.status === 'Procesando').length,
+    [orders]
+  );
 
   const moreSections = visibleSections.filter(s =>
     !BOTTOM_TABS.some(t => t.id === s.id)
   );
 
-  // Group sections for sidebar with group headers
   const groupedSections = visibleSections.reduce((acc, section) => {
     const group = section.group;
     if (!acc.find(g => g.group === group)) {
@@ -164,25 +160,21 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   };
 
   const renderSection = () => {
-    // Admin-only redirect
     if (!isAdmin && ALL_SECTIONS.find(s => s.id === activeSection)?.adminOnly) {
       return <ComandasSection scopeSedeId={scopeSedeId} />;
     }
 
     switch (activeSection) {
-      // REPORTES
       case 'dashboard':       return <ResumenGeneralSection />;
       case 'sales-report':    return <VentasReportSection />;
       case 'products-report': return <ProductosReportSection />;
       case 'app-report':      return <AppReportSection />;
       case 'analytics':       return <EstadisticasSection />;
 
-      // PEDIDOS
       case 'orders':          return <ComandasSection scopeSedeId={scopeSedeId} />;
       case 'order-history':   return <HistorialPedidosSection scopeSedeId={scopeSedeId} />;
       case 'delivery-map':    return <MapaDeliverySection scopeSedeId={scopeSedeId} />;
 
-      // MARKETING
       case 'customers':       return <ClientesSection />;
       case 'messages':        return <MensajesSection />;
       case 'promos':          return <PromocionesSection />;
@@ -192,7 +184,6 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
       case 'automations':     return <AutomatizacionSection />;
       case 'push-analytics':  return <AnalyticsPushSection />;
 
-      // TIENDA
       case 'store-general':   return <StoreGeneralSection />;
       case 'products':        return <ProductosSection onEdit={(p) => setOpenEditor(p)} onCreate={() => setShowProductForm(true)} config={config} />;
       case 'store-promos':    return <OfertasSection />;
@@ -202,7 +193,6 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
       case 'banners':         return <BannersSection />;
       case 'categories':      return <CategoriasSection />;
 
-      // CONFIGURACIÓN
       case 'branding':        return <PersonalizacionSection />;
       case 'pwa-config':      return <PWASection />;
       case 'seo':             return <SEOSection />;
@@ -216,60 +206,85 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
     }
   };
 
-
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--ios-bg)' }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--erp-content-bg)' }}>
       <SEOHead title={`Admin - ${config.site_nombre || 'Panel'}`} type="admin" />
 
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-60 shrink-0" style={{ background: 'var(--ios-card)', borderRight: '1px solid var(--ios-border)' }}>
-        <div className="p-4 flex items-center gap-3" style={{ borderBottom: '1px solid var(--ios-border)' }}>
+      <aside className={`erp-sidebar hidden lg:flex ${sidebarCollapsed ? 'collapsed' : ''}`}>
+        <div className="flex items-center gap-3 px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--erp-card-border)', minHeight: 52 }}>
           {config.logo_url ? (
-            <img src={config.logo_url} alt={config.site_nombre || 'Logo'} className="h-8 w-auto max-w-[140px] object-contain" />
+            <img src={config.logo_url} alt={config.site_nombre || 'Logo'} className={sidebarCollapsed ? 'h-7 w-7 object-contain mx-auto' : 'h-7 w-auto max-w-[140px] object-contain'} />
           ) : (
             <>
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold shrink-0" style={{ background: themeColor }}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ background: themeColor }}>
                 {config.site_nombre?.[0] || 'A'}
               </div>
-              <span className="font-bold text-base truncate" style={{ color: 'var(--ios-text)' }}>{config.site_nombre || 'Admin'}</span>
+              {!sidebarCollapsed && (
+                <span className="font-bold text-sm truncate" style={{ color: 'var(--ios-text)' }}>{config.site_nombre || 'Admin'}</span>
+              )}
             </>
           )}
         </div>
-        <SidebarNav groupedSections={groupedSections} activeSection={activeSection} themeColor={themeColor} onSectionChange={handleSectionChange} />
-        <div className="p-3" style={{ borderTop: '1px solid var(--ios-border)' }}>
-          <button onClick={() => setTab('home')} className="w-full text-sm py-3 transition-colors cursor-pointer flex items-center justify-center gap-2" style={{ color: 'var(--ios-text-secondary)' }}>
-            <ChevronLeft size={16} /> Volver a la tienda
+        <SidebarNav
+          groupedSections={groupedSections}
+          activeSection={activeSection}
+          themeColor={themeColor}
+          onSectionChange={handleSectionChange}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={toggleSidebarCollapsed}
+        />
+        <div className="px-2 py-2 shrink-0" style={{ borderTop: '1px solid var(--erp-card-border)' }}>
+          <button onClick={() => setTab('home')} className="erp-sidebar-item justify-center" style={{ color: 'var(--ios-text-secondary)' }}>
+            <ChevronLeft size={16} />
+            {!sidebarCollapsed && <span className="text-xs">Volver a la tienda</span>}
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
-        {/* Header */}
-        <header className="admin-header shrink-0">
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 -ml-2 rounded-xl cursor-pointer" style={{ color: 'var(--ios-text)' }}>
-            <BarChart3 size={22} />
+        <header className="erp-header shrink-0">
+          <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 -ml-2 rounded-lg cursor-pointer" style={{ color: 'var(--ios-text)' }}>
+            <LayoutGrid size={20} />
           </button>
-          {config.logo_url ? (
-            <img src={config.logo_url} alt={config.site_nombre || 'Logo'} className="h-7 w-auto max-w-[100px] object-contain ml-2" />
-          ) : (
-            <h1 className="admin-section-title ml-2">{sectionLabel}</h1>
-          )}
+          <div className="erp-breadcrumb">
+            <span className="erp-breadcrumb-sep">/</span>
+            <span>{sectionGroup}</span>
+            <span className="erp-breadcrumb-sep">/</span>
+            <span className="erp-breadcrumb-current flex items-center gap-1.5">
+              {SectionIcon && <SectionIcon size={14} />}
+              {sectionLabel}
+            </span>
+          </div>
+          <div className="ml-auto flex items-center gap-3">
+            {pendingOrdersCount > 0 && (
+              <div
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold cursor-pointer"
+                style={{ background: `${themeColor}15`, color: themeColor }}
+                onClick={() => handleSectionChange('orders')}
+              >
+                <ShoppingBag size={13} />
+                <span>{pendingOrdersCount}</span>
+                <span className="hidden sm:inline">pendientes</span>
+              </div>
+            )}
+            {!sidebarCollapsed && config.logo_url && (
+              <img src={config.logo_url} alt="" className="h-6 w-auto max-w-[80px] object-contain opacity-40 hidden lg:block" />
+            )}
+          </div>
         </header>
 
-        {/* Content */}
-        <main className="flex-1 overflow-y-auto" style={{ padding: '16px', paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))' }}>
+        <main className="erp-content" style={{ padding: 16, paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))' }}>
           <Suspense fallback={<SectionLoader />}>
             {renderSection()}
           </Suspense>
         </main>
 
-        {/* Mobile Bottom Tabs */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 admin-bottom-tabs">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 erp-header" style={{ borderTop: '1px solid var(--erp-card-border)', justifyContent: 'space-around', height: 64, paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {BOTTOM_TABS.map(tab => {
             const Icon = tab.icon;
             const isMore = tab.id === '__more';
             const isActive = isMore ? showMoreSheet : activeSection === tab.id;
+            const showBadge = tab.hasBadge && pendingOrdersCount > 0;
             return (
               <button
                 key={tab.id}
@@ -277,79 +292,85 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
                   if (isMore) setShowMoreSheet(true);
                   else handleSectionChange(tab.id);
                 }}
-                className="flex flex-col items-center justify-center gap-1 flex-1 py-2 cursor-pointer touch-target"
-                style={{ color: isActive ? themeColor : 'var(--ios-text-secondary)' }}
+                className="relative flex flex-col items-center justify-center gap-0.5 flex-1 cursor-pointer"
+                style={{ color: isActive ? themeColor : 'var(--ios-text-secondary)', minHeight: 48 }}
               >
-                <Icon size={22} strokeWidth={isActive ? 2.5 : 1.5} />
-                <span className="text-[10px] font-semibold">{tab.label}</span>
+                <div className="relative">
+                  <Icon size={22} strokeWidth={isActive ? 2.2 : 1.5} />
+                  {showBadge && <span className="erp-nav-badge">{pendingOrdersCount}</span>}
+                </div>
+                <span className="text-[9px] font-semibold">{tab.label}</span>
+                {isActive && (
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full" style={{ background: themeColor }} />
+                )}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Edit Product Modal */}
       {openEditor && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+        <BottomSheet open={true} onClose={() => setOpenEditor(null)} title="Editar Producto">
           <ProductoFormSection
             product={openEditor}
             onSave={async (updated: Partial<FoodItem>) => { updateFoodItem(updated.id!, updated); }}
             onClose={() => setOpenEditor(null)}
           />
-        </div>
+        </BottomSheet>
       )}
 
-      {/* New Product Modal */}
       {showProductForm && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+        <BottomSheet open={true} onClose={() => setShowProductForm(false)} title="Crear Producto">
           <ProductoFormSection
             product={null}
-            onSave={async (newProduct: Partial<FoodItem>) => {
-              addFoodItem(newProduct as any);
-            }}
+            onSave={async (newProduct: Partial<FoodItem>) => { addFoodItem(newProduct as any); }}
             onClose={() => setShowProductForm(false)}
           />
-        </div>
+        </BottomSheet>
       )}
 
-      {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/30" onClick={() => setSidebarOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 w-72 flex flex-col" style={{ background: 'var(--ios-card)' }}>
-            <div className="p-4 flex items-center gap-3" style={{ borderBottom: '1px solid var(--ios-border)' }}>
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+          <aside className="absolute inset-y-0 left-0 w-72 erp-sidebar flex flex-col" style={{ background: 'var(--erp-sidebar-bg)' }}>
+            <div className="flex items-center gap-3 px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--erp-card-border)', minHeight: 52 }}>
               {config.logo_url ? (
-                <img src={config.logo_url} alt={config.site_nombre || 'Logo'} className="h-8 w-auto max-w-[120px] object-contain" />
+                <img src={config.logo_url} alt={config.site_nombre || 'Logo'} className="h-7 w-auto max-w-[120px] object-contain" />
               ) : (
                 <>
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold shrink-0" style={{ background: themeColor }}>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ background: themeColor }}>
                     {config.site_nombre?.[0] || 'A'}
                   </div>
-                  <span className="font-bold text-base truncate" style={{ color: 'var(--ios-text)' }}>{config.site_nombre || 'Admin'}</span>
+                  <span className="font-bold text-sm truncate" style={{ color: 'var(--ios-text)' }}>{config.site_nombre || 'Admin'}</span>
                 </>
               )}
-              <button onClick={() => setSidebarOpen(false)} className="ml-auto p-2 rounded-xl" style={{ color: 'var(--ios-text-secondary)' }}>
+              <button onClick={() => setSidebarOpen(false)} className="ml-auto p-2 rounded-lg" style={{ color: 'var(--ios-text-secondary)' }}>
                 <X size={20} />
               </button>
             </div>
-            <SidebarNav groupedSections={groupedSections} activeSection={activeSection} themeColor={themeColor} onSectionChange={handleSectionChange} />
-            <div className="p-3" style={{ borderTop: '1px solid var(--ios-border)' }}>
-              <button onClick={() => setTab('home')} className="w-full text-sm py-3 flex items-center justify-center gap-2" style={{ color: 'var(--ios-text-secondary)' }}>
-                <ChevronLeft size={16} /> Volver a la tienda
+            <SidebarNav
+              groupedSections={groupedSections}
+              activeSection={activeSection}
+              themeColor={themeColor}
+              onSectionChange={handleSectionChange}
+            />
+            <div className="px-2 py-2 shrink-0" style={{ borderTop: '1px solid var(--erp-card-border)' }}>
+              <button onClick={() => setTab('home')} className="erp-sidebar-item justify-center" style={{ color: 'var(--ios-text-secondary)' }}>
+                <ChevronLeft size={16} />
+                <span className="text-xs">Volver a la tienda</span>
               </button>
             </div>
           </aside>
         </div>
       )}
 
-      {/* More Sections Bottom Sheet */}
       {showMoreSheet && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/30" onClick={() => setShowMoreSheet(false)} />
-          <div className="absolute bottom-0 left-0 right-0 bottom-sheet" style={{ background: 'var(--ios-card)' }}>
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowMoreSheet(false)} />
+          <div className="absolute bottom-0 left-0 right-0 bottom-sheet" style={{ background: 'var(--erp-sidebar-bg)' }}>
             <div className="bottom-sheet-handle" />
             <div className="p-4 max-h-[70vh] overflow-y-auto">
-              <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--ios-text)' }}>Más opciones</h3>
+              <h3 className="text-base font-bold mb-3" style={{ color: 'var(--ios-text)' }}>Mas opciones</h3>
               {(() => {
                 const moreGrouped = moreSections.reduce((acc, section) => {
                   const group = section.group;
@@ -369,14 +390,15 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
                         <button
                           key={section.id}
                           onClick={() => handleSectionChange(section.id)}
-                          className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer touch-target"
+                          className="erp-sidebar-item w-full"
                           style={{
-                            background: isActive ? `${themeColor}15` : 'transparent',
+                            background: isActive ? `${themeColor}12` : 'transparent',
                             color: isActive ? themeColor : 'var(--ios-text)',
+                            borderLeftColor: isActive ? themeColor : 'transparent',
                           }}
                         >
-                          <Icon size={20} />
-                          {section.label}
+                          <Icon size={18} />
+                          <span className="truncate">{section.label}</span>
                         </button>
                       );
                     })}
@@ -385,10 +407,11 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
               })()}
               <button
                 onClick={() => { setTab('home'); setShowMoreSheet(false); }}
-                className="w-full mt-4 py-3.5 rounded-xl text-sm font-semibold cursor-pointer touch-target"
-                style={{ color: 'var(--ios-text-secondary)', borderTop: '1px solid var(--ios-border)' }}
+                className="erp-sidebar-item w-full justify-center mt-2"
+                style={{ color: 'var(--ios-text-secondary)', borderTop: '1px solid var(--erp-card-border)', paddingTop: 12 }}
               >
-                ← Volver a la tienda
+                <ChevronLeft size={16} />
+                <span className="text-xs">Volver a la tienda</span>
               </button>
             </div>
           </div>

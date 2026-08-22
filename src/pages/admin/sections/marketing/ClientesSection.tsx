@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { supabase } from '../../../../store/supabaseClient';
 import { Users, Search, Mail, Download, ShoppingCart, MessageCircle, Phone } from 'lucide-react';
+import { Tooltip } from '../../components/Tooltip';
 
 const ClientesSection: React.FC = () => {
   const { users, orders, config, addNotification } = useApp();
@@ -99,12 +100,12 @@ const ClientesSection: React.FC = () => {
           <Users size={18} style={{ color: themeColor }} />
           <h3 className="text-sm font-bold text-slate-900 uppercase">Clientes</h3>
         </div>
-        <button onClick={exportCSV} className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-colors">
-          <Download size={12} /> Exportar CSV
+        <button onClick={exportCSV} className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-colors">
+          <Download size={12} /> <span className="hidden sm:inline">Exportar</span>CSV
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
         {[
           { label: 'Total Clientes', value: String(users.length), color: themeColor },
           { label: 'Activos (30d)', value: String(activeCount), color: '#10B981' },
@@ -145,16 +146,22 @@ const ClientesSection: React.FC = () => {
                   <p className="text-[10px] text-slate-500">${uOrders.reduce((s, o) => s + (Number(o.total_usd) || 0), 0).toFixed(2)}</p>
                 </div>
               </div>
-              <div className="flex gap-1.5 pt-1 border-t border-slate-100">
-                <button onClick={() => setShowMsgModal(user.id)} className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[10px] font-bold bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors">
-                  <Mail size={11} /> Mensaje
-                </button>
-                <button onClick={() => sendWhatsApp(user.telefono || '')} className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[10px] font-bold bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors">
-                  <MessageCircle size={11} /> WhatsApp
-                </button>
-                <button onClick={() => setExpandedOrders(isExpanded ? null : user.id)} className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[10px] font-bold bg-slate-50 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors">
-                  <ShoppingCart size={11} /> Historial
-                </button>
+              <div className="flex gap-1 pt-1 border-t border-slate-100">
+                <Tooltip content="Enviar mensaje personal" position="top">
+                  <button onClick={() => setShowMsgModal(user.id)} className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[10px] font-bold bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors">
+                    <Mail size={11} /> <span className="hidden sm:inline">Mensaje</span>
+                  </button>
+                </Tooltip>
+                <Tooltip content="Abrir chat de WhatsApp" position="top">
+                  <button onClick={() => sendWhatsApp(user.telefono || '')} className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[10px] font-bold bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors">
+                    <MessageCircle size={11} /> <span className="hidden sm:inline">WhatsApp</span>
+                  </button>
+                </Tooltip>
+                <Tooltip content="Ver historial de pedidos" position="top">
+                  <button onClick={() => setExpandedOrders(isExpanded ? null : user.id)} className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[10px] font-bold bg-slate-50 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors">
+                    <ShoppingCart size={11} /> <span className="hidden sm:inline">Historial</span>
+                  </button>
+                </Tooltip>
               </div>
               {isExpanded && (
                 <div className="mt-2 pt-2 border-t border-slate-100">

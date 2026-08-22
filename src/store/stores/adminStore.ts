@@ -15,6 +15,7 @@ type AdminSection =
 interface AdminState {
   activeSection: AdminSection;
   sidebarOpen: boolean;
+  sidebarCollapsed: boolean;
   orderFilter: string;
   crudSearch: string;
   isEditorOpen: boolean;
@@ -22,6 +23,8 @@ interface AdminState {
   setActiveSection: (section: AdminSection) => void;
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
+  toggleSidebarCollapsed: () => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
   setOrderFilter: (filter: string) => void;
   setCrudSearch: (search: string) => void;
   setEditorOpen: (open: boolean) => void;
@@ -30,6 +33,7 @@ interface AdminState {
 export const useAdminStore = create<AdminState>((set) => ({
   activeSection: 'dashboard',
   sidebarOpen: false,
+  sidebarCollapsed: false,
   orderFilter: 'all',
   crudSearch: '',
   isEditorOpen: false,
@@ -37,6 +41,8 @@ export const useAdminStore = create<AdminState>((set) => ({
   setActiveSection: (section) => set({ activeSection: section }),
   toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
+  toggleSidebarCollapsed: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
+  setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
   setOrderFilter: (filter) => set({ orderFilter: filter }),
   setCrudSearch: (search) => set({ crudSearch: search }),
   setEditorOpen: (open) => set({ isEditorOpen: open }),
