@@ -101,7 +101,7 @@ export const onRequestPost: any = async (context: any) => {
     let webpush: any;
     const wpMod = await import('web-push');
     webpush = (wpMod as any).default || wpMod;
-    webpush.setVapidDetails('mailto:admin@marketo.com.ve', vapidPublic, vapidPrivate);
+    webpush.setVapidDetails('mailto:admin@marketcoffesweet.com', vapidPublic, vapidPrivate);
 
     let sentCount = 0;
     let rateLimitedCount = 0;

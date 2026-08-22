@@ -51,9 +51,9 @@ Variables de entorno (Settings → Environment variables):
 | `PUSH_WEBHOOK_SECRET` | **Secret** | valor aleatorio (coincide con `app_secrets`) |
 | `VAPID_PRIVATE_KEY` | **Secret** | clave privada VAID nueva |
 | `VAPID_PUBLIC_KEY` | Text | clave pública VAID |
-| `ALLOWED_ORIGINS` | Text | `https://marketcoffee.maketo.site,http://localhost:3000` |
+| `ALLOWED_ORIGINS` | Text | `https://marketcoffesweet.com,http://localhost:3000` |
 
-CORS: el default en las functions ya incluye `https://marketcoffee.maketo.site` y `localhost:3000`.
+CORS: el default en las functions ya incluye `https://marketcoffesweet.com` y `localhost:3000`.
 
 **Rate limiting (opcional pero recomendado):**
 1. Crea un KV namespace en Cloudflare (Workers & Pages → KV).

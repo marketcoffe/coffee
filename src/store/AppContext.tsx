@@ -194,7 +194,7 @@ const DEFAULT_CONFIG: StoreConfig = {
     '/imagen/charcuteria-banner.webp'
   ],
   zelle_enabled: true,
-  zelle_data: 'pagos@marketcoffee.com.ve',
+  zelle_data: 'pagos@marketcoffesweet.com',
   zelle_discount_percent: 0,
   pagomovil_enabled: true,
   pagomovil_data: 'Banesco (0134) - RIF J-50123456-7 - Tel: 0412-4058904',

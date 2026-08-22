@@ -16,7 +16,7 @@ if (result.error) {
   console.warn('⚠️ Error al cargar .env:', result.error.message);
 }
 
-const ENDPOINT = process.env.VITE_PUSH_WEBHOOK_URL || 'https://market-cbh.pages.dev/api/push-notify';
+const ENDPOINT = process.env.VITE_PUSH_WEBHOOK_URL || 'https://marketcoffesweet.com/api/push-notify';
 const SECRET = process.env.VITE_PUSH_WEBHOOK_SECRET || process.env.PUSH_WEBHOOK_SECRET || process.env.AUTH_SECRET;
 
 async function triggerTestPush() {

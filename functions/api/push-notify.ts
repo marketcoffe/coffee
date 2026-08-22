@@ -13,8 +13,7 @@ declare const PagesFunction: any;
 
 // Default allowed origins for browser-based calls (dev + production).
 const DEFAULT_ALLOWED_ORIGINS = [
-  'https://marketcoffee.maketo.site',
-  'https://marketcoffee.pages.dev',
+  'https://marketcoffesweet.com',
   'http://localhost:3000',
   'http://127.0.0.1:3000',
 ];
@@ -165,7 +164,7 @@ export const onRequestPost: any = async (context: any) => {
     }
 
     webpush.setVapidDetails(
-      'mailto:admin@marketo.com.ve',
+      'mailto:admin@marketcoffesweet.com',
       vapidPublic,
       vapidPrivate
     );

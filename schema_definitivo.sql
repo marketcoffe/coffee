@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS store_config (
 
     -- Pagos
     zelle_enabled BOOLEAN NOT NULL DEFAULT TRUE,
-    zelle_data TEXT NOT NULL DEFAULT 'pagos@marketcoffee.com.ve',
+    zelle_data TEXT NOT NULL DEFAULT 'pagos@marketcoffesweet.com',
     zelle_discount_percent NUMERIC(5,2) NOT NULL DEFAULT 0.00,
     pagomovil_enabled BOOLEAN NOT NULL DEFAULT TRUE,
     pagomovil_data TEXT NOT NULL DEFAULT 'Banesco (0134) - RIF J-50123456-7 - Tel: 0412-4058904',
@@ -329,7 +329,7 @@ ALTER TABLE public.push_subscriptions ENABLE ROW LEVEL SECURITY;
 
 UPDATE store_config 
 SET 
-    push_webhook_url = 'https://marketcoffee.maketo.site/api/push-notify',
+    push_webhook_url = 'https://marketcoffesweet.com/api/push-notify',
   push_webhook_secret = 'fp-push-secret-2024-xK9m'
 WHERE id = 1;
 -- ----------------------------------------------------------------------------

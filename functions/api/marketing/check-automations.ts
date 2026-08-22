@@ -77,7 +77,7 @@ export const onRequestPost: any = async (context: any) => {
   if (vapidPublic && vapidPrivate) {
     const wpMod = await import('web-push');
     webpush = (wpMod as any).default || wpMod;
-    webpush.setVapidDetails('mailto:admin@marketo.com.ve', vapidPublic, vapidPrivate);
+    webpush.setVapidDetails('mailto:admin@marketcoffesweet.com', vapidPublic, vapidPrivate);
   }
 
   const results = [];

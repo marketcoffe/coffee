@@ -102,7 +102,7 @@ SELECT * FROM public.app_secrets WHERE id = 1;
 
 ## 4. Verificación final
 
-1. `GET https://marketcoffee.maketo.site/api/push-notify` →
+1. `GET https://marketcoffesweet.com/api/push-notify` →
    `{ status:'ok', vapidConfigured:true, authConfigured:true }`.
 2. `POST /api/push-notify` sin header `x-push-webhook-secret` → `401`.
 3. Pedido de prueba: avanza estados y confirma que **cada** estado muestra su
