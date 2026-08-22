@@ -33,7 +33,7 @@ const StoreGeneralSection: React.FC = () => {
       <div className="admin-card p-4">
         <p className="admin-label mb-3">Telefono / WhatsApp</p>
         <div className="flex flex-col gap-1">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <span className="text-[10px] font-bold" style={{ color: 'var(--ios-text-secondary)' }}>Numero Maestro de Notificaciones</span>
             {currentUser && config.telefono_soporte !== currentUser.telefono && (
               <button onClick={async () => {

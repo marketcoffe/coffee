@@ -100,7 +100,7 @@ const MapaDeliverySection: React.FC<MapaDeliverySectionProps> = ({ scopeSedeId }
       {/* Main: Map + Panel */}
       <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
         {/* Map (60% on desktop) */}
-        <div className="w-full lg:w-[60%] h-[50vh] lg:h-full shrink-0">
+        <div className="w-full lg:w-[60%] h-[40vh] lg:h-full shrink-0">
           <AdminTrackingMap
             orders={filteredOrders}
             shopCoords={config.coordenadas_tienda}

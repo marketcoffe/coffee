@@ -22,7 +22,7 @@ const ProductosReportSection: React.FC = () => {
     return Object.values(productSalesMap)
       .sort((a, b) => b.unidades - a.unidades)
       .slice(0, 10)
-      .map(p => ({ name: p.nombre.substring(0, 20), Unidades: p.unidades }));
+      .map(p => ({ name: p.nombre.substring(0, 12), Unidades: p.unidades }));
   }, [productSalesMap]);
 
   const lowStockProducts = useMemo(() =>
@@ -94,7 +94,7 @@ const ProductosReportSection: React.FC = () => {
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={topProductsData} layout="vertical">
                 <XAxis type="number" stroke="#64748b" />
-                <YAxis dataKey="name" type="category" width={120} stroke="#64748b" tick={{ fontSize: 10 }} />
+                <YAxis dataKey="name" type="category" width={80} stroke="#64748b" tick={{ fontSize: 10 }} />
                 <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0' }} />
                 <Bar dataKey="Unidades" fill="#7c3aed" radius={[0, 4, 4, 0]} />
               </BarChart>

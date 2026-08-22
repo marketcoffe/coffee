@@ -8,12 +8,13 @@ import {
   LayoutGrid, ChevronLeft, ChevronRight, MapPin, Shield, Store,
   TrendingUp, Smartphone, Activity, Clock, Users, Zap, Tag,
   Truck, CreditCard, Image, Grid, Search, Building2, HelpCircle,
-  Sliders, Palette, Ticket, Settings
+  Sliders, Palette, Ticket, Settings, Menu
 } from 'lucide-react';
 import { SEOHead } from '../../components/SEOHead';
 import ProductoFormSection from './sections/tienda/ProductoFormSection';
 import SidebarNav from './components/SidebarNav';
 import BottomSheet from './components/BottomSheet';
+import { Tooltip } from './components/Tooltip';
 
 // Lazy Imports: Reportes
 const ResumenGeneralSection = lazy(() => import('./sections/reports/ResumenGeneralSection'));
@@ -207,23 +208,13 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--erp-content-bg)' }}>
+    <div className="h-screen" style={{ background: 'var(--erp-content-bg)' }}>
       <SEOHead title={`Admin - ${config.site_nombre || 'Panel'}`} type="admin" />
 
-      <aside className={`erp-sidebar hidden lg:flex ${sidebarCollapsed ? 'collapsed' : ''}`}>
+      {/* Desktop sidebar - only visible lg+ */}
+      <aside className={`erp-sidebar hidden lg:flex fixed inset-y-0 left-0 z-30 ${sidebarCollapsed ? 'collapsed' : ''}`} style={{ width: sidebarCollapsed ? 'var(--erp-sidebar-collapsed)' : 'var(--erp-sidebar-width)' }}>
         <div className="flex items-center gap-3 px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--erp-card-border)', minHeight: 52 }}>
-          {config.logo_url ? (
-            <img src={config.logo_url} alt={config.site_nombre || 'Logo'} className={sidebarCollapsed ? 'h-7 w-7 object-contain mx-auto' : 'h-7 w-auto max-w-[140px] object-contain'} />
-          ) : (
-            <>
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ background: themeColor }}>
-                {config.site_nombre?.[0] || 'A'}
-              </div>
-              {!sidebarCollapsed && (
-                <span className="font-bold text-sm truncate" style={{ color: 'var(--ios-text)' }}>{config.site_nombre || 'Admin'}</span>
-              )}
-            </>
-          )}
+          <span className="font-bold text-sm truncate" style={{ color: 'var(--ios-text)' }}>{sidebarCollapsed ? 'PA' : 'Panel Administrativo'}</span>
         </div>
         <SidebarNav
           groupedSections={groupedSections}
@@ -241,11 +232,14 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
-        <header className="erp-header shrink-0">
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 -ml-2 rounded-lg cursor-pointer" style={{ color: 'var(--ios-text)' }}>
-            <LayoutGrid size={20} />
-          </button>
+      <div className="erp-main-content flex-1 flex flex-col min-h-0 relative" data-collapsed={sidebarCollapsed}>
+        {/* Desktop Header */}
+        <header className="erp-header shrink-0 hidden lg:flex">
+          <Tooltip content="Abrir menu de navegacion" position="bottom">
+            <button onClick={() => setSidebarOpen(true)} className="p-2 -ml-2 rounded-lg cursor-pointer" style={{ color: 'var(--ios-text)' }}>
+              <Menu size={20} />
+            </button>
+          </Tooltip>
           <div className="erp-breadcrumb">
             <span className="erp-breadcrumb-sep">/</span>
             <span>{sectionGroup}</span>
@@ -257,53 +251,87 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
           </div>
           <div className="ml-auto flex items-center gap-3">
             {pendingOrdersCount > 0 && (
-              <div
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold cursor-pointer"
-                style={{ background: `${themeColor}15`, color: themeColor }}
-                onClick={() => handleSectionChange('orders')}
-              >
-                <ShoppingBag size={13} />
-                <span>{pendingOrdersCount}</span>
-                <span className="hidden sm:inline">pendientes</span>
-              </div>
-            )}
-            {!sidebarCollapsed && config.logo_url && (
-              <img src={config.logo_url} alt="" className="h-6 w-auto max-w-[80px] object-contain opacity-40 hidden lg:block" />
+              <Tooltip content={`${pendingOrdersCount} pedidos esperando ser procesados`} position="bottom">
+                <div
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold cursor-pointer"
+                  style={{ background: `${themeColor}15`, color: themeColor }}
+                  onClick={() => handleSectionChange('orders')}
+                >
+                  <ShoppingBag size={13} />
+                  <span>{pendingOrdersCount}</span>
+                  <span className="hidden sm:inline">pendientes</span>
+                </div>
+              </Tooltip>
             )}
           </div>
         </header>
 
-        <main className="erp-content" style={{ padding: 16, paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))' }}>
+        {/* Mobile Header */}
+        <header className="lg:hidden shrink-0 flex items-center justify-between px-3 gap-2" style={{ height: 'var(--erp-mobile-header-height, 56px)', background: 'var(--erp-header-bg)', borderBottom: '1px solid var(--erp-card-border)' }}>
+          <Tooltip content="Abrir menu de navegacion" position="bottom">
+            <button onClick={() => setSidebarOpen(true)} className="p-2 -ml-1 rounded-xl cursor-pointer active:scale-95 transition-transform" style={{ color: 'var(--ios-text)', minWidth: 44, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Menu size={22} />
+            </button>
+          </Tooltip>
+          <div className="flex-1 flex items-center gap-2 min-w-0 px-1">
+            {SectionIcon && <SectionIcon size={16} style={{ color: themeColor }} className="shrink-0" />}
+            <span className="text-sm font-bold truncate" style={{ color: 'var(--ios-text)' }}>{sectionLabel}</span>
+          </div>
+          {pendingOrdersCount > 0 && (
+            <Tooltip content={`${pendingOrdersCount} pedidos pendientes`} position="bottom">
+              <button
+                onClick={() => handleSectionChange('orders')}
+                className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer active:scale-95 transition-transform"
+                style={{ background: `${themeColor}15`, color: themeColor, minHeight: 40 }}
+              >
+                <ShoppingBag size={14} />
+                <span>{pendingOrdersCount}</span>
+              </button>
+            </Tooltip>
+          )}
+        </header>
+
+        <main className="erp-content" style={{ padding: 16 }}>
           <Suspense fallback={<SectionLoader />}>
             {renderSection()}
           </Suspense>
         </main>
+      </div>
 
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 erp-header" style={{ borderTop: '1px solid var(--erp-card-border)', justifyContent: 'space-around', height: 64, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      {/* Mobile Bottom Nav - Native App Style - OUTSIDE flex container */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 w-full" style={{ background: 'var(--erp-header-bg)', borderTop: '1px solid var(--erp-card-border)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <div className="flex items-stretch" style={{ height: 'var(--erp-mobile-bottom-nav-height, 64px)' }}>
           {BOTTOM_TABS.map(tab => {
             const Icon = tab.icon;
             const isMore = tab.id === '__more';
             const isActive = isMore ? showMoreSheet : activeSection === tab.id;
             const showBadge = tab.hasBadge && pendingOrdersCount > 0;
             return (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  if (isMore) setShowMoreSheet(true);
-                  else handleSectionChange(tab.id);
-                }}
-                className="relative flex flex-col items-center justify-center gap-0.5 flex-1 cursor-pointer"
-                style={{ color: isActive ? themeColor : 'var(--ios-text-secondary)', minHeight: 48 }}
-              >
-                <div className="relative">
-                  <Icon size={22} strokeWidth={isActive ? 2.2 : 1.5} />
-                  {showBadge && <span className="erp-nav-badge">{pendingOrdersCount}</span>}
-                </div>
-                <span className="text-[9px] font-semibold">{tab.label}</span>
-                {isActive && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full" style={{ background: themeColor }} />
-                )}
-              </button>
+              <Tooltip key={tab.id} content={
+                tab.id === 'dashboard' ? 'Ver reportes y estadisticas del negocio' :
+                tab.id === 'orders' ? 'Gestionar comandas y pedidos activos' :
+                tab.id === 'products' ? 'Administrar productos y tienda' :
+                tab.id === 'customers' ? 'Ver clientes y mensajeria' :
+                'Mas secciones y configuracion'
+              } position="top">
+                <button
+                  onClick={() => {
+                    if (isMore) setShowMoreSheet(true);
+                    else handleSectionChange(tab.id);
+                  }}
+                  className="relative flex flex-col items-center justify-center gap-0.5 flex-1 cursor-pointer active:scale-95 transition-all"
+                  style={{ color: isActive ? themeColor : 'var(--ios-text-secondary)', WebkitTapHighlightColor: 'transparent' }}
+                >
+                  <div className="relative" style={{ marginTop: 4 }}>
+                    <Icon size={22} strokeWidth={isActive ? 2.4 : 1.6} />
+                    {showBadge && <span className="erp-nav-badge">{pendingOrdersCount}</span>}
+                  </div>
+                  <span className="text-[10px] font-semibold" style={{ marginBottom: 2 }}>{tab.label}</span>
+                  {isActive && (
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-[3px] rounded-full" style={{ background: themeColor }} />
+                  )}
+                </button>
+              </Tooltip>
             );
           })}
         </div>
@@ -331,22 +359,15 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
 
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 w-72 erp-sidebar flex flex-col" style={{ background: 'var(--erp-sidebar-bg)' }}>
-            <div className="flex items-center gap-3 px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--erp-card-border)', minHeight: 52 }}>
-              {config.logo_url ? (
-                <img src={config.logo_url} alt={config.site_nombre || 'Logo'} className="h-7 w-auto max-w-[120px] object-contain" />
-              ) : (
-                <>
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ background: themeColor }}>
-                    {config.site_nombre?.[0] || 'A'}
-                  </div>
-                  <span className="font-bold text-sm truncate" style={{ color: 'var(--ios-text)' }}>{config.site_nombre || 'Admin'}</span>
-                </>
-              )}
-              <button onClick={() => setSidebarOpen(false)} className="ml-auto p-2 rounded-lg" style={{ color: 'var(--ios-text-secondary)' }}>
-                <X size={20} />
-              </button>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+          <aside className="absolute inset-y-0 left-0 w-[280px] max-w-[85vw] erp-sidebar flex flex-col shadow-2xl" style={{ background: 'var(--erp-sidebar-bg)', animation: 'slideInLeft 0.25s ease-out' }}>
+            <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--erp-card-border)', minHeight: 56 }}>
+              <span className="text-sm font-bold" style={{ color: 'var(--ios-text)' }}>Panel Administrativo</span>
+              <Tooltip content="Cerrar menu" position="right">
+                <button onClick={() => setSidebarOpen(false)} className="ml-auto p-2 rounded-xl hover:bg-slate-100 active:scale-95 transition-all" style={{ color: 'var(--ios-text-secondary)', minWidth: 44, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <X size={20} />
+                </button>
+              </Tooltip>
             </div>
             <SidebarNav
               groupedSections={groupedSections}
@@ -355,10 +376,12 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
               onSectionChange={handleSectionChange}
             />
             <div className="px-2 py-2 shrink-0" style={{ borderTop: '1px solid var(--erp-card-border)' }}>
-              <button onClick={() => setTab('home')} className="erp-sidebar-item justify-center" style={{ color: 'var(--ios-text-secondary)' }}>
-                <ChevronLeft size={16} />
-                <span className="text-xs">Volver a la tienda</span>
-              </button>
+              <Tooltip content="Volver a la tienda principal" position="top">
+                <button onClick={() => setTab('home')} className="erp-sidebar-item justify-center" style={{ color: 'var(--ios-text-secondary)', minHeight: 44 }}>
+                  <ChevronLeft size={16} />
+                  <span className="text-xs">Volver a la tienda</span>
+                </button>
+              </Tooltip>
             </div>
           </aside>
         </div>
@@ -366,11 +389,18 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
 
       {showMoreSheet && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowMoreSheet(false)} />
-          <div className="absolute bottom-0 left-0 right-0 bottom-sheet" style={{ background: 'var(--erp-sidebar-bg)' }}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowMoreSheet(false)} />
+          <div className="absolute bottom-0 left-0 right-0 bottom-sheet rounded-t-2xl shadow-2xl" style={{ background: 'var(--erp-sidebar-bg)', animation: 'slideUp 0.3s ease-out', maxHeight: '80vh' }}>
             <div className="bottom-sheet-handle" />
-            <div className="p-4 max-h-[70vh] overflow-y-auto">
-              <h3 className="text-base font-bold mb-3" style={{ color: 'var(--ios-text)' }}>Mas opciones</h3>
+            <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 20px)' }}>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-bold" style={{ color: 'var(--ios-text)' }}>Mas secciones</h3>
+                <Tooltip content="Cerrar menu" position="left">
+                  <button onClick={() => setShowMoreSheet(false)} className="p-2 rounded-xl hover:bg-slate-100 active:scale-95 transition-all" style={{ color: 'var(--ios-text-secondary)', minWidth: 44, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <X size={18} />
+                  </button>
+                </Tooltip>
+              </div>
               {(() => {
                 const moreGrouped = moreSections.reduce((acc, section) => {
                   const group = section.group;
@@ -381,38 +411,70 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
                   return acc;
                 }, [] as { group: string; groupLabel: string; sections: typeof moreSections }[]);
                 return moreGrouped.map(({ group, groupLabel, sections }) => (
-                  <div key={group} className="mb-3">
-                    <p className="text-[9px] font-bold uppercase tracking-widest px-2 mb-1 text-slate-400">{groupLabel}</p>
-                    {sections.map(section => {
-                      const Icon = section.icon;
-                      const isActive = activeSection === section.id;
-                      return (
-                        <button
-                          key={section.id}
-                          onClick={() => handleSectionChange(section.id)}
-                          className="erp-sidebar-item w-full"
-                          style={{
-                            background: isActive ? `${themeColor}12` : 'transparent',
-                            color: isActive ? themeColor : 'var(--ios-text)',
-                            borderLeftColor: isActive ? themeColor : 'transparent',
-                          }}
-                        >
-                          <Icon size={18} />
-                          <span className="truncate">{section.label}</span>
-                        </button>
-                      );
-                    })}
+                  <div key={group} className="mb-4">
+                    <p className="text-[10px] font-bold uppercase tracking-widest px-1 mb-2" style={{ color: 'var(--ios-text-secondary)', opacity: 0.6 }}>{groupLabel}</p>
+                    <div className="space-y-1">
+                      {sections.map(section => {
+                        const Icon = section.icon;
+                        const isActive = activeSection === section.id;
+                        return (
+                          <Tooltip key={section.id} content={
+                            section.id === 'order-history' ? 'Ver historial de pedidos completados y cancelados' :
+                            section.id === 'delivery-map' ? 'Mapa en tiempo real de envios activos' :
+                            section.id === 'messages' ? 'Enviar mensajes y broadcasts a clientes' :
+                            section.id === 'promos' ? 'Crear y gestionar promociones activas' :
+                            section.id === 'coupons' ? 'Administrar cupones de descuento' :
+                            section.id === 'loyalty' ? 'Programa de fidelizacion y recompensas' :
+                            section.id === 'segments' ? 'Segmentar clientes por comportamiento' :
+                            section.id === 'automations' ? 'Automatizar mensajes y acciones' :
+                            section.id === 'push-analytics' ? 'Estadisticas de notificaciones push' :
+                            section.id === 'store-general' ? 'Configuracion general de la tienda' :
+                            section.id === 'store-promos' ? 'Gestionar ofertas y descuentos' :
+                            section.id === 'store-combos' ? 'Crear y editar combos de productos' :
+                            section.id === 'delivery' ? 'Configurar zonas y tarifas de delivery' :
+                            section.id === 'payments' ? 'Metodos de pago y pasarelas' :
+                            section.id === 'banners' ? 'Gestionar banners promocionales' :
+                            section.id === 'categories' ? 'Organizar categorias de productos' :
+                            section.id === 'branding' ? 'Colores, logo y apariencia' :
+                            section.id === 'pwa-config' ? 'Configurar app progresiva' :
+                            section.id === 'seo' ? 'Optimizacion para buscadores' :
+                            section.id === 'branches' ? 'Gestionar sucursales' :
+                            section.id === 'roles' ? 'Permisos y roles de usuario' :
+                            section.id === 'system' ? 'Configuracion del sistema' :
+                            section.id === 'extras' ? 'Extras y complementos para productos' :
+                            section.id === 'faq' ? 'Preguntas frecuentes de la tienda' :
+                            ''
+                          } position="top">
+                            <button
+                              onClick={() => handleSectionChange(section.id)}
+                              className="erp-sidebar-item w-full"
+                              style={{
+                                background: isActive ? `${themeColor}12` : 'transparent',
+                                color: isActive ? themeColor : 'var(--ios-text)',
+                                borderLeftColor: isActive ? themeColor : 'transparent',
+                                minHeight: 44,
+                              }}
+                            >
+                              <Icon size={18} />
+                              <span className="truncate">{section.label}</span>
+                            </button>
+                          </Tooltip>
+                        );
+                      })}
+                    </div>
                   </div>
                 ));
               })()}
-              <button
-                onClick={() => { setTab('home'); setShowMoreSheet(false); }}
-                className="erp-sidebar-item w-full justify-center mt-2"
-                style={{ color: 'var(--ios-text-secondary)', borderTop: '1px solid var(--erp-card-border)', paddingTop: 12 }}
-              >
-                <ChevronLeft size={16} />
-                <span className="text-xs">Volver a la tienda</span>
-              </button>
+              <Tooltip content="Volver a la tienda principal" position="top">
+                <button
+                  onClick={() => { setTab('home'); setShowMoreSheet(false); }}
+                  className="erp-sidebar-item w-full justify-center mt-2"
+                  style={{ color: 'var(--ios-text-secondary)', borderTop: '1px solid var(--erp-card-border)', paddingTop: 12, minHeight: 44 }}
+                >
+                  <ChevronLeft size={16} />
+                  <span className="text-xs">Volver a la tienda</span>
+                </button>
+              </Tooltip>
             </div>
           </div>
         </div>

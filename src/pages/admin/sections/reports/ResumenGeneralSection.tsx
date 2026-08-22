@@ -198,7 +198,7 @@ const ResumenGeneralSection: React.FC = () => {
           <div className="w-full h-[220px] mt-3">
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={monthlyComparisonData}>
-                <XAxis dataKey="period" stroke="#64748b" />
+                <XAxis dataKey="period" stroke="#64748b" interval="preserveStartEnd" />
                 <YAxis stroke="#64748b" />
                 <Tooltip formatter={(value: unknown) => [`$${Number(value).toFixed(2)}`, 'Ventas']} />
                 <Bar dataKey="total" fill="#4f46e5" radius={[4, 4, 0, 0]} barSize={60} />
@@ -212,7 +212,7 @@ const ResumenGeneralSection: React.FC = () => {
           <div className="w-full h-[220px] mt-3">
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={salesChartData}>
-                <XAxis dataKey="fecha" stroke="#64748b" />
+                <XAxis dataKey="fecha" stroke="#64748b" interval="preserveStartEnd" />
                 <YAxis stroke="#64748b" />
                 <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0' }} />
                 <Line type="monotone" dataKey="Ventas" stroke="#7c3aed" strokeWidth={2.5} activeDot={{ r: 8 }} />
@@ -226,7 +226,7 @@ const ResumenGeneralSection: React.FC = () => {
           <div className="w-full h-[220px] mt-3">
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={topProductsChartData}>
-                <XAxis dataKey="name" stroke="#64748b" />
+                <XAxis dataKey="name" stroke="#64748b" interval="preserveStartEnd" />
                 <YAxis stroke="#64748b" />
                 <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0' }} />
                 <Bar dataKey="Unidades" fill="#7c3aed" radius={[4, 4, 0, 0]} />
@@ -240,7 +240,7 @@ const ResumenGeneralSection: React.FC = () => {
           <div className="w-full h-[220px] mt-3">
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={couponUsageChartData}>
-                <XAxis dataKey="fecha" stroke="#64748b" />
+                <XAxis dataKey="fecha" stroke="#64748b" interval="preserveStartEnd" />
                 <YAxis stroke="#64748b" allowDecimals={false} />
                 <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0' }} />
                 <Line type="monotone" dataKey="Usos" stroke="#ec4899" strokeWidth={2.5} activeDot={{ r: 8 }} />

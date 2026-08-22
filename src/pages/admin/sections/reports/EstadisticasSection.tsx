@@ -106,7 +106,7 @@ const EstadisticasSection: React.FC = () => {
           <div className="h-[250px]">
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={ordersByHour}>
-                <XAxis dataKey="hora" stroke="#64748b" tick={{ fontSize: 10 }} />
+                <XAxis dataKey="hora" stroke="#64748b" tick={{ fontSize: 10 }} interval={2} />
                 <YAxis stroke="#64748b" allowDecimals={false} />
                 <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0' }} />
                 <Bar dataKey="pedidos" fill="#6366f1" radius={[4, 4, 0, 0]} />

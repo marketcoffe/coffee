@@ -246,7 +246,7 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as FilterStatus)} className="px-3 py-2 text-xs font-semibold bg-white border border-slate-200 rounded-lg cursor-pointer">
             <option value="todos">Todos ({stats.total})</option>
             <option value="activos">Activos ({stats.activos})</option>
@@ -413,7 +413,7 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
         </div>
       ) : (
         /* Grid View */
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {filteredProducts.map(product => {
             const badge = getAvailabilityBadge(product);
             return (
@@ -437,22 +437,22 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
                 <div className="p-3">
                   <h3 className="text-xs font-bold text-slate-800 truncate">{product.nombre}</h3>
                   <p className="text-[10px] text-slate-400 truncate">{formatCategories(product)}</p>
-                  <div className="flex items-center justify-between mt-2">
+                  <div className="flex flex-col gap-1 mt-1.5">
                     {editingCell?.id === product.id && editingCell.field === 'precio_usd' ? (
                       <div className="flex items-center gap-1">
                         <span className="text-[10px] text-slate-400">$</span>
                         <input type="number" step="0.01" min="0" value={editValue} onChange={(e) => setEditValue(e.target.value)} onBlur={saveEdit} onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} className="erp-inline-edit w-16 text-[10px]" autoFocus />
                       </div>
                     ) : (
-                      <span className="text-sm font-black erp-inline-editable cursor-pointer hover:opacity-70" style={{ color: themeColor }} onClick={() => startEdit(product, 'precio_usd')} title="Clic para editar">
+                      <span className="text-base font-black erp-inline-editable cursor-pointer hover:opacity-70" style={{ color: themeColor }} onClick={() => startEdit(product, 'precio_usd')} title="Clic para editar precio">
                         ${product.precio_usd.toFixed(2)}
                       </span>
                     )}
                     {editingCell?.id === product.id && editingCell.field === 'stock' ? (
                       <input type="number" min="0" value={editValue} onChange={(e) => setEditValue(e.target.value)} onBlur={saveEdit} onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} className="erp-inline-edit w-12 text-[10px]" autoFocus />
                     ) : (
-                      <span className={`text-[10px] font-semibold ${getStockColor(product.stock)} erp-inline-editable cursor-pointer hover:opacity-70`} onClick={() => startEdit(product, 'stock')} title="Clic para editar">
-                        Stock: {product.stock}
+                      <span className={`text-[11px] font-semibold ${getStockColor(product.stock)} erp-inline-editable cursor-pointer hover:opacity-70`} onClick={() => startEdit(product, 'stock')} title="Clic para editar stock">
+                        Stock: {product.stock} uds
                       </span>
                     )}
                   </div>
