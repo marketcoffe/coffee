@@ -267,8 +267,8 @@ export const Home: React.FC<HomeProps> = ({
             const subtitle = isHero
               ? (config.hero_subtitle || config.mensaje_bienvenida || 'Tu comida favorita, más rápido que nunca.')
               : (config.banner_descriptions?.[idx] || '');
-            const ctaText = isHero ? (config.hero_cta_text || 'Ordenar Ahora') : '';
-            const ctaUrl = isHero ? (config.hero_cta_url || '') : '';
+            const ctaText = isHero ? (config.hero_cta_text || 'Ordenar Ahora') : (config.banner_cta_texts?.[idx] || '');
+            const ctaUrl = isHero ? (config.hero_cta_url || '') : (config.banner_cta_urls?.[idx] || '');
 
             return (
               <div key={idx} className="relative w-full h-full shrink-0 snap-start">
@@ -297,11 +297,14 @@ export const Home: React.FC<HomeProps> = ({
                       {subtitle}
                     </p>
                   )}
-                  {isHero && ctaText && (
+                  {ctaText && (
                     <button onClick={() => {
                       if (ctaUrl) {
                         if (ctaUrl.startsWith('http')) {
                           window.open(ctaUrl, '_blank');
+                        } else if (ctaUrl.startsWith('#')) {
+                          const el = document.getElementById(ctaUrl.slice(1));
+                          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         } else {
                           const tab = ctaUrl.replace('/', '') as string;
                           const validTabs = ['home', 'catalog', 'cart', 'admin', 'profile', 'checkout'];
@@ -464,7 +467,7 @@ export const Home: React.FC<HomeProps> = ({
                 className="px-5 py-2 rounded-full font-semibold text-xs whitespace-nowrap transition-all shrink-0"
                 style={{
                   backgroundColor: isActive ? tc : surfaceContainer,
-                  color: isActive ? '#000000' : text2,
+                  color: isActive ? '#ffffff' : text2,
                   boxShadow: isActive ? `0 4px 12px ${tc}30` : 'none',
                 }}>{cat}</button>
             );
@@ -1118,7 +1121,7 @@ export const Home: React.FC<HomeProps> = ({
       )}
 
       {/* ═══ 8. PWA DOWNLOAD INVITATION ═══ */}
-      <section className="py-6 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
+      <section id="download-app" className="py-6 px-4 md:px-8 max-w-[1440px] mx-auto w-full scroll-mt-4">
         <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: tc, color: '#fff' }}>
           <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-black/5 rounded-full blur-2xl" />
           <div className="absolute -left-8 -top-8 w-24 h-24 bg-black/5 rounded-full blur-xl" />

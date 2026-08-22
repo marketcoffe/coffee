@@ -15,7 +15,9 @@ const BannersSection: React.FC = () => {
     const newTexts = [...(config.banner_texts || []), ''];
     const newTitles = [...(config.banner_titles || []), ''];
     const newDescs = [...(config.banner_descriptions || []), ''];
-    updateConfig({ banners: newBanners, banners_mobile: newBannersMobile, banner_texts: newTexts, banner_titles: newTitles, banner_descriptions: newDescs });
+    const newCtaTexts = [...(config.banner_cta_texts || []), ''];
+    const newCtaUrls = [...(config.banner_cta_urls || []), ''];
+    updateConfig({ banners: newBanners, banners_mobile: newBannersMobile, banner_texts: newTexts, banner_titles: newTitles, banner_descriptions: newDescs, banner_cta_texts: newCtaTexts, banner_cta_urls: newCtaUrls });
   };
 
   const handleRemoveBanner = (index: number) => {
@@ -24,7 +26,9 @@ const BannersSection: React.FC = () => {
     const newTexts = (config.banner_texts || []).filter((_, i) => i !== index);
     const newTitles = (config.banner_titles || []).filter((_, i) => i !== index);
     const newDescs = (config.banner_descriptions || []).filter((_, i) => i !== index);
-    updateConfig({ banners: newBanners, banners_mobile: newBannersMobile, banner_texts: newTexts, banner_titles: newTitles, banner_descriptions: newDescs });
+    const newCtaTexts = (config.banner_cta_texts || []).filter((_, i) => i !== index);
+    const newCtaUrls = (config.banner_cta_urls || []).filter((_, i) => i !== index);
+    updateConfig({ banners: newBanners, banners_mobile: newBannersMobile, banner_texts: newTexts, banner_titles: newTitles, banner_descriptions: newDescs, banner_cta_texts: newCtaTexts, banner_cta_urls: newCtaUrls });
   };
 
   const handleMoveBanner = (index: number, direction: 'up' | 'down') => {
@@ -33,6 +37,8 @@ const BannersSection: React.FC = () => {
     const texts = [...(config.banner_texts || [])];
     const titles = [...(config.banner_titles || [])];
     const descs = [...(config.banner_descriptions || [])];
+    const ctaTexts = [...(config.banner_cta_texts || [])];
+    const ctaUrls = [...(config.banner_cta_urls || [])];
     const newIndex = direction === 'up' ? index - 1 : index + 1;
     if (newIndex < 0 || newIndex >= banners.length) return;
     [banners[index], banners[newIndex]] = [banners[newIndex], banners[index]];
@@ -40,7 +46,9 @@ const BannersSection: React.FC = () => {
     [texts[index], texts[newIndex]] = [texts[newIndex], texts[index]];
     [titles[index], titles[newIndex]] = [titles[newIndex], titles[index]];
     [descs[index], descs[newIndex]] = [descs[newIndex], descs[index]];
-    updateConfig({ banners, banners_mobile: bannersMobile, banner_texts: texts, banner_titles: titles, banner_descriptions: descs });
+    [ctaTexts[index], ctaTexts[newIndex]] = [ctaTexts[newIndex], ctaTexts[index]];
+    [ctaUrls[index], ctaUrls[newIndex]] = [ctaUrls[newIndex], ctaUrls[index]];
+    updateConfig({ banners, banners_mobile: bannersMobile, banner_texts: texts, banner_titles: titles, banner_descriptions: descs, banner_cta_texts: ctaTexts, banner_cta_urls: ctaUrls });
   };
 
   return (
@@ -73,8 +81,8 @@ const BannersSection: React.FC = () => {
         const isHero = index === 0;
         const bannerTitle = isHero ? (config.hero_title || config.site_nombre || '') : (config.banner_titles?.[index] || '');
         const bannerDesc = isHero ? (config.hero_subtitle || config.mensaje_bienvenida || '') : (config.banner_descriptions?.[index] || '');
-        const bannerCtaText = isHero ? (config.hero_cta_text || '') : '';
-        const bannerCtaUrl = isHero ? (config.hero_cta_url || '') : '';
+        const bannerCtaText = isHero ? (config.hero_cta_text || '') : (config.banner_cta_texts?.[index] || '');
+        const bannerCtaUrl = isHero ? (config.hero_cta_url || '') : (config.banner_cta_urls?.[index] || '');
         const bannerMobile = config.banners_mobile?.[index] || '';
 
         return (
@@ -169,25 +177,37 @@ const BannersSection: React.FC = () => {
                   className="admin-input mt-1" placeholder={isHero ? 'Delivery express en minutos' : 'Descripcion del banner...'} />
               </div>
 
-              {isHero && (
-                <>
-                  <div>
-                    <label className="text-xs font-semibold" style={{ color: 'var(--ios-text-secondary)' }}>Texto del Boton CTA</label>
-                    <input type="text" value={bannerCtaText}
-                      onChange={e => updateConfig({ hero_cta_text: e.target.value })}
-                      className="admin-input mt-1" placeholder="Ordenar Ahora" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold" style={{ color: 'var(--ios-text-secondary)' }}>URL del Boton (destino)</label>
-                    <input type="url" value={bannerCtaUrl}
-                      onChange={e => updateConfig({ hero_cta_url: e.target.value })}
-                      className="admin-input mt-1" placeholder="https://... o deja vacio para ir al catalogo" />
-                    <p className="text-[10px] mt-1" style={{ color: 'var(--ios-text-tertiary)' }}>
-                      Si se deja vacio, el boton ira al catalogo automaticamente.
-                    </p>
-                  </div>
-                </>
-              )}
+              <div>
+                <label className="text-xs font-semibold" style={{ color: 'var(--ios-text-secondary)' }}>Texto del Boton CTA</label>
+                <input type="text" value={bannerCtaText}
+                  onChange={e => {
+                    if (isHero) {
+                      updateConfig({ hero_cta_text: e.target.value });
+                    } else {
+                      const newCtaTexts = [...(config.banner_cta_texts || [])];
+                      newCtaTexts[index] = e.target.value;
+                      updateConfig({ banner_cta_texts: newCtaTexts });
+                    }
+                  }}
+                  className="admin-input mt-1" placeholder="Dejar vacio para ocultar boton" />
+              </div>
+              <div>
+                <label className="text-xs font-semibold" style={{ color: 'var(--ios-text-secondary)' }}>URL del Boton (destino)</label>
+                <input type="url" value={bannerCtaUrl}
+                  onChange={e => {
+                    if (isHero) {
+                      updateConfig({ hero_cta_url: e.target.value });
+                    } else {
+                      const newCtaUrls = [...(config.banner_cta_urls || [])];
+                      newCtaUrls[index] = e.target.value;
+                      updateConfig({ banner_cta_urls: newCtaUrls });
+                    }
+                  }}
+                  className="admin-input mt-1" placeholder="https://... o #id-seccion" />
+                <p className="text-[10px] mt-1" style={{ color: 'var(--ios-text-tertiary)' }}>
+                  Usa #nombre para scroll a una seccion (ej: #download-app). Dejar vacio para ir al catalogo.
+                </p>
+              </div>
             </div>
 
             <div className="mt-4">
@@ -221,7 +241,7 @@ const BannersSection: React.FC = () => {
                         {bannerDesc}
                       </p>
                     )}
-                    {isHero && bannerCtaText && (
+                    {bannerCtaText && (
                       <span className="inline-block px-4 py-1.5 rounded-lg text-white font-bold" style={{
                         background: themeColor,
                         fontSize: bannerPreviewMode === 'mobile' ? '11px' : '13px',

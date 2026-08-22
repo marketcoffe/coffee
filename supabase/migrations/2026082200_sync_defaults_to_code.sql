@@ -17,13 +17,17 @@ UPDATE store_config SET
     secondary_color = '#A4D045',
 
     -- Banners: rutas locales en vez de URLs de Unsplash
-    banner_url_1 = '/imagen/combo-banner.webp',
-    banner_url_2 = '/imagen/panaderia-banner.webp',
-    banner_url_3 = '/imagen/charcuteria-banner.webp',
-    banner_url_1_mobile = '/imagen/banner1_movil.jpg',
-    banner_url_2_mobile = '/imagen/banner3_movil.jpg',
-    banner_url_3_mobile = '/imagen/charcuteria-banner.webp',
-    banner_texts = ARRAY['Panadería, Comida Rápida y Víveres', 'Combos que Enamoran', 'Pan Fresco todos los dias'],
+    banner_url_1 = '/imagen/descarga_app.webp',
+    banner_url_2 = '/imagen/combo-banner.webp',
+    banner_url_3 = '/imagen/panaderia_pc.webp',
+    banner_url_1_mobile = '/imagen/descarga_appmovil.webp',
+    banner_url_2_mobile = '/imagen/combos_movil.webp',
+    banner_url_3_mobile = '/imagen/panaderia_movil.webp',
+    banner_texts = ARRAY['', 'Combos Especiales para ti', 'Pan Artesanal Fresco'],
+    banner_titles = ARRAY['', 'Combos Especiales para ti', 'Pan Artesanal Fresco'],
+    banner_descriptions = ARRAY['', 'Ahorra más comprando en combo, ofertas listas para toda ocasión', 'Pan fresco, tortas, dulces y pastelería del día'],
+    banner_cta_texts = ARRAY['', 'Ver combos', ''],
+    banner_cta_urls = ARRAY['', '/catalog', ''],
 
     -- Categorias: las 18 actuales del codigo
     categories = ARRAY['Bebidas', 'Carnicería', 'Charcutería', 'Charcutería y Embutidos', 'Combos Familiares', 'Comida Rapida', 'Frutas y Verduras', 'Higiene Personal', 'Hogar', 'Lácteos', 'Licores', 'Limpieza', 'Mascotas', 'Panaderia', 'Dulces y Postres', 'Salsas y Condimentos', 'Snacks y Frituras', 'Viveres'],
@@ -35,6 +39,8 @@ UPDATE store_config SET
 
     -- Textos
     mensaje_bienvenida = 'Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado.',
+    hero_cta_text = 'Descargar la app',
+    hero_cta_url = '#download-app',
 
     -- SEO
     seo_home_title = 'Market Coffee Sweet | Panadería, Comida Rápida y Víveres en Valencia',

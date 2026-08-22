@@ -356,6 +356,8 @@ export interface StoreConfig {
   banner_texts?: string[];
   banner_titles?: string[];
   banner_descriptions?: string[];
+  banner_cta_texts?: string[];
+  banner_cta_urls?: string[];
   categories?: string[];
   subcategories?: Record<string, string[]>;
   categories_images?: Record<string, string>;

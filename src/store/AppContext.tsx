@@ -184,14 +184,14 @@ const DEFAULT_CONFIG: StoreConfig = {
   direccion_fisica: 'Av. Principal El Trigal, justo al frente de Patio Trigal, Valencia, Carabobo',
   coordenadas_tienda: { lat: 10.2185, lng: -68.0021 },
   banners: [
+    '/imagen/descarga_app.webp',
     '/imagen/combo-banner.webp',
-    '/imagen/panaderia-banner.webp',
-    '/imagen/charcuteria-banner.webp'
+    '/imagen/panaderia_pc.webp'
   ],
   banners_mobile: [
-    '/imagen/banner1_movil.jpg',
-    '/imagen/banner3_movil.jpg',
-    '/imagen/charcuteria-banner.webp'
+    '/imagen/descarga_appmovil.webp',
+    '/imagen/combos_movil.webp',
+    '/imagen/panaderia_movil.webp'
   ],
   zelle_enabled: true,
   zelle_data: 'pagos@marketcoffesweet.com',
@@ -228,19 +228,21 @@ const DEFAULT_CONFIG: StoreConfig = {
     'Pan Fresco todos los dias'
   ],
   banner_titles: [
-    'Panadería, Comida Rápida y Víveres',
+    '',
     'Combos Especiales para ti',
     'Pan Artesanal Fresco'
   ],
   banner_descriptions: [
-    'Pan fresco, tortas, dulces y pastelería del día',
-    'Hamburguesas, shawarma, perros calientes y más',
-    'Frutas, verduras, víveres y todo para tu hogar'
+    '',
+    'Ahorra más comprando en combo, ofertas listas para toda ocasión',
+    'Pan fresco, tortas, dulces y pastelería del día'
   ],
+  banner_cta_texts: ['', 'Ver combos', ''],
+  banner_cta_urls: ['', '/catalog', ''],
   hero_title: 'Market Coffee Sweet',
   hero_subtitle: 'Tu minimarket de confianza en El Trigal, Valencia. Panadería fresca, comida rápida, víveres y más con delivery a domicilio.',
-  hero_cta_text: 'Ver Catálogo',
-  hero_cta_url: '',
+  hero_cta_text: 'Descargar la app',
+  hero_cta_url: '#download-app',
   categories: [
     'Bebidas',
     'Carnicería',
@@ -1086,6 +1088,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           banner_texts: dbConfig.banner_texts || prev.banner_texts,
           banner_titles: dbConfig.banner_titles || prev.banner_titles,
           banner_descriptions: dbConfig.banner_descriptions || prev.banner_descriptions,
+          banner_cta_texts: dbConfig.banner_cta_texts || prev.banner_cta_texts,
+          banner_cta_urls: dbConfig.banner_cta_urls || prev.banner_cta_urls,
           categories: dbConfig.categories || prev.categories,
           mensaje_bienvenida: dbConfig.mensaje_bienvenida || prev.mensaje_bienvenida,
           delivery_gratis: dbConfig.delivery_gratis ?? prev.delivery_gratis,
