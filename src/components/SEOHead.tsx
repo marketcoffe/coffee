@@ -10,6 +10,7 @@ import {
   getBreadcrumbSchema
 } from '../schemas';
 import { escapeJsonForScript } from '../security/security';
+import { getCategories } from '../utils/categoryUtils';
 
 interface SEOHeadProps {
   title?: string;
@@ -52,7 +53,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       seoDesc = product.descripcion
         ? `${product.descripcion}. Pide ${product.nombre} con delivery en Valencia, El Trigal, Prebo, La Viña, Mañongo, Naguanagua y San Diego.`
         : `Pide ${product.nombre} de la mejor calidad. Delivery express en minutos en Valencia, El Trigal y alrededores.`;
-      seoKeywords = `${product.nombre}, ${product.categoria}, ${siteName}, delivery, Valencia, El Trigal, panadería, comida rápida`;
+      seoKeywords = `${product.nombre}, ${getCategories(product).join(', ')}, ${siteName}, delivery, Valencia, El Trigal, panadería, comida rápida`;
     }
 
     if (type === 'catalog') {
@@ -156,7 +157,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       themeMeta.setAttribute('name', 'theme-color');
       document.head.appendChild(themeMeta);
     }
-    themeMeta.setAttribute('content', config.theme_color || '#6E472A');
+    themeMeta.setAttribute('content', config.theme_color || '#A4D045');
 
     let appleTitleMeta = document.querySelector('meta[name="apple-mobile-web-app-title"]');
     if (!appleTitleMeta) {

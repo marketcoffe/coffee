@@ -6,6 +6,7 @@ import {
   Search, Plus, Eye, Edit3, Trash2, ToggleLeft, ToggleRight,
   Tag, Package, Download, Upload, Mic, MicOff, Grid, List, X
 } from 'lucide-react';
+import { getCategories, hasCategory, formatCategories } from '../../../../utils/categoryUtils';
 
 type SortBy = 'nombre' | 'precio' | 'stock' | 'order_count';
 type FilterStatus = 'todos' | 'activos' | 'inactivos' | 'promo' | 'bajo_stock';
@@ -19,7 +20,7 @@ interface ProductosSectionProps {
 const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, config }) => {
   const { foodItems, addFoodItem, updateFoodItem, deleteFoodItem, searchItems } = useApp();
   const { showToast } = useToast();
-  const themeColor = config.theme_color || '#007AFF';
+  const themeColor = config.theme_color || '#A4D045';
 
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('todos');
@@ -30,7 +31,7 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const categories = useMemo(() => {
-    const cats = new Set(foodItems.map(p => p.categoria).filter(Boolean));
+    const cats = new Set(foodItems.flatMap(p => getCategories(p)).filter(Boolean));
     return Array.from(cats).sort();
   }, [foodItems]);
 
@@ -47,7 +48,7 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
 
     // Filter by category
     if (filterCategory) {
-      result = result.filter(p => p.categoria === filterCategory);
+      result = result.filter(p => hasCategory(p, filterCategory));
     }
 
     // Sort
@@ -118,7 +119,7 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
     const rows = filteredProducts.map(p => [
       p.nombre,
       p.descripcion,
-      p.categoria,
+      p.categoria.join(', '),
       p.precio_usd,
       p.stock,
       (p.imagen_urls || []).join(';'),
@@ -283,7 +284,7 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
                       {product.delivery_gratis && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-cyan-100 text-cyan-600">ENVÍO GRATIS</span>}
                     </div>
                     <div className="flex items-center gap-3 mt-1">
-                      <span className="text-xs text-slate-500">{product.categoria}</span>
+                      <span className="text-xs text-slate-500">{formatCategories(product)}</span>
                       <span className={`text-xs font-bold ${getStockColor(product.stock)}`}>
                         Stock: {product.stock}
                       </span>
@@ -357,7 +358,7 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
                 </div>
                 <div className="p-3">
                   <h3 className="text-xs font-bold text-slate-800 truncate">{product.nombre}</h3>
-                  <p className="text-[10px] text-slate-400">{product.categoria}</p>
+                  <p className="text-[10px] text-slate-400">{formatCategories(product)}</p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-sm font-black" style={{ color: themeColor }}>${product.precio_usd.toFixed(2)}</span>
                     <span className={`text-[10px] font-semibold ${getStockColor(product.stock)}`}>Stock: {product.stock}</span>

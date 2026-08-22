@@ -11,11 +11,11 @@ export const NotFound: React.FC<NotFoundProps> = ({ onGoHome }) => {
       <div className="text-center max-w-md">
         {/* Ilustración 404 */}
         <div className="relative mb-8">
-          <div className="text-[120px] md:text-[160px] font-black leading-none" style={{ color: '#A4D045', opacity: 0.15 }}>
+          <div className="text-[120px] md:text-[160px] font-black leading-none" style={{ color: '#6E472A', opacity: 0.15 }}>
             404
           </div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ backgroundColor: '#A4D045' }}>
+            <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ backgroundColor: '#6E472A' }}>
               <Search size={32} className="text-white" />
             </div>
           </div>
@@ -35,7 +35,7 @@ export const NotFound: React.FC<NotFoundProps> = ({ onGoHome }) => {
         <button
           onClick={onGoHome}
           className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105 active:scale-95"
-          style={{ backgroundColor: '#A4D045' }}
+          style={{ backgroundColor: '#6E472A' }}
         >
           <Home size={18} />
           Volver al Inicio

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 import { AlertTriangle, XCircle, DollarSign, Tag } from 'lucide-react';
+import { getCategories } from '../../../../utils/categoryUtils';
 
 const ProductosReportSection: React.FC = () => {
   const { orders, foodItems, config } = useApp();
@@ -39,8 +40,14 @@ const ProductosReportSection: React.FC = () => {
   const productsByCategory = useMemo(() => {
     const map: { [cat: string]: number } = {};
     foodItems.forEach(p => {
-      const cat = p.categoria || 'Sin categoría';
-      map[cat] = (map[cat] || 0) + 1;
+      const cats = getCategories(p);
+      if (cats.length === 0) {
+        map['Sin categoría'] = (map['Sin categoría'] || 0) + 1;
+      } else {
+        cats.forEach(cat => {
+          map[cat] = (map[cat] || 0) + 1;
+        });
+      }
     });
     return Object.entries(map)
       .map(([categoria, count]) => ({ categoria, count }))

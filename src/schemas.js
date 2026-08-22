@@ -9,6 +9,8 @@ export function getOrganizationSchema(config) {
     "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,
     "name": "Market Coffee Sweet",
+    "legalName": "Coffee Market Sweet C.A.",
+    "taxID": "J500338260",
     "url": SITE_URL,
     "logo": {
       "@type": "ImageObject",
@@ -36,7 +38,7 @@ export function getOrganizationSchema(config) {
     ],
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": config.telefono_soporte || "+584121234567",
+      "telephone": config.telefono_soporte || "+584123758879",
       "contactType": "customer service",
       "availableLanguage": "Spanish",
       "areaServed": "VE"
@@ -50,8 +52,10 @@ export function getLocalBusinessSchema(config) {
     "@type": ["Bakery", "GroceryStore", "FastFoodRestaurant"],
     "@id": `${SITE_URL}/#localbusiness`,
     "name": "Market Coffee Sweet",
+    "legalName": "Coffee Market Sweet C.A.",
+    "taxID": "J500338260",
     "url": SITE_URL,
-    "telephone": config.telefono_soporte || "+584121234567",
+    "telephone": config.telefono_soporte || "+584123758879",
     "priceRange": config.jsonld_priceRange || "$$",
     "image": [
       config.banners?.[0] || config.logo_url || `${SITE_URL}/fachada.jpg`,
@@ -117,10 +121,13 @@ export function getRestaurantSchema(config) {
     "@type": config.jsonld_type || "FastFoodRestaurant",
     "@id": `${SITE_URL}/#localbusiness`,
     "name": "Market Coffee Sweet",
+    "legalName": "Coffee Market Sweet C.A.",
+    "taxID": "J500338260",
     "image": config.banners?.[0] || config.logo_url || `${SITE_URL}/fachada.jpg`,
     "url": SITE_URL,
     "description": "Panadería fresca, hamburguesas, shawarmas, víveres, frutas, verduras, bebidas y agua potable con delivery en El Trigal, Valencia.",
     "priceRange": config.jsonld_priceRange || "$$",
+    "telephone": config.telefono_soporte || "+584123758879",
     "servesCuisine": config.jsonld_servesCuisine || [
       "Panadería",
       "Comida Rápida",
@@ -170,9 +177,10 @@ export function getProductSchema(product, config) {
     'Higiene': 'Víveres y Supermercado'
   };
 
+  const cats = Array.isArray(product.categoria) ? product.categoria : [product.categoria];
   const categoryPath = product.subcategoria
-    ? `${categoryMap[product.categoria] || product.categoria} > ${product.subcategoria}`
-    : (categoryMap[product.categoria] || product.categoria);
+    ? `${cats.map(c => categoryMap[c] || c).join(', ')} > ${product.subcategoria}`
+    : cats.map(c => categoryMap[c] || c).join(', ');
 
   const getAvailability = () => {
     if (product.disponibilidad === 'Agotado') return 'https://schema.org/OutOfStock';

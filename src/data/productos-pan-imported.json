@@ -3,7 +3,9 @@
     "id": "pnd_001",
     "nombre": "Baklava",
     "descripcion": "Deliciosa baklava, postre tradicional elaborado con capas de masa filo, nueces trituradas y bañado en jarabe de miel. Crujiente y dulce.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 1.5,
     "stock": 100,
@@ -23,7 +25,9 @@
     "id": "pnd_002",
     "nombre": "Shavier",
     "descripcion": "Suave y esponjoso shavier, pastelito relleno de crema pastelera cubierto con azúcar flor. Una Tentación irresistible.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 3,
     "stock": 100,
@@ -43,7 +47,9 @@
     "id": "pnd_003",
     "nombre": "Galleta Red Velvet",
     "descripcion": "Galleta red velvet con color intenso y sabor a cacao suave, cubierta con frosting de queso crema. Textura crujiente por fuera y suave por dentro.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 1.2,
     "stock": 100,
@@ -63,7 +69,9 @@
     "id": "pnd_004",
     "nombre": "Torta Choconutella",
     "descripcion": "Exquisita torta de chocolate con relleno de Nutella y cobertura de ganache de chocolate. Para los amantes del chocolate.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 3.5,
     "stock": 100,
@@ -88,7 +96,9 @@
     "id": "pnd_005",
     "nombre": "Torta Chocoarequipe",
     "descripcion": "Torta de chocolate con generoso relleno de arequipe artesanal y cobertura de ganache. Combinación perfecta de dulce y chocolate.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 3.5,
     "stock": 100,
@@ -113,7 +123,9 @@
     "id": "pnd_006",
     "nombre": "Torta Selva Negra",
     "descripcion": "Clasica torta selva negra con capas de bizcocho de chocolate, crema chantilly, cerezas y virutas de chocolate. Postre premium.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 3.5,
     "stock": 100,
@@ -138,7 +150,9 @@
     "id": "pnd_007",
     "nombre": "Cheesecake",
     "descripcion": "Autentico cheesecake cremoso con base de galleta Graham y cobertura de frutos rojos. Textura sedosa y sabor equilibrado.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 3.5,
     "stock": 100,
@@ -161,7 +175,9 @@
     "id": "pnd_008",
     "nombre": "Torta Beso de Ángel",
     "descripcion": "Torta beso de angel con capas de bizcocho suave, relleno de merengue italiano y cubierta con merengue dorado al soplete.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 4,
     "stock": 100,
@@ -184,7 +200,9 @@
     "id": "pnd_009",
     "nombre": "Torta Tres Leches Arequipe",
     "descripcion": "Torta tres leches remojada en mezcla de leche evaporada, leche condensada y crema de leche, con generoso relleno de arequipe.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 3,
     "stock": 100,
@@ -211,7 +229,9 @@
     "id": "pnd_010",
     "nombre": "Torta Tres Leches Fresa",
     "descripcion": "Torta tres leches con fresas frescas frescas naturales, remojada en tres leches y cubierta con crema batida y fresas.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 3,
     "stock": 100,
@@ -238,7 +258,9 @@
     "id": "pnd_011",
     "nombre": "Torta Tres Leches Limón",
     "descripcion": "Torta tres leches con toque refrescante de limon, remojada en mezcla de tres leches y decorada con merengue de limon.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 3,
     "stock": 100,
@@ -264,7 +286,9 @@
     "id": "pnd_012",
     "nombre": "Torta Tres Leches Zanahoria",
     "descripcion": "Torta de zanahoria casera remojada en tres leches, con canela y nueces. Esponjosa, húmeda y llena de sabor.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 3,
     "stock": 100,
@@ -293,7 +317,9 @@
     "id": "pnd_013",
     "nombre": "Marquesa",
     "descripcion": "Suave marquesa de chocolate, postre tradicional sin hornear elaborado con galletas de chocolate, crema de cacao y chocolate derretido.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 3,
     "stock": 100,
@@ -316,7 +342,9 @@
     "id": "pnd_014",
     "nombre": "Trufa de Chocolate",
     "descripcion": "Trufa artesanal de chocolate belga con centro cremoso y recubierta de cacao en polvo. Bocado pequeño de puro placer.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 1,
     "stock": 100,
@@ -336,7 +364,9 @@
     "id": "pnd_015",
     "nombre": "Brazo Gitano",
     "descripcion": "Brazo gitano de bizcocho suave relleno de mermelada de guayaba y cubierto con azúcar glas. Postre típico e irresistible.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 3,
     "stock": 100,
@@ -356,7 +386,9 @@
     "id": "pnd_016",
     "nombre": "Cachito de Jamón",
     "descripcion": "Cachito de Jamón, cachito fresco y crocante relleno con ingredientes selectos. Perfecto para el desayuno.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Cachitos",
     "precio_usd": 1.8,
     "stock": 100,
@@ -378,7 +410,9 @@
     "id": "pnd_017",
     "nombre": "Cachito de Jamón y Queso",
     "descripcion": "Cachito de Jamón y Queso, cachito fresco y crocante relleno con ingredientes selectos. Perfecto para el desayuno.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Cachitos",
     "precio_usd": 2,
     "stock": 100,
@@ -401,7 +435,9 @@
     "id": "pnd_018",
     "nombre": "Cachito de Mortadela y Queso",
     "descripcion": "Cachito de Mortadela y Queso, cachito fresco y crocante relleno con ingredientes selectos. Perfecto para el desayuno.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Cachitos",
     "precio_usd": 2,
     "stock": 100,
@@ -424,7 +460,9 @@
     "id": "pnd_019",
     "nombre": "Pan de Queso",
     "descripcion": "Pan de queso fresco y esponjoso, con sabor intenso a queso criollo. Ideal para el desayuno o merienda.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.5,
     "stock": 100,
@@ -448,7 +486,9 @@
     "id": "pnd_020",
     "nombre": "Pan de Queso, Tocino y Tajada",
     "descripcion": "Pan de queso fresco y esponjoso, con sabor intenso a queso criollo. Ideal para el desayuno o merienda.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.5,
     "stock": 100,
@@ -473,7 +513,9 @@
     "id": "pnd_021",
     "nombre": "Mini Lunch",
     "descripcion": "Mini lunch: combo completo de snacks que incluye empanada, tequeño, pastelito y mas. Porcion perfecta para compartir.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Snacks",
     "precio_usd": 3,
     "stock": 100,
@@ -493,7 +535,9 @@
     "id": "pnd_022",
     "nombre": "Churros",
     "descripcion": "Churros recien fritos, crocantes por fuera y suaves por dentro, espolvoreados con azúcar y canela. Acompañados de salsa de chocolate.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Snacks",
     "precio_usd": 1.6,
     "stock": 100,
@@ -515,7 +559,9 @@
     "id": "pnd_023",
     "nombre": "Empanadas",
     "descripcion": "Empanadas rellenas de carne mechada sazonada, fritas hasta alcanzar un dorado perfecto. Crujientes y jugosas.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Snacks",
     "precio_usd": 2,
     "stock": 100,
@@ -538,7 +584,9 @@
     "id": "pnd_024",
     "nombre": "Arepa Rellena Pequeña (2 Contornos)",
     "descripcion": "Arepa Rellena Pequeña (2 Contornos), arepa rellena con ingredientes frescos y contornos selectos. Tipica y deliciosa.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Arepas Rellenas",
     "precio_usd": 2.5,
     "stock": 100,
@@ -560,7 +608,9 @@
     "id": "pnd_025",
     "nombre": "Arepas Rellenas Pequeñas (2 Contornos) - Promo 2x5$",
     "descripcion": "Arepas Rellenas Pequeñas (2 Contornos) - Promo 2x5$, arepa rellena con ingredientes frescos y contornos selectos. Tipica y deliciosa.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Arepas Rellenas",
     "precio_usd": 5,
     "stock": 100,
@@ -582,7 +632,9 @@
     "id": "pnd_026",
     "nombre": "Arepa Rellena Grande (3 Contornos)",
     "descripcion": "Arepa Rellena Grande (3 Contornos), arepa rellena con ingredientes frescos y contornos selectos. Tipica y deliciosa.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Arepas Rellenas",
     "precio_usd": 4,
     "stock": 100,
@@ -604,7 +656,9 @@
     "id": "pnd_027",
     "nombre": "Arepas Rellenas Grandes (3 Contornos) - Promo 2x8$",
     "descripcion": "Arepas Rellenas Grandes (3 Contornos) - Promo 2x8$, arepa rellena con ingredientes frescos y contornos selectos. Tipica y deliciosa.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Arepas Rellenas",
     "precio_usd": 8,
     "stock": 100,
@@ -626,7 +680,9 @@
     "id": "pnd_028",
     "nombre": "Tequeños",
     "descripcion": "Tequenos de queso blanco fresco envueltos en masa crujiente, fritos hasta alcanzar un dorado perfecto. Tipicos y deliciosos.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Snacks",
     "precio_usd": 1.5,
     "stock": 100,
@@ -647,7 +703,9 @@
     "id": "pnd_029",
     "nombre": "Pastelito",
     "descripcion": "Pastelito relleno de carne sazonada, frito y dorado. Masa crujiente con relleno sabroso.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Snacks",
     "precio_usd": 1.5,
     "stock": 100,
@@ -668,7 +726,9 @@
     "id": "pnd_030",
     "nombre": "Pan Francés (Grande)",
     "descripcion": "Pan Francés (Grande) fresco de panadería, elaborado con ingredientes de calidad. Ideal para acompañar cualquier comida.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.9,
     "stock": 100,
@@ -691,7 +751,9 @@
     "id": "pnd_031",
     "nombre": "Pan Francés (Pequeño)",
     "descripcion": "Pan Francés (Pequeño) fresco de panadería, elaborado con ingredientes de calidad. Ideal para acompañar cualquier comida.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.6,
     "stock": 100,
@@ -714,7 +776,9 @@
     "id": "pnd_032",
     "nombre": "Pan Canilla (Grande)",
     "descripcion": "Pan Canilla (Grande) fresco de panadería, elaborado con ingredientes de calidad. Ideal para acompañar cualquier comida.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.9,
     "stock": 100,
@@ -737,7 +801,9 @@
     "id": "pnd_033",
     "nombre": "Pan Canilla (Pequeño)",
     "descripcion": "Pan Canilla (Pequeño) fresco de panadería, elaborado con ingredientes de calidad. Ideal para acompañar cualquier comida.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.6,
     "stock": 100,
@@ -760,7 +826,9 @@
     "id": "pnd_034",
     "nombre": "Pan Canilla Concha Dura",
     "descripcion": "Pan canilla con concha dura crocante por fuera y miga suave por dentro. Textura clasica y sabor tradicional.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.9,
     "stock": 100,
@@ -783,7 +851,9 @@
     "id": "pnd_035",
     "nombre": "Pan Perro Pequeño",
     "descripcion": "Pan para perro caliente, suave y elástico, tamano pequeno. Ideal para preparar hot dogs caseros.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 2.4,
     "stock": 100,
@@ -806,7 +876,9 @@
     "id": "pnd_036",
     "nombre": "Pan Hamburguesa",
     "descripcion": "Pan para hamburguesa, suave y dorado con semillas de sesamo. Base perfecta para hamburguesas caseras.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 2.4,
     "stock": 100,
@@ -829,7 +901,9 @@
     "id": "pnd_037",
     "nombre": "Pan Campesino",
     "descripcion": "Pan campesino artesanal, denso y rústico con sabor intenso a trigo. Ideal para acompañar sopas y guisos.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.2,
     "stock": 100,
@@ -852,7 +926,9 @@
     "id": "pnd_038",
     "nombre": "Pan Gallego",
     "descripcion": "Pan gallego, pan tradicional de corteza crujiente y miga alveolada. Sabor auténtico de panadería artesanal.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.7,
     "stock": 100,
@@ -875,7 +951,9 @@
     "id": "pnd_039",
     "nombre": "Pan Galleguito",
     "descripcion": "Pan galleguito, versión pequeña del pan gallego. Crocante por fuera, suave por dentro. Perfecto para porciones individuales.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.7,
     "stock": 100,
@@ -898,7 +976,9 @@
     "id": "pnd_040",
     "nombre": "Pan Siciliano",
     "descripcion": "Pan siciliano con sabor intenso a ajo y hierbas aromáticas. Corteza crujiente y miga suave. Ideal para acompañar pastas.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.5,
     "stock": 100,
@@ -923,7 +1003,9 @@
     "id": "pnd_041",
     "nombre": "Pan Masa Madre",
     "descripcion": "Pan de masa madre fermentada naturalmente, con sabor ligeramente acido y textura alveolada. Sin aditivos artificiales.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 2,
     "stock": 100,
@@ -947,7 +1029,9 @@
     "id": "pnd_042",
     "nombre": "Pan de Guayaba",
     "descripcion": "Pan dulce de guayaba, suave y aromático con relleno de pasta de guayaba. Perfecto para el desayuno o merienda.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.9,
     "stock": 100,
@@ -971,7 +1055,9 @@
     "id": "pnd_043",
     "nombre": "Pan Chino",
     "descripcion": "Pan chino, pan dulce venezolano suave y esponjoso con sabor ligeramente dulce. Clásico de la panadería.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.9,
     "stock": 100,
@@ -994,7 +1080,9 @@
     "id": "pnd_044",
     "nombre": "Pan de Arequipe",
     "descripcion": "Pan dulce relleno de arequipe artesanal, suave y esponjoso. Combina la dulzura del pan con el sabor del caramelo.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.9,
     "stock": 100,
@@ -1018,7 +1106,9 @@
     "id": "pnd_045",
     "nombre": "Pan Andino",
     "descripcion": "Pan andino artesanal, denso y rústico elaborado con harina de trigo integral. Sabor intenso y textura firme.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.9,
     "stock": 100,
@@ -1042,7 +1132,9 @@
     "id": "pnd_046",
     "nombre": "Pan Trenza",
     "descripcion": "Pan trenza trenzado artesanalmente, suave y esponjoso con corteza dorada. Perfecto para desayunos y meriendas.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.9,
     "stock": 100,
@@ -1065,7 +1157,9 @@
     "id": "pnd_047",
     "nombre": "Quesadilla / Arequipilla",
     "descripcion": "Quesadilla o arequipilla, pan dulce tradicional con queso crema y sabor ligeramente dulce. Suave y esponjoso.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 1.9,
     "stock": 100,
@@ -1085,7 +1179,9 @@
     "id": "pnd_048",
     "nombre": "Pan de Coco",
     "descripcion": "Pan de coco aromático con trozos de coco rallado, suave y esponjoso. Sabor tropical irresistible.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.9,
     "stock": 100,
@@ -1109,7 +1205,9 @@
     "id": "pnd_049",
     "nombre": "Pan de Coco con Leche Condensada",
     "descripcion": "Pan de coco aromático con trozos de coco rallado, suave y esponjoso. Sabor tropical irresistible.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.9,
     "stock": 100,
@@ -1133,7 +1231,9 @@
     "id": "pnd_050",
     "nombre": "Pata e Gato",
     "descripcion": "Pan pata de gato, pan dulce crujiente con forma característica, sabor ligeramente dulce y textura crocante.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 1.9,
     "stock": 100,
@@ -1156,7 +1256,9 @@
     "id": "pnd_051",
     "nombre": "Pan Uva",
     "descripcion": "Pan de uva dulce con pasas jugosas distribuidas en la masa suave. Ideal para desayunos y meriendas.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 3,
     "stock": 100,
@@ -1180,7 +1282,9 @@
     "id": "pnd_052",
     "nombre": "Sándwich Pequeño",
     "descripcion": "Sándwich preparado en pan fresco con ingredientes selectos. Tamaño ideal para un snack ligero.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Sándwiches",
     "precio_usd": 1.9,
     "stock": 100,
@@ -1203,7 +1307,9 @@
     "id": "pnd_053",
     "nombre": "Sándwich Mediano",
     "descripcion": "Sándwich preparado en pan fresco con generosa porción de ingredientes. Tamaño perfecto para el almuerzo.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Sándwiches",
     "precio_usd": 2.5,
     "stock": 100,
@@ -1226,7 +1332,9 @@
     "id": "pnd_054",
     "nombre": "Sándwich Grande",
     "descripcion": "Sándwich grande preparado en pan fresco con doble porción de ingredientes. Para los que tienen mucho apetito.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Sándwiches",
     "precio_usd": 4,
     "stock": 100,
@@ -1249,7 +1357,9 @@
     "id": "pnd_055",
     "nombre": "Sándwich Granjero",
     "descripcion": "Sándwich granjero con jamón, queso, lechuga, tomate y mayonesa en pan tostado. Clásico y sustancioso.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Sándwiches",
     "precio_usd": 1.9,
     "stock": 100,
@@ -1272,7 +1382,9 @@
     "id": "pnd_056",
     "nombre": "Sándwich Granjerito",
     "descripcion": "Sándwich granjerito, versión compacta del sándwich granjero. Jamón, queso y vegetales frescos en pan suave.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Sándwiches",
     "precio_usd": 1.5,
     "stock": 100,
@@ -1295,7 +1407,9 @@
     "id": "pnd_057",
     "nombre": "Pan Chino Grande",
     "descripcion": "Pan chino, pan dulce venezolano suave y esponjoso con sabor ligeramente dulce. Clásico de la panadería.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Panes",
     "precio_usd": 2.5,
     "stock": 100,
@@ -1318,7 +1432,9 @@
     "id": "pnd_058",
     "nombre": "Pizza Individual",
     "descripcion": "Pizza individual con masa crujiente, salsa de tomate casera, queso mozzarella derretido y topping a elegir.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Snacks",
     "precio_usd": 1,
     "stock": 100,
@@ -1340,7 +1456,9 @@
     "id": "pnd_059",
     "nombre": "Brownie Porción",
     "descripcion": "Brownie denso y chocolatoso con costra crujiente por fuera y centro húmedo. Porcion generosa para disfrutar.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 3,
     "stock": 100,
@@ -1364,7 +1482,9 @@
     "id": "pnd_060",
     "nombre": "Torta de Pan",
     "descripcion": "Torta de pan casera elaborada con pan remojado en leche, canela y especias. Postre típico hogareño con sabor tradicional.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 1.2,
     "stock": 100,
@@ -1387,7 +1507,9 @@
     "id": "pnd_061",
     "nombre": "Donas",
     "descripcion": "Donas frescas fritas, esponjosas y cubiertas con azúcar. Perfectas para acompañar el café de la mañana.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 1.5,
     "stock": 100,
@@ -1407,7 +1529,9 @@
     "id": "pnd_062",
     "nombre": "Bombas",
     "descripcion": "Bombas de masa frita rellenas de crema pastelera, cubiertas con azúcar flor. Grandes, esponjosas y deliciosas.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 1.8,
     "stock": 100,
@@ -1427,7 +1551,9 @@
     "id": "pnd_063",
     "nombre": "Mini Bombas",
     "descripcion": "Bombas de masa frita rellenas de crema pastelera, cubiertas con azúcar flor. Grandes, esponjosas y deliciosas.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 1,
     "stock": 100,
@@ -1447,7 +1573,9 @@
     "id": "pnd_064",
     "nombre": "Alfajores (1 Unid)",
     "descripcion": "Alfajores (1 Unid), postre artesanal de maizena relleno de arequipe y cubierto con coco rallado. Unidad individual.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 0.6,
     "stock": 100,
@@ -1467,7 +1595,9 @@
     "id": "pnd_065",
     "nombre": "Alfajores (Pack 3x1,60$)",
     "descripcion": "Alfajores (Pack 3x1,60$), pack de 3 alfajores artesanales de maizena rellenos de arequipe y cubiertos con coco rallado.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 1.6,
     "stock": 100,
@@ -1487,7 +1617,9 @@
     "id": "pnd_066",
     "nombre": "Reinitas (1 Unid)",
     "descripcion": "Reinitas (1 Unid), galleta típica de anís con forma de flor. Sabor tradicional en unidad individual.",
-    "categoria": "Panaderia",
+    "categoria": [
+      "Panaderia"
+    ],
     "subcategoria": "Pasteleria",
     "precio_usd": 0.6,
     "stock": 100,

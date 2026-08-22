@@ -5,7 +5,7 @@ import { Image, Type, FileText, Palette, Eye, Share2, Layout } from 'lucide-reac
 
 const PersonalizacionSection: React.FC = () => {
   const { config, updateConfig } = useApp();
-  const themeColor = config.theme_color || '#007AFF';
+  const themeColor = config.theme_color || '#A4D045';
   const [activeTab, setActiveTab] = useState<'logos' | 'colors' | 'theme' | 'fonts' | 'hero' | 'texts' | 'social' | 'preview'>('logos');
 
   const tabs = [
@@ -79,9 +79,9 @@ const PersonalizacionSection: React.FC = () => {
             <SectionTitle>Identidad Visual (Colores)</SectionTitle>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { label: 'Color Primario', key: 'theme_color', fallback: '#6d28d9' },
-                { label: 'Color Secundario', key: 'secondary_color', fallback: '#1e293b' },
-                { label: 'Color de Acento', key: 'accent_color', fallback: '#f59e0b' },
+                { label: 'Color Primario', key: 'theme_color', fallback: '#6E472A' },
+                { label: 'Color Secundario', key: 'secondary_color', fallback: '#A4D045' },
+                { label: 'Color de Acento', key: 'accent_color', fallback: '#A4D045' },
               ].map(c => (
                 <div key={c.key} className="flex flex-col gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{c.label}</span>
@@ -115,7 +115,7 @@ const PersonalizacionSection: React.FC = () => {
               <button
                 onClick={() => updateConfig({ theme_mode: config.theme_mode === 'dark' ? 'light' : config.theme_mode === 'light' ? 'system' : 'dark' })}
                 className="relative w-14 h-8 rounded-full transition-colors duration-300 cursor-pointer"
-                style={{ backgroundColor: config.theme_mode === 'dark' ? '#6d28d9' : config.theme_mode === 'system' ? '#64748b' : '#d1d5db' }}>
+                style={{ backgroundColor: config.theme_mode === 'dark' ? '#A4D045' : config.theme_mode === 'system' ? '#64748b' : '#d1d5db' }}>
                 <div className="absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300"
                   style={{ transform: config.theme_mode === 'dark' ? 'translateX(24px)' : config.theme_mode === 'system' ? 'translateX(12px)' : 'translateX(0)' }} />
               </button>
@@ -212,13 +212,13 @@ const PersonalizacionSection: React.FC = () => {
             <SectionTitle>Vista Previa del Hero</SectionTitle>
             <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--ios-border)' }}>
               <div className="relative p-6 text-center" style={{
-                background: `linear-gradient(135deg, ${config.theme_color || '#FF6B35'}, ${config.secondary_color || '#1e293b'})`,
+                background: `linear-gradient(135deg, ${config.theme_color || '#A4D045'}, ${config.secondary_color || '#6E472A'})`,
                 opacity: (config.hero_overlay_opacity ?? 100) / 100,
               }}>
                 <p className="text-white font-bold text-lg">{config.hero_title || 'Pide Tu Comida Favorita'}</p>
                 <p className="text-white/80 text-sm mt-1">{config.hero_subtitle || 'Delivery express en minutos'}</p>
                 {config.hero_cta_text && (
-                  <button className="mt-3 px-4 py-2 rounded-xl text-sm font-bold" style={{ background: config.accent_color || '#FF6B35', color: 'white' }}>
+                  <button className="mt-3 px-4 py-2 rounded-xl text-sm font-bold" style={{ background: config.accent_color || '#A4D045', color: '#000' }}>
                     {config.hero_cta_text}
                   </button>
                 )}
@@ -379,25 +379,25 @@ const PersonalizacionSection: React.FC = () => {
           <div className="admin-card p-4">
             <SectionTitle>Vista Previa del Header</SectionTitle>
             <div className="rounded-xl overflow-hidden shadow-md border border-slate-200">
-              <div className="flex items-center justify-between px-4 py-3" style={{ backgroundColor: config.theme_color || '#6d28d9' }}>
+              <div className="flex items-center justify-between px-4 py-3" style={{ backgroundColor: config.theme_color || '#A4D045' }}>
                 <div className="flex items-center gap-2">
                   {config.logo_url ? (
                     <img src={config.logo_url} alt="Logo" className="w-8 h-8 object-contain" />
                   ) : (
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: config.secondary_color || '#1e293b' }}>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold" style={{ backgroundColor: config.secondary_color || '#6E472A', color: '#000' }}>
                       {config.site_nombre?.[0] || 'F'}
                     </div>
                   )}
-                  <span className="text-white font-bold text-sm">{config.site_nombre || 'Tienda'}</span>
+                  <span className="font-bold text-sm" style={{ color: '#000' }}>{config.site_nombre || 'Tienda'}</span>
                 </div>
                 <div className="flex gap-2">
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ backgroundColor: config.accent_color || '#f59e0b' }}>C</div>
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ backgroundColor: config.secondary_color || '#1e293b' }}>N</div>
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-black" style={{ backgroundColor: config.accent_color || '#A4D045' }}>C</div>
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold" style={{ backgroundColor: config.secondary_color || '#6E472A', color: '#000' }}>N</div>
                 </div>
               </div>
               <div className="flex gap-2 p-2 bg-white border-t border-slate-100">
                 {['Inicio', 'Catalogo', 'Pedidos'].map(tab => (
-                  <div key={tab} className="px-3 py-1 rounded-full text-[10px] font-semibold" style={{ backgroundColor: tab === 'Inicio' ? (config.theme_color || '#6d28d9') + '20' : 'transparent', color: tab === 'Inicio' ? (config.theme_color || '#6d28d9') : '#64748b' }}>{tab}</div>
+                  <div key={tab} className="px-3 py-1 rounded-full text-[10px] font-semibold" style={{ backgroundColor: tab === 'Inicio' ? (config.theme_color || '#A4D045') + '20' : 'transparent', color: tab === 'Inicio' ? (config.theme_color || '#A4D045') : '#64748b' }}>{tab}</div>
                 ))}
               </div>
             </div>

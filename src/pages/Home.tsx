@@ -13,6 +13,7 @@ import { FloatingCartButton } from '../components/FloatingCartButton';
 import { SedesMap } from '../components/SedesMap';
 import { findNearestSede } from '../utils/geo';
 import { getWhatsAppPhone } from '../utils/phone';
+import { hasCategory, categoryIncludes, formatCategories } from '../utils/categoryUtils';
 
 interface BeforeInstallPromptEvent {
   prompt: () => void;
@@ -68,7 +69,7 @@ export const Home: React.FC<HomeProps> = ({
 }) => {
   const { foodItems, config, cart, addToCart, getProductAverageRating, isDarkMode, promotions } = useApp();
   const { showToast } = useToast();
-  const tc = config.theme_color || '#FF6B35';
+  const tc = config.theme_color || '#A4D045';
 
   const activeItems = useMemo(() => foodItems.filter(p => p.activo !== false), [foodItems]);
   const promoItems = useMemo(() => activeItems.filter(p => p.es_promo), [activeItems]);
@@ -79,14 +80,14 @@ export const Home: React.FC<HomeProps> = ({
     return (promotions || []).filter(p => p.status === 'active' && p.start_date <= now && p.end_date >= now);
   }, [promotions]);
 
-  const panaderiaItems = useMemo(() => activeItems.filter(p => p.categoria.toLowerCase() === 'panaderia').slice(0, 8), [activeItems]);
-  const comidaRapidaItems = useMemo(() => activeItems.filter(p => p.categoria.toLowerCase() === 'comida rapida').slice(0, 8), [activeItems]);
-  const reposteriaItems = useMemo(() => activeItems.filter(p => p.categoria.toLowerCase() === 'repostería').slice(0, 8), [activeItems]);
-  const charcuteriaItems = useMemo(() => activeItems.filter(p => p.categoria.toLowerCase() === 'charcutería y embutidos').slice(0, 8), [activeItems]);
-  const frutasItems = useMemo(() => activeItems.filter(p => p.categoria.toLowerCase() === 'frutas y verduras').slice(0, 8), [activeItems]);
-  const viveresItems = useMemo(() => activeItems.filter(p => p.categoria.toLowerCase() === 'víveres' || p.categoria.toLowerCase() === 'viveres').slice(0, 8), [activeItems]);
-  const bebidasItems = useMemo(() => activeItems.filter(p => p.categoria.toLowerCase() === 'bebidas').slice(0, 8), [activeItems]);
-  const mascotasItems = useMemo(() => activeItems.filter(p => p.categoria.toLowerCase() === 'mascotas').slice(0, 8), [activeItems]);
+  const panaderiaItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Panaderia') || hasCategory(p, 'Panadería')).slice(0, 8), [activeItems]);
+  const comidaRapidaItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Comida Rapida') || hasCategory(p, 'Comida Rápida')).slice(0, 8), [activeItems]);
+  const reposteriaItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Repostería')).slice(0, 8), [activeItems]);
+  const charcuteriaItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Charcutería y Embutidos')).slice(0, 8), [activeItems]);
+  const frutasItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Frutas y Verduras')).slice(0, 8), [activeItems]);
+  const viveresItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Viveres') || hasCategory(p, 'Víveres')).slice(0, 8), [activeItems]);
+  const bebidasItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Bebidas')).slice(0, 8), [activeItems]);
+  const mascotasItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Mascotas')).slice(0, 8), [activeItems]);
 
   const [heroSlide, setHeroSlide] = useState(0);
   const heroBanners = config.banners.slice(0, 3);
@@ -104,7 +105,7 @@ export const Home: React.FC<HomeProps> = ({
     const q = searchQuery.toLowerCase();
     return activeItems.filter(p =>
       p.nombre.toLowerCase().includes(q) ||
-      p.categoria.toLowerCase().includes(q) ||
+      categoryIncludes(p, q) ||
       (p.subcategoria && p.subcategoria.toLowerCase().includes(q))
     ).slice(0, 6);
   }, [searchQuery, activeItems]);
@@ -309,8 +310,8 @@ export const Home: React.FC<HomeProps> = ({
                       } else {
                         setTab('catalog');
                       }
-                    }} className="text-white font-bold text-sm md:text-base px-7 py-3 md:px-9 md:py-3.5 rounded-xl flex items-center gap-2 shadow-xl active:scale-95 transition-transform"
-                      style={{ backgroundColor: tc, boxShadow: `0 8px 30px ${tc}50` }}>
+                    }} className="font-bold text-sm md:text-base px-7 py-3 md:px-9 md:py-3.5 rounded-xl flex items-center gap-2 shadow-xl active:scale-95 transition-transform"
+                      style={{ backgroundColor: tc, color: '#fff', boxShadow: `0 8px 30px ${tc}50` }}>
                       {ctaText} <ArrowRight size={18} />
                     </button>
                   )}
@@ -386,7 +387,7 @@ export const Home: React.FC<HomeProps> = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold truncate" style={{ color: text1 }}>{item.nombre}</p>
-                    <p className="text-[10px] uppercase tracking-wider" style={{ color: text2 }}>{item.categoria}{item.subcategoria ? ` · ${item.subcategoria}` : ''}</p>
+                    <p className="text-[10px] uppercase tracking-wider" style={{ color: text2 }}>{formatCategories(item)}{item.subcategoria ? ` · ${item.subcategoria}` : ''}</p>
                   </div>
                   <span className="text-sm font-bold shrink-0" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                 </button>
@@ -463,7 +464,7 @@ export const Home: React.FC<HomeProps> = ({
                 className="px-5 py-2 rounded-full font-semibold text-xs whitespace-nowrap transition-all shrink-0"
                 style={{
                   backgroundColor: isActive ? tc : surfaceContainer,
-                  color: isActive ? '#ffffff' : text2,
+                  color: isActive ? '#000000' : text2,
                   boxShadow: isActive ? `0 4px 12px ${tc}30` : 'none',
                 }}>{cat}</button>
             );
@@ -551,7 +552,7 @@ export const Home: React.FC<HomeProps> = ({
                 <div key={item.id} className="relative rounded-2xl border-2 overflow-hidden group cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5"
                   style={{ backgroundColor: cardBg, borderColor: tc, boxShadow: `0 0 20px ${tc}25` }}
                   onClick={() => onViewProductDetails(item)}>
-                  <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-white font-bold text-[9px]"
+                  <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-black font-bold text-[9px]"
                     style={{ backgroundColor: tc }}>
                     <Zap size={10} fill="currentColor" /> FLASH
                   </div>
@@ -570,7 +571,7 @@ export const Home: React.FC<HomeProps> = ({
                     </button>
                   </div>
                   <div className="p-3">
-                    <p className="text-[10px] uppercase tracking-wider font-medium mb-0.5" style={{ color: text2 }}>{item.categoria}</p>
+                    <p className="text-[10px] uppercase tracking-wider font-medium mb-0.5" style={{ color: text2 }}>{formatCategories(item)}</p>
                     <h4 className="text-sm font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                     <div className="flex items-center gap-1.5 mb-1.5">
                       {renderStars(getProductAverageRating(item.id))}
@@ -604,7 +605,7 @@ export const Home: React.FC<HomeProps> = ({
                 <div key={item.id} className="relative min-w-[155px] rounded-xl border-2 overflow-hidden shrink-0 cursor-pointer"
                   style={{ backgroundColor: cardBg, borderColor: tc, boxShadow: `0 0 12px ${tc}20` }}
                   onClick={() => onViewProductDetails(item)}>
-                  <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-white font-bold text-[8px]"
+                  <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-black font-bold text-[8px]"
                     style={{ backgroundColor: tc }}>
                     <Zap size={8} fill="currentColor" /> FLASH
                   </div>
@@ -618,7 +619,7 @@ export const Home: React.FC<HomeProps> = ({
                     </button>
                   </div>
                   <div className="p-2.5">
-                    <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.categoria}</p>
+                    <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{formatCategories(item)}</p>
                     <h4 className="text-xs font-bold truncate mb-0.5" style={{ color: text1 }}>{item.nombre}</h4>
                     <div className="flex items-center gap-0.5 mb-1">
                       {renderStars(getProductAverageRating(item.id), 9)}
@@ -745,7 +746,7 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || item.categoria}</p>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
@@ -801,7 +802,7 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || item.categoria}</p>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center gap-0.5 mb-1">
                     {renderStars(getProductAverageRating(item.id), 9)}
@@ -854,7 +855,7 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || item.categoria}</p>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
@@ -903,7 +904,7 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || item.categoria}</p>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
@@ -952,7 +953,7 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || item.categoria}</p>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
@@ -1001,7 +1002,7 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || item.categoria}</p>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
@@ -1050,7 +1051,7 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || item.categoria}</p>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
@@ -1099,7 +1100,7 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || item.categoria}</p>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
@@ -1118,19 +1119,19 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* ═══ 8. PWA DOWNLOAD INVITATION ═══ */}
       <section className="py-6 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
-        <div className="rounded-2xl p-6 md:p-8 text-white relative overflow-hidden" style={{ backgroundColor: tc }}>
-          <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-          <div className="absolute -left-8 -top-8 w-24 h-24 bg-white/10 rounded-full blur-xl" />
+        <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: tc, color: '#fff' }}>
+          <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-black/5 rounded-full blur-2xl" />
+          <div className="absolute -left-8 -top-8 w-24 h-24 bg-black/5 rounded-full blur-xl" />
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
             <div className="flex-1">
               <div className="flex items-center gap-1.5 mb-2">
-                <Sparkles size={16} className="text-white" />
-                <span className="text-white/80 font-semibold text-[10px] uppercase tracking-widest">Exclusivo Móvil</span>
+                <Sparkles size={16} className="text-black" />
+                <span className="text-black/60 font-semibold text-[10px] uppercase tracking-widest">Exclusivo Móvil</span>
               </div>
               <h3 className="text-lg md:text-xl font-extrabold mb-2">
                 Descarga la app en tu móvil
               </h3>
-              <p className="text-white/75 mb-4 text-xs md:text-sm max-w-md">
+              <p className="text-black/60 mb-4 text-xs md:text-sm max-w-md">
                 Instálala directamente desde tu navegador y estate al tanto de nuestras promociones exclusivas. Sin descargas pesadas, directo a tu pantalla de inicio.
               </p>
               <div className="flex flex-col sm:flex-row gap-2">
@@ -1140,18 +1141,18 @@ export const Home: React.FC<HomeProps> = ({
                   } else {
                     setShowIOSInstallModal(true);
                   }
-                }} className="h-10 bg-black text-white rounded-lg px-5 flex items-center justify-center gap-2 border border-white/10 hover:bg-white/10 transition-colors font-bold text-xs">
+                }} className="h-10 bg-black text-white rounded-lg px-5 flex items-center justify-center gap-2 border border-black/10 hover:bg-black/10 transition-colors font-bold text-xs">
                   <Download size={16} />
                   Instalar App Web
                 </button>
-                <p className="text-[10px] text-white/60 flex items-center gap-1">
+                <p className="text-[10px] text-black/50 flex items-center gap-1">
                   <Smartphone size={12} />
                   Funciona como una app nativa en tu celular
                 </p>
               </div>
             </div>
-            <div className="hidden md:flex items-center justify-center w-24 h-24 rounded-2xl bg-white/10 backdrop-blur-sm shrink-0">
-              <Smartphone size={36} className="text-white" />
+            <div className="hidden md:flex items-center justify-center w-24 h-24 rounded-2xl bg-black/5 backdrop-blur-sm shrink-0">
+              <Smartphone size={36} className="text-black" />
             </div>
           </div>
         </div>
@@ -1308,7 +1309,12 @@ export const Home: React.FC<HomeProps> = ({
         <div className="max-w-[1440px] mx-auto pt-4 border-t flex flex-col md:flex-row justify-between items-center gap-2 text-[10px]"
           style={{ borderColor: cardBorder, color: isDarkMode ? '#5a5a7a' : '#8f7065' }}>
           <p>© {new Date().getFullYear()} {config.footer_copyright || config.site_nombre || 'Market Coffee Sweet'}. Todos los derechos reservados.</p>
-          <div className="flex gap-4"><span>{config.direccion_fisica || 'Venezuela'}</span></div>
+          <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-center">
+            <span>Razón Social: Coffee Market Sweet C.A.</span>
+            <span>RIF: J-500338260</span>
+            <span>Tel: 0412-3758879</span>
+            <span>{config.direccion_fisica || 'Venezuela'}</span>
+          </div>
         </div>
       </footer>
 
@@ -1329,6 +1335,8 @@ export const Home: React.FC<HomeProps> = ({
               <div>
                 <h4 className="font-bold text-slate-800 mb-1">2. Descripcion del Servicio</h4>
                 <p>Market Coffee Sweet es una plataforma de pedidos en linea que ofrece productos de mercado, panaderia y comida rapida con servicio de delivery. El servicio esta disponible exclusivamente en la Republica Bolivariana de Venezuela.</p>
+                <p className="mt-2"><strong>Razon Social:</strong> Coffee Market Sweet C.A. | <strong>RIF:</strong> J-500338260</p>
+                <p><strong>Dominio:</strong> https://marketcoffeesweet.com | <strong>Telefono:</strong> 0412-3758879</p>
               </div>
               <div>
                 <h4 className="font-bold text-slate-800 mb-1">3. Registro y Cuenta</h4>
@@ -1416,6 +1424,8 @@ export const Home: React.FC<HomeProps> = ({
               <div>
                 <h4 className="font-bold text-slate-800 mb-1">10. Contacto</h4>
                 <p>Para cualquier consulta sobre esta politica de privacidad o para ejercer sus derechos, puede contactarnos a traves de WhatsApp al numero proporcionado en la plataforma.</p>
+                <p className="mt-2"><strong>Razon Social:</strong> Coffee Market Sweet C.A. | <strong>RIF:</strong> J-500338260</p>
+                <p><strong>Dominio:</strong> https://marketcoffeesweet.com | <strong>Telefono:</strong> 0412-3758879</p>
               </div>
             </div>
           </div>
@@ -1480,7 +1490,7 @@ export const Home: React.FC<HomeProps> = ({
             </div>
 
             <div className="p-3 border-t border-slate-100">
-              <button onClick={() => setShowSedeModal(false)} className="w-full py-3 rounded-xl font-bold text-sm text-white transition-colors cursor-pointer" style={{ backgroundColor: tc }}>
+              <button onClick={() => setShowSedeModal(false)} className="w-full py-3 rounded-xl font-bold text-sm transition-colors cursor-pointer" style={{ backgroundColor: tc, color: '#fff' }}>
                 Listo
               </button>
             </div>
@@ -1526,7 +1536,7 @@ export const Home: React.FC<HomeProps> = ({
               </div>
             </div>
             <div className="p-3 border-t border-slate-100">
-              <button onClick={() => setShowIOSInstallModal(false)} className="w-full py-3 rounded-xl font-bold text-sm text-white transition-colors cursor-pointer" style={{ backgroundColor: tc }}>
+              <button onClick={() => setShowIOSInstallModal(false)} className="w-full py-3 rounded-xl font-bold text-sm transition-colors cursor-pointer" style={{ backgroundColor: tc, color: '#fff' }}>
                 Entendido
               </button>
             </div>

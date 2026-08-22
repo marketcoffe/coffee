@@ -40,7 +40,7 @@ const mockItem: FoodItem = {
   id: 'test-001',
   nombre: 'Smash Clásica',
   descripcion: 'Doble smash de carne con queso',
-  categoria: 'Hamburguesas',
+  categoria: ['Hamburguesas'],
   precio_usd: 7.5,
   stock: 30,
   imagen_urls: ['https://example.com/burger.jpg'],

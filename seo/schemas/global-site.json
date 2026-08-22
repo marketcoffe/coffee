@@ -5,6 +5,8 @@
       "@type": "Organization",
       "@id": "https://marketcoffeesweet.com/#organization",
       "name": "Market Coffee Sweet",
+      "legalName": "Coffee Market Sweet C.A.",
+      "taxID": "J500338260",
       "url": "https://marketcoffeesweet.com",
       "logo": {
         "@type": "ImageObject",
@@ -32,7 +34,7 @@
       ],
       "contactPoint": {
         "@type": "ContactPoint",
-        "telephone": "+584121234567",
+        "telephone": "+584123758879",
         "contactType": "customer service",
         "availableLanguage": "Spanish",
         "areaServed": "VE"
@@ -42,8 +44,10 @@
       "@type": ["Bakery", "GroceryStore", "FastFoodRestaurant"],
       "@id": "https://marketcoffeesweet.com/#localbusiness",
       "name": "Market Coffee Sweet",
+      "legalName": "Coffee Market Sweet C.A.",
+      "taxID": "J500338260",
       "url": "https://marketcoffeesweet.com",
-      "telephone": "+584121234567",
+      "telephone": "+584123758879",
       "priceRange": "$$",
       "image": [
         "https://marketcoffeesweet.com/fachada.jpg",

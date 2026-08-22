@@ -8,7 +8,7 @@ import {
 const StoreGeneralSection: React.FC = () => {
   const { config, updateConfig, currentUser, syncPushSubscription } = useApp();
   const { showToast } = useToast();
-  const themeColor = config.theme_color || '#007AFF';
+  const themeColor = config.theme_color || '#A4D045';
 
   return (
     <div className="flex flex-col gap-4">

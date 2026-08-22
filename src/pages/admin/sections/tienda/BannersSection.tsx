@@ -5,7 +5,7 @@ import ImageField from '../../components/ImageField';
 
 const BannersSection: React.FC = () => {
   const { config, updateConfig } = useApp();
-  const themeColor = config.theme_color || '#007AFF';
+  const themeColor = config.theme_color || '#A4D045';
 
   const [bannerPreviewMode, setBannerPreviewMode] = useState<'mobile' | 'desktop'>('mobile');
 

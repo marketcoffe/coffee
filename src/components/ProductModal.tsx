@@ -5,6 +5,7 @@ import { ProductOptionsEditor } from './ProductOptionsEditor';
 import { ProductReviews } from './ProductReviews';
 import { RippleButton } from './RippleButton';
 import { useApp } from '../store/AppContext';
+import { hasCategory, getCategories, formatCategories } from '../utils/categoryUtils';
 
 interface ProductModalProps {
   product: FoodItem | null;
@@ -52,7 +53,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   const [removedIngredients, setRemovedIngredients] = useState<Set<number>>(new Set());
   const [selectedSize, setSelectedSize] = useState<string>('');
 
-  const themeColor = config.theme_color || '#FF6B35';
+  const themeColor = config.theme_color || '#A4D045';
   const flashSale = product ? getActiveFlashSale(product.id) : null;
 
   const recommendedItems = useMemo(() => {
@@ -62,9 +63,9 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       .slice(0, 4);
   }, [product, foodItems]);
 
-  const isPizza = product?.categoria?.toLowerCase() === 'pizzas';
-  const isComboCategory = ['hamburguesas', 'pizzas', 'pollo'].includes(product?.categoria?.toLowerCase() || '');
-  const comboInfo = isComboCategory ? COMBO_ITEMS[product!.categoria.toLowerCase()] : null;
+  const isPizza = product ? hasCategory(product, 'Pizzas') : false;
+  const isComboCategory = product ? ['Hamburguesas', 'Pizzas', 'Pollo'].some(c => hasCategory(product, c)) : false;
+  const comboInfo = isComboCategory && product ? COMBO_ITEMS[getCategories(product)[0]?.toLowerCase() || ''] : null;
 
   const avgRating = product ? getProductAverageRating(product.id) : 0;
   const reviewCount = product ? getProductReviews(product.id).length : 0;
@@ -194,7 +195,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             {/* Category & delivery */}
             <div className="flex items-center gap-2 mb-2">
               <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-xl" style={{ backgroundColor: themeColor + '15', color: themeColor }}>
-                {product.categoria}
+                {formatCategories(product)}
               </span>
               {product.delivery_gratis && (
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-xl" style={{ backgroundColor: '#e8f5e9', color: '#2e7d32' }}>

@@ -3,6 +3,7 @@ import { FoodItem, Order, StoreConfig, InAppNotification, OrderItem, AppUser, Co
 import { supabase } from './supabaseClient';
 import productsData from '../data/products.json';
 import panProductsData from '../data/productos-pan-imported.json';
+import { getCategories, hasCategory, toArray } from '../utils/categoryUtils';
 
 interface AppContextProps {
   foodItems: FoodItem[];
@@ -247,7 +248,6 @@ const DEFAULT_CONFIG: StoreConfig = {
     'Charcutería y Embutidos',
     'Combos Familiares',
     'Comida Rapida',
-    'Conservas',
     'Frutas y Verduras',
     'Higiene Personal',
     'Hogar',
@@ -268,7 +268,6 @@ const DEFAULT_CONFIG: StoreConfig = {
     'Charcutería y Embutidos': ['Chorizo', 'Morcilla', 'Congelados'],
     'Combos Familiares': ['Combos Familiares'],
     'Comida Rapida': ['Hamburguesas', 'Shawarmas', 'Perros Calientes', 'Club House', 'Pizza', 'Pepitos', 'Arepas', 'Empanadas', 'Menú'],
-    'Conservas': ['Atún', 'Sardinas', 'Vegetales'],
     'Frutas y Verduras': ['Frutas', 'Verduras', 'Tubérculos', 'Hortalizas'],
     'Higiene Personal': ['Shampoo', 'Acondicionador', 'Cuidado Dental', 'Desodorantes', 'Toallas', 'Cuidado del Cabello', 'Pañales', 'Cuidado de la Piel', 'Jabones'],
     'Hogar': ['Papel', 'Bolsas', 'Velas', 'Aromatizantes', 'Utensilios', 'Insecticidas', 'Limpieza'],
@@ -280,7 +279,7 @@ const DEFAULT_CONFIG: StoreConfig = {
     'Dulces y Postres': ['Harinas', 'Vainilla'],
     'Salsas y Condimentos': ['Ketchup', 'Mostaza', 'Mayonesa', 'Salsas', 'Adobos'],
     'Snacks y Frituras': ['Papas', 'Tostones', 'Chicharrones'],
-    'Viveres': ['Arroces', 'Pastas', 'Harinas', 'Aceites', 'Vinagres', 'Enlatados', 'Especias', 'Carbón / Parrilla', 'Chocolate', 'Conservas', 'Mantequilla', 'Panaderia', 'Snacks'],
+    'Viveres': ['Arroces', 'Pastas', 'Harinas', 'Aceites', 'Vinagres', 'Enlatados', 'Especias', 'Carbón / Parrilla', 'Chocolate', 'Conservas', 'Mantequilla'],
   },
   seo_home_title: 'Market Coffee Sweet | Panadería, Comida Rápida y Víveres en Valencia',
   seo_home_description: 'Tu minimarket de confianza en El Trigal, Valencia. Panadería fresca, comida rápida (hamburguesas, shawarmas, perros calientes), víveres, frutas, verduras, bebidas y agua potable con delivery a domicilio.',
@@ -1005,7 +1004,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const merged = (dbProducts as FoodItem[]).map(p => {
           const hasDbOptions = Array.isArray(p.option_groups) && p.option_groups.length > 0;
           if (hasDbOptions) return p;
-          const fallback = DEFAULT_PRODUCTS.find(d => d.nombre === p.nombre && d.categoria === p.categoria);
+          const fallback = DEFAULT_PRODUCTS.find(d => d.nombre === p.nombre && hasCategory(p, getCategories(d)[0] || ''));
           return { ...p, option_groups: fallback?.option_groups || [] };
         });
         setProducts(merged);
@@ -1450,7 +1449,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return false;
       }
       
-      const itemSearchText = `${item.nombre} ${item.descripcion} ${item.categoria} ${(item.ingredientes || []).join(' ')} ${item.delivery_gratis ? 'delivery gratis' : ''}`.toLowerCase();
+      const itemSearchText = `${item.nombre} ${item.descripcion} ${getCategories(item).join(' ')} ${(item.ingredientes || []).join(' ')} ${item.delivery_gratis ? 'delivery gratis' : ''}`.toLowerCase();
       
       return tokens.every(tok => itemSearchText.includes(tok));
     }).sort((a, b) => {
@@ -2077,8 +2076,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setProducts(prevProducts => {
       const updatedProducts = prevProducts.map(p => {
-        if (p.categoria === categoryName) {
-          return { ...p, categoria: 'Panaderia' };
+        if (hasCategory(p, categoryName)) {
+          return { ...p, categoria: getCategories(p).filter(c => c.toLowerCase() !== categoryName.toLowerCase()) };
         }
         return p;
       });
@@ -2099,8 +2098,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
     setProducts(prevProducts => {
       const updatedProducts = prevProducts.map(p => {
-        if (p.categoria === oldCategory) {
-          return { ...p, categoria: newCategory };
+        if (hasCategory(p, oldCategory)) {
+          return { ...p, categoria: getCategories(p).map(c => c.toLowerCase() === oldCategory.toLowerCase() ? newCategory : c) };
         }
         return p;
       });

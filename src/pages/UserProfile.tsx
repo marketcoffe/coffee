@@ -60,7 +60,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
     redeemRewardItem,
   } = useApp();
 
-  const themeColor = config.theme_color || '#E31837';
+  const themeColor = config.theme_color || '#A4D045';
 
   const [activeSubTab, setActiveSubTab] = useState<'profile' | 'orders' | 'notifications' | 'rewards' | 'promos' | 'coupons'>('orders');
   const [authMode, setAuthMode] = useState<'login' | 'register' | 'forgot'>('login');
@@ -414,14 +414,14 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
               >
                 <X size={16} />
               </button>
-              <div className="absolute bottom-4 left-6 text-white text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded shadow-lg" style={{ backgroundColor: themeColor }}>
+              <div className="absolute bottom-4 left-6 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded shadow-lg" style={{ backgroundColor: themeColor, color: '#fff' }}>
                 App Oficial
               </div>
             </div>
 
             <div className="p-5 flex flex-col gap-4">
               <div className="flex items-start gap-4">
-                <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0" style={{ backgroundColor: themeColor }}>
+                <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg shrink-0" style={{ backgroundColor: themeColor, color: '#fff' }}>
                   <Smartphone size={22} />
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -436,8 +436,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
                     if (onInstallClick) onInstallClick();
                     setShowAutoPopup(false);
                   }}
-                  className="w-full hover:opacity-90 text-white font-black py-3.5 rounded-2xl text-xs uppercase tracking-widest shadow-xl transition-all active:scale-95 cursor-pointer"
-                  style={{ backgroundColor: themeColor }}
+                  className="w-full hover:opacity-90 font-black py-3.5 rounded-2xl text-xs uppercase tracking-widest shadow-xl transition-all active:scale-95 cursor-pointer"
+                  style={{ backgroundColor: themeColor, color: '#fff' }}
                 >
                   Instalar Ahora
                 </button>
@@ -562,8 +562,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
 
                 <button
                   type="submit"
-                  className="hover:opacity-90 text-white font-bold font-display uppercase tracking-wider py-3 rounded-xl text-sm mt-2 transition-transform cursor-pointer"
-                  style={{ backgroundColor: themeColor }}
+                  className="hover:opacity-90 font-bold font-display uppercase tracking-wider py-3 rounded-xl text-sm mt-2 transition-transform cursor-pointer"
+                  style={{ backgroundColor: themeColor, color: '#fff' }}
                 >
                   Entrar
                 </button>
@@ -596,7 +596,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
                 </div>
                 <button
                   type="submit"
-                  className="hover:opacity-90 text-white font-bold font-display uppercase tracking-wider py-3 rounded-xl text-sm mt-2 transition-transform cursor-pointer" style={{ backgroundColor: themeColor }}
+                  className="hover:opacity-90 font-bold font-display uppercase tracking-wider py-3 rounded-xl text-sm mt-2 transition-transform cursor-pointer" style={{ backgroundColor: themeColor, color: '#fff' }}
                 >
                   Enviar Enlace de Recuperación
                 </button>
@@ -682,7 +682,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
 
                 <button
                   type="submit"
-                  className="hover:opacity-90 text-white font-bold font-display uppercase tracking-wider py-3 rounded-xl text-sm mt-2 transition-transform cursor-pointer" style={{ backgroundColor: themeColor }}
+                  className="hover:opacity-90 font-bold font-display uppercase tracking-wider py-3 rounded-xl text-sm mt-2 transition-transform cursor-pointer" style={{ backgroundColor: themeColor, color: '#fff' }}
                 >
                   Registrar e Ingresar
                 </button>
@@ -706,7 +706,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
             <div className="p-5 border border-[#e4beb1]/10 rounded-2xl bg-white shadow-sm divide-y divide-zinc-200/80 flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full text-white font-bold flex items-center justify-center text-lg shadow-inner" style={{ backgroundColor: themeColor }}>
+                  <div className="w-12 h-12 rounded-full font-bold flex items-center justify-center text-lg shadow-inner" style={{ backgroundColor: themeColor, color: '#fff' }}>
                     {currentUser.nombre.charAt(0).toUpperCase()}
                   </div>
                   <div>
@@ -803,7 +803,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
                     </button>
                   </div>
                 </div>
-                <button type="submit" className="hover:opacity-90 text-white font-bold py-3 rounded-xl text-sm tracking-wider transition-all uppercase font-display cursor-pointer active:scale-[0.98]" style={{ backgroundColor: themeColor }}>
+                <button type="submit" className="hover:opacity-90 font-bold py-3 rounded-xl text-sm tracking-wider transition-all uppercase font-display cursor-pointer active:scale-[0.98]" style={{ backgroundColor: themeColor, color: '#fff' }}>
                   Guardar Cambios
                 </button>
               </form>
@@ -825,7 +825,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
                   <p className="text-[12px] text-[#8f7065] max-w-[240px] leading-relaxed">
                     Tus pedidos aparecerán aquí. ¡Empieza a pedir!
                   </p>
-                  <button onClick={() => setTab('catalog')} className="mt-2 text-white px-5 py-2.5 rounded-xl font-bold text-[12px] cursor-pointer active:scale-95 transition-all" style={{ backgroundColor: themeColor }}>
+                  <button onClick={() => setTab('catalog')} className="mt-2 px-5 py-2.5 rounded-xl font-bold text-[12px] cursor-pointer active:scale-95 transition-all" style={{ backgroundColor: themeColor, color: '#fff' }}>
                     Ver Menú
                   </button>
                 </div>
@@ -986,7 +986,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
                   </div>
                 </div>
                 {notificationPermission === 'default' && (
-                  <button onClick={requestNotificationPermission} className="w-full text-white font-bold py-2.5 px-3 rounded-xl text-[12px] uppercase tracking-wider transition-all cursor-pointer active:scale-[0.98]" style={{ backgroundColor: themeColor }}>
+                  <button onClick={requestNotificationPermission} className="w-full font-bold py-2.5 px-3 rounded-xl text-[12px] uppercase tracking-wider transition-all cursor-pointer active:scale-[0.98]" style={{ backgroundColor: themeColor, color: '#fff' }}>
                     Activar Notificaciones
                   </button>
                 )}
@@ -1181,8 +1181,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
                       )}
                       <button
                         onClick={() => { navigator.clipboard.writeText(coupon.code); showToast('success', 'Coupon copiado: ' + coupon.code); }}
-                        className="w-full text-white font-bold py-2.5 rounded-xl text-[12px] transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
-                        style={{ backgroundColor: themeColor }}
+                        className="w-full font-bold py-2.5 rounded-xl text-[12px] transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                        style={{ backgroundColor: themeColor, color: '#fff' }}
                       >
                         <Copy size={12} /> Copiar Código
                       </button>
@@ -1261,8 +1261,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
                             }
                           }}
                           disabled={!canRedeem}
-                          className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all ${canRedeem ? 'text-white active:scale-95' : 'bg-[#eeeef0] text-[#8f7065]'}`}
-                          style={canRedeem ? { backgroundColor: themeColor } : {}}
+                          className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all ${canRedeem ? 'active:scale-95' : 'bg-[#eeeef0] text-[#8f7065]'}`}
+                          style={canRedeem ? { backgroundColor: themeColor, color: '#000' } : {}}
                         >
                           {canRedeem ? 'Canjear' : `Faltan ${reward.points_cost - userPoints}`}
                         </button>

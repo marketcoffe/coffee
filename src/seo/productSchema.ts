@@ -102,7 +102,7 @@ function getAvailability(product: FoodItem): string {
   return 'https://schema.org/OutOfStock';
 }
 
-function buildCategoryPath(categoria: string, subcategoria?: string): string {
+function buildCategoryPath(categorias: string | string[], subcategoria?: string): string {
   const categoryMap: Record<string, string> = {
     'Mercado': 'Víveres y Supermercado',
     'Panaderia': 'Panadería y Pastelería',
@@ -119,7 +119,8 @@ function buildCategoryPath(categoria: string, subcategoria?: string): string {
     'Higiene': 'Víveres y Supermercado'
   };
 
-  const mainCategory = categoryMap[categoria] || categoria;
+  const cats = Array.isArray(categorias) ? categorias : [categorias];
+  const mainCategory = cats.map(c => categoryMap[c] || c).join(', ');
 
   if (subcategoria) {
     return `${mainCategory} > ${subcategoria}`;

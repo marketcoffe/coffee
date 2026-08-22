@@ -29,7 +29,7 @@ const MapaDeliverySection: React.FC<MapaDeliverySectionProps> = ({ scopeSedeId }
   const effectiveSede = lockedSede || sedeFilter || undefined;
 
   const { activeOrders, advanceStatus, advancingId } = useOrders(effectiveSede);
-  const themeColor = config.theme_color || '#0f5d34';
+  const themeColor = config.theme_color || '#A4D045';
 
   const filteredOrders = useMemo(() => {
     if (statusFilter === 'Todos') return activeOrders;

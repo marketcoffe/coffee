@@ -40,7 +40,7 @@ export const Navigation: React.FC<NavigationProps> = ({
 }) => {
   const { cart, config, currentUser, logoutUser, isDarkMode, toggleDarkMode } = useApp();
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const themeColor = config.theme_color || '#FF6B35';
+  const themeColor = config.theme_color || '#A4D045';
   const categories = config.categories || [];
   const subcategories = config.subcategories || {};
 
@@ -81,9 +81,9 @@ export const Navigation: React.FC<NavigationProps> = ({
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#e4beb1]/20 transition-colors cursor-pointer active:scale-95"
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 transition-colors cursor-pointer active:scale-95"
               aria-label="Abrir menú de categorías"
-              style={{ color: 'white' }}
+              style={{ color: '#000' }}
             >
               <Menu size={22} strokeWidth={1.8} />
             </button>
@@ -98,7 +98,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               ) : (
                 <h1
                   className="text-xl font-extrabold tracking-tighter"
-                  style={{ color: 'white', fontFamily: 'Plus Jakarta Sans, sans-serif' }}
+                  style={{ color: '#000', fontFamily: 'Plus Jakarta Sans, sans-serif' }}
                 >
                   {config.site_nombre || 'Market Coffee Sweet'}
                 </h1>
@@ -121,10 +121,10 @@ export const Navigation: React.FC<NavigationProps> = ({
                   onClick={() => setTab(link.tab)}
                   className={`px-5 py-2 text-[13px] font-semibold tracking-wide rounded-full transition-all cursor-pointer focus:outline-none ${
                     isActive
-                      ? 'text-white shadow-md'
+                      ? 'text-black shadow-md'
                       : 'hover:opacity-80'
                   }`}
-                  style={isActive ? { backgroundColor: 'rgba(255,255,255,0.25)', color: 'white' } : { color: 'rgba(255,255,255,0.85)' }}
+                  style={isActive ? { backgroundColor: 'rgba(0,0,0,0.1)', color: '#000' } : { color: 'rgba(0,0,0,0.7)' }}
                   aria-current={isActive ? 'page' : undefined}
                 >
                   {link.label}
@@ -138,10 +138,10 @@ export const Navigation: React.FC<NavigationProps> = ({
             <button
               type="button"
               onClick={toggleDarkMode}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors cursor-pointer"
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 transition-colors cursor-pointer"
               aria-label={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
             >
-              {isDarkMode ? <Sun size={20} className="text-amber-300" /> : <Moon size={20} className="text-white" />}
+              {isDarkMode ? <Sun size={20} className="text-amber-300" /> : <Moon size={20} className="text-black" />}
             </button>
 
             {currentUser ? (
@@ -149,7 +149,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                 <button
                   type="button"
                   onClick={() => setTab('profile')}
-                  className="text-[13px] font-semibold tracking-wide text-white/90 hover:text-white transition-colors cursor-pointer rounded-full px-3 py-1.5"
+                  className="text-[13px] font-semibold tracking-wide text-black/80 hover:text-black transition-colors cursor-pointer rounded-full px-3 py-1.5"
                 >
                   HOLA, {currentUser.nombre.split(' ')[0].toUpperCase()}
                 </button>
@@ -158,7 +158,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               <button
                 type="button"
                 onClick={() => setTab('profile')}
-                className="text-[13px] font-semibold tracking-wide text-white/90 hover:text-white transition-colors cursor-pointer rounded-full px-3 py-1.5"
+                className="text-[13px] font-semibold tracking-wide text-black/80 hover:text-black transition-colors cursor-pointer rounded-full px-3 py-1.5"
               >
                 INICIAR SESIÓN
               </button>
@@ -167,14 +167,14 @@ export const Navigation: React.FC<NavigationProps> = ({
             <button
               type="button"
               onClick={() => setTab('checkout')}
-              className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors cursor-pointer"
+              className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 transition-colors cursor-pointer"
               aria-label={`Carrito de compras, ${cartCount} artículos`}
             >
-              <ShoppingCart size={22} style={{ color: 'white' }} strokeWidth={1.5} />
+              <ShoppingCart size={22} style={{ color: '#000' }} strokeWidth={1.5} />
               {cartCount > 0 && (
                 <span
-                  className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 leading-none"
-                  style={{ backgroundColor: themeColor }}
+                  className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold px-1 leading-none"
+                  style={{ backgroundColor: themeColor, color: '#fff' }}
                   aria-hidden="true"
                 >
                   {cartCount}
@@ -376,9 +376,9 @@ export const Navigation: React.FC<NavigationProps> = ({
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#e4beb1]/20 transition-colors cursor-pointer active:scale-95"
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 transition-colors cursor-pointer active:scale-95"
             aria-label="Abrir menú"
-            style={{ color: 'white' }}
+            style={{ color: '#000' }}
           >
             <Menu size={22} strokeWidth={1.8} />
           </button>
@@ -393,7 +393,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               ) : (
                 <h1
                   className="text-lg font-extrabold tracking-tighter"
-                  style={{ color: 'white', fontFamily: 'Plus Jakarta Sans, sans-serif' }}
+                  style={{ color: '#000', fontFamily: 'Plus Jakarta Sans, sans-serif' }}
                 >
                   {config.site_nombre || 'Market Coffee Sweet'}
                 </h1>
@@ -405,22 +405,22 @@ export const Navigation: React.FC<NavigationProps> = ({
           <button
             type="button"
             onClick={toggleDarkMode}
-            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#e4beb1]/20 dark:hover:bg-white/10 transition-colors cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-black/10 transition-colors cursor-pointer"
             aria-label={isDarkMode ? 'Modo claro' : 'Modo oscuro'}
           >
-            {isDarkMode ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-[#5b4137]" />}
+            {isDarkMode ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-black" />}
           </button>
           <button
             type="button"
             onClick={() => setTab('checkout')}
-            className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#e4beb1]/20 transition-colors cursor-pointer"
+            className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 transition-colors cursor-pointer"
             aria-label={`Carrito de compras, ${cartCount} artículos`}
           >
-            <ShoppingCart size={22} style={{ color: isDarkMode ? '#e8e8f0' : '#1a1c1d' }} strokeWidth={1.5} />
+            <ShoppingCart size={22} style={{ color: isDarkMode ? '#000' : '#000' }} strokeWidth={1.5} />
             {cartCount > 0 && (
               <span
-                className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 leading-none"
-                style={{ backgroundColor: themeColor }}
+                className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold px-1 leading-none"
+                style={{ backgroundColor: themeColor, color: '#fff' }}
               >
                 {cartCount}
               </span>

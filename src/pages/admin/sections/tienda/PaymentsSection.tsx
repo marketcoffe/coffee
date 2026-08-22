@@ -3,7 +3,7 @@ import { useApp } from '../../../../store/AppContext';
 
 const PaymentsSection: React.FC = () => {
   const { config, updateConfig } = useApp();
-  const themeColor = config.theme_color || '#007AFF';
+  const themeColor = config.theme_color || '#A4D045';
 
   const paymentMethods = [
     { key: 'pagomovil_enabled', label: 'Pago Movil Bs', dataKey: 'pagomovil_data', discKey: 'pagomovil_discount_percent', placeholder: 'Banco, telefono, cedula...' },

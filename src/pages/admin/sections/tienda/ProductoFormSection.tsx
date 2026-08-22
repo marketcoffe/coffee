@@ -8,6 +8,7 @@ import {
   Tag, Palette, List, Link2, Clock, AlertTriangle, ChevronDown, ChevronUp,
   Upload
 } from 'lucide-react';
+import { toArray } from '../../../../utils/categoryUtils';
 
 interface ProductoFormSectionProps {
   product: FoodItem | null;
@@ -23,14 +24,14 @@ const ALLERGEN_OPTIONS = [
 const ProductoFormSection: React.FC<ProductoFormSectionProps> = ({ product, onSave, onClose }) => {
   const { config, foodItems } = useApp();
   const { showToast } = useToast();
-  const themeColor = config.theme_color || '#007AFF';
+  const themeColor = config.theme_color || '#A4D045';
   const isEditing = !!product;
 
   // ── Form State ──
   const [nombre, setNombre] = useState(product?.nombre || '');
   const [descripcionCorta, setDescripcionCorta] = useState(product?.descripcion || '');
   const [descripcionCompleta, setDescripcionCompleta] = useState((product as any)?.descripcion_completa || '');
-  const [categoria, setCategoria] = useState(product?.categoria || '');
+  const [categoria, setCategoria] = useState<string[]>(toArray(product?.categoria));
   const [subcategoria, setSubcategoria] = useState(product?.subcategoria || '');
   const [precioUsd, setPrecioUsd] = useState(product?.precio_usd || 0);
   const [precioAnterior, setPrecioAnterior] = useState(product?.precio_anterior_usd || 0);
@@ -141,7 +142,7 @@ const ProductoFormSection: React.FC<ProductoFormSectionProps> = ({ product, onSa
   // ── Submit ──
   const handleSubmit = async () => {
     if (!nombre.trim()) { showToast('error', 'El nombre es obligatorio'); return; }
-    if (!categoria.trim()) { showToast('error', 'La categoría es obligatoria'); return; }
+    if (!categoria.length) { showToast('error', 'Seleccioná al menos una categoría'); return; }
     if (precioUsd <= 0) { showToast('error', 'El precio debe ser mayor a 0'); return; }
 
     setSaving(true);
@@ -149,7 +150,7 @@ const ProductoFormSection: React.FC<ProductoFormSectionProps> = ({ product, onSa
       const productData: Partial<FoodItem> = {
         nombre: nombre.trim(),
         descripcion: descripcionCorta.trim(),
-        categoria: categoria.trim(),
+        categoria: categoria,
         subcategoria: subcategoria || undefined,
         precio_usd: precioUsd,
         precio_anterior_usd: esPromo && precioAnterior > 0 ? precioAnterior : undefined,
@@ -227,21 +228,25 @@ const ProductoFormSection: React.FC<ProductoFormSectionProps> = ({ product, onSa
               <label className="text-[10px] font-bold text-slate-500 uppercase">Descripción Completa</label>
               <textarea value={descripcionCompleta} onChange={(e) => setDescripcionCompleta(e.target.value)} rows={3} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-slate-400 resize-none" placeholder="Descripción detallada del producto" />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-[10px] font-bold text-slate-500 uppercase">Categoría *</label>
-                <select value={categoria} onChange={(e) => { setCategoria(e.target.value); setSubcategoria(''); }} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-sm cursor-pointer">
-                  <option value="">Seleccionar...</option>
-                  {categories.map((c: string) => <option key={c} value={c}>{c}</option>)}
-                </select>
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 uppercase">Categorías *</label>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {categories.map((c: string) => (
+                  <label key={c} className={`text-xs px-2 py-1 rounded-lg border cursor-pointer transition-all ${categoria.includes(c) ? 'border-current font-bold' : 'border-slate-200 hover:border-slate-300'}`}
+                    style={categoria.includes(c) ? { backgroundColor: themeColor + '15', color: themeColor, borderColor: themeColor } : {}}>
+                    <input type="checkbox" className="hidden" checked={categoria.includes(c)}
+                      onChange={() => setCategoria(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c])} />
+                    {c}
+                  </label>
+                ))}
               </div>
-              <div>
-                <label className="text-[10px] font-bold text-slate-500 uppercase">Subcategoría</label>
-                <select value={subcategoria} onChange={(e) => setSubcategoria(e.target.value)} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-sm cursor-pointer" disabled={!categoria || !(subcategories as any)[categoria]?.length}>
-                  <option value="">Ninguna</option>
-                  {((subcategories as any)[categoria] || []).map((s: string) => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 uppercase">Subcategoría</label>
+              <select value={subcategoria} onChange={(e) => setSubcategoria(e.target.value)} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-sm cursor-pointer" disabled={!categoria.length}>
+                <option value="">Ninguna</option>
+                {categoria.flatMap((cat: string) => ((subcategories as any)[cat] || []).map((s: string) => <option key={`${cat}-${s}`} value={s}>{s}</option>))}
+              </select>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>

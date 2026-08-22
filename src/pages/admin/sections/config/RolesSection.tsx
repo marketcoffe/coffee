@@ -17,7 +17,7 @@ interface OperatorRecord {
 const RolesSection: React.FC = () => {
   const { config } = useApp();
   const { showToast } = useToast();
-  const themeColor = config.theme_color || '#007AFF';
+  const themeColor = config.theme_color || '#A4D045';
   const activeSedes = config.sedes?.filter(s => s.activa) || [];
 
   const [operators, setOperators] = useState<OperatorRecord[]>([]);

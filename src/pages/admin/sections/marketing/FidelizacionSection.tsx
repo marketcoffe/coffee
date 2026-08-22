@@ -14,7 +14,7 @@ const FidelizacionSection: React.FC = () => {
   } = useApp();
 
   const loyalty = config.loyalty;
-  const themeColor = config.theme_color || '#007AFF';
+  const themeColor = config.theme_color || '#A4D045';
 
   const [activeTab, setActiveTab] = useState<'dashboard' | 'rewards' | 'tiers' | 'history' | 'adjust'>('dashboard');
   const [searchPhone, setSearchPhone] = useState('');

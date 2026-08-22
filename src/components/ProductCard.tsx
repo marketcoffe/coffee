@@ -27,7 +27,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const [isAnimatingHeart, setIsAnimatingHeart] = useState(false);
   const [showAddedToast, setShowAddedToast] = useState(false);
   const isAgotado = item.stock <= 0;
-  const themeColor = config.theme_color || '#FF6B35';
+  const themeColor = config.theme_color || '#A4D045';
   const isLowStock = item.stock > 0 && item.stock < (config.stock_alert_threshold || 5);
   const hasPromoEnd = item.promo_end_date && new Date(item.promo_end_date) > new Date();
   const isFav = isFavorite(item.id);

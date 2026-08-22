@@ -5,7 +5,7 @@ import { Smartphone } from 'lucide-react';
 
 const PWASection: React.FC = () => {
   const { config, updateConfig } = useApp();
-  const themeColor = config.theme_color || '#FF6B35';
+  const themeColor = config.theme_color || '#A4D045';
 
   const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <p className="admin-label mb-3">{children}</p>
@@ -52,10 +52,10 @@ const PWASection: React.FC = () => {
           Color de fondo del splash screen, barra de navegacion y pantalla de inicio.
         </p>
         <div className="flex items-center gap-3">
-          <input type="color" value={config.theme_color || '#FF6B35'}
+          <input type="color" value={config.theme_color || '#A4D045'}
             onChange={e => updateConfig({ theme_color: e.target.value })}
             className="w-12 h-12 rounded-xl cursor-pointer" style={{ border: 'none', padding: 0 }} />
-          <input type="text" value={config.theme_color || '#FF6B35'}
+          <input type="text" value={config.theme_color || '#A4D045'}
             onChange={e => updateConfig({ theme_color: e.target.value })}
             className="admin-input flex-1 font-mono" />
         </div>
@@ -63,7 +63,7 @@ const PWASection: React.FC = () => {
 
       <div className="admin-card p-4">
         <SectionTitle>Vista Previa: Splash Screen</SectionTitle>
-        <div className="rounded-2xl overflow-hidden mx-auto shadow-lg" style={{ width: 220, background: config.theme_color || '#FF6B35' }}>
+        <div className="rounded-2xl overflow-hidden mx-auto shadow-lg" style={{ width: 220, background: config.theme_color || '#A4D045' }}>
           <div className="flex flex-col items-center justify-center py-8 px-4">
             {config.splash_logo_url || config.pwa_icon_url || config.logo_url ? (
               <img src={config.splash_logo_url || config.pwa_icon_url || config.logo_url} alt="Splash Logo"
@@ -90,13 +90,13 @@ const PWASection: React.FC = () => {
             <div className="h-5 flex items-center justify-end px-3" style={{ background: '#333' }}>
               <span className="text-[7px] text-white/70 font-semibold">9:41</span>
             </div>
-            <div className="grid grid-cols-4 gap-3 p-4" style={{ background: `linear-gradient(180deg, ${config.theme_color || '#FF6B35'}30 0%, #f0f0f0 40%)` }}>
+            <div className="grid grid-cols-4 gap-3 p-4" style={{ background: `linear-gradient(180deg, ${config.theme_color || '#A4D045'}30 0%, #f0f0f0 40%)` }}>
               {[0, 1, 2, 3].map(i => (
                 <div key={i} className="flex flex-col items-center gap-1">
                   {i === 0 ? (
                     <>
                       <div className="w-11 h-11 rounded-[10px] flex items-center justify-center overflow-hidden shadow-md"
-                        style={{ background: config.theme_color || '#FF6B35' }}>
+                        style={{ background: config.theme_color || '#A4D045' }}>
                         {(config.pwa_icon_url || config.logo_url) ? (
                           <img src={config.pwa_icon_url || config.logo_url} alt="" className="w-full h-full object-contain" />
                         ) : (

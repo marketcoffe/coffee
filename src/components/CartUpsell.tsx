@@ -2,6 +2,7 @@ import React from 'react';
 import { useApp } from '../store/AppContext';
 import { FoodItem } from '../types/store';
 import { Plus } from 'lucide-react';
+import { categoryIncludes } from '../utils/categoryUtils';
 
 interface CartUpsellProps {
   onAddToCart: (item: FoodItem) => void;
@@ -12,15 +13,15 @@ export const CartUpsell: React.FC<CartUpsellProps> = ({ onAddToCart }) => {
 
   if (cart.length === 0) return null;
 
-  const themeColor = config.theme_color || '#0f5d34';
+  const themeColor = config.theme_color || '#A4D045';
 
   const cartItemIds = new Set(cart.map(ci => ci.item.id));
 
-  const hasBebidas = cart.some(ci => ci.item.categoria.toLowerCase().includes('bebida') || ci.item.categoria.toLowerCase().includes('drink'));
-  const hasPostres = cart.some(ci => ci.item.categoria.toLowerCase().includes('postre') || ci.item.categoria.toLowerCase().includes('dessert'));
-  const hasPapas = cart.some(ci => ci.item.categoria.toLowerCase().includes('papa') || ci.item.categoria.toLowerCase().includes('fries'));
+  const hasBebidas = cart.some(ci => categoryIncludes(ci.item, 'bebida') || categoryIncludes(ci.item, 'drink'));
+  const hasPostres = cart.some(ci => categoryIncludes(ci.item, 'postre') || categoryIncludes(ci.item, 'dessert'));
+  const hasPapas = cart.some(ci => categoryIncludes(ci.item, 'papa') || categoryIncludes(ci.item, 'fries'));
 
-  const isBurgerCategory = (cat: string) => cat.toLowerCase().includes('hamburguesa') || cat.toLowerCase().includes('burger');
+  const isBurgerCategory = (item: FoodItem) => categoryIncludes(item, 'hamburguesa') || categoryIncludes(item, 'burger');
 
   const suggestions: { items: FoodItem[]; message: string }[] = [];
 
@@ -28,7 +29,7 @@ export const CartUpsell: React.FC<CartUpsellProps> = ({ onAddToCart }) => {
     const bebidas = foodItems.filter(f =>
       f.activo !== false &&
       !cartItemIds.has(f.id) &&
-      (f.categoria.toLowerCase().includes('bebida') || f.categoria.toLowerCase().includes('drink')) &&
+      (categoryIncludes(f, 'bebida') || categoryIncludes(f, 'drink')) &&
       f.stock > 0
     ).slice(0, 2);
     if (bebidas.length > 0) {
@@ -40,7 +41,7 @@ export const CartUpsell: React.FC<CartUpsellProps> = ({ onAddToCart }) => {
     const postres = foodItems.filter(f =>
       f.activo !== false &&
       !cartItemIds.has(f.id) &&
-      (f.categoria.toLowerCase().includes('postre') || f.categoria.toLowerCase().includes('dessert')) &&
+      (categoryIncludes(f, 'postre') || categoryIncludes(f, 'dessert')) &&
       f.stock > 0
     ).slice(0, 2);
     if (postres.length > 0) {
@@ -48,11 +49,11 @@ export const CartUpsell: React.FC<CartUpsellProps> = ({ onAddToCart }) => {
     }
   }
 
-  if (!hasPapas && cart.some(ci => isBurgerCategory(ci.item.categoria))) {
+  if (!hasPapas && cart.some(ci => isBurgerCategory(ci.item))) {
     const papas = foodItems.filter(f =>
       f.activo !== false &&
       !cartItemIds.has(f.id) &&
-      (f.categoria.toLowerCase().includes('papa') || f.categoria.toLowerCase().includes('fries') || f.categoria.toLowerCase().includes('acompañamiento')) &&
+      (categoryIncludes(f, 'papa') || categoryIncludes(f, 'fries') || categoryIncludes(f, 'acompañamiento')) &&
       f.stock > 0
     ).slice(0, 2);
     if (papas.length > 0) {

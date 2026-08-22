@@ -10,7 +10,7 @@ interface BottomNavProps {
 export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setTab }) => {
   const { cart, config, isDarkMode } = useApp();
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const themeColor = config.theme_color || '#FF6B35';
+  const themeColor = config.theme_color || '#A4D045';
 
   const tabs = [
     { id: 'home' as const, label: 'Home', icon: Home },
@@ -51,7 +51,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setTab }) => {
               onClick={handleTabClick}
               className="flex flex-col items-center justify-center gap-0.5 w-14 h-full cursor-pointer relative transition-transform duration-200 active:scale-90"
               style={{
-                color: isActive ? themeColor : (isDarkMode ? 'rgba(160, 160, 184, 0.6)' : 'rgba(91, 65, 55, 0.6)'),
+                color: isActive ? '#000000' : (isDarkMode ? 'rgba(160, 160, 184, 0.6)' : 'rgba(91, 65, 55, 0.6)'),
               }}
             >
               <div className="relative">
@@ -60,14 +60,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setTab }) => {
                   strokeWidth={isActive ? 2.2 : 1.5}
                   className="transition-all duration-200"
                   style={{
-                    color: isActive ? themeColor : (isDarkMode ? 'rgba(160, 160, 184, 0.6)' : 'rgba(91, 65, 55, 0.6)'),
+                    color: isActive ? '#000000' : (isDarkMode ? 'rgba(160, 160, 184, 0.6)' : 'rgba(91, 65, 55, 0.6)'),
                   }}
                   fill={isActive ? themeColor : 'none'}
                 />
                 {tabItem.badge !== undefined && tabItem.badge > 0 && (
                   <span
-                    className="absolute -top-1.5 -right-2 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-[9px] font-bold px-1 leading-none text-white"
-                    style={{ backgroundColor: themeColor }}
+                    className="absolute -top-1.5 -right-2 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-[9px] font-bold px-1 leading-none"
+                    style={{ backgroundColor: themeColor, color: '#ffffff' }}
                   >
                     {tabItem.badge > 99 ? '99+' : tabItem.badge}
                   </span>
@@ -76,7 +76,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setTab }) => {
               <span
                 className="text-[10px] mt-0.5 transition-colors duration-200"
                 style={{
-                  color: isActive ? themeColor : (isDarkMode ? 'rgba(160, 160, 184, 0.6)' : 'rgba(91, 65, 55, 0.6)'),
+                  color: isActive ? '#000000' : (isDarkMode ? 'rgba(160, 160, 184, 0.6)' : 'rgba(91, 65, 55, 0.6)'),
                   fontWeight: isActive ? 600 : 400,
                 }}
               >

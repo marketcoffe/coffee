@@ -5,7 +5,7 @@ import { Users, Search, Mail, Download, ShoppingCart, MessageCircle, Phone } fro
 
 const ClientesSection: React.FC = () => {
   const { users, orders, config, addNotification } = useApp();
-  const themeColor = config.theme_color || '#E31837';
+  const themeColor = config.theme_color || '#A4D045';
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showMsgModal, setShowMsgModal] = useState<string | null>(null);

@@ -9,7 +9,7 @@ interface SplashScreenProps {
 export const SplashScreen: React.FC<SplashScreenProps> = ({ config, onComplete }) => {
   const [phase, setPhase] = useState<'init' | 'logo' | 'text' | 'fade'>('init');
 
-  const themeColor = config.theme_color || '#FF6B35';
+  const themeColor = config.theme_color || '#A4D045';
   const logoUrl = config.splash_logo_url || config.pwa_icon_url || config.logo_url || '/logo.png';
   const siteName = config.site_nombre || 'Market Coffee Sweet';
   const welcomeMsg = config.mensaje_bienvenida || 'La mejor comida con delivery express.';
@@ -119,15 +119,16 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ config, onComplete }
         }}
       >
         <h1
-          className="text-white text-2xl sm:text-3xl font-extrabold tracking-tight"
+          className="text-2xl sm:text-3xl font-extrabold tracking-tight"
           style={{
             fontFamily: 'Plus Jakarta Sans, sans-serif',
-            textShadow: '0 2px 12px rgba(0,0,0,0.2)',
+            color: '#000',
+            textShadow: '0 2px 12px rgba(255,255,255,0.3)',
           }}
         >
           {siteName}
         </h1>
-        <p className="text-white/75 text-xs sm:text-sm leading-relaxed max-w-[260px]">
+        <p className="text-xs sm:text-sm leading-relaxed max-w-[260px]" style={{ color: 'rgba(0,0,0,0.6)' }}>
           {welcomeMsg}
         </p>
       </div>

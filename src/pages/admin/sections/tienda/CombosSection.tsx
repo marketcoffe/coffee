@@ -3,6 +3,7 @@ import { useApp } from '../../../../store/AppContext';
 import { useToast } from '../../../../components/Toast';
 import { Package, Plus, Trash2, Edit, Check, X } from 'lucide-react';
 import { ProductCombo } from '../../../../types/store';
+import { categoryIncludes, formatCategories } from '../../../../utils/categoryUtils';
 
 const CombosSection: React.FC = () => {
   const { foodItems, config, updateConfig } = useApp();
@@ -20,7 +21,7 @@ const CombosSection: React.FC = () => {
 
   const filteredProducts = foodItems.filter(p =>
     p.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.categoria.toLowerCase().includes(searchTerm.toLowerCase())
+    categoryIncludes(p, searchTerm)
   );
 
   const startEdit = (combo?: ProductCombo) => {
@@ -166,7 +167,7 @@ const CombosSection: React.FC = () => {
                     <img src={p.imagen_urls[0]} alt="" className="w-10 h-10 rounded-lg object-cover" />
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-slate-800 truncate">{p.nombre}</p>
-                      <p className="text-[10px] text-slate-500">{p.categoria} · ${p.precio_usd.toFixed(2)}</p>
+                      <p className="text-[10px] text-slate-500">{formatCategories(p)} · ${p.precio_usd.toFixed(2)}</p>
                     </div>
                     {selectedProductIds.includes(p.id) && (
                       <Check size={16} className="text-violet-600" />

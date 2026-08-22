@@ -11,7 +11,7 @@ describe('AppContext - Lógica del Carrito', () => {
     id: 'hmb-001',
     nombre: 'Smash Clásica',
     descripcion: 'Doble smash de carne',
-    categoria: 'Hamburguesas',
+    categoria: ['Hamburguesas'],
     precio_usd: 7.5,
     stock: 30,
     imagen_urls: ['https://example.com/burger.jpg'],
@@ -198,8 +198,8 @@ describe('AppContext - Cálculo de Totales del Pedido', () => {
   };
 
   const cart: CartItem[] = [
-    { item: { id: '1', nombre: 'Burger', descripcion: '', categoria: '', precio_usd: 7.5, stock: 10, imagen_urls: [], es_promo: false, es_nuevo: false, es_mas_vendido: false }, quantity: 2 },
-    { item: { id: '2', nombre: 'Papas', descripcion: '', categoria: '', precio_usd: 3, stock: 20, imagen_urls: [], es_promo: false, es_nuevo: false, es_mas_vendido: false }, quantity: 1 },
+    { item: { id: '1', nombre: 'Burger', descripcion: '', categoria: ['Hamburguesas'], precio_usd: 7.5, stock: 10, imagen_urls: [], es_promo: false, es_nuevo: false, es_mas_vendido: false }, quantity: 2 },
+    { item: { id: '2', nombre: 'Papas', descripcion: '', categoria: ['Snacks'], precio_usd: 3, stock: 20, imagen_urls: [], es_promo: false, es_nuevo: false, es_mas_vendido: false }, quantity: 1 },
   ];
 
   it('calcula subtotal correctamente', () => {

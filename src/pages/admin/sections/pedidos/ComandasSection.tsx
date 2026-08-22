@@ -23,7 +23,7 @@ interface ComandasSectionProps { scopeSedeId?: string; }
 const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
   const { orders, config } = useApp();
   const { advanceStatus } = useOrders();
-  const themeColor = config.theme_color || '#007AFF';
+  const themeColor = config.theme_color || '#A4D045';
 
   const [viewMode, setViewMode] = useState<'kanban' | 'lista' | 'mapa'>('kanban');
   const [sedeFilter, setSedeFilter] = useState('');

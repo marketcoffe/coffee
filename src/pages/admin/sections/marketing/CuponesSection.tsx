@@ -6,7 +6,7 @@ import { useToast } from '../../../../components/Toast';
 const CuponesSection: React.FC = () => {
   const { coupons, addCoupon, updateCoupon, deleteCoupon, config } = useApp();
   const { showToast } = useToast();
-  const themeColor = config.theme_color || '#E31837';
+  const themeColor = config.theme_color || '#A4D045';
 
   const [newCouponCode, setNewCouponCode] = useState('');
   const [newCouponDiscount, setNewCouponDiscount] = useState(10);

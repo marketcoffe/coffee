@@ -6,7 +6,7 @@ import { Megaphone, Plus, Trash2, Edit3, Send, Calendar, Eye, MousePointerClick,
 
 const PromocionesSection: React.FC = () => {
   const { foodItems, updateFoodItem, addNotification, config, promotions, setPromotions } = useApp();
-  const themeColor = config.theme_color || '#E31837';
+  const themeColor = config.theme_color || '#A4D045';
 
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);

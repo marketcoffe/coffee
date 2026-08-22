@@ -126,7 +126,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   const { config, updateFoodItem, addFoodItem, userRole, adminScopeSedeId } = useApp();
   const { activeSection, setActiveSection } = useAdminStore();
   const { advanceStatus } = useOrders();
-  const themeColor = config.theme_color || '#007AFF';
+  const themeColor = config.theme_color || '#A4D045';
   const isAdmin = userRole === 'admin';
   const scopeSedeId = isAdmin ? '' : (adminScopeSedeId || '');
 

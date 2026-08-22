@@ -4,6 +4,7 @@ import { FoodItem } from '../types/store';
 import { Search, X, ChevronLeft, Menu } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
 import { ProductCard } from '../components/ProductCard';
+import { getCategories, hasCategory, categoryIncludes } from '../utils/categoryUtils';
 
 interface CatalogProps {
   selectedCategory: string;
@@ -24,7 +25,7 @@ export const Catalog: React.FC<CatalogProps> = ({
   onViewProductDetails, passedSearchTerm, clearPassedSearchTerm, resetGlobalFilters, setTab, onOpenDrawer
 }) => {
   const { foodItems, config, addToCart, isDarkMode } = useApp();
-  const themeColor = config.theme_color || '#FF6B35';
+  const themeColor = config.theme_color || '#A4D045';
   const [searchQuery, setSearchQuery] = useState('');
 
   const c = {
@@ -50,12 +51,12 @@ export const Catalog: React.FC<CatalogProps> = ({
       list = list.filter(p =>
         p.nombre.toLowerCase().includes(q) ||
         p.descripcion.toLowerCase().includes(q) ||
-        p.categoria.toLowerCase().includes(q) ||
+        categoryIncludes(p, q) ||
         (p.subcategoria || '').toLowerCase().includes(q)
       );
     }
     if (selectedCategory) {
-      list = list.filter(p => p.categoria.toLowerCase() === selectedCategory.toLowerCase());
+      list = list.filter(p => hasCategory(p, selectedCategory));
     }
     if (selectedSubcategory) {
       list = list.filter(p => (p.subcategoria || '').toLowerCase() === selectedSubcategory.toLowerCase());
@@ -133,8 +134,8 @@ export const Catalog: React.FC<CatalogProps> = ({
             <div className="flex gap-2 w-max">
               <button
                 onClick={() => resetGlobalFilters()}
-                className="shrink-0 px-4 py-2 rounded-xl text-[13px] font-semibold text-white min-h-[40px]"
-                style={{ backgroundColor: themeColor }}
+                className="shrink-0 px-4 py-2 rounded-xl text-[13px] font-semibold min-h-[40px]"
+                style={{ backgroundColor: themeColor, color: '#fff' }}
               >
                 Todos
               </button>

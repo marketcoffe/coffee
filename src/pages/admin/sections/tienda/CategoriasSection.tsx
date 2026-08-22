@@ -5,7 +5,7 @@ import ImageField from '../../components/ImageField';
 
 const CategoriasSection: React.FC = () => {
   const { config, updateConfig, addCategory, deleteCategory, updateCategory } = useApp();
-  const themeColor = config.theme_color || '#007AFF';
+  const themeColor = config.theme_color || '#A4D045';
   const [editInput, setEditInput] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);

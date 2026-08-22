@@ -5,7 +5,7 @@ import { Plus, Trash2 } from 'lucide-react';
 
 const DeliverySection: React.FC = () => {
   const { config, updateConfig } = useApp();
-  const themeColor = config.theme_color || '#007AFF';
+  const themeColor = config.theme_color || '#A4D045';
 
   const [editingZone, setEditingZone] = useState<DeliveryZone | null>(null);
   const [newZoneName, setNewZoneName] = useState('');

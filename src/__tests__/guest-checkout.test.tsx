@@ -12,7 +12,7 @@ describe('FASE 2 - Guest Checkout', () => {
         id: 'hmb-001',
         nombre: 'Smash Clásica',
         descripcion: 'Doble smash',
-        categoria: 'Hamburguesas',
+        categoria: ['Hamburguesas'],
         precio_usd: 7.5,
         stock: 30,
         imagen_urls: ['https://example.com/burger.jpg'],
@@ -132,7 +132,7 @@ describe('FASE 2 - Guest Checkout', () => {
         id: 'test-001',
         nombre: 'Test',
         descripcion: 'Test',
-        categoria: 'Test',
+        categoria: ['Test'],
         precio_usd: 5,
         stock: 10,
         imagen_urls: [],
@@ -191,23 +191,23 @@ describe('FASE 2 - Guest Checkout', () => {
 
   describe('Lógica de Upselling', () => {
     it('detecta que no hay bebidas en el carrito', () => {
-      const cartCategories = mockCartItems.map(ci => ci.item.categoria);
+      const cartCategories = mockCartItems.flatMap(ci => Array.isArray(ci.item.categoria) ? ci.item.categoria : [ci.item.categoria]);
       const hasBebidas = cartCategories.some(c => c.toLowerCase().includes('bebida'));
       expect(hasBebidas).toBe(false);
     });
 
     it('detecta que no hay postres en el carrito', () => {
-      const cartCategories = mockCartItems.map(ci => ci.item.categoria);
+      const cartCategories = mockCartItems.flatMap(ci => Array.isArray(ci.item.categoria) ? ci.item.categoria : [ci.item.categoria]);
       const hasPostres = cartCategories.some(c => c.toLowerCase().includes('postre'));
       expect(hasPostres).toBe(false);
     });
 
     it('sugiere papas cuando hay hamburguesa', () => {
       const hasBurger = mockCartItems.some(ci =>
-        ci.item.categoria.toLowerCase().includes('hamburguesa')
+        (Array.isArray(ci.item.categoria) ? ci.item.categoria : [ci.item.categoria]).some(c => c.toLowerCase().includes('hamburguesa'))
       );
       const hasPapas = mockCartItems.some(ci =>
-        ci.item.categoria.toLowerCase().includes('papa')
+        (Array.isArray(ci.item.categoria) ? ci.item.categoria : [ci.item.categoria]).some(c => c.toLowerCase().includes('papa'))
       );
       expect(hasBurger).toBe(true);
       expect(hasPapas).toBe(false);
@@ -215,8 +215,8 @@ describe('FASE 2 - Guest Checkout', () => {
 
     it('filtra items sugeridos por stock disponible', () => {
       const allItems = [
-        { ...mockCartItems[0].item, id: 'beb-001', categoria: 'Bebidas', stock: 10, activo: true },
-        { ...mockCartItems[0].item, id: 'beb-002', categoria: 'Bebidas', stock: 0, activo: true },
+        { ...mockCartItems[0].item, id: 'beb-001', categoria: ['Bebidas'], stock: 10, activo: true },
+        { ...mockCartItems[0].item, id: 'beb-002', categoria: ['Bebidas'], stock: 0, activo: true },
       ];
       const available = allItems.filter(f => f.activo !== false && f.stock > 0);
       expect(available).toHaveLength(1);

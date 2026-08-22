@@ -197,7 +197,7 @@ const SistemaSection: React.FC = () => {
           <div className="flex justify-between"><span>Productos:</span><span className="font-bold">{foodItems.length}</span></div>
           <div className="flex justify-between"><span>Cupones:</span><span className="font-bold">{coupons.length}</span></div>
           <div className="flex justify-between"><span>Sucursales:</span><span className="font-bold">{config.sedes?.length || 0}</span></div>
-          <div className="flex justify-between"><span>Tema:</span><span className="font-bold" style={{ color: config.theme_color }}>{config.theme_color || '#007AFF'}</span></div>
+          <div className="flex justify-between"><span>Tema:</span><span className="font-bold" style={{ color: config.theme_color }}>{config.theme_color || '#A4D045'}</span></div>
           <div className="flex justify-between"><span>Version:</span><span className="font-bold">1.0.0</span></div>
         </div>
       </div>

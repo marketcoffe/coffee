@@ -307,7 +307,7 @@ function AppContent() {
               navigateToCatalog={navigateToCatalog}
             />
             <div className={tab === 'catalog' ? 'lg:h-16' : 'h-14 lg:h-16'} />
-            <FreeDeliveryBar currentTotal={cart.reduce((sum, item) => sum + item.item.precio_usd * item.quantity, 0)} threshold={config.delivery_gratis_threshold || 0} themeColor={config.theme_color || '#FF2D95'} />
+            <FreeDeliveryBar currentTotal={cart.reduce((sum, item) => sum + item.item.precio_usd * item.quantity, 0)} threshold={config.delivery_gratis_threshold || 0} themeColor={config.theme_color || '#A4D045'} />
           </>
         )}
 

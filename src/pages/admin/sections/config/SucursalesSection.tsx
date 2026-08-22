@@ -8,7 +8,7 @@ import { useToast } from '../../../../components/Toast';
 const SucursalesSection: React.FC = () => {
   const { config, updateConfig } = useApp();
   const { showToast } = useToast();
-  const themeColor = config.theme_color || '#007AFF';
+  const themeColor = config.theme_color || '#A4D045';
 
   const [sedeForm, setSedeForm] = useState({ nombre: '', telefono: '', whatsapp_numero: '', direccion: '', horario: '', lat: 0, lng: 0 });
   const [editingSedeId, setEditingSedeId] = useState<string | null>(null);

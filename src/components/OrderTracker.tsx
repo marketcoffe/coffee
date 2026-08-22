@@ -35,7 +35,7 @@ const AD_INTERVAL = 6000;
 
 export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onContinueShopping }) => {
   const { config, foodItems } = useApp();
-  const themeColor = config.theme_color || '#E31837';
+  const themeColor = config.theme_color || '#A4D045';
   const [currentMsgIdx, setCurrentMsgIdx] = useState(0);
   const [adIdx, setAdIdx] = useState(0);
 

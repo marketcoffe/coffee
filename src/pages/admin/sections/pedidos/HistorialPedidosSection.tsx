@@ -32,7 +32,7 @@ const HistorialPedidosSection: React.FC<HistorialPedidosSectionProps> = ({ scope
 
   const { showToast } = useToast();
   const { completedOrders, cancelledOrders } = useOrders(effectiveSede);
-  const themeColor = config.theme_color || '#0f5d34';
+  const themeColor = config.theme_color || '#A4D045';
 
   const allHistoryOrders = useMemo(() => {
     return [...completedOrders, ...cancelledOrders].sort(

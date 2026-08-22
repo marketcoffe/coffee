@@ -5,7 +5,7 @@ import { Send, MessageSquare, MessageCircle, Trash2, User, Bell, Upload, Package
 
 const MensajesSection: React.FC = () => {
   const { notifications, addNotification, deleteNotification, foodItems, config } = useApp();
-  const themeColor = config.theme_color || '#E31837';
+  const themeColor = config.theme_color || '#A4D045';
 
   const [activeChatPhone, setActiveChatPhone] = useState<string | null>(null);
   const [replyMessage, setReplyMessage] = useState('');

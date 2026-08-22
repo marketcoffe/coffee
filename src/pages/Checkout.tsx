@@ -509,7 +509,7 @@ ${productosDetailText}
     );
   }
 
-  const themeColor = config.theme_color || '#E31837';
+  const themeColor = config.theme_color || '#A4D045';
   const stepCompleted = (s: number) => s < currentStep;
   const stepActive = (s: number) => s === currentStep;
   const selectedSede = activeSedes.find(s => s.id === selectedSedeId) || activeSedes[0];
@@ -592,7 +592,7 @@ ${productosDetailText}
                   <ListOrdered size={36} className="text-[#8f7065] mb-2 mx-auto" />
                   <p className="text-sm font-bold text-[#1a1c1d]">Tu carrito está vacío</p>
                   <p className="text-xs text-[#8f7065] mt-1">Agrega productos para continuar.</p>
-                  <button onClick={() => setTab('catalog')} className="mt-4 text-white text-xs font-bold px-5 py-2.5 rounded-xl" style={{ backgroundColor: themeColor }}>
+                  <button onClick={() => setTab('catalog')} className="mt-4 text-xs font-bold px-5 py-2.5 rounded-xl" style={{ backgroundColor: themeColor, color: '#fff' }}>
                     Explorar Menú
                   </button>
                 </div>
@@ -853,7 +853,7 @@ ${productosDetailText}
                     <label className="text-[11px] font-bold uppercase text-[#8f7065] mb-2 block">Cupón</label>
                     <div className="flex gap-2">
                       <input type="text" value={couponInput} onChange={(e) => setCouponInput(e.target.value)} placeholder="CÓDIGO" className="flex-1 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl px-3 py-2.5 text-xs outline-none focus:border-[var(--theme-color,#FF6B35)] font-bold uppercase" />
-                      <button onClick={handleApplyCoupon} className="text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:opacity-90 transition-colors" style={{ backgroundColor: themeColor }}>Aplicar</button>
+                      <button onClick={handleApplyCoupon} className="px-4 py-2.5 rounded-xl text-xs font-bold hover:opacity-90 transition-colors" style={{ backgroundColor: themeColor, color: '#fff' }}>Aplicar</button>
                     </div>
                     {couponError && <span className="text-[11px] text-red-500 mt-1 block">{couponError}</span>}
                     {appliedCoupon && (
@@ -1143,11 +1143,11 @@ ${productosDetailText}
           )}
 
           {currentStep < 3 ? (
-            <button onClick={handleNextStep} className="w-full py-3.5 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: themeColor }}>
+            <button onClick={handleNextStep} className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: themeColor, color: '#fff' }}>
               Continuar <ArrowRight size={16} />
             </button>
           ) : (
-            <button onClick={handleFormSubmit} disabled={isProcessing} className={`w-full py-3.5 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : themeColor }}>
+            <button onClick={handleFormSubmit} disabled={isProcessing} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : themeColor, color: '#000' }}>
               {isProcessing ? 'Procesando...' : 'Confirmar Pedido'}
             </button>
           )}

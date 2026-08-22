@@ -3,11 +3,12 @@ import { useApp } from '../../../../store/AppContext';
 import { useToast } from '../../../../components/Toast';
 import { FlashSale } from '../../../../types/store';
 import { Plus, Trash2, Edit, Check, X, Zap } from 'lucide-react';
+import { categoryIncludes, formatCategories } from '../../../../utils/categoryUtils';
 
 const OfertasSection: React.FC = () => {
   const { flashSales, foodItems, updateFlashSales, config } = useApp();
   const { showToast } = useToast();
-  const themeColor = config.theme_color || '#FF9500';
+  const themeColor = config.theme_color || '#A4D045';
   const [isEditing, setIsEditing] = useState(false);
   const [editingSale, setEditingSale] = useState<FlashSale | null>(null);
   const [selectedProductId, setSelectedProductId] = useState('');
@@ -19,7 +20,7 @@ const OfertasSection: React.FC = () => {
 
   const filteredProducts = foodItems.filter(p =>
     p.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.categoria.toLowerCase().includes(searchTerm.toLowerCase())
+    categoryIncludes(p, searchTerm)
   );
 
   const startEdit = (sale?: FlashSale) => {
@@ -143,7 +144,7 @@ const OfertasSection: React.FC = () => {
                     )}
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold truncate" style={{ color: 'var(--ios-text)' }}>{p.nombre}</p>
-                      <p className="text-[10px]" style={{ color: 'var(--ios-text-secondary)' }}>{p.categoria} · ${p.precio_usd.toFixed(2)}</p>
+                      <p className="text-[10px]" style={{ color: 'var(--ios-text-secondary)' }}>{formatCategories(p)} · ${p.precio_usd.toFixed(2)}</p>
                     </div>
                     {selectedProductId === p.id && (
                       <Check size={16} style={{ color: themeColor }} />
