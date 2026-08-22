@@ -712,6 +712,40 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             });
           }
         })
+        // Escuchar cambios de estado vía BROADCAST (Ultra Rápido, <100ms)
+        .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
+          const updatedOrder = payload.payload;
+          if (!updatedOrder?.id) return;
+
+          setOrders(prev =>
+            prev.map(o =>
+              o.id === updatedOrder.id
+                ? { ...o, status: updatedOrder.status, tiempo_estimado_entrega: updatedOrder.tiempo_estimado_entrega }
+                : o
+            )
+          );
+
+          playNotificationSound('update', updatedOrder.status);
+
+          const cu = currentUserRef.current;
+          if (cu && updatedOrder.cliente_telefono === cu.telefono) {
+            if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+              const tiempo = updatedOrder.tiempo_estimado_entrega || '';
+              navigator.serviceWorker.ready.then(reg => {
+                reg.showNotification(`${config.site_nombre || 'App'}: Actualización de Pedido`, {
+                  body: `Tu pedido ${updatedOrder.id} ahora está: ${updatedOrder.status}${tiempo ? `\nTiempo estimado: ${tiempo}` : ''}`,
+                  icon: '/icon.png',
+                  badge: '/icon.png',
+                  tag: `order-update-${updatedOrder.id}`,
+                  renotify: true,
+                  vibrate: [200, 100, 200],
+                  requireInteraction: true,
+                  data: { url: '/' }
+                } as NotificationOptions);
+              });
+            }
+          }
+        })
         // Escuchar Notificaciones (CDC)
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (payload: Record<string, unknown>) => {
           const newNotif = payload.new as InAppNotification;
@@ -1737,10 +1771,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     if (estimatedTime) statusMsg += ` Tiempo estimado de entrega: ${estimatedTime}.`;
 
+    // Enviar notificación (await para garantizar que se inserta antes del update)
     if (targetPhone) {
-      addNotification('Estado de Pedido Actualizado', statusMsg, 'personal', targetPhone);
+      await addNotification('Estado de Pedido Actualizado', statusMsg, 'personal', targetPhone);
     } else {
-      addNotification('Estado de Pedido Actualizado', statusMsg, 'todos');
+      await addNotification('Estado de Pedido Actualizado', statusMsg, 'todos');
     }
 
     const { error } = await supabase.from('orders')
@@ -1751,6 +1786,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       console.error('Update order status error:', error);
       if (prevOrder) {
         setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...prevOrder } : o));
+      }
+    } else {
+      // Broadcast instantáneo para que el cliente reciba el cambio en <100ms
+      try {
+        const updatedOrder = { ...prevOrder, ...updatePayload } as Order;
+        supabase.channel('marketo_realtime_system').send({
+          type: 'broadcast',
+          event: 'order_status_broadcast',
+          payload: updatedOrder
+        });
+      } catch (e) {
+        console.warn('Broadcast status update failed:', e);
       }
     }
   };
