@@ -545,14 +545,14 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
               <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3.5 text-sm">
                 <div className="flex flex-col gap-1.5">
                   <label className="font-bold text-[#5b4137] flex items-center gap-1.5 uppercase font-mono text-[10px] tracking-wider">
-                    <User size={11} style={{ color: themeColor }} /> Usuario
+                    <User size={11} style={{ color: themeColor }} /> Email o Usuario
                   </label>
                   <input
                     type="text"
                     required
                     value={logPhone}
                     onChange={(e) => setLogPhone(e.target.value)}
-                    placeholder="Tu nombre de usuario"
+                    placeholder="tu@correo.com o nombre de usuario"
                     className="bg-[#f9f9fb] px-3 py-2.5 border border-[#e4beb1]/10 rounded-xl outline-none focus:border-[var(--theme-color,#FF6B35)] text-sm"
                   />
                 </div>

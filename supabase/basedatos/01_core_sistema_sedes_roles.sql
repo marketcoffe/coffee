@@ -185,6 +185,18 @@ CREATE TABLE IF NOT EXISTS admin_users (
 
 CREATE INDEX IF NOT EXISTS idx_admin_users_email ON admin_users(email);
 CREATE INDEX IF NOT EXISTS idx_admin_users_role ON admin_users(role);
+
+-- Migración: Agregar sede_id si no existe (para tablas pre-existentes)
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'admin_users' AND column_name = 'sede_id'
+    ) THEN
+        ALTER TABLE admin_users ADD COLUMN sede_id TEXT DEFAULT '';
+    END IF;
+END $$;
+
 CREATE INDEX IF NOT EXISTS idx_admin_users_sede ON admin_users(sede_id)
     WHERE sede_id IS NOT NULL AND sede_id != '';
 

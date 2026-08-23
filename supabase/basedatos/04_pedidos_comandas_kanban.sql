@@ -47,6 +47,18 @@ CREATE INDEX IF NOT EXISTS idx_orders_guest_email ON orders (guest_email)
 CREATE INDEX IF NOT EXISTS idx_orders_cliente_telefono ON orders (cliente_telefono);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_fecha ON orders(fecha DESC);
+
+-- Migración: Agregar sede_id si no existe (para tablas pre-existentes)
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'orders' AND column_name = 'sede_id'
+    ) THEN
+        ALTER TABLE orders ADD COLUMN sede_id TEXT DEFAULT '';
+    END IF;
+END $$;
+
 CREATE INDEX IF NOT EXISTS idx_orders_sede ON orders(sede_id)
     WHERE sede_id IS NOT NULL AND sede_id != '';
 CREATE INDEX IF NOT EXISTS idx_orders_cliente_uid ON orders(cliente_uid)
