@@ -745,30 +745,31 @@ export const Home: React.FC<HomeProps> = ({
           {/* Mobile: Horizontal Carousel */}
           <div ref={masVendidosRef} className="flex md:hidden gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
             {masVendidosItems.map((item) => (
-              <div key={item.id} className="relative min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer"
+              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-white font-bold text-[8px]"
-                  style={{ backgroundColor: '#f97316' }}>
-                  <TrendingUp size={8} fill="currentColor" /> MÁS VENDIDO
-                </div>
-                <div className="relative h-28">
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover" />
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                  <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded"
+                    style={{ backgroundColor: '#f97316' }}>
+                    <TrendingUp size={8} className="inline mr-0.5" fill="currentColor" /> TOP
+                  </span>
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow"
+                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
                     style={{ backgroundColor: tc, color: '#fff' }}>
                     <Plus size={12} />
                   </button>
                 </div>
                 <div className="p-2.5">
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-0.5" style={{ color: text1 }}>{item.nombre}</h4>
-                  <div className="flex items-center gap-0.5 mb-1">
-                    {renderStars(getProductAverageRating(item.id), 9)}
-                    <span className="text-[9px]" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
+                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                      className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
+                      style={{ backgroundColor: surfaceContainer, color: tc }}>
+                      <Plus size={12} />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -852,30 +853,31 @@ export const Home: React.FC<HomeProps> = ({
           {/* Mobile: Horizontal Carousel */}
           <div ref={combosCategoriaRef} className="flex md:hidden gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
             {combosCategoriaItems.map((item) => (
-              <div key={item.id} className="relative min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer"
-                style={{ backgroundColor: cardBg, borderColor: tc }}
+              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-white font-bold text-[8px]"
-                  style={{ backgroundColor: tc }}>
-                  <ShoppingCart size={8} /> COMBO
-                </div>
-                <div className="relative h-28">
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover" />
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                  <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded"
+                    style={{ backgroundColor: tc }}>
+                    COMBO
+                  </span>
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow"
+                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
                     style={{ backgroundColor: tc, color: '#fff' }}>
                     <Plus size={12} />
                   </button>
                 </div>
                 <div className="p-2.5">
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-0.5" style={{ color: text1 }}>{item.nombre}</h4>
-                  <div className="flex items-center gap-0.5 mb-1">
-                    {renderStars(getProductAverageRating(item.id), 9)}
-                    <span className="text-[9px]" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
+                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                      className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
+                      style={{ backgroundColor: surfaceContainer, color: tc }}>
+                      <Plus size={12} />
+                    </button>
                   </div>
                 </div>
               </div>
