@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, ChevronLeft, ChevronRight, Plus, Minus, AlertTriangle, Flame, ShoppingCart, Star, Clock, Users, Check, Zap, Utensils } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Plus, Minus, AlertTriangle, Flame, ShoppingCart, Star, Clock, Users, Check, Zap, Utensils, Share2, MessageCircle, Copy } from 'lucide-react';
 import { FoodItem, SelectedOption } from '../types/store';
 import { ProductOptionsEditor } from './ProductOptionsEditor';
 import { ProductReviews } from './ProductReviews';
@@ -48,6 +48,41 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 }) => {
   const { config, getActiveFlashSale, getProductAverageRating, getProductReviews, foodItems } = useApp();
   const vesRate = config.tasa_cambio && config.tasa_cambio > 10 ? config.tasa_cambio : null;
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  const getShareUrl = () => `${window.location.origin}/?product=${product?.id || ''}`;
+  const getShareText = () => {
+    if (!product) return '';
+    const price = `$${product.precio_usd.toFixed(2)}`;
+    const siteName = config.site_nombre || 'Market Coffee Sweet';
+    return `Mira este producto: ${product.nombre} por ${price} en ${siteName}`;
+  };
+
+  const handleShareWhatsApp = () => {
+    const text = `${getShareText()}\n${getShareUrl()}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  const handleShareFacebook = () => {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getShareUrl())}`, '_blank', 'width=600,height=400');
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(getShareUrl());
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = getShareUrl();
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    }
+  };
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<SelectedOption[]>([]);
@@ -258,6 +293,35 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               )}
             </div>
 
+            {/* Share buttons */}
+            <div className="flex items-center gap-2 mb-5">
+              <span className="text-[11px] font-bold text-[#5b4137] mr-1">
+                <Share2 size={12} className="inline mr-1" />Compartir:
+              </span>
+              <button
+                onClick={handleShareWhatsApp}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold text-white transition-all hover:scale-105"
+                style={{ backgroundColor: '#25D366' }}
+              >
+                <MessageCircle size={12} /> WhatsApp
+              </button>
+              <button
+                onClick={handleShareFacebook}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold text-white transition-all hover:scale-105"
+                style={{ backgroundColor: '#1877F2' }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                Facebook
+              </button>
+              <button
+                onClick={handleCopyLink}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all hover:scale-105"
+                style={{ backgroundColor: copiedLink ? '#10b981' : '#E4405F', color: '#fff' }}
+              >
+                {copiedLink ? <><Check size={12} /> ¡Copiado!</> : <><Copy size={12} /> Instagram</>}
+              </button>
+            </div>
+
             {/* Pizza Sizes */}
             {isPizza && product.sizes && product.sizes.length > 0 && (
               <div className="mb-5">
@@ -433,7 +497,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               }}
             >
               <ShoppingCart size={16} />
-              Agregar · ${totalPrice.toFixed(2)}{vesRate && ` / ${formatVes(totalPrice, vesRate)} Bs`}
+              Agregar
             </RippleButton>
 
             {/* Go to checkout */}
