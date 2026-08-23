@@ -68,7 +68,7 @@ const ProductoFormSection: React.FC<ProductoFormSectionProps> = ({ product, onSa
   const handleImageUpload = async (index: number, file: File) => {
     setUploadingImage(index);
     try {
-      const url = await uploadImage(file, 'settings', 'products', { maxWidth: 800 });
+      const url = await uploadImage(file, 'productos', 'products', { maxWidth: 800 });
       const newUrls = [...imagenUrls];
       newUrls[index] = url;
       setImagenUrls(newUrls.filter(u => u));
