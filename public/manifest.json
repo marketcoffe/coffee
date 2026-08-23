@@ -1,7 +1,7 @@
 {
   "id": "/",
   "name": "Market Coffee - Mercado, Panaderia & Comida Rapida",
-  "short_name": "Market Coffee",
+  "short_name": "Market Coffee Sweet",
   "description": "Tu mercado, panaderia y comida rapida favorita. Frutas, verduras, pan fresco, hamburguesas y mas.",
   "start_url": "/",
   "scope": "/",
@@ -29,7 +29,7 @@
       "purpose": "maskable"
     }
   ],
-  "categories": ["food", "restaurants"],
+  "categories": ["food", "market", "bakery", "fast-food"],
   "shortcuts": [
     {
       "name": "Menú del Día",
