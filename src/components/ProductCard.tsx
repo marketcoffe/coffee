@@ -64,11 +64,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       }}
       onClick={() => onViewProductDetails(item)}
     >
-      <div className="relative aspect-[4/3] overflow-hidden" style={{ backgroundColor: tcSurf }}>
+      <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: tcSurf }}>
         <img
           src={item.imagen_urls[0]}
           alt={item.nombre}
-          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${isAgotado ? 'grayscale opacity-50' : ''}`}
+          className={`w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105 ${isAgotado ? 'grayscale opacity-50' : ''}`}
           referrerPolicy="no-referrer"
         />
 
