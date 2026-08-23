@@ -244,17 +244,20 @@ export const uploadFileToStorage = async (file: File | Blob, bucket: string, fol
   const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
   const filePath = `${folder}/${fileName}`;
 
-  const { error: uploadError } = await supabase.storage
+  const { data, error: uploadError } = await supabase.storage
     .from(bucket)
     .upload(filePath, file, {
       upsert: true,
       contentType: file.type || 'image/webp'
     });
 
-  if (uploadError) throw uploadError;
+  if (uploadError) {
+    console.error('[Storage Upload Error]', uploadError.message, 'bucket:', bucket, 'path:', filePath, 'type:', file.type, 'size:', file.size);
+    throw uploadError;
+  }
 
-  const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
-  return data.publicUrl;
+  const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(filePath);
+  return urlData.publicUrl;
 };
 
 /**

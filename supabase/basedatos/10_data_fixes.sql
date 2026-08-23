@@ -113,3 +113,30 @@ ALTER TABLE store_config ADD COLUMN IF NOT EXISTS banner_descriptions TEXT[] DEF
 ALTER TABLE store_config ADD COLUMN IF NOT EXISTS banner_cta_texts TEXT[] DEFAULT ARRAY['', '', '']::TEXT[];
 ALTER TABLE store_config ADD COLUMN IF NOT EXISTS banner_cta_urls TEXT[] DEFAULT ARRAY['', '', '']::TEXT[];
 ALTER TABLE store_config ADD COLUMN IF NOT EXISTS hero_cta_url TEXT DEFAULT '';
+
+-- ----------------------------------------------------------------------------
+-- 5. FIX: Bucket de Storage 'productos' (faltaba en producción)
+-- ----------------------------------------------------------------------------
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('productos', 'productos', true)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "productos_select_public" ON storage.objects;
+CREATE POLICY "productos_select_public" ON storage.objects
+FOR SELECT USING (bucket_id = 'productos');
+
+DROP POLICY IF EXISTS "productos_insert_admin" ON storage.objects;
+CREATE POLICY "productos_insert_admin" ON storage.objects
+FOR INSERT TO authenticated
+WITH CHECK (bucket_id = 'productos' AND public.is_admin_or_operator());
+
+DROP POLICY IF EXISTS "productos_update_admin" ON storage.objects;
+CREATE POLICY "productos_update_admin" ON storage.objects
+FOR UPDATE TO authenticated
+USING (bucket_id = 'productos' AND public.is_admin_or_operator())
+WITH CHECK (bucket_id = 'productos' AND public.is_admin_or_operator());
+
+DROP POLICY IF EXISTS "productos_delete_admin" ON storage.objects;
+CREATE POLICY "productos_delete_admin" ON storage.objects
+FOR DELETE TO authenticated
+USING (bucket_id = 'productos' AND public.is_admin());
