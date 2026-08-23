@@ -6,6 +6,7 @@ import { ProductReviews } from './ProductReviews';
 import { RippleButton } from './RippleButton';
 import { useApp } from '../store/AppContext';
 import { hasCategory, getCategories, formatCategories } from '../utils/categoryUtils';
+import { formatVes } from '../utils/bcvRate';
 
 interface ProductModalProps {
   product: FoodItem | null;
@@ -46,6 +47,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   onGoToCheckout,
 }) => {
   const { config, getActiveFlashSale, getProductAverageRating, getProductReviews, foodItems } = useApp();
+  const vesRate = config.tasa_cambio && config.tasa_cambio > 10 ? config.tasa_cambio : null;
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<SelectedOption[]>([]);
@@ -205,7 +207,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             </div>
 
             {/* Name & description */}
-            <h2 className="text-[20px] font-bold text-[#1a1c1d] mb-1" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{product.nombre}</h2>
+            <h2 className="text-[20px] font-bold text-[#1a1c1d] mb-1" style={{ fontFamily: 'var(--font-display)' }}>{product.nombre}</h2>
             <p className="text-[14px] text-[#5b4137] mb-3">{product.descripcion}</p>
 
             {/* Rating, stats & calories */}
@@ -241,9 +243,14 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                   ${product.precio_usd.toFixed(2)}
                 </span>
               )}
-              <span className="text-[24px] font-bold" style={{ color: themeColor, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+              <span className="text-[24px] font-bold" style={{ color: themeColor, fontFamily: 'var(--font-display)' }}>
                 ${finalBasePrice.toFixed(2)}
               </span>
+              {vesRate && (
+                <span className="text-[13px] font-semibold text-[#8f7065]">
+                  {formatVes(finalBasePrice, vesRate)} Bs
+                </span>
+              )}
               {optionsTotal > 0 && (
                 <span className="text-[12px] text-[#8f7065]">
                   +${optionsTotal.toFixed(2)} extras
@@ -426,7 +433,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               }}
             >
               <ShoppingCart size={16} />
-              Agregar · ${totalPrice.toFixed(2)}
+              Agregar · ${totalPrice.toFixed(2)}{vesRate && ` / ${formatVes(totalPrice, vesRate)} Bs`}
             </RippleButton>
 
             {/* Go to checkout */}

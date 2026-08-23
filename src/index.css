@@ -139,7 +139,7 @@
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-display, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif);
   background-color: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
@@ -152,7 +152,7 @@ body {
 }
 
 h1, h2, h3, h4, .font-display {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: var(--font-display, 'Plus Jakarta Sans', system-ui, sans-serif);
 }
 
 code, pre, .font-mono {

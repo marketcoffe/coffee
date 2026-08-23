@@ -140,14 +140,17 @@ const PersonalizacionSection: React.FC = () => {
         <div className="flex flex-col gap-4">
           <div className="admin-card p-4">
             <SectionTitle>Fuente del Sitio</SectionTitle>
-            <select value={config.font_display || 'Fredoka'} onChange={e => updateConfig({ font_display: e.target.value })}
+            <select value={config.font_display || 'Plus Jakarta Sans'} onChange={e => updateConfig({ font_display: e.target.value })}
               className="admin-input">
+              <option value="Plus Jakarta Sans">Plus Jakarta Sans (Default)</option>
+              <option value="Inter">Inter</option>
               <option value="Fredoka">Fredoka</option>
               <option value="Space Grotesk">Space Grotesk</option>
               <option value="Poppins">Poppins</option>
               <option value="Montserrat">Montserrat</option>
-              <option value="Inter">Inter</option>
               <option value="Nunito">Nunito</option>
+              <option value="Outfit">Outfit</option>
+              <option value="DM Sans">DM Sans</option>
             </select>
             <p className="text-[10px] mt-2" style={{ color: 'var(--ios-text-tertiary)' }}>
               La fuente se aplica a todo el sitio web y la app.

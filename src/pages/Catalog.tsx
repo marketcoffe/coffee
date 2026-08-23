@@ -75,7 +75,7 @@ export const Catalog: React.FC<CatalogProps> = ({
           </button>
 
           {/* Desktop title */}
-          <h2 className="hidden lg:block text-[16px] font-bold shrink-0" style={{ color: c.t1, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+            <h2 className="hidden lg:block text-[16px] font-bold shrink-0" style={{ color: c.t1, fontFamily: 'var(--font-display)' }}>
             {selectedCategory || 'Menú'}
           </h2>
 
@@ -181,6 +181,7 @@ export const Catalog: React.FC<CatalogProps> = ({
               <ProductCard key={item.id} item={item} config={config}
                 onViewProductDetails={onViewProductDetails}
                 addToCart={(food) => addToCart(food)}
+                vesRate={config.tasa_cambio || null}
               />
             ))}
           </div>

@@ -14,6 +14,7 @@ import { SedesMap } from '../components/SedesMap';
 import { findNearestSede } from '../utils/geo';
 import { getWhatsAppPhone } from '../utils/phone';
 import { hasCategory, categoryIncludes, formatCategories } from '../utils/categoryUtils';
+import { formatVes } from '../utils/bcvRate';
 
 interface BeforeInstallPromptEvent {
   prompt: () => void;
@@ -69,6 +70,7 @@ export const Home: React.FC<HomeProps> = ({
   const { foodItems, config, cart, addToCart, getProductAverageRating, isDarkMode, promotions } = useApp();
   const { showToast } = useToast();
   const tc = config.theme_color || '#A4D045';
+  const vesRate = config.tasa_cambio && config.tasa_cambio > 10 ? config.tasa_cambio : null;
 
   const activeItems = useMemo(() => foodItems.filter(p => p.activo !== false), [foodItems]);
   const promoItems = useMemo(() => activeItems.filter(p => p.es_promo), [activeItems]);
@@ -336,7 +338,7 @@ export const Home: React.FC<HomeProps> = ({
                   )}
                   {title && (
                     <h2 className="text-white font-extrabold text-2xl md:text-5xl leading-[1.05] mb-3"
-                      style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+                      style={{ fontFamily: 'var(--font-display)' }}>
                       {title}
                     </h2>
                   )}
@@ -440,7 +442,7 @@ export const Home: React.FC<HomeProps> = ({
                     <p className="text-sm font-bold truncate" style={{ color: text1 }}>{item.nombre}</p>
                     <p className="text-[10px] uppercase tracking-wider" style={{ color: text2 }}>{formatCategories(item)}{item.subcategoria ? ` · ${item.subcategoria}` : ''}</p>
                   </div>
-                  <span className="text-sm font-bold shrink-0" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                  <span className="text-sm font-bold shrink-0 text-right" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                 </button>
               ))}
             </div>
@@ -614,7 +616,7 @@ export const Home: React.FC<HomeProps> = ({
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-base" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                        <span className="font-bold text-base" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[10px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                         {item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd && (
                           <span className="line-through text-[11px]" style={{ color: `${text2}66` }}>${item.precio_anterior_usd.toFixed(2)}</span>
                         )}
@@ -661,7 +663,7 @@ export const Home: React.FC<HomeProps> = ({
                       <span className="text-[9px]" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                      <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                       {item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd && (
                         <span className="line-through text-[10px]" style={{ color: `${text2}66` }}>${item.precio_anterior_usd.toFixed(2)}</span>
                       )}
@@ -730,7 +732,7 @@ export const Home: React.FC<HomeProps> = ({
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-base" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                      <span className="font-bold text-base" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[10px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                       {item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd && (
                         <span className="line-through text-[11px]" style={{ color: `${text2}66` }}>${item.precio_anterior_usd.toFixed(2)}</span>
                       )}
@@ -768,7 +770,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -838,7 +840,7 @@ export const Home: React.FC<HomeProps> = ({
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-base" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                      <span className="font-bold text-base" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[10px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                       {item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd && (
                         <span className="line-through text-[11px]" style={{ color: `${text2}66` }}>${item.precio_anterior_usd.toFixed(2)}</span>
                       )}
@@ -876,7 +878,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1006,7 +1008,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1069,7 +1071,7 @@ export const Home: React.FC<HomeProps> = ({
                     <span className="text-[9px]" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1121,7 +1123,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1173,7 +1175,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1225,7 +1227,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1277,7 +1279,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1329,7 +1331,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1381,7 +1383,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1433,7 +1435,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1485,7 +1487,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1537,7 +1539,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1589,7 +1591,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1641,7 +1643,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1693,7 +1695,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1745,7 +1747,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1797,7 +1799,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
@@ -1847,7 +1849,7 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || cat.name}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>

@@ -4,6 +4,7 @@ import { supabase } from './supabaseClient';
 import productsData from '../data/products.json';
 import panProductsData from '../data/productos-pan-imported.json';
 import { getCategories, hasCategory, toArray } from '../utils/categoryUtils';
+import { fetchBcvRate, storeRate, getStoredRate, shouldFetchRate, msUntilNextScheduledFetch } from '../utils/bcvRate';
 
 interface AppContextProps {
   foodItems: FoodItem[];
@@ -68,6 +69,7 @@ interface AppContextProps {
   updateConfig: (newConfig: Partial<StoreConfig>) => void;
   updateExchangeRate: (rate: number) => void;
   fetchExchangeRate: () => Promise<boolean>;
+  rateDate: string | null;
   addCategory: (categoryName: string) => void;
   deleteCategory: (categoryName: string) => void;
   updateCategory: (oldCategory: string, newCategory: string) => void;
@@ -356,6 +358,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
     return DEFAULT_CONFIG;
+  });
+
+  const [rateDate, setRateDate] = useState<string | null>(() => {
+    const stored = getStoredRate();
+    return stored ? stored.date : null;
   });
 
   const [notifications, setNotifications] = useState<InAppNotification[]>(() => {
@@ -859,71 +866,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('trv_reward_catalog', JSON.stringify(rewardCatalog));
   }, [rewardCatalog]);
 
-  // Daily Exchange Rate Update Routine (BCV Oficial)
-  const fetchExchangeRate = async (retryCount = 0): Promise<boolean> => {
-    const MAX_RETRIES = 2;
-    const endpoints = [
-      'https://ve.dolarapi.com/v1/dolares',
-      'https://pydolarve.org/api/v1/dollar'
-    ];
-
-    for (const url of endpoints) {
-      try {
-        console.warn(`🔍 Marketo: Intentando obtener tasa BCV desde ${url}...`);
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000);
-        const response = await fetch(url, { signal: controller.signal });
-        clearTimeout(timeout);
-
-        if (!response.ok) continue;
-        const data = await response.json();
-        let newRate: number | null = null;
-
-        if (Array.isArray(data)) {
-          const oficial = data.find((d: { nombre?: string; fuente?: string; promedio?: string; venta?: string; compra?: string }) => d.nombre === 'Oficial' || d.fuente === 'oficial');
-          if (oficial) {
-            newRate = parseFloat((oficial.promedio || oficial.venta || oficial.compra) as string);
-          }
-        } else if (data && typeof data === 'object') {
-          if (data.venta) newRate = parseFloat(data.venta);
-          else if (data.valor) newRate = parseFloat(data.valor);
-          else if (data.dollar && data.dollar.price) newRate = parseFloat(data.dollar.price);
-          else if (data.promedio) newRate = parseFloat(data.promedio);
-        }
-
-        // Validar: debe ser un número razonable para Bs/USD en Venezuela (actual ~600+)
-        if (newRate && !isNaN(newRate) && newRate > 10 && newRate < 10000) {
-          updateExchangeRate(newRate);
-          const now = Date.now();
-          localStorage.setItem('trv_last_rate_fetch', now.toString());
-          console.warn(`✅ Tasa BCV actualizada automáticamente: ${newRate} Bs/USD.`);
-          return true;
-        }
-      } catch (error: unknown) {
-        console.warn(`⚠️ Marketo: Error con ${url}:`, (error as Error).message || error);
-      }
+  // ── BCV Exchange Rate — programado 7 AM y 1 PM ──
+  const fetchExchangeRate = async (): Promise<boolean> => {
+    const rate = await fetchBcvRate();
+    if (rate) {
+      updateExchangeRate(rate);
+      setRateDate(new Date().toISOString().slice(0, 10));
+      return true;
     }
-
-    // Reintentar si quedan intentos
-    if (retryCount < MAX_RETRIES) {
-      console.warn(`🔄 Marketo: Reintentando obtener tasa BCV (intento ${retryCount + 2}/${MAX_RETRIES + 1})...`);
-      await new Promise(r => setTimeout(r, 3000));
-      return fetchExchangeRate(retryCount + 1);
-    }
-
-    console.error('❌ Marketo: No se pudo obtener la tasa BCV de ninguna fuente tras varios intentos.');
     return false;
   };
 
   // Verificar si la tasa necesita actualización
   const needsRateUpdate = (): boolean => {
-    const lastFetch = localStorage.getItem('trv_last_rate_fetch');
-    if (!lastFetch) return true;
-    const lastFetchTime = parseInt(lastFetch, 10);
-    if (isNaN(lastFetchTime)) return true;
-    // Actualizar si pasaron más de 4 horas desde la última obtención exitosa
-    const FOUR_HOURS = 4 * 60 * 60 * 1000;
-    return Date.now() - lastFetchTime > FOUR_HOURS;
+    return shouldFetchRate();
   };
 
   useEffect(() => {
@@ -2827,6 +2783,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateConfig,
       updateExchangeRate,
       fetchExchangeRate,
+      rateDate,
       addCategory,
       deleteCategory,
       updateCategory,

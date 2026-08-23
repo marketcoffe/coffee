@@ -2,13 +2,28 @@ import React, { useMemo, useState } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts';
 import {
-  Calendar, BarChart3, ShoppingBag, ShoppingCart, DollarSign, Landmark, Package, Ticket
+  Calendar, BarChart3, ShoppingBag, ShoppingCart, DollarSign, Landmark, Package, Ticket, RefreshCw
 } from 'lucide-react';
 
 const ResumenGeneralSection: React.FC = () => {
-  const { orders, config, foodItems } = useApp();
+  const { orders, config, foodItems, fetchExchangeRate, rateDate } = useApp();
   const [sedeFilter, setSedeFilter] = useState<string>('');
-  const activeSedes = config.sedes?.filter(s => s.activa) || [];
+  const [isRefreshingRate, setIsRefreshingRate] = useState(false);
+  const [rateRefreshStatus, setRateRefreshStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  const handleRefreshRate = async () => {
+    setIsRefreshingRate(true);
+    setRateRefreshStatus('idle');
+    try {
+      const success = await fetchExchangeRate();
+      setRateRefreshStatus(success ? 'success' : 'error');
+    } catch {
+      setRateRefreshStatus('error');
+    } finally {
+      setIsRefreshingRate(false);
+      setTimeout(() => setRateRefreshStatus('idle'), 3000);
+    }
+  };  const activeSedes = config.sedes?.filter(s => s.activa) || [];
   const principalSedeId = activeSedes.find(s => s.es_principal)?.id || activeSedes[0]?.id || '';
 
   const filteredOrders = useMemo(() => {
@@ -141,6 +156,36 @@ const ResumenGeneralSection: React.FC = () => {
           </select>
         </div>
       )}
+
+      {/* Tasa de Cambio BCV */}
+      <div className="flex items-center justify-between p-4 border border-slate-200 rounded-xl bg-white shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
+            <Landmark size={18} />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Tasa BCV (USD → Bs)</p>
+            <p className="text-lg font-bold font-mono text-slate-900">
+              {config.tasa_cambio ? `${config.tasa_cambio.toFixed(2)} Bs/$` : 'No disponible'}
+            </p>
+            {rateDate && (
+              <p className="text-[9px] text-slate-400 mt-0.5">Última actualización: {rateDate}</p>
+            )}
+          </div>
+        </div>
+        <button
+          onClick={handleRefreshRate}
+          disabled={isRefreshingRate}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold transition-all disabled:opacity-50"
+          style={{
+            backgroundColor: rateRefreshStatus === 'success' ? '#10b981' : rateRefreshStatus === 'error' ? '#ef4444' : '#3b82f6',
+            color: '#ffffff',
+          }}
+        >
+          <RefreshCw size={14} className={isRefreshingRate ? 'animate-spin' : ''} />
+          {isRefreshingRate ? 'Actualizando...' : rateRefreshStatus === 'success' ? '¡Actualizado!' : rateRefreshStatus === 'error' ? 'Error - Reintentar' : 'Actualizar ahora'}
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-5 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl text-white shadow-lg shadow-emerald-200">

@@ -85,10 +85,21 @@ function AppContent() {
     };
   }, [currentUser, markUserAsPwaInstalled]);
 
-  // Aplicar font_display y theme_color dinámicamente al CSS
+  // Aplicar font_display y theme_color dinámicamente al CSS + cargar fuente dinámicamente
   useEffect(() => {
-    const fontName = config.font_display || 'Fredoka';
+    const fontName = config.font_display || 'Plus Jakarta Sans';
     document.documentElement.style.setProperty('--font-display', `"${fontName}", sans-serif`);
+
+    // Cargar la fuente desde Google Fonts si no está ya cargada
+    const loadedFonts = Array.from(document.querySelectorAll('link[href*="fonts.googleapis.com/css"]'))
+      .map((el) => el.getAttribute('data-font-name') || '');
+    if (!loadedFonts.includes(fontName) && fontName !== 'Plus Jakarta Sans' && fontName !== 'Inter') {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;500;600;700;800&display=swap`;
+      link.setAttribute('data-font-name', fontName);
+      document.head.appendChild(link);
+    }
   }, [config.font_display]);
 
   useEffect(() => {

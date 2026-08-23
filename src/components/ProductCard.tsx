@@ -3,6 +3,7 @@ import { FoodItem, StoreConfig } from '../types/store';
 import { Plus, Star, Users, Clock, Heart, TrendingUp } from 'lucide-react';
 import { useApp } from '../store/AppContext';
 import { RippleButton } from './RippleButton';
+import { formatVes } from '../utils/bcvRate';
 
 interface ProductCardProps {
   item: FoodItem;
@@ -12,6 +13,7 @@ interface ProductCardProps {
   averageRating?: number;
   reviewCount?: number;
   index?: number;
+  vesRate?: number | null;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -22,6 +24,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   averageRating = 0,
   reviewCount = 0,
   index = 0,
+  vesRate = null,
 }) => {
   const { toggleFavorite, isFavorite, isDarkMode } = useApp();
   const [isAnimatingHeart, setIsAnimatingHeart] = useState(false);
@@ -203,6 +206,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <span className="text-base font-bold" style={{ color: themeColor }}>
               ${item.precio_usd.toFixed(2)}
             </span>
+            {vesRate && vesRate > 0 && (
+              <span className="text-[10px] font-semibold" style={{ color: tcT3 }}>
+                {formatVes(item.precio_usd, vesRate)} Bs
+              </span>
+            )}
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); onViewProductDetails(item); }}
