@@ -490,10 +490,10 @@ export const Home: React.FC<HomeProps> = ({
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-lg font-bold" style={{ color: text1 }}>Explorar por categorías</h3>
           <div className="hidden md:flex gap-1.5">
-            <button onClick={() => scroll(scrollRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+            <button onClick={() => scroll(scrollRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
               <ChevronLeft size={16} />
             </button>
-            <button onClick={() => scroll(scrollRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+            <button onClick={() => scroll(scrollRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
               <ChevronRight size={16} />
             </button>
           </div>
@@ -532,12 +532,16 @@ export const Home: React.FC<HomeProps> = ({
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {activePromotions.map((promo) => (
-              <div key={promo.id} className="flex-shrink-0 min-w-[155px] rounded-xl overflow-hidden border" style={{ background: cardBg, borderColor: cardBorder }}>
-                {promo.image_url && (
-                  <img src={promo.image_url} alt={promo.title} className="w-full h-28 object-cover" />
-                )}
+              <div key={promo.id} className="flex-shrink-0 w-[140px] rounded-xl overflow-hidden border" style={{ background: cardBg, borderColor: cardBorder }}>
+                <div className="h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  {promo.image_url ? (
+                    <img src={promo.image_url} alt={promo.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center"><Sparkles size={24} style={{ color: tc, opacity: 0.4 }} /></div>
+                  )}
+                </div>
                 <div className="p-2.5">
-                  <h4 className="font-bold text-xs truncate" style={{ color: text1 }}>{promo.title}</h4>
+                  <h4 className="font-bold text-xs line-clamp-2" style={{ color: text1 }}>{promo.title}</h4>
                   <p className="text-[10px] mt-0.5 line-clamp-2" style={{ color: text2 }}>{promo.message}</p>
                   <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                     <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${tc}20`, color: tc }}>
@@ -603,7 +607,7 @@ export const Home: React.FC<HomeProps> = ({
                   </div>
                   <div className="p-3">
                     <p className="text-[10px] uppercase tracking-wider font-medium mb-0.5" style={{ color: text2 }}>{formatCategories(item)}</p>
-                    <h4 className="text-sm font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                    <h4 className="text-sm font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                     <div className="flex items-center gap-1.5 mb-1.5">
                       {renderStars(getProductAverageRating(item.id))}
                       <span className="text-[10px] font-medium" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
@@ -633,14 +637,14 @@ export const Home: React.FC<HomeProps> = ({
               const discount = item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd
                 ? Math.round(((item.precio_anterior_usd - item.precio_usd) / item.precio_anterior_usd) * 100) : 0;
               return (
-                <div key={item.id} className="relative min-w-[155px] rounded-xl border-2 overflow-hidden shrink-0 cursor-pointer"
+                <div key={item.id} className="relative w-[140px] rounded-xl border-2 overflow-hidden shrink-0 cursor-pointer"
                   style={{ backgroundColor: cardBg, borderColor: tc, boxShadow: `0 0 12px ${tc}20` }}
                   onClick={() => onViewProductDetails(item)}>
                   <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-white font-bold text-[8px]"
                     style={{ backgroundColor: tc }}>
                     <Zap size={8} fill="currentColor" /> FLASH
                   </div>
-                  <div className="relative h-28">
+                  <div className="relative h-[90px]">
                     <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover" />
                     {discount > 0 && <div className="absolute top-1.5 right-1.5 bg-red-500 text-white font-bold px-1.5 py-0.5 rounded-md text-[9px]">-{discount}%</div>}
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -650,8 +654,8 @@ export const Home: React.FC<HomeProps> = ({
                     </button>
                   </div>
                   <div className="p-2.5">
-                    <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{formatCategories(item)}</p>
-                    <h4 className="text-xs font-bold truncate mb-0.5" style={{ color: text1 }}>{item.nombre}</h4>
+                    <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{formatCategories(item)}</p>
+                    <h4 className="text-xs font-bold line-clamp-2 mb-0.5" style={{ color: text1 }}>{item.nombre}</h4>
                     <div className="flex items-center gap-0.5 mb-1">
                       {renderStars(getProductAverageRating(item.id), 9)}
                       <span className="text-[9px]" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
@@ -685,10 +689,10 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => setTab('catalog')} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(masVendidosRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(masVendidosRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(masVendidosRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(masVendidosRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
@@ -719,7 +723,7 @@ export const Home: React.FC<HomeProps> = ({
                 </div>
                 <div className="p-3">
                   <p className="text-[10px] uppercase tracking-wider font-medium mb-0.5" style={{ color: text2 }}>{formatCategories(item)}</p>
-                  <h4 className="text-sm font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <h4 className="text-sm font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center gap-1.5 mb-1.5">
                     {renderStars(getProductAverageRating(item.id))}
                     <span className="text-[10px] font-medium" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
@@ -745,14 +749,14 @@ export const Home: React.FC<HomeProps> = ({
           {/* Mobile: Horizontal Carousel */}
           <div ref={masVendidosRef} className="flex md:hidden gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
             {masVendidosItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
-                  <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded"
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <span className="absolute top-1.5 left-1.5 text-[7px] font-bold text-white px-1 py-px rounded"
                     style={{ backgroundColor: '#f97316' }}>
-                    <TrendingUp size={8} className="inline mr-0.5" fill="currentColor" /> TOP
+                    <TrendingUp size={7} className="inline mr-px" fill="currentColor" /> TOP
                   </span>
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -761,8 +765,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -793,10 +797,10 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Combos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(combosCategoriaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(combosCategoriaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(combosCategoriaRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(combosCategoriaRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
@@ -827,7 +831,7 @@ export const Home: React.FC<HomeProps> = ({
                 </div>
                 <div className="p-3">
                   <p className="text-[10px] uppercase tracking-wider font-medium mb-0.5" style={{ color: text2 }}>{formatCategories(item)}</p>
-                  <h4 className="text-sm font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <h4 className="text-sm font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center gap-1.5 mb-1.5">
                     {renderStars(getProductAverageRating(item.id))}
                     <span className="text-[10px] font-medium" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
@@ -853,12 +857,12 @@ export const Home: React.FC<HomeProps> = ({
           {/* Mobile: Horizontal Carousel */}
           <div ref={combosCategoriaRef} className="flex md:hidden gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
             {combosCategoriaItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
-                  <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded"
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <span className="absolute top-1.5 left-1.5 text-[7px] font-bold text-white px-1 py-px rounded"
                     style={{ backgroundColor: tc }}>
                     COMBO
                   </span>
@@ -869,8 +873,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -917,7 +921,7 @@ export const Home: React.FC<HomeProps> = ({
                       : <div className="w-full h-full flex items-center justify-center text-2xl" style={{ backgroundColor: surfaceContainer }}>🎁</div>}
                   </div>
                   <div className="w-2/3 p-4 flex flex-col justify-center">
-                    <h5 className="text-sm font-bold mb-1 truncate" style={{ color: text1 }}>{combo.nombre}</h5>
+                    <h5 className="text-sm font-bold mb-1 line-clamp-2" style={{ color: text1 }}>{combo.nombre}</h5>
                     <p className="text-[11px] mb-3 line-clamp-2" style={{ color: text2 }}>{combo.descripcion}</p>
                     <div className="flex items-center justify-between mt-auto">
                       <span className="font-bold text-base" style={{ color: tc }}>-{combo.discount_percent}%</span>
@@ -941,14 +945,14 @@ export const Home: React.FC<HomeProps> = ({
               const prods = combo.product_ids.map(id => activeItems.find(p => p.id === id)).filter(Boolean) as FoodItem[];
               const img = combo.imagen_url || prods[0]?.imagen_urls?.[0] || '';
               return (
-                <div key={combo.id} className="flex min-w-[155px] rounded-xl border overflow-hidden h-32 shrink-0"
+                <div key={combo.id} className="flex w-[140px] rounded-xl border overflow-hidden h-[150px] shrink-0"
                   style={{ backgroundColor: cardBg, borderColor: cardBorder }}>
                   <div className="w-1/3">
                     {img ? <img src={img} alt={combo.nombre} className="w-full h-full object-cover" />
                       : <div className="w-full h-full flex items-center justify-center text-2xl" style={{ backgroundColor: surfaceContainer }}>🎁</div>}
                   </div>
                   <div className="w-2/3 p-3 flex flex-col justify-center">
-                    <h5 className="text-sm font-bold mb-0.5 truncate" style={{ color: text1 }}>{combo.nombre}</h5>
+                    <h5 className="text-sm font-bold mb-0.5 line-clamp-2" style={{ color: text1 }}>{combo.nombre}</h5>
                     <p className="text-[10px] mb-2 line-clamp-2" style={{ color: text2 }}>{combo.descripcion}</p>
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm" style={{ color: tc }}>-{combo.discount_percent}%</span>
@@ -976,21 +980,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Panaderia'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(panaderiaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(panaderiaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(panaderiaRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(panaderiaRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={panaderiaRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {panaderiaItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -999,8 +1003,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1035,21 +1039,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Comida Rapida'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(comidaRapidaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(comidaRapidaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(comidaRapidaRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(comidaRapidaRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={comidaRapidaRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {comidaRapidaItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1058,8 +1062,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center gap-0.5 mb-1">
                     {renderStars(getProductAverageRating(item.id), 9)}
                     <span className="text-[9px]" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
@@ -1091,21 +1095,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Repostería'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(reposteriaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(reposteriaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(reposteriaRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(reposteriaRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={reposteriaRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {reposteriaItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1114,8 +1118,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1143,21 +1147,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Charcutería y Embutidos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(charcuteriaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(charcuteriaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(charcuteriaRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(charcuteriaRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={charcuteriaRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {charcuteriaItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1166,8 +1170,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1195,21 +1199,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Frutas y Verduras'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(frutasRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(frutasRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(frutasRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(frutasRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={frutasRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {frutasItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1218,8 +1222,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1247,21 +1251,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Viveres'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(viveresRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(viveresRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(viveresRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(viveresRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={viveresRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {viveresItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1270,8 +1274,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1299,21 +1303,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Bebidas'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(bebidasRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(bebidasRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(bebidasRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(bebidasRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={bebidasRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {bebidasItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1322,8 +1326,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1351,21 +1355,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Mascotas'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(mascotasRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(mascotasRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(mascotasRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(mascotasRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={mascotasRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {mascotasItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1374,8 +1378,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1403,21 +1407,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Higiene Personal'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(higieneRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(higieneRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(higieneRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(higieneRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={higieneRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {higieneItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1426,8 +1430,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1455,21 +1459,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Salsas y Condimentos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(salsasRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(salsasRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(salsasRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(salsasRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={salsasRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {salsasItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1478,8 +1482,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1507,21 +1511,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Licores'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(licoresRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(licoresRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(licoresRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(licoresRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={licoresRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {licoresItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1530,8 +1534,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1559,21 +1563,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Limpieza'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(limpiezaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(limpiezaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(limpiezaRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(limpiezaRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={limpiezaRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {limpiezaItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1582,8 +1586,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1611,21 +1615,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Hogar'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(hogarRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(hogarRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(hogarRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(hogarRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={hogarRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {hogarItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1634,8 +1638,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1663,21 +1667,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Carnicería'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(carniceriaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(carniceriaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(carniceriaRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(carniceriaRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={carniceriaRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {carniceriaItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1686,8 +1690,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1715,21 +1719,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Lácteos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(lacteosRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(lacteosRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(lacteosRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(lacteosRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={lacteosRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {lacteosItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1738,8 +1742,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1767,21 +1771,21 @@ export const Home: React.FC<HomeProps> = ({
               <button onClick={() => { setSelectedCategory('Combos Familiares'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
               </button>
-              <button onClick={() => scroll(combosFamiliaresRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(combosFamiliaresRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(combosFamiliaresRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(combosFamiliaresRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={combosFamiliaresRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {combosFamiliaresItems.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1790,8 +1794,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1817,21 +1821,21 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-[11px]" style={{ color: text2 }}>{cat.items.length} productos disponibles</p>
             </div>
             <div className="flex gap-1.5">
-              <button onClick={() => scroll(missingCatRefs[idx], 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(missingCatRefs[idx], 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
-              <button onClick={() => scroll(missingCatRefs[idx], 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+              <button onClick={() => scroll(missingCatRefs[idx], 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
           <div ref={missingCatRefs[idx]} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {cat.items.map((item) => (
-              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+              <div key={item.id} className="w-[140px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                <div className="relative h-[90px] overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1840,8 +1844,8 @@ export const Home: React.FC<HomeProps> = ({
                   </button>
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || cat.name}</p>
-                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{item.subcategoria || cat.name}</p>
+                  <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
