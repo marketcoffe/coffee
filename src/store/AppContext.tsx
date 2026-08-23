@@ -263,26 +263,7 @@ const DEFAULT_CONFIG: StoreConfig = {
     'Snacks y Frituras',
     'Viveres',
   ],
-  subcategories: {
-    'Bebidas': ['Agua', 'Jugos', 'Té', 'Gaseosas', 'Lácteos', 'Alcohólicas', 'Refrescos', 'Té Frío'],
-    'Carnicería': ['Cerdo', 'Res', 'Pollo', 'Embutidos'],
-    'Charcutería': ['Mortadela', 'Embutidos', 'Pavo', 'Quesos Madurados', 'Jamón', 'Quesos Amarillos', 'Quesos Blancos / Madurados', 'Quesos', 'Salchichas / Embutidos'],
-    'Charcutería y Embutidos': ['Chorizo', 'Morcilla', 'Congelados'],
-    'Combos Familiares': ['Combos Familiares'],
-    'Comida Rapida': ['Hamburguesas', 'Shawarmas', 'Perros Calientes', 'Club House', 'Pizza', 'Pepitos', 'Arepas', 'Empanadas', 'Menú'],
-    'Frutas y Verduras': ['Frutas', 'Verduras', 'Tubérculos', 'Hortalizas'],
-    'Higiene Personal': ['Shampoo', 'Acondicionador', 'Cuidado Dental', 'Desodorantes', 'Toallas', 'Cuidado del Cabello', 'Pañales', 'Cuidado de la Piel', 'Jabones'],
-    'Hogar': ['Papel', 'Bolsas', 'Velas', 'Aromatizantes', 'Utensilios', 'Insecticidas', 'Limpieza'],
-    'Lácteos': ['Quesos', 'Mantequilla', 'Yogurt'],
-    'Licores': ['Licores Dulces / Coctelería', 'Vinos', 'Vinos Blancos', 'Vinos Tintos', 'Vinos Rosados', 'Vinos Espumosos', 'Vinos Espumosos / Cava', 'Whiskies', 'Whiskies Premium', 'Whiskies / Licores de Whisky', 'Vodka', 'Ron', 'Ron Premium / Extra Añejo', 'Aguardiente / Anís', 'Bebidas Preparadas / Cocteles'],
-    'Limpieza': ['Detergentes', 'Desinfectantes', 'Suavizantes', 'Limpiadores'],
-    'Mascotas': ['Perros', 'Gatos', 'Higiene'],
-    'Panaderia': ['Panes', 'Pasteleria', 'Dulces', 'Tortas', 'Cachitos', 'Arepas Rellenas', 'Sándwiches', 'Snacks'],
-    'Dulces y Postres': ['Harinas', 'Vainilla'],
-    'Salsas y Condimentos': ['Ketchup', 'Mostaza', 'Mayonesa', 'Salsas', 'Adobos'],
-    'Snacks y Frituras': ['Papas', 'Tostones', 'Chicharrones'],
-    'Viveres': ['Arroces', 'Pastas', 'Harinas', 'Aceites', 'Vinagres', 'Enlatados', 'Especias', 'Carbón / Parrilla', 'Chocolate', 'Conservas', 'Mantequilla'],
-  },
+  subcategories: {},
   seo_home_title: 'Market Coffee Sweet | Panadería, Comida Rápida y Víveres en Valencia',
   seo_home_description: 'Tu minimarket de confianza en El Trigal, Valencia. Panadería fresca, comida rápida (hamburguesas, shawarmas, perros calientes), víveres, frutas, verduras, bebidas y agua potable con delivery a domicilio.',
   seo_home_keywords: 'panadería, comida rápida, hamburguesas, shawarmas, víveres, delivery, Valencia, El Trigal, Prebo, La Viña, Mañongo, Naguanagua, San Diego, minimarket, pan fresco, agua potable',
@@ -368,10 +349,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       try {
         const parsed = JSON.parse(saved);
         const merged = { ...DEFAULT_CONFIG, ...parsed };
-        // Si no tiene subcategories o están vacías, usar las del DEFAULT_CONFIG
-        if (!merged.subcategories || Object.keys(merged.subcategories).length === 0) {
-          merged.subcategories = DEFAULT_CONFIG.subcategories;
-        }
+        merged.subcategories = {};
         return merged;
       } catch {
         return DEFAULT_CONFIG;

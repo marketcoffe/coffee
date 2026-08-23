@@ -42,10 +42,8 @@ export const Navigation: React.FC<NavigationProps> = ({
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   const themeColor = config.theme_color || '#A4D045';
   const categories = config.categories || [];
-  const subcategories = config.subcategories || {};
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
   const hideMobileHeader = currentTab === 'catalog';
 
@@ -260,18 +258,12 @@ export const Navigation: React.FC<NavigationProps> = ({
               <div className="flex flex-col gap-1">
                 {categories.map((cat) => {
                   const IconComponent = CATEGORY_ICON_MAP[cat.toLowerCase()] || UtensilsCrossed;
-                  const hasSubcategories = (subcategories[cat] || []).length > 0;
-                  const isExpanded = expandedCategory === cat;
                   return (
                     <div key={cat}>
                       <button
                         type="button"
                         onClick={() => {
-                          if (hasSubcategories) {
-                            setExpandedCategory(isExpanded ? null : cat);
-                          } else {
-                            handleCategoryClick(cat);
-                          }
+                          handleCategoryClick(cat);
                         }}
                         className="flex items-center gap-3 w-full px-4 py-3 text-sm rounded-xl font-medium hover:opacity-80 transition-all cursor-pointer group"
                         style={{ color: isDarkMode ? '#a0a0b8' : '#5b4137' }}
@@ -283,36 +275,8 @@ export const Navigation: React.FC<NavigationProps> = ({
                           <IconComponent size={18} strokeWidth={2} />
                         </div>
                         <span className="flex-1 text-left">{cat}</span>
-                        {hasSubcategories ? (
-                          <ChevronRight size={14} className={`text-[#e4beb1] group-hover:text-[#5b4137] transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
-                        ) : (
-                          <ChevronRight size={14} className="text-[#e4beb1] group-hover:text-[#5b4137] transition-colors" />
-                        )}
+                        <ChevronRight size={14} className="text-[#e4beb1] group-hover:text-[#5b4137] transition-colors" />
                       </button>
-                      {/* Subcategories */}
-                      {hasSubcategories && isExpanded && (
-                        <div className="ml-12 flex flex-col gap-0.5 pb-2">
-                          {(subcategories[cat] || []).map((sub) => (
-                            <button
-                              key={sub}
-                              type="button"
-                              onClick={() => {
-                                if (navigateToCatalog) {
-                                  navigateToCatalog({ category: cat });
-                                } else {
-                                  setTab('catalog');
-                                }
-                                setSidebarOpen(false);
-                              }}
-                              className="flex items-center gap-2 w-full px-3 py-2 text-[13px] rounded-lg hover:opacity-80 transition-all cursor-pointer text-left"
-                              style={{ color: isDarkMode ? '#a0a0b8' : '#5b4137' }}
-                            >
-                              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: `${themeColor}40` }} />
-                              {sub}
-                            </button>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   );
                 })}

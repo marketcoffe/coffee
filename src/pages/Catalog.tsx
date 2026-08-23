@@ -9,8 +9,6 @@ import { getCategories, hasCategory, categoryIncludes } from '../utils/categoryU
 interface CatalogProps {
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
-  selectedSubcategory?: string;
-  setSelectedSubcategory?: (subcategory: string) => void;
   onViewProductDetails: (part: FoodItem) => void;
   passedSearchTerm?: string;
   clearPassedSearchTerm?: () => void;
@@ -21,7 +19,6 @@ interface CatalogProps {
 
 export const Catalog: React.FC<CatalogProps> = ({
   selectedCategory, setSelectedCategory,
-  selectedSubcategory, setSelectedSubcategory,
   onViewProductDetails, passedSearchTerm, clearPassedSearchTerm, resetGlobalFilters, setTab, onOpenDrawer
 }) => {
   const { foodItems, config, addToCart, isDarkMode } = useApp();
@@ -58,11 +55,8 @@ export const Catalog: React.FC<CatalogProps> = ({
     if (selectedCategory) {
       list = list.filter(p => hasCategory(p, selectedCategory));
     }
-    if (selectedSubcategory) {
-      list = list.filter(p => (p.subcategoria || '').toLowerCase() === selectedSubcategory.toLowerCase());
-    }
     return list;
-  }, [foodItems, searchQuery, selectedCategory, selectedSubcategory]);
+  }, [foodItems, searchQuery, selectedCategory]);
 
   return (
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: c.bg }}>
@@ -156,47 +150,16 @@ export const Catalog: React.FC<CatalogProps> = ({
           </div>
         )}
 
-        {/* Subcategory filters */}
-        {selectedCategory && (config.subcategories?.[selectedCategory] || []).length > 0 && (
-          <div className="mb-4 overflow-x-auto no-scrollbar -mx-4 px-4">
-            <div className="flex gap-2 w-max">
-              <button
-                onClick={() => setSelectedSubcategory?.('')}
-                className={`shrink-0 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors min-h-[32px] border`}
-                style={{
-                  backgroundColor: !selectedSubcategory ? `${themeColor}15` : 'transparent',
-                  borderColor: !selectedSubcategory ? themeColor : c.border,
-                  color: !selectedSubcategory ? themeColor : c.t2
-                }}
-              >
-                Todas
-              </button>
-              {(config.subcategories?.[selectedCategory] || []).map(sub => (
-                <button
-                  key={sub}
-                  onClick={() => setSelectedSubcategory?.(sub)}
-                  className={`shrink-0 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors min-h-[32px] border`}
-                  style={{
-                    backgroundColor: selectedSubcategory === sub ? `${themeColor}15` : 'transparent',
-                    borderColor: selectedSubcategory === sub ? themeColor : c.border,
-                    color: selectedSubcategory === sub ? themeColor : c.t2
-                  }}
-                >
-                  {sub}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+
 
         {/* Active category chip */}
         {selectedCategory && (
           <button
-            onClick={() => { setSelectedCategory(''); setSelectedSubcategory?.(''); resetGlobalFilters(); }}
+            onClick={() => { setSelectedCategory(''); resetGlobalFilters(); }}
             className="text-[13px] font-semibold w-fit px-3 py-2 rounded-xl cursor-pointer transition-colors mb-4 flex items-center gap-1"
             style={{ backgroundColor: themeColor + '15', color: themeColor }}
           >
-            ← {selectedCategory}{selectedSubcategory ? ` > ${selectedSubcategory}` : ''}
+            ← {selectedCategory}
           </button>
         )}
 

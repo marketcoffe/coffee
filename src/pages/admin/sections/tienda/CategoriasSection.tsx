@@ -40,11 +40,9 @@ const CategoriasSection: React.FC = () => {
         </div>
         <div className="flex flex-col gap-2">
           {(config.categories || []).map((cat) => {
-            const subcats = (config.subcategories || {})[cat] || [];
             return (
               <div key={cat} className="rounded-lg" style={{ background: 'var(--ios-bg)' }}>
-                <div className="flex items-center justify-between p-2">
-                  {editInput === cat ? (
+                <div className="flex items-center justify-between p-2">                  {editInput === cat ? (
                     <div className="flex items-center gap-1 flex-1">
                       <input
                         type="text"
@@ -120,46 +118,6 @@ const CategoriasSection: React.FC = () => {
                         <Trash2 size={12} />
                       </button>
                     )}
-                  </div>
-                </div>
-                <div className="px-2 pb-2">
-                  <div className="flex flex-wrap gap-1.5 mb-2">
-                    {subcats.map((sub) => (
-                      <span key={sub} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium" style={{ background: 'var(--ios-surface)', color: 'var(--ios-text-secondary)' }}>
-                        {sub}
-                        <button onClick={() => {
-                          const updated = subcats.filter(s => s !== sub);
-                          const subs = { ...(config.subcategories || {}), [cat]: updated };
-                          updateConfig({ subcategories: subs });
-                        }} className="hover:text-red-500 cursor-pointer"><X size={10} /></button>
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex gap-1.5">
-                    <input type="text" id={`new-sub-${cat}`} placeholder="Nueva subcategoria..."
-                      className="admin-input flex-1 text-[11px]"
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          const val = (e.target as HTMLInputElement).value.trim();
-                          if (val && !subcats.includes(val)) {
-                            const subs = { ...(config.subcategories || {}), [cat]: [...subcats, val] };
-                            updateConfig({ subcategories: subs });
-                            (e.target as HTMLInputElement).value = '';
-                          }
-                        }
-                      }} />
-                    <button onClick={() => {
-                      const el = document.getElementById(`new-sub-${cat}`) as HTMLInputElement;
-                      const val = el?.value.trim();
-                      if (val && !subcats.includes(val)) {
-                        const subs = { ...(config.subcategories || {}), [cat]: [...subcats, val] };
-                        updateConfig({ subcategories: subs });
-                        el.value = '';
-                      }
-                    }} className="admin-btn px-2 cursor-pointer text-[11px]">
-                      <Plus size={12} />
-                    </button>
                   </div>
                 </div>
               </div>

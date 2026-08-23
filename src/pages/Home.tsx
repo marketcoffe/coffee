@@ -5,7 +5,7 @@ import {
   ArrowRight, ChevronLeft, ChevronRight, ChevronDown,
   Zap, Star, Plus, ShoppingCart, Clock, MapPin, X, LocateFixed, Check,
   Smartphone, Instagram, Twitter, Facebook,
-  MessageCircle, Download, Award, Sparkles,
+  MessageCircle, Download, Award, Sparkles, TrendingUp, BadgeCheck, Flame,
 } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
 import { useToast } from '../components/Toast';
@@ -51,7 +51,6 @@ const DEFAULT_FAQ = [
 interface HomeProps {
   setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout') => void;
   setSelectedCategory: (category: string) => void;
-  setSelectedSubcategory?: (subcategory: string) => void;
   onViewProductDetails: (food: FoodItem) => void;
   globalSearch: string;
   setGlobalSearch: (term: string) => void;
@@ -63,7 +62,7 @@ interface HomeProps {
 }
 
 export const Home: React.FC<HomeProps> = ({
-  setTab, setSelectedCategory, setSelectedSubcategory,
+  setTab, setSelectedCategory,
   onViewProductDetails, navigateToCatalog: _navigateToCatalog,
   deferredPrompt, onInstallClick, onAdminClick, isAdminAuthenticated
 }) => {
@@ -88,11 +87,42 @@ export const Home: React.FC<HomeProps> = ({
   const viveresItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Viveres') || hasCategory(p, 'Víveres')).slice(0, 8), [activeItems]);
   const bebidasItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Bebidas')).slice(0, 8), [activeItems]);
   const mascotasItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Mascotas')).slice(0, 8), [activeItems]);
+  const higieneItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Higiene Personal')).slice(0, 8), [activeItems]);
+  const salsasItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Salsas y Condimentos')).slice(0, 8), [activeItems]);
+  const licoresItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Licores')).slice(0, 8), [activeItems]);
+  const limpiezaItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Limpieza')).slice(0, 8), [activeItems]);
+  const hogarItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Hogar')).slice(0, 8), [activeItems]);
+  const carniceriaItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Carnicería')).slice(0, 8), [activeItems]);
+  const lacteosItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Lácteos')).slice(0, 8), [activeItems]);
+  const combosFamiliaresItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Combos Familiares')).slice(0, 8), [activeItems]);
+
+  const masVendidosItems = useMemo(() => activeItems.filter(p => p.es_mas_vendido).slice(0, 8), [activeItems]);
+  const combosCategoriaItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Combos') || hasCategory(p, 'Combos') || p.categoria.some(c => c.toLowerCase() === 'combos')).slice(0, 8), [activeItems]);
+
+  const coveredCategoryKeywords = useMemo(() => [
+    'panaderia', 'panadería', 'comida rapida', 'comida rápida', 'repostería', 'reposteria',
+    'charcutería', 'charcuteria', 'frutas', 'verduras', 'víveres', 'viveres', 'bebidas',
+    'mascotas', 'higiene', 'salsas', 'condimentos', 'licores', 'limpieza', 'hogar',
+    'carnicería', 'carniceria', 'lácteos', 'lacteos', 'combos familiares', 'combos',
+  ], []);
+
+  const missingCategories = useMemo(() => {
+    const cats = config.categories || [];
+    return cats
+      .filter(cat => !coveredCategoryKeywords.some(kw => cat.toLowerCase().includes(kw)))
+      .map(cat => ({
+        name: cat,
+        items: activeItems.filter(p => hasCategory(p, cat)).slice(0, 8),
+      }))
+      .filter(cat => cat.items.length > 0)
+      .sort((a, b) => b.items.length - a.items.length)
+      .slice(0, 7);
+  }, [config.categories, activeItems, coveredCategoryKeywords]);
 
   const [heroSlide, setHeroSlide] = useState(0);
   const heroBanners = config.banners.slice(0, 3);
   const [activeCategory, setActiveCategory] = useState('Todas');
-  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
+
   const [openFaq, setOpenFaq] = useState<string | null>(null);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -213,6 +243,24 @@ export const Home: React.FC<HomeProps> = ({
   const viveresRef = useRef<HTMLDivElement>(null);
   const bebidasRef = useRef<HTMLDivElement>(null);
   const mascotasRef = useRef<HTMLDivElement>(null);
+  const higieneRef = useRef<HTMLDivElement>(null);
+  const salsasRef = useRef<HTMLDivElement>(null);
+  const licoresRef = useRef<HTMLDivElement>(null);
+  const limpiezaRef = useRef<HTMLDivElement>(null);
+  const hogarRef = useRef<HTMLDivElement>(null);
+  const carniceriaRef = useRef<HTMLDivElement>(null);
+  const lacteosRef = useRef<HTMLDivElement>(null);
+  const combosFamiliaresRef = useRef<HTMLDivElement>(null);
+  const masVendidosRef = useRef<HTMLDivElement>(null);
+  const combosCategoriaRef = useRef<HTMLDivElement>(null);
+  const missingCat1Ref = useRef<HTMLDivElement>(null);
+  const missingCat2Ref = useRef<HTMLDivElement>(null);
+  const missingCat3Ref = useRef<HTMLDivElement>(null);
+  const missingCat4Ref = useRef<HTMLDivElement>(null);
+  const missingCat5Ref = useRef<HTMLDivElement>(null);
+  const missingCat6Ref = useRef<HTMLDivElement>(null);
+  const missingCat7Ref = useRef<HTMLDivElement>(null);
+  const missingCatRefs = [missingCat1Ref, missingCat2Ref, missingCat3Ref, missingCat4Ref, missingCat5Ref, missingCat6Ref, missingCat7Ref];
 
   const scroll = (ref: React.RefObject<HTMLDivElement | null>, dir: 'left' | 'right') => {
     if (ref.current) {
@@ -457,10 +505,8 @@ export const Home: React.FC<HomeProps> = ({
             return (
               <button key={cat} onClick={() => {
                 setActiveCategory(cat);
-                setActiveSubcategory(null);
                 if (cat !== 'Todas') {
                   setSelectedCategory(cat);
-                  setSelectedSubcategory?.('');
                   setTab('catalog');
                 }
               }}
@@ -474,25 +520,7 @@ export const Home: React.FC<HomeProps> = ({
           })}
         </div>
         {/* Subcategory pills */}
-        {activeCategory !== 'Todas' && (config.subcategories?.[activeCategory] || []).length > 0 && (
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 pt-2 -mx-4 px-4 md:mx-0 md:px-0">
-            {(config.subcategories?.[activeCategory] || []).map((sub) => {
-              const isActive = activeSubcategory === sub;
-              return (
-                <button key={sub} onClick={() => {
-                  setActiveSubcategory(isActive ? null : sub);
-                  setSelectedSubcategory?.(isActive ? '' : sub);
-                }}
-                  className="px-4 py-1.5 rounded-full font-medium text-[11px] whitespace-nowrap transition-all shrink-0 border"
-                  style={{
-                    backgroundColor: isActive ? `${tc}15` : 'transparent',
-                    borderColor: isActive ? tc : cardBorder,
-                    color: isActive ? tc : text2,
-                  }}>{sub}</button>
-              );
-            })}
-          </div>
-        )}
+
       </section>
 
       {/* ═══ PROMOCIONES ACTIVAS ═══ */}
@@ -642,12 +670,229 @@ export const Home: React.FC<HomeProps> = ({
         </section>
       )}
 
+      {/* ═══ 3B. MÁS VENDIDOS ═══ */}
+      {masVendidosItems.length > 0 && (
+        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
+          <div className="flex justify-between items-end mb-3">
+            <div>
+              <div className="flex items-center gap-1.5 mb-1" style={{ color: tc }}>
+                <TrendingUp size={14} fill="currentColor" />
+                <span className="font-semibold text-[11px] uppercase tracking-tight">Los favoritos</span>
+              </div>
+              <h3 className="text-lg font-bold" style={{ color: text1 }}>Más Vendidos</h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setTab('catalog')} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
+              <button onClick={() => scroll(masVendidosRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronLeft size={16} />
+              </button>
+              <button onClick={() => scroll(masVendidosRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop: Grid */}
+          <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {masVendidosItems.map((item) => (
+              <div key={item.id} className="relative rounded-2xl border overflow-hidden group cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5"
+                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+                onClick={() => onViewProductDetails(item)}>
+                <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-white font-bold text-[9px]"
+                  style={{ backgroundColor: '#f97316' }}>
+                  <TrendingUp size={10} fill="currentColor" /> MÁS VENDIDO
+                </div>
+                <div className="relative h-36 overflow-hidden">
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  {item.estimated_prep_time && (
+                    <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                      <Clock size={10} /> {item.estimated_prep_time}min
+                    </div>
+                  )}
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                    className="absolute bottom-2 right-2 w-9 h-9 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: tc, color: '#fff' }}>
+                    <Plus size={16} />
+                  </button>
+                </div>
+                <div className="p-3">
+                  <p className="text-[10px] uppercase tracking-wider font-medium mb-0.5" style={{ color: text2 }}>{formatCategories(item)}</p>
+                  <h4 className="text-sm font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    {renderStars(getProductAverageRating(item.id))}
+                    <span className="text-[10px] font-medium" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-base" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                      {item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd && (
+                        <span className="line-through text-[11px]" style={{ color: `${text2}66` }}>${item.precio_anterior_usd.toFixed(2)}</span>
+                      )}
+                    </div>
+                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                      className="w-7 h-7 rounded-full flex items-center justify-center md:hidden"
+                      style={{ backgroundColor: surfaceContainer, color: tc }}>
+                      <Plus size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile: Horizontal Carousel */}
+          <div ref={masVendidosRef} className="flex md:hidden gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
+            {masVendidosItems.map((item) => (
+              <div key={item.id} className="relative min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer"
+                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+                onClick={() => onViewProductDetails(item)}>
+                <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-white font-bold text-[8px]"
+                  style={{ backgroundColor: '#f97316' }}>
+                  <TrendingUp size={8} fill="currentColor" /> MÁS VENDIDO
+                </div>
+                <div className="relative h-28">
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover" />
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow"
+                    style={{ backgroundColor: tc, color: '#fff' }}>
+                    <Plus size={12} />
+                  </button>
+                </div>
+                <div className="p-2.5">
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold truncate mb-0.5" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center gap-0.5 mb-1">
+                    {renderStars(getProductAverageRating(item.id), 9)}
+                    <span className="text-[9px]" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═══ 3C. PÍDELO EN COMBO ═══ */}
+      {combosCategoriaItems.length > 0 && (
+        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
+          <div className="flex justify-between items-end mb-3">
+            <div>
+              <div className="flex items-center gap-1.5 mb-1" style={{ color: tc }}>
+                <ShoppingCart size={14} />
+                <span className="font-semibold text-[11px] uppercase tracking-tight">Ahorra más</span>
+              </div>
+              <h3 className="text-lg font-bold" style={{ color: text1 }}>Pídelo en combo</h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Combos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
+              <button onClick={() => scroll(combosCategoriaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronLeft size={16} />
+              </button>
+              <button onClick={() => scroll(combosCategoriaRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop: Grid */}
+          <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {combosCategoriaItems.map((item) => (
+              <div key={item.id} className="relative rounded-2xl border overflow-hidden group cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5"
+                style={{ backgroundColor: cardBg, borderColor: tc, boxShadow: `0 0 15px ${tc}15` }}
+                onClick={() => onViewProductDetails(item)}>
+                <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-white font-bold text-[9px]"
+                  style={{ backgroundColor: tc }}>
+                  <ShoppingCart size={10} /> COMBO
+                </div>
+                <div className="relative h-36 overflow-hidden">
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  {item.estimated_prep_time && (
+                    <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                      <Clock size={10} /> {item.estimated_prep_time}min
+                    </div>
+                  )}
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                    className="absolute bottom-2 right-2 w-9 h-9 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: tc, color: '#fff' }}>
+                    <Plus size={16} />
+                  </button>
+                </div>
+                <div className="p-3">
+                  <p className="text-[10px] uppercase tracking-wider font-medium mb-0.5" style={{ color: text2 }}>{formatCategories(item)}</p>
+                  <h4 className="text-sm font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    {renderStars(getProductAverageRating(item.id))}
+                    <span className="text-[10px] font-medium" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-base" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                      {item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd && (
+                        <span className="line-through text-[11px]" style={{ color: `${text2}66` }}>${item.precio_anterior_usd.toFixed(2)}</span>
+                      )}
+                    </div>
+                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                      className="w-7 h-7 rounded-full flex items-center justify-center md:hidden"
+                      style={{ backgroundColor: surfaceContainer, color: tc }}>
+                      <Plus size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile: Horizontal Carousel */}
+          <div ref={combosCategoriaRef} className="flex md:hidden gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
+            {combosCategoriaItems.map((item) => (
+              <div key={item.id} className="relative min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer"
+                style={{ backgroundColor: cardBg, borderColor: tc }}
+                onClick={() => onViewProductDetails(item)}>
+                <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-white font-bold text-[8px]"
+                  style={{ backgroundColor: tc }}>
+                  <ShoppingCart size={8} /> COMBO
+                </div>
+                <div className="relative h-28">
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover" />
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow"
+                    style={{ backgroundColor: tc, color: '#fff' }}>
+                    <Plus size={12} />
+                  </button>
+                </div>
+                <div className="p-2.5">
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold truncate mb-0.5" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center gap-0.5 mb-1">
+                    {renderStars(getProductAverageRating(item.id), 9)}
+                    <span className="text-[9px]" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* ═══ 2. COMBOS EXPLOSIVOS ═══ */}
       {activeCombos.length > 0 && (
         <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-lg font-bold" style={{ color: text1 }}>Combos Explosivos</h3>
-            <div className="flex gap-1.5">
+            <div className="flex items-center gap-2">
+              <button onClick={() => setTab('catalog')} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
               <button onClick={() => scroll(comboRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center" style={{ borderColor: cardBorder, color: text1 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -725,7 +970,10 @@ export const Home: React.FC<HomeProps> = ({
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Panadería</h3>
               <p className="text-[11px]" style={{ color: text2 }}>Panes, pastelería y dulces frescos</p>
             </div>
-            <div className="flex gap-1.5">
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Panaderia'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
               <button onClick={() => scroll(panaderiaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -739,7 +987,7 @@ export const Home: React.FC<HomeProps> = ({
               <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative h-28 overflow-hidden">
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
                   <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -781,7 +1029,10 @@ export const Home: React.FC<HomeProps> = ({
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Comida Rápida</h3>
               <p className="text-[11px]" style={{ color: text2 }}>Hamburguesas, shawarmas y perros calientes</p>
             </div>
-            <div className="flex gap-1.5">
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Comida Rapida'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
               <button onClick={() => scroll(comidaRapidaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -795,7 +1046,7 @@ export const Home: React.FC<HomeProps> = ({
               <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative h-28 overflow-hidden">
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
                   <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -834,7 +1085,10 @@ export const Home: React.FC<HomeProps> = ({
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Repostería</h3>
               <p className="text-[11px]" style={{ color: text2 }}>Tortas, pasteles y dulces artesanales</p>
             </div>
-            <div className="flex gap-1.5">
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Repostería'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
               <button onClick={() => scroll(reposteriaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -848,7 +1102,7 @@ export const Home: React.FC<HomeProps> = ({
               <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative h-28 overflow-hidden">
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
                   <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -883,7 +1137,10 @@ export const Home: React.FC<HomeProps> = ({
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Charcutería</h3>
               <p className="text-[11px]" style={{ color: text2 }}>Chorizos, morcillas y embutidos frescos</p>
             </div>
-            <div className="flex gap-1.5">
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Charcutería y Embutidos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
               <button onClick={() => scroll(charcuteriaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -897,7 +1154,7 @@ export const Home: React.FC<HomeProps> = ({
               <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative h-28 overflow-hidden">
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
                   <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -932,7 +1189,10 @@ export const Home: React.FC<HomeProps> = ({
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Frutas y Verduras</h3>
               <p className="text-[11px]" style={{ color: text2 }}>Productos frescos del día</p>
             </div>
-            <div className="flex gap-1.5">
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Frutas y Verduras'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
               <button onClick={() => scroll(frutasRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -946,7 +1206,7 @@ export const Home: React.FC<HomeProps> = ({
               <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative h-28 overflow-hidden">
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
                   <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -981,7 +1241,10 @@ export const Home: React.FC<HomeProps> = ({
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Víveres</h3>
               <p className="text-[11px]" style={{ color: text2 }}>Arroz, pasta, aceites y más</p>
             </div>
-            <div className="flex gap-1.5">
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Viveres'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
               <button onClick={() => scroll(viveresRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -995,7 +1258,7 @@ export const Home: React.FC<HomeProps> = ({
               <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative h-28 overflow-hidden">
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
                   <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1030,7 +1293,10 @@ export const Home: React.FC<HomeProps> = ({
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Bebidas</h3>
               <p className="text-[11px]" style={{ color: text2 }}>Refrescos, jugos, té y agua</p>
             </div>
-            <div className="flex gap-1.5">
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Bebidas'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
               <button onClick={() => scroll(bebidasRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1044,7 +1310,7 @@ export const Home: React.FC<HomeProps> = ({
               <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative h-28 overflow-hidden">
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
                   <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1079,7 +1345,10 @@ export const Home: React.FC<HomeProps> = ({
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Mascotas</h3>
               <p className="text-[11px]" style={{ color: text2 }}>Alimento y cuidado para tus mascotas</p>
             </div>
-            <div className="flex gap-1.5">
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Mascotas'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
               <button onClick={() => scroll(mascotasRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1093,7 +1362,7 @@ export const Home: React.FC<HomeProps> = ({
               <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="relative h-28 overflow-hidden">
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
                   <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
@@ -1119,6 +1388,472 @@ export const Home: React.FC<HomeProps> = ({
           </div>
         </section>
       )}
+
+      {/* ═══ 12. HIGIENE PERSONAL ═══ */}
+      {higieneItems.length > 0 && (
+        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full" style={{ backgroundColor: isDarkMode ? '#111111' : '#fafafa' }}>
+          <div className="flex justify-between items-end mb-3">
+            <div>
+              <h3 className="text-lg font-bold" style={{ color: text1 }}>Higiene Personal</h3>
+              <p className="text-[11px]" style={{ color: text2 }}>Cuidado personal y bienestar</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Higiene Personal'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
+              <button onClick={() => scroll(higieneRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronLeft size={16} />
+              </button>
+              <button onClick={() => scroll(higieneRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+          <div ref={higieneRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+            {higieneItems.map((item) => (
+              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+                onClick={() => onViewProductDetails(item)}>
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                  {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: tc, color: '#fff' }}>
+                    <Plus size={12} />
+                  </button>
+                </div>
+                <div className="p-2.5">
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                      className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
+                      style={{ backgroundColor: surfaceContainer, color: tc }}>
+                      <Plus size={12} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═══ 13. SALSAS Y CONDIMENTOS ═══ */}
+      {salsasItems.length > 0 && (
+        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
+          <div className="flex justify-between items-end mb-3">
+            <div>
+              <h3 className="text-lg font-bold" style={{ color: text1 }}>Salsas y Condimentos</h3>
+              <p className="text-[11px]" style={{ color: text2 }}>Sabores para realzar tus comidas</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Salsas y Condimentos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
+              <button onClick={() => scroll(salsasRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronLeft size={16} />
+              </button>
+              <button onClick={() => scroll(salsasRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+          <div ref={salsasRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+            {salsasItems.map((item) => (
+              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+                onClick={() => onViewProductDetails(item)}>
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                  {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: tc, color: '#fff' }}>
+                    <Plus size={12} />
+                  </button>
+                </div>
+                <div className="p-2.5">
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                      className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
+                      style={{ backgroundColor: surfaceContainer, color: tc }}>
+                      <Plus size={12} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═══ 14. LICORES ═══ */}
+      {licoresItems.length > 0 && (
+        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full" style={{ backgroundColor: isDarkMode ? '#111111' : '#fafafa' }}>
+          <div className="flex justify-between items-end mb-3">
+            <div>
+              <h3 className="text-lg font-bold" style={{ color: text1 }}>Licores</h3>
+              <p className="text-[11px]" style={{ color: text2 }}>Vinos, whisky, ron y más</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Licores'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
+              <button onClick={() => scroll(licoresRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronLeft size={16} />
+              </button>
+              <button onClick={() => scroll(licoresRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+          <div ref={licoresRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+            {licoresItems.map((item) => (
+              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+                onClick={() => onViewProductDetails(item)}>
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                  {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: tc, color: '#fff' }}>
+                    <Plus size={12} />
+                  </button>
+                </div>
+                <div className="p-2.5">
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                      className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
+                      style={{ backgroundColor: surfaceContainer, color: tc }}>
+                      <Plus size={12} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═══ 15. LIMPIEZA ═══ */}
+      {limpiezaItems.length > 0 && (
+        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
+          <div className="flex justify-between items-end mb-3">
+            <div>
+              <h3 className="text-lg font-bold" style={{ color: text1 }}>Limpieza</h3>
+              <p className="text-[11px]" style={{ color: text2 }}>Productos para tu hogar</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Limpieza'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
+              <button onClick={() => scroll(limpiezaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronLeft size={16} />
+              </button>
+              <button onClick={() => scroll(limpiezaRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+          <div ref={limpiezaRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+            {limpiezaItems.map((item) => (
+              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+                onClick={() => onViewProductDetails(item)}>
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                  {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: tc, color: '#fff' }}>
+                    <Plus size={12} />
+                  </button>
+                </div>
+                <div className="p-2.5">
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                      className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
+                      style={{ backgroundColor: surfaceContainer, color: tc }}>
+                      <Plus size={12} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═══ 16. HOGAR ═══ */}
+      {hogarItems.length > 0 && (
+        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full" style={{ backgroundColor: isDarkMode ? '#111111' : '#fafafa' }}>
+          <div className="flex justify-between items-end mb-3">
+            <div>
+              <h3 className="text-lg font-bold" style={{ color: text1 }}>Hogar</h3>
+              <p className="text-[11px]" style={{ color: text2 }}>Artículos para el hogar</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Hogar'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
+              <button onClick={() => scroll(hogarRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronLeft size={16} />
+              </button>
+              <button onClick={() => scroll(hogarRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+          <div ref={hogarRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+            {hogarItems.map((item) => (
+              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+                onClick={() => onViewProductDetails(item)}>
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                  {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: tc, color: '#fff' }}>
+                    <Plus size={12} />
+                  </button>
+                </div>
+                <div className="p-2.5">
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                      className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
+                      style={{ backgroundColor: surfaceContainer, color: tc }}>
+                      <Plus size={12} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═══ 17. CARNICERÍA ═══ */}
+      {carniceriaItems.length > 0 && (
+        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
+          <div className="flex justify-between items-end mb-3">
+            <div>
+              <h3 className="text-lg font-bold" style={{ color: text1 }}>Carnicería</h3>
+              <p className="text-[11px]" style={{ color: text2 }}>Carnes frescas y embutidos</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Carnicería'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
+              <button onClick={() => scroll(carniceriaRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronLeft size={16} />
+              </button>
+              <button onClick={() => scroll(carniceriaRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+          <div ref={carniceriaRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+            {carniceriaItems.map((item) => (
+              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+                onClick={() => onViewProductDetails(item)}>
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                  {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: tc, color: '#fff' }}>
+                    <Plus size={12} />
+                  </button>
+                </div>
+                <div className="p-2.5">
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                      className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
+                      style={{ backgroundColor: surfaceContainer, color: tc }}>
+                      <Plus size={12} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═══ 18. LÁCTEOS ═══ */}
+      {lacteosItems.length > 0 && (
+        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full" style={{ backgroundColor: isDarkMode ? '#111111' : '#fafafa' }}>
+          <div className="flex justify-between items-end mb-3">
+            <div>
+              <h3 className="text-lg font-bold" style={{ color: text1 }}>Lácteos</h3>
+              <p className="text-[11px]" style={{ color: text2 }}>Leche, queso, mantequilla y más</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Lácteos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
+              <button onClick={() => scroll(lacteosRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronLeft size={16} />
+              </button>
+              <button onClick={() => scroll(lacteosRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+          <div ref={lacteosRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+            {lacteosItems.map((item) => (
+              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+                onClick={() => onViewProductDetails(item)}>
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                  {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: tc, color: '#fff' }}>
+                    <Plus size={12} />
+                  </button>
+                </div>
+                <div className="p-2.5">
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                      className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
+                      style={{ backgroundColor: surfaceContainer, color: tc }}>
+                      <Plus size={12} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═══ 19. COMBOS FAMILIARES ═══ */}
+      {combosFamiliaresItems.length > 0 && (
+        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
+          <div className="flex justify-between items-end mb-3">
+            <div>
+              <h3 className="text-lg font-bold" style={{ color: text1 }}>Combos Familiares</h3>
+              <p className="text-[11px]" style={{ color: text2 }}>Combos para toda la familia</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setSelectedCategory('Combos Familiares'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+                Ver más <ChevronRight size={14} />
+              </button>
+              <button onClick={() => scroll(combosFamiliaresRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronLeft size={16} />
+              </button>
+              <button onClick={() => scroll(combosFamiliaresRef, 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+          <div ref={combosFamiliaresRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+            {combosFamiliaresItems.map((item) => (
+              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+                onClick={() => onViewProductDetails(item)}>
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                  {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: tc, color: '#fff' }}>
+                    <Plus size={12} />
+                  </button>
+                </div>
+                <div className="p-2.5">
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || formatCategories(item)}</p>
+                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                      className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
+                      style={{ backgroundColor: surfaceContainer, color: tc }}>
+                      <Plus size={12} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═══ DYNAMIC MISSING CATEGORY CAROUSELS ═══ */}
+      {missingCategories.map((cat, idx) => (
+        <section key={cat.name} className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full"
+          style={idx % 2 === 1 ? { backgroundColor: isDarkMode ? '#111111' : '#fafafa' } : undefined}>
+          <div className="flex justify-between items-end mb-3">
+            <div>
+              <h3 className="text-lg font-bold" style={{ color: text1 }}>{cat.name}</h3>
+              <p className="text-[11px]" style={{ color: text2 }}>{cat.items.length} productos disponibles</p>
+            </div>
+            <div className="flex gap-1.5">
+              <button onClick={() => scroll(missingCatRefs[idx], 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronLeft size={16} />
+              </button>
+              <button onClick={() => scroll(missingCatRefs[idx], 'right')} className="w-8 h-8 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+          <div ref={missingCatRefs[idx]} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+            {cat.items.map((item) => (
+              <div key={item.id} className="min-w-[155px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+                onClick={() => onViewProductDetails(item)}>
+                <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: surfaceContainer }}>
+                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                  {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
+                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                    className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: tc, color: '#fff' }}>
+                    <Plus size={12} />
+                  </button>
+                </div>
+                <div className="p-2.5">
+                  <p className="text-[9px] uppercase tracking-wider mb-0.5 truncate" style={{ color: text2 }}>{item.subcategoria || cat.name}</p>
+                  <h4 className="text-xs font-bold truncate mb-1" style={{ color: text1 }}>{item.nombre}</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                      className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
+                      style={{ backgroundColor: surfaceContainer, color: tc }}>
+                      <Plus size={12} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
 
       {/* ═══ 8. PWA DOWNLOAD INVITATION ═══ */}
       <section id="download-app" className="py-6 px-4 md:px-8 max-w-[1440px] mx-auto w-full scroll-mt-4">

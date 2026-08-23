@@ -194,7 +194,6 @@ function AppContent() {
   const [tab, setTab] = useState<'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout'>((isAdminAuthenticated || isAdminUrl) ? 'admin' : 'home');
   const [is404, setIs404] = useState(is404Url);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Custom Overlays & Modals
@@ -208,7 +207,6 @@ function AppContent() {
 
   const resetAllFilters = () => {
     setSelectedCategory('');
-    setSelectedSubcategory('');
     setGlobalSearch('');
   };
 
@@ -317,7 +315,6 @@ function AppContent() {
             <Home
               setTab={setTab}
               setSelectedCategory={setSelectedCategory}
-              setSelectedSubcategory={setSelectedSubcategory}
               onViewProductDetails={setSelectedProductDetails}
               globalSearch={globalSearch}
               setGlobalSearch={setGlobalSearch}
@@ -333,8 +330,6 @@ function AppContent() {
             <Catalog
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}
-              selectedSubcategory={selectedSubcategory}
-              setSelectedSubcategory={setSelectedSubcategory}
               onViewProductDetails={setSelectedProductDetails}
               passedSearchTerm={globalSearch}
               clearPassedSearchTerm={() => setGlobalSearch('')}

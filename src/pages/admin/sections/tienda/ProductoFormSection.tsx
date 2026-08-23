@@ -32,7 +32,7 @@ const ProductoFormSection: React.FC<ProductoFormSectionProps> = ({ product, onSa
   const [descripcionCorta, setDescripcionCorta] = useState(product?.descripcion || '');
   const [descripcionCompleta, setDescripcionCompleta] = useState((product as any)?.descripcion_completa || '');
   const [categoria, setCategoria] = useState<string[]>(toArray(product?.categoria));
-  const [subcategoria, setSubcategoria] = useState(product?.subcategoria || '');
+
   const [precioUsd, setPrecioUsd] = useState(product?.precio_usd || 0);
   const [precioAnterior, setPrecioAnterior] = useState(product?.precio_anterior_usd || 0);
   const [stock, setStock] = useState(product?.stock || 0);
@@ -62,7 +62,7 @@ const ProductoFormSection: React.FC<ProductoFormSectionProps> = ({ product, onSa
   const toggleSection = (key: string) => setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
 
   const categories = config.categories || [];
-  const subcategories = config.subcategories || {};
+
 
   // ── Image Management ──
   const handleImageUpload = async (index: number, file: File) => {
@@ -151,7 +151,7 @@ const ProductoFormSection: React.FC<ProductoFormSectionProps> = ({ product, onSa
         nombre: nombre.trim(),
         descripcion: descripcionCorta.trim(),
         categoria: categoria,
-        subcategoria: subcategoria || undefined,
+
         precio_usd: precioUsd,
         precio_anterior_usd: esPromo && precioAnterior > 0 ? precioAnterior : undefined,
         stock,
@@ -241,13 +241,7 @@ const ProductoFormSection: React.FC<ProductoFormSectionProps> = ({ product, onSa
                 ))}
               </div>
             </div>
-            <div>
-              <label className="text-[10px] font-bold text-slate-500 uppercase">Subcategoría</label>
-              <select value={subcategoria} onChange={(e) => setSubcategoria(e.target.value)} className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-sm cursor-pointer" disabled={!categoria.length}>
-                <option value="">Ninguna</option>
-                {categoria.flatMap((cat: string) => ((subcategories as any)[cat] || []).map((s: string) => <option key={`${cat}-${s}`} value={s}>{s}</option>))}
-              </select>
-            </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-[10px] font-bold text-slate-500 uppercase">Precio USD *</label>
