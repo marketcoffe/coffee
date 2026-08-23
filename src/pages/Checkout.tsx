@@ -466,9 +466,7 @@ ${productosDetailText}
       if (appliedCoupon) {
         updateCoupon(appliedCoupon.id, { usage_count: (appliedCoupon.usage_count || 0) + 1 });
       }
-      if (finalUserId) {
-        earnLoyaltyPoints(finalUserId, created.id, totalUsd - discountFromCoupon, selectedSedeId || undefined);
-      }
+      // Legacy: earnLoyaltyPoints removed — points are now awarded via SQL trigger on order delivery
       localStorage.setItem('trv_active_order_id', created.id);
       localStorage.setItem('trv_checkout_contact', JSON.stringify({ nombre: clientName, telefono: clientPhone, email: clientEmail }));
       localStorage.setItem('trv_checkout_method', shippingMethod);

@@ -2008,7 +2008,7 @@ export const Home: React.FC<HomeProps> = ({
             <div className="w-full h-48 md:h-64 relative border-t" style={{ borderColor: cardBorder }}>
               <iframe
                 title="Ubicación en Google Maps"
-                src={`https://maps.google.com/maps?q=${config.coordenadas_tienda?.lat || 0},${config.coordenadas_tienda?.lng || 0}&z=15&output=embed`}
+                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1963.2083043602725!2d-67.9976162!3d10.2279443!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e805d6dc676e98f%3A0xba3a0b197129594d!2sCoffee%20market%20sweet!5e0!3m2!1ses!2sve!4v1787513029771!5m2!1ses!2sve"
                 className="w-full h-full border-0"
                 allowFullScreen
                 loading="lazy"

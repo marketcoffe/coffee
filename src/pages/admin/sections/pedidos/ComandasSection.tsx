@@ -24,7 +24,7 @@ const COLUMN_CONFIG: Record<KanbanColumn, { label: string; color: string; bg: st
 function getOrderColumn(order: Order): KanbanColumn {
   if (order.status === 'Cancelado') return 'Cancelado';
   if (order.status === 'Procesando') return 'Pendiente';
-  if (order.status === 'En preparacion' || order.status === 'En preparación') return 'En preparacion';
+  if (order.status === ('En preparacion' as Order['status']) || order.status === 'En preparación') return 'En preparacion';
   return order.status as KanbanColumn;
 }
 

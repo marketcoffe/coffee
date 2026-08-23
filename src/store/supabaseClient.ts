@@ -13,6 +13,7 @@ const MOCK_SESSION_KEY = 'trv_mock_session';
 interface MockUser {
   id: string;
   email: string;
+  username: string;
   password: string;
   user_metadata: Record<string, unknown>;
   app_metadata: Record<string, unknown>;
@@ -26,9 +27,9 @@ const getMockUsers = (): MockUser[] => {
   } catch { /* ignore */ }
   // Usuarios por defecto
   const defaults: MockUser[] = [
-    { id: 'admin-001', email: 'kecho8a@gmail.com', password: 'admin123', user_metadata: { nombre: 'Admin', role: 'admin' }, app_metadata: { role: 'admin' }, created_at: new Date().toISOString() },
-    { id: 'operator-001', email: 'op@gmail.com', password: '123456', user_metadata: { nombre: 'Operador', role: 'operator' }, app_metadata: { role: 'operator' }, created_at: new Date().toISOString() },
-    { id: 'customer-001', email: 'custo@gmail.com', password: '123456', user_metadata: { nombre: 'Cliente', role: 'customer' }, app_metadata: { role: 'customer' }, created_at: new Date().toISOString() },
+    { id: 'admin-001', email: 'kecho8a@gmail.com', username: 'maketo', password: 'admin123', user_metadata: { nombre: 'Admin', role: 'admin' }, app_metadata: { role: 'admin' }, created_at: new Date().toISOString() },
+    { id: 'operator-001', email: 'op@gmail.com', username: 'operador', password: '123456', user_metadata: { nombre: 'Operador', role: 'operator' }, app_metadata: { role: 'operator' }, created_at: new Date().toISOString() },
+    { id: 'customer-001', email: 'marketcoffee.ve@gmail.com', username: 'marketcoffee', password: '123456', user_metadata: { nombre: 'Cliente', role: 'customer' }, app_metadata: { role: 'customer' }, created_at: new Date().toISOString() },
   ];
   localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(defaults));
   return defaults;
@@ -110,7 +111,10 @@ const createMockClient = (): SupabaseClient => {
       },
       signInWithPassword: async ({ email, password }: { email: string; password: string }) => {
         const users = getMockUsers();
-        const user = users.find(u => u.email === email.trim().toLowerCase() && u.password === password.trim());
+        const input = email.trim().toLowerCase();
+        const user = users.find(u =>
+          (u.username.toLowerCase() === input || u.email.toLowerCase() === input) && u.password === password.trim()
+        );
         if (!user) return { data: { user: null, session: null }, error: { message: 'Credenciales incorrectas' } };
         const session = createMockSession(user);
         localStorage.setItem(MOCK_SESSION_KEY, JSON.stringify(session));
@@ -124,6 +128,7 @@ const createMockClient = (): SupabaseClient => {
         const newUser: MockUser = {
           id: 'mock-' + Date.now(),
           email: email.trim().toLowerCase(),
+          username: (options?.data?.username as string) || email.trim().split('@')[0],
           password: password.trim(),
           user_metadata: options?.data || {},
           app_metadata: {},
@@ -249,6 +254,24 @@ export const uploadFileToStorage = async (file: File | Blob, bucket: string, fol
 
   const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
   return data.publicUrl;
+};
+
+/**
+ * Comprime una imagen a WebP y la sube a Supabase Storage.
+ * Función centralizada para que todos los uploads de imagen pasen por aquí.
+ */
+export const uploadImage = async (
+  file: File,
+  bucket: string,
+  folder: string,
+  options: { maxWidth?: number; quality?: number } = {}
+): Promise<string> => {
+  const compressed = await compressImage(file, {
+    maxWidth: options.maxWidth ?? 800,
+    quality: options.quality ?? 0.82,
+    format: 'image/webp'
+  });
+  return uploadFileToStorage(compressed, bucket, folder);
 };
 
 /**

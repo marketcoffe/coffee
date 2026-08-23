@@ -120,6 +120,8 @@ export const onRequestPost: any = async (context: any) => {
       : crypto.randomUUID();
     const userPhone = (payload.phone || payload.telefono || '').toString().slice(0, 32).trim();
     const userId = payload.user_id ? String(payload.user_id).slice(0, 128) : null;
+    const platform = (payload.platform || 'unknown').toString().slice(0, 32);
+    const userAgent = (payload.user_agent || '').toString().slice(0, 512);
 
     // Upsert subscription - save with user_id: null for anonymous users
     const subJSON = typeof subscription === 'string' ? JSON.parse(subscription) : subscription;
@@ -143,7 +145,11 @@ export const onRequestPost: any = async (context: any) => {
       const updateData: any = {
         p256dh: String(subJSON.keys?.p256dh || '').slice(0, 1024),
         auth_secret: String(subJSON.keys?.auth || '').slice(0, 256),
-        anonymous_id: anonymousId
+        anonymous_id: anonymousId,
+        platform,
+        user_agent: userAgent,
+        is_active: true,
+        last_used_at: new Date().toISOString()
       };
       if (userId) updateData.user_id = userId;
       if (userPhone) updateData.destinatario_telefono = userPhone;
@@ -164,6 +170,9 @@ export const onRequestPost: any = async (context: any) => {
           auth_secret: String(subJSON.keys?.auth || '').slice(0, 256),
           destinatario_telefono: userPhone || null,
           anonymous_id: anonymousId,
+          platform,
+          user_agent: userAgent,
+          is_active: true,
           created_at: new Date().toISOString()
         });
       dbError = insertError;

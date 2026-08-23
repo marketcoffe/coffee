@@ -245,21 +245,41 @@ export const onRequestPost: any = async (context: any) => {
 
     // 5. Payload Web Push - usar tag consistente con 'marketcoffee-' prefix
     const notifId = record.id || ('notif-' + crypto.randomUUID().slice(0, 12));
+    const notifTipo = record.tipo || 'todos';
+
+    // Determinar prioridad segun tipo de notificacion
+    const isHighPriority = notifTipo === 'personal' || notifTipo === 'admin' || notifTipo === 'request';
+
     const payloadForSW = {
       title: titulo,
       body: mensaje,
+      icon: record.icon || '/icon.png',
+      badge: record.badge || '/icon.png',
+      image: record.imagen_url || record.image || undefined,
       link_url: linkUrl,
       tag: 'marketcoffee-' + notifId,
       id: notifId,
-      requireInteraction: false,
+      tipo: notifTipo,
+      priority: isHighPriority ? 'high' : 'normal',
+      requireInteraction: isHighPriority,
       silent: false,
     };
 
-    // 6. Enviar a cada suscripcion en paralelo
+    // 6. Enviar a cada suscripcion en paralelo con headers VAPID correctos
     const results = await Promise.all(
       validSubscriptions.map(async (sub) => {
         try {
-          await webpush.sendNotification(sub as any, JSON.stringify(payloadForSW));
+          // Headers HTTP obligatorios para Web Push:
+          // - TTL: 0 para urgentes (pedido/chat), 86400 para promos (24h)
+          // - Urgency: high para pedidos, normal para promos
+          // - Topic: reemplaza notificaciones previas del mismo tipo en la barra
+          const pushOptions = {
+            TTL: isHighPriority ? 0 : 86400,
+            urgency: isHighPriority ? 'high' : 'normal',
+            topic: 'marketcoffee-' + notifTipo,
+          };
+
+          await webpush.sendNotification(sub as any, JSON.stringify(payloadForSW), pushOptions);
 
           // Track successful send
           try {

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { uploadFileToStorage, compressImage } from '../../../store/supabaseClient';
+import { uploadImage } from '../../../store/supabaseClient';
 import { useToast } from '../../../components/Toast';
 import { Image, Upload, Link, X } from 'lucide-react';
 
@@ -10,9 +10,7 @@ interface ImageFieldProps {
   folder?: string;
   label?: string;
   maxSize?: number;
-  format?: 'image/png' | 'image/jpeg' | 'image/webp';
   previewSize?: 'sm' | 'md' | 'lg';
-  accept?: string;
 }
 
 const ImageField: React.FC<ImageFieldProps> = ({
@@ -22,9 +20,7 @@ const ImageField: React.FC<ImageFieldProps> = ({
   folder = 'uploads',
   label,
   maxSize = 800,
-  format = 'image/png',
   previewSize = 'md',
-  accept = 'image/png, image/jpeg, image/webp',
 }) => {
   const [uploading, setUploading] = useState(false);
   const [urlInput, setUrlInput] = useState(value || '');
@@ -38,9 +34,7 @@ const ImageField: React.FC<ImageFieldProps> = ({
     if (!file) return;
     setUploading(true);
     try {
-      const compressed = await compressImage(file, { maxWidth: maxSize, format });
-      const ext = format === 'image/webp' ? 'webp' : format === 'image/jpeg' ? 'jpg' : 'png';
-      const url = await uploadFileToStorage(compressed, bucket, `${folder}/${crypto.randomUUID()}.${ext}`);
+      const url = await uploadImage(file, bucket, folder, { maxWidth: maxSize });
       onChange(url);
       setUrlInput(url);
     } catch (err: unknown) {
@@ -130,14 +124,14 @@ const ImageField: React.FC<ImageFieldProps> = ({
             type="file"
             ref={fileInputRef}
             hidden
-            accept={accept}
+            accept="image/png, image/jpeg, image/webp"
             onChange={handleFileUpload}
           />
         </div>
       </div>
 
       <p className="text-[10px]" style={{ color: 'var(--ios-text-tertiary)' }}>
-        Formatos: JPG, PNG, WebP
+        Se convierte automáticamente a WebP. Formatos: JPG, PNG, WebP
       </p>
     </div>
   );

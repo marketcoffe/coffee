@@ -35,7 +35,7 @@ interface AppContextProps {
   toggleCurrency: () => void;
   users: AppUser[];
   currentUser: AppUser | null;
-  registerUser: (nombre: string, email: string, telefono: string, contrasena: string) => Promise<AppUser>;
+  registerUser: (nombre: string, username: string, email: string, telefono: string, contrasena: string) => Promise<AppUser>;
   loginUser: (identifier: string, contrasena: string) => Promise<AppUser | null>;
   logoutUser: () => void;
   updateUser: (updated: Partial<AppUser>) => void;
@@ -183,8 +183,10 @@ const DEFAULT_PRODUCTS: FoodItem[] = [
 const DEFAULT_CONFIG: StoreConfig = {
   site_nombre: 'Market Coffee Sweet',
   telefono_soporte: '+584124058904',
-  direccion_fisica: 'Av. Principal El Trigal, justo al frente de Patio Trigal, Valencia, Carabobo',
-  coordenadas_tienda: { lat: 10.2185, lng: -68.0021 },
+  direccion_fisica: '2001 Calle 159, C. Apolo, Valencia 2001, Carabobo',
+  coordenadas_tienda: { lat: 10.2279443, lng: -67.997616 },
+  correo_interno: 'marketcoffee.ve@gmail.com',
+  instagram_url: 'https://www.instagram.com/marketcoffee_sweet',
   banners: [
     '/imagen/descarga_app.webp',
     '/imagen/combo-banner.webp',
@@ -242,7 +244,7 @@ const DEFAULT_CONFIG: StoreConfig = {
   banner_cta_texts: ['', 'Ver combos', ''],
   banner_cta_urls: ['', '/catalog', ''],
   hero_title: 'Market Coffee Sweet',
-  hero_subtitle: 'Tu minimarket de confianza en El Trigal, Valencia. Panadería fresca, comida rápida, víveres y más con delivery a domicilio.',
+  hero_subtitle: 'Tu minimarket de confianza en C. Apolo, Valencia. Panadería fresca, comida rápida, víveres y más con delivery a domicilio.',
   hero_cta_text: 'Descargar la app',
   hero_cta_url: '#download-app',
   categories: [
@@ -267,7 +269,7 @@ const DEFAULT_CONFIG: StoreConfig = {
   ],
   subcategories: {},
   seo_home_title: 'Market Coffee Sweet | Panadería, Comida Rápida y Víveres en Valencia',
-  seo_home_description: 'Tu minimarket de confianza en El Trigal, Valencia. Panadería fresca, comida rápida (hamburguesas, shawarmas, perros calientes), víveres, frutas, verduras, bebidas y agua potable con delivery a domicilio.',
+  seo_home_description: 'Tu minimarket de confianza en C. Apolo, Valencia. Panadería fresca, comida rápida (hamburguesas, shawarmas, perros calientes), víveres, frutas, verduras, bebidas y agua potable con delivery a domicilio.',
   seo_home_keywords: 'panadería, comida rápida, hamburguesas, shawarmas, víveres, delivery, Valencia, El Trigal, Prebo, La Viña, Mañongo, Naguanagua, San Diego, minimarket, pan fresco, agua potable',
   seo_catalog_title: 'Catálogo de Productos',
   seo_catalog_description: 'Explora nuestro catálogo completo: panadería fresca, comida rápida, víveres, frutas, verduras, bebidas y más con delivery en Valencia y alrededores.',
@@ -282,9 +284,9 @@ const DEFAULT_CONFIG: StoreConfig = {
     {
       id: 'sede-1',
       nombre: 'Sede Principal',
-      direccion: 'Av. Principal, Local #12, Ciudad',
+      direccion: '2001 Calle 159, C. Apolo, Valencia 2001, Carabobo',
       telefono: '+584124058904',
-      coordenadas: { lat: 10.198300, lng: -68.004400 },
+      coordenadas: { lat: 10.2279443, lng: -67.997616 },
       horario: '11am - 10pm',
       activa: true,
       es_principal: true
@@ -297,11 +299,16 @@ const DEFAULT_CONFIG: StoreConfig = {
     redemption_rate: 100,
     max_discount_percent: 30,
     welcome_bonus: 50,
+    first_order_bonus: 25,
+    referral_bonus_referrer: 100,
+    referral_bonus_referred: 50,
+    daily_login_bonus: 5,
+    review_bonus: 10,
     bonus_actions: { daily_login: 5, first_order: 25, review: 10, referral: 100 },
     tiers: [
-      { id: 'tier-bronze', name: 'Bronce', min_points: 0, multiplier: 1, benefits: ['Puntos base'], color: '#CD7F32' },
-      { id: 'tier-silver', name: 'Plata', min_points: 500, multiplier: 1.25, benefits: ['25% más puntos'], color: '#8E8E93' },
-      { id: 'tier-gold', name: 'Oro', min_points: 1500, multiplier: 1.5, benefits: ['50% más puntos', 'Envío gratis'], color: '#FF9500' },
+      { id: 'tier-bronze', name: 'Bronce', min_points: 0, multiplier: 1, benefits: ['Puntos base'], color: '#CD7F32', icon: '🥉', sort_order: 1, active: true },
+      { id: 'tier-silver', name: 'Plata', min_points: 500, multiplier: 1.25, benefits: ['25% más puntos'], color: '#8E8E93', icon: '🥈', sort_order: 2, active: true },
+      { id: 'tier-gold', name: 'Oro', min_points: 1500, multiplier: 1.5, benefits: ['50% más puntos', 'Envío gratis'], color: '#FF9500', icon: '🥇', sort_order: 3, active: true },
     ],
   },
   brand_stat1_value: '20min',
@@ -1829,12 +1836,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // User Management Implementation
-  const registerUser = async (nombre: string, email: string, telefono: string, contrasena: string): Promise<AppUser> => {
+  const registerUser = async (nombre: string, username: string, email: string, telefono: string, contrasena: string): Promise<AppUser> => {
     // 1. Registrar primero en Supabase Auth para obtener el UID oficial
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password: contrasena.trim(),
-      options: { data: { nombre: nombre.trim(), telefono: telefono.trim() } }
+      options: { data: { nombre: nombre.trim(), username: username.trim(), telefono: telefono.trim() } }
     });
 
     if (authError) {
@@ -1845,8 +1852,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     const newUser: AppUser = {
-      id: authData.user?.id || `user-${Date.now()}`, // Sincronizar con el ID de Auth
+      id: authData.user?.id || `user-${Date.now()}`,
       nombre: nombre.trim(),
+      username: username.trim(),
       email: email.trim().toLowerCase(),
       telefono: telefono.trim(),
       contrasena: contrasena.trim(),
@@ -1867,39 +1875,40 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const loyaltyConfig = config.loyalty;
     if (loyaltyConfig?.enabled && loyaltyConfig.welcome_bonus > 0 && authData.user?.id) {
       const bonusPoints = loyaltyConfig.welcome_bonus;
-      const tx: LoyaltyTransaction = {
-        id: `loy-tx-welcome-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
-        user_id: authData.user.id,
-        type: 'earn',
-        points: bonusPoints,
-        description: 'Bonus de bienvenida',
-        created_at: new Date().toISOString(),
-      };
       try {
-        await supabase.from('loyalty_transactions').insert({
-          user_id: tx.user_id,
-          type: tx.type,
-          points: tx.points,
-          description: tx.description,
-          sede_id: '',
+        await supabase.from('loyalty_history').insert({
+          user_id: authData.user.id,
+          points: bonusPoints,
+          operation: 'suma',
+          reason: 'bienvenida',
+          description: 'Bonus de bienvenida',
+          created_by: 'system',
         });
         await supabase.from('usuarios_clientes')
-          .update({ loyalty_points: bonusPoints, loyalty_lifetime_points: bonusPoints })
+          .update({ puntos_fidelidad: bonusPoints, puntos_historicos: bonusPoints })
           .eq('id', authData.user.id);
       } catch (e) {
         console.error('[Loyalty] Welcome bonus sync failed:', e);
       }
-      setLoyaltyTransactions(prev => [...prev, tx]);
+      setLoyaltyTransactions(prev => [...prev, {
+        id: `loy-tx-welcome-${Date.now()}`,
+        user_id: authData.user!.id,
+        operation: 'suma',
+        reason: 'bienvenida',
+        points: bonusPoints,
+        description: 'Bonus de bienvenida',
+        created_at: new Date().toISOString(),
+      }]);
       setUsers(prev => prev.map(u => {
         if (u.id !== authData.user?.id) return u;
-        return { ...u, loyalty_points: bonusPoints, loyalty_lifetime_points: bonusPoints };
+        return { ...u, puntos_fidelidad: bonusPoints, puntos_historicos: bonusPoints, loyalty_points: bonusPoints, loyalty_lifetime_points: bonusPoints };
       }));
-      setCurrentUser(prev => prev ? { ...prev, loyalty_points: bonusPoints, loyalty_lifetime_points: bonusPoints } : prev);
+      setCurrentUser(prev => prev ? { ...prev, puntos_fidelidad: bonusPoints, puntos_historicos: bonusPoints, loyalty_points: bonusPoints, loyalty_lifetime_points: bonusPoints } : prev);
     }
 
     addNotification(
       '¡Registro Exitoso! 🎉',
-      `Hola ${newUser.nombre}. Te has registrado con éxito. Recuerda que con tu nombre, teléfono (${newUser.telefono}) y tu clave secreta podrás acceder siempre a tu panel de usuario.`,
+      `Hola ${newUser.nombre}. Te has registrado con éxito. Recuerda que con tu usuario (${newUser.username}), teléfono (${newUser.telefono}) y tu clave secreta podrás acceder siempre a tu panel de usuario.`,
       'personal',
       newUser.telefono
     );
@@ -1910,23 +1919,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const loginUser = async (identifier: string, contrasena: string): Promise<AppUser | null> => {
     const cleanId = identifier.trim().toLowerCase();
     
-    // Determine if identifier is email or phone
+    // Determine if identifier is email or username
     const isEmail = cleanId.includes('@');
     
     // Use Supabase Auth for secure login
     let authEmail = cleanId;
     if (!isEmail) {
-      // If phone number, look up the email from usuarios_clientes
+      // If username, look up the email from usuarios_clientes
       const { data: lookupData } = await supabase
         .from('usuarios_clientes')
         .select('email')
-        .eq('telefono', identifier.trim())
+        .eq('username', identifier.trim())
         .single();
       
       if (lookupData?.email) {
         authEmail = lookupData.email;
       } else {
-        return null; // No account found for this phone
+        return null; // No account found for this username
       }
     }
 
@@ -1954,12 +1963,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       telefono: dbUser?.telefono || data.user.user_metadata?.telefono || '',
       contrasena: 'auth_managed',
       createdAt: dbUser?.created_at || data.user.created_at || new Date().toISOString(),
-      loyalty_points: dbUser?.loyalty_points || 0,
-      loyalty_lifetime_points: dbUser?.loyalty_lifetime_points || 0,
-      loyalty_tier_id: dbUser?.loyalty_tier_id || '',
+      puntos_fidelidad: dbUser?.puntos_fidelidad || dbUser?.loyalty_points || 0,
+      puntos_historicos: dbUser?.puntos_historicos || dbUser?.loyalty_lifetime_points || 0,
+      codigo_referido: dbUser?.codigo_referido || '',
+      referred_by: dbUser?.referred_by || '',
+      referral_count: dbUser?.referral_count || 0,
       sede_preferida_id: dbUser?.sede_preferida_id || '',
       is_pwa_installed: dbUser?.is_pwa_installed || false,
       pwa_installed_at: dbUser?.pwa_installed_at || undefined,
+      loyalty_points: dbUser?.loyalty_points || 0,
+      loyalty_lifetime_points: dbUser?.loyalty_lifetime_points || 0,
     };
 
     setCurrentUser(user);
@@ -1986,8 +1999,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return { success: true };
   };
 
-  const logoutUser = () => {
+  const logoutUser = async () => {
     setCurrentUser(null);
+    await supabase.auth.signOut();
   };
 
   const updateUser = (updated: Partial<AppUser>) => {
@@ -2041,12 +2055,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const syncCategoriesToSupabase = (newCategories: string[]) => {
+    supabase.from('store_config').upsert({ id: 1, categories: newCategories })
+      .then(({ error }) => { if (error) console.error('[Categories] Sync error:', error.message); });
+  };
+
   const addCategory = (categoryName: string) => {
     setConfig(prev => {
       const currentCats = prev.categories || [];
       if (currentCats.includes(categoryName)) return prev;
-      const updated = { ...prev, categories: [...currentCats, categoryName] };
+      const updatedCats = [...currentCats, categoryName];
+      const updated = { ...prev, categories: updatedCats };
       localStorage.setItem('trv_config', JSON.stringify(updated));
+      syncCategoriesToSupabase(updatedCats);
       return updated;
     });
   };
@@ -2054,15 +2075,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const deleteCategory = (categoryName: string) => {
     setConfig(prev => {
       const currentCats = prev.categories || [];
-      const updated = { ...prev, categories: currentCats.filter(c => c !== categoryName) };
+      const updatedCats = currentCats.filter(c => c !== categoryName);
+      const updated = { ...prev, categories: updatedCats };
       localStorage.setItem('trv_config', JSON.stringify(updated));
+      syncCategoriesToSupabase(updatedCats);
       return updated;
     });
 
     setProducts(prevProducts => {
       const updatedProducts = prevProducts.map(p => {
         if (hasCategory(p, categoryName)) {
-          return { ...p, categoria: getCategories(p).filter(c => c.toLowerCase() !== categoryName.toLowerCase()) };
+          const newCats = getCategories(p).filter(c => c.toLowerCase() !== categoryName.toLowerCase());
+          const updated = { ...p, categoria: newCats };
+          supabase.from('products').update({ categoria: newCats }).eq('id', p.id)
+            .then(({ error }) => { if (error) console.error('[Category] Product sync error:', error.message); });
+          return updated;
         }
         return p;
       });
@@ -2074,17 +2101,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateCategory = (oldCategory: string, newCategory: string) => {
     setConfig(prev => {
       const currentCats = prev.categories || [];
-      const updated = {
-        ...prev,
-        categories: currentCats.map(c => c === oldCategory ? newCategory : c)
-      };
+      const updatedCats = currentCats.map(c => c === oldCategory ? newCategory : c);
+      const updated = { ...prev, categories: updatedCats };
       localStorage.setItem('trv_config', JSON.stringify(updated));
+      syncCategoriesToSupabase(updatedCats);
       return updated;
     });
     setProducts(prevProducts => {
       const updatedProducts = prevProducts.map(p => {
         if (hasCategory(p, oldCategory)) {
-          return { ...p, categoria: getCategories(p).map(c => c.toLowerCase() === oldCategory.toLowerCase() ? newCategory : c) };
+          const newCats = getCategories(p).map(c => c.toLowerCase() === oldCategory.toLowerCase() ? newCategory : c);
+          const updated = { ...p, categoria: newCats };
+          supabase.from('products').update({ categoria: newCats }).eq('id', p.id)
+            .then(({ error }) => { if (error) console.error('[Category] Product sync error:', error.message); });
+          return updated;
         }
         return p;
       });
@@ -2250,10 +2280,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const markNotificationAsRead = (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, leida: true } : n));
+    supabase.from('notifications').update({ leida: true }).eq('id', id)
+      .then(({ error }) => { if (error) console.error('[Notification] Mark read sync error:', error.message); });
   };
 
   const toggleNotificationReadStatus = (id: string) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, leida: !n.leida } : n));
+    setNotifications(prev => {
+      const target = prev.find(n => n.id === id);
+      const newLeida = target ? !target.leida : false;
+      supabase.from('notifications').update({ leida: newLeida }).eq('id', id)
+        .then(({ error }) => { if (error) console.error('[Notification] Toggle read sync error:', error.message); });
+      return prev.map(n => n.id === id ? { ...n, leida: newLeida } : n);
+    });
   };
 
   const registerNotificationClick = async (id: string) => {
@@ -2330,17 +2368,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const deleteNotification = (id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
+    supabase.from('notifications').delete().eq('id', id)
+      .then(({ error }) => { if (error) console.error('[Notification] Delete sync error:', error.message); });
   };
 
   const clearAllNotifications = () => {
     setNotifications([]);
+    supabase.from('notifications').delete().neq('id', '')
+      .then(({ error }) => { if (error) console.error('[Notification] ClearAll sync error:', error.message); });
   };
 
   // Admin/Operator Auth functions
-  const authenticateAdmin = async (email: string, pass: string): Promise<boolean> => {
+  const authenticateAdmin = async (identifier: string, pass: string): Promise<boolean> => {
     try {
+      // Resolve username to email if needed
+      const isEmail = identifier.includes('@');
+      let authEmail = identifier.trim();
+      if (!isEmail) {
+        const { data: lookupData } = await supabase
+          .from('admin_users')
+          .select('email')
+          .eq('username', identifier.trim())
+          .single();
+        if (lookupData?.email) {
+          authEmail = lookupData.email;
+        } else {
+          return false;
+        }
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+        email: authEmail,
         password: pass.trim()
       });
       if (error) {
@@ -2455,23 +2513,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const tx: LoyaltyTransaction = {
       id: `loy-tx-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
       user_id: userId,
-      type: 'earn',
+      operation: 'suma',
+      reason: 'compra',
       points: pointsEarned,
       description: user.is_pwa_installed ? `Compra #${orderId.slice(-8)} (Bonus App x1.5)` : `Compra #${orderId.slice(-8)}`,
       order_id: orderId,
-      sede_id: sedeId,
       created_at: new Date().toISOString(),
     };
     
     // Persistir a Supabase (idempotente por unique index en user_id+order_id)
     try {
-      const { error: txErr } = await supabase.from('loyalty_transactions').insert({
+      const { error: txErr } = await supabase.from('loyalty_history').insert({
         user_id: tx.user_id,
-        type: tx.type,
+        operation: tx.operation,
+        reason: tx.reason,
         points: tx.points,
         description: tx.description,
         order_id: tx.order_id,
-        sede_id: tx.sede_id || '',
+        created_by: 'system',
       });
       if (txErr && txErr.code !== '23505') { // 23505 = duplicate key (ya ganó puntos por esta orden)
         console.error('[Loyalty] Error guardando transaccion:', txErr.message);
@@ -2479,8 +2538,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // Actualizar puntos en Supabase
       const { error: ptsErr } = await supabase.from('usuarios_clientes')
         .update({
-          loyalty_points: (user.loyalty_points || 0) + pointsEarned,
-          loyalty_lifetime_points: (user.loyalty_lifetime_points || 0) + pointsEarned,
+          puntos_fidelidad: (user.puntos_fidelidad || user.loyalty_points || 0) + pointsEarned,
+          puntos_historicos: (user.puntos_historicos || user.loyalty_lifetime_points || 0) + pointsEarned,
         })
         .eq('id', userId);
       if (ptsErr) console.error('[Loyalty] Error actualizando puntos:', ptsErr.message);
@@ -2494,6 +2553,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (u.id !== userId) return u;
       return {
         ...u,
+        puntos_fidelidad: (u.puntos_fidelidad || u.loyalty_points || 0) + pointsEarned,
+        puntos_historicos: (u.puntos_historicos || u.loyalty_lifetime_points || 0) + pointsEarned,
         loyalty_points: (u.loyalty_points || 0) + pointsEarned,
         loyalty_lifetime_points: (u.loyalty_lifetime_points || 0) + pointsEarned,
       };
@@ -2501,6 +2562,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (currentUser?.id === userId) {
       setCurrentUser(prev => prev ? {
         ...prev,
+        puntos_fidelidad: (prev.puntos_fidelidad || prev.loyalty_points || 0) + pointsEarned,
+        puntos_historicos: (prev.puntos_historicos || prev.loyalty_lifetime_points || 0) + pointsEarned,
         loyalty_points: (prev.loyalty_points || 0) + pointsEarned,
         loyalty_lifetime_points: (prev.loyalty_lifetime_points || 0) + pointsEarned,
       } : prev);
@@ -2573,30 +2636,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const reward = rewardCatalog.find(r => r.id === rewardId);
     if (!reward || !reward.active) return false;
     const user = users.find(u => u.id === userId);
-    if (!user || (user.loyalty_points || 0) < reward.points_cost) return false;
+    if (!user || (user.puntos_fidelidad || user.loyalty_points || 0) < reward.points_cost) return false;
     
     const tx: LoyaltyTransaction = {
       id: `loy-tx-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
       user_id: userId,
-      type: 'redeem',
-      points: -reward.points_cost,
+      operation: 'resta',
+      reason: 'canje',
+      points: reward.points_cost,
       description: `Canje: ${reward.name}`,
       created_at: new Date().toISOString(),
     };
 
-    const newPoints = (user.loyalty_points || 0) - reward.points_cost;
+    const newPoints = (user.puntos_fidelidad || user.loyalty_points || 0) - reward.points_cost;
 
     // Persistir a Supabase
     try {
-      const { error: txErr } = await supabase.from('loyalty_transactions').insert({
+      const { error: txErr } = await supabase.from('loyalty_history').insert({
         user_id: tx.user_id,
-        type: tx.type,
+        operation: tx.operation,
+        reason: tx.reason,
         points: tx.points,
         description: tx.description,
+        created_by: userId,
       });
       if (txErr) console.error('[Loyalty] Error guardando canje:', txErr.message);
       const { error: ptsErr } = await supabase.from('usuarios_clientes')
-        .update({ loyalty_points: newPoints })
+        .update({ puntos_fidelidad: newPoints, loyalty_points: newPoints })
         .eq('id', userId);
       if (ptsErr) console.error('[Loyalty] Error actualizando puntos:', ptsErr.message);
     } catch (e) {
@@ -2607,10 +2673,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setLoyaltyTransactions(prev => [...prev, tx]);
     setUsers(prev => prev.map(u => {
       if (u.id !== userId) return u;
-      return { ...u, loyalty_points: newPoints };
+      return { ...u, puntos_fidelidad: newPoints, loyalty_points: newPoints };
     }));
     if (currentUser?.id === userId) {
-      setCurrentUser(prev => prev ? { ...prev, loyalty_points: newPoints } : prev);
+      setCurrentUser(prev => prev ? { ...prev, puntos_fidelidad: newPoints, loyalty_points: newPoints } : prev);
     }
     return true;
   };
@@ -2620,32 +2686,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!loyaltyConfig?.enabled) return false;
     
     const user = users.find(u => u.id === userId);
-    if (!user || (user.loyalty_points || 0) < pointsToRedeem) return false;
+    if (!user || (user.puntos_fidelidad || user.loyalty_points || 0) < pointsToRedeem) return false;
     
     const tx: LoyaltyTransaction = {
       id: `loy-tx-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
       user_id: userId,
-      type: 'redeem',
-      points: -pointsToRedeem,
+      operation: 'resta',
+      reason: 'canje',
+      points: pointsToRedeem,
       description: orderId ? `Canje en pedido #${orderId.slice(-8)}` : 'Canje de puntos',
       order_id: orderId,
       created_at: new Date().toISOString(),
     };
     
-    const newPoints = (user.loyalty_points || 0) - pointsToRedeem;
+    const newPoints = (user.puntos_fidelidad || user.loyalty_points || 0) - pointsToRedeem;
 
     // Persistir a Supabase
     try {
-      const { error: txErr } = await supabase.from('loyalty_transactions').insert({
+      const { error: txErr } = await supabase.from('loyalty_history').insert({
         user_id: tx.user_id,
-        type: tx.type,
+        operation: tx.operation,
+        reason: tx.reason,
         points: tx.points,
         description: tx.description,
         order_id: tx.order_id || null,
+        created_by: userId,
       });
       if (txErr) console.error('[Loyalty] Error guardando canje:', txErr.message);
       const { error: ptsErr } = await supabase.from('usuarios_clientes')
-        .update({ loyalty_points: newPoints })
+        .update({ puntos_fidelidad: newPoints, loyalty_points: newPoints })
         .eq('id', userId);
       if (ptsErr) console.error('[Loyalty] Error actualizando puntos:', ptsErr.message);
     } catch (e) {
@@ -2656,10 +2725,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setLoyaltyTransactions(prev => [...prev, tx]);
     setUsers(prev => prev.map(u => {
       if (u.id !== userId) return u;
-      return { ...u, loyalty_points: newPoints };
+      return { ...u, puntos_fidelidad: newPoints, loyalty_points: newPoints };
     }));
     if (currentUser?.id === userId) {
-      setCurrentUser(prev => prev ? { ...prev, loyalty_points: newPoints } : prev);
+      setCurrentUser(prev => prev ? { ...prev, puntos_fidelidad: newPoints, loyalty_points: newPoints } : prev);
     }
     
     return true;
@@ -2667,8 +2736,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const getUserLoyaltyPoints = (userId: string): number => {
     const user = users.find(u => u.id === userId);
-    if (user) return user.loyalty_points || 0;
-    if (currentUser?.id === userId) return currentUser.loyalty_points || 0;
+    if (user) return user.puntos_fidelidad || user.loyalty_points || 0;
+    if (currentUser?.id === userId) return currentUser.puntos_fidelidad || currentUser.loyalty_points || 0;
     return 0;
   };
 
@@ -2677,8 +2746,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!loyaltyConfig?.enabled || !loyaltyConfig.tiers?.length) return null;
     
     const user = users.find(u => u.id === userId);
-    const lifetimePoints = user?.loyalty_lifetime_points
-      || (currentUser?.id === userId ? currentUser.loyalty_lifetime_points || 0 : 0);
+    const lifetimePoints = user?.puntos_historicos || user?.loyalty_lifetime_points
+      || (currentUser?.id === userId ? (currentUser.puntos_historicos || currentUser.loyalty_lifetime_points || 0) : 0);
     
     let bestTier: LoyaltyTier | null = null;
     for (const tier of loyaltyConfig.tiers) {
@@ -2698,27 +2767,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const tx: LoyaltyTransaction = {
       id: `loy-tx-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
       user_id: userId,
-      type: 'adjustment',
-      points: points,
+      operation: points >= 0 ? 'suma' : 'resta',
+      reason: 'ajuste_admin',
+      points: Math.abs(points),
       description: reason,
       created_at: new Date().toISOString(),
     };
     
-    const newPoints = Math.max(0, (user.loyalty_points || 0) + points);
+    const newPoints = Math.max(0, (user.puntos_fidelidad || user.loyalty_points || 0) + points);
     const newLifetime = points > 0
-      ? (user.loyalty_lifetime_points || 0) + points
-      : user.loyalty_lifetime_points || 0;
+      ? (user.puntos_historicos || user.loyalty_lifetime_points || 0) + points
+      : user.puntos_historicos || user.loyalty_lifetime_points || 0;
 
     // Persistir a Supabase (solo admin puede llegar aqui)
     try {
-      await supabase.from('loyalty_transactions').insert({
+      await supabase.from('loyalty_history').insert({
         user_id: tx.user_id,
-        type: tx.type,
+        operation: tx.operation,
+        reason: tx.reason,
         points: tx.points,
         description: tx.description,
+        created_by: 'admin',
       });
       await supabase.from('usuarios_clientes')
-        .update({ loyalty_points: newPoints, loyalty_lifetime_points: newLifetime })
+        .update({ puntos_fidelidad: newPoints, puntos_historicos: newLifetime, loyalty_points: newPoints, loyalty_lifetime_points: newLifetime })
         .eq('id', userId);
     } catch (e) {
       console.error('[Loyalty] Adjust sync failed:', e);
@@ -2728,7 +2800,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setLoyaltyTransactions(prev => [...prev, tx]);
     setUsers(prev => prev.map(u => {
       if (u.id !== userId) return u;
-      return { ...u, loyalty_points: newPoints, loyalty_lifetime_points: newLifetime };
+      return { ...u, puntos_fidelidad: newPoints, puntos_historicos: newLifetime, loyalty_points: newPoints, loyalty_lifetime_points: newLifetime };
     }));
   };
 

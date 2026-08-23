@@ -409,13 +409,13 @@ function AppContent() {
 
               <form onSubmit={handleAdminVerifySubmit} className="flex flex-col gap-3.5 text-xs text-zinc-900">
                 <div className="flex flex-col gap-1.5">
-                  <span>Correo Electrónico *</span>
+                  <span>Usuario *</span>
                   <input
-                    type="email"
+                    type="text"
                     required
                     value={adminUserInput}
                     onChange={(e) => setAdminUserInput(e.target.value)}
-                    placeholder="Ingrese correo electrónico..."
+                    placeholder="Ingrese su usuario..."
                     className="bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 text-center text-sm tracking-wider font-mono text-blue-600 font-bold"
                   />
                 </div>

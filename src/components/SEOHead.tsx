@@ -34,9 +34,9 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
 
   useEffect(() => {
     const siteName = config.site_nombre || 'Market Coffee Sweet';
-    const defaultTitle = config.seo_home_title || `Panadería y Comida Rápida en El Trigal Valencia | ${siteName}`;
-    const defaultDesc = config.seo_home_description || `Market Coffee Sweet en El Trigal, Valencia. Panadería fresca, hamburguesas, shawarmas, perros calientes, víveres, frutas, verduras, bebidas y agua potable. Delivery a domicilio en El Trigal, La Trigaleña, Prebo, La Viña, Mañongo, Naguanagua y San Diego.`;
-    const defaultKeywords = config.seo_home_keywords || `panadería El Trigal Valencia, comida rápida Valencia Carabobo, hamburguesas delivery Prebo, shawarmas La Viña, víveres Mañongo, agua potable Naguanagua, pan fresco Patio Trigal, minimarket Valencia, market coffee sweet`;
+    const defaultTitle = config.seo_home_title || `Panadería y Comida Rápida en C. Apolo Valencia | ${siteName}`;
+    const defaultDesc = config.seo_home_description || `Market Coffee Sweet en C. Apolo, Valencia. Panadería fresca, hamburguesas, shawarmas, perros calientes, víveres, frutas, verduras, bebidas y agua potable. Delivery a domicilio en El Trigal, La Trigaleña, Prebo, La Viña, Mañongo, Naguanagua y San Diego.`;
+    const defaultKeywords = config.seo_home_keywords || `panadería C. Apolo Valencia, comida rápida Valencia Carabobo, hamburguesas delivery Prebo, shawarmas La Viña, víveres Mañongo, agua potable Naguanagua, pan fresco Apolo, minimarket Valencia, market coffee sweet`;
 
     let seoTitle = title;
     let seoDesc = description;
@@ -104,7 +104,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
     // Geo tags
     setMeta('geo.region', 'VE', 'name');
     setMeta('geo.placename', 'Valencia, Carabobo', 'name');
-    setMeta('geo.position', '10.2185;-68.0021', 'name');
+    setMeta('geo.position', '10.2279443;-67.997616', 'name');
     setMeta('ICBM', '10.2185, -68.0021', 'name');
 
     // PWA: Guardar config en IndexedDB

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { useToast } from '../../../../components/Toast';
 import { FoodItem, FoodOptionGroup, FoodOption, PizzaSize } from '../../../../types/store';
-import { uploadFileToStorage, compressImage } from '../../../../store/supabaseClient';
+import { uploadImage } from '../../../../store/supabaseClient';
 import {
   Save, X, Plus, Trash2, Image as ImageIcon, GripVertical, Package,
   Tag, Palette, List, Link2, Clock, AlertTriangle, ChevronDown, ChevronUp,
@@ -68,10 +68,7 @@ const ProductoFormSection: React.FC<ProductoFormSectionProps> = ({ product, onSa
   const handleImageUpload = async (index: number, file: File) => {
     setUploadingImage(index);
     try {
-      const compressed = await compressImage(file, { maxWidth: 800, quality: 0.8, format: 'image/webp' });
-      const ext = file.name.split('.').pop() || 'webp';
-      const path = `products/${crypto.randomUUID()}-${index}.${ext}`;
-      const url = await uploadFileToStorage(compressed, 'settings', path);
+      const url = await uploadImage(file, 'settings', 'products', { maxWidth: 800 });
       const newUrls = [...imagenUrls];
       newUrls[index] = url;
       setImagenUrls(newUrls.filter(u => u));

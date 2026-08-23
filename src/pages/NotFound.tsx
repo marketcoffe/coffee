@@ -44,7 +44,7 @@ export const NotFound: React.FC<NotFoundProps> = ({ onGoHome }) => {
         {/* Info de contacto */}
         <div className="mt-10 pt-6 border-t" style={{ borderColor: '#d4c4b0' }}>
           <p className="text-xs" style={{ color: '#6E472A' }}>
-            Si crees que es un error, contáctanos por WhatsApp o visita nuestro local en El Trigal, Valencia.
+            Si crees que es un error, contáctanos por WhatsApp o visita nuestro local en C. Apolo, Valencia.
           </p>
         </div>
       </div>

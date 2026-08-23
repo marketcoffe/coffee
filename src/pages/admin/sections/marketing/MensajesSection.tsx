@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useApp } from '../../../../store/AppContext';
-import { uploadFileToStorage, compressImage } from '../../../../store/supabaseClient';
+import { uploadImage } from '../../../../store/supabaseClient';
 import { Send, MessageSquare, MessageCircle, Trash2, User, Bell, Upload, Package, Search, ExternalLink } from 'lucide-react';
 
 const MensajesSection: React.FC = () => {
@@ -73,8 +73,7 @@ const MensajesSection: React.FC = () => {
     setBroadcastImage(URL.createObjectURL(file));
     setIsUploadingImage(true);
     try {
-      const compressed = await compressImage(file, { maxWidth: 800, quality: 0.8 });
-      const url = await uploadFileToStorage(compressed, 'settings', `promos/${crypto.randomUUID()}.webp`);
+      const url = await uploadImage(file, 'settings', 'promos', { maxWidth: 800 });
       setBroadcastImage(url);
     } catch { /* ignore */ }
     setIsUploadingImage(false);

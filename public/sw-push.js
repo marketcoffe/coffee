@@ -1,42 +1,33 @@
-// Custom Push Notifications Service Worker Extension for Marketo PWA
-// Loaded via workbox importScripts (generateSW strategy)
+// ═══════════════════════════════════════════════════════════════════════════
+// Service Worker: Market Coffee Sweet — Push Notifications + Offline Queue
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ─── Lifecycle ───
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
 
 // ─── SPA Navigation Handler ───
-// Intercept navigation requests to prevent redirect errors from the server.
-// Serves index.html from cache for all SPA navigation routes.
-self.addEventListener('fetch', function(event) {
+self.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate' && event.request.method === 'GET') {
-    var url = new URL(event.request.url);
+    const url = new URL(event.request.url);
     if (url.pathname.startsWith('/api/')) return;
     event.respondWith(
-      caches.open('workbox-precache-v2').then(function(cache) {
-        return cache.match('/index.html').then(function(cached) {
+      caches.open('workbox-precache-v2').then((cache) => {
+        return cache.match('/index.html').then((cached) => {
           if (cached) return cached;
-          return caches.match('/index.html').then(function(c2) {
-            if (c2) return c2;
-            return fetch(event.request, { redirect: 'follow' }).catch(function() {
-              return caches.match('/offline.html');
-            });
+          return fetch(event.request, { redirect: 'follow' }).catch(() => {
+            return new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/html' } });
           });
         });
       })
     );
   }
 });
-
-function clearAssetsCache() {
-  return caches.keys().then(function(names) {
-    return Promise.all(names.map(function(n) {
-      if (n.includes('images') || n.includes('supabase') || n.includes('manifest')) return caches.delete(n);
-    }));
-  });
-}
-
-function notifyClients(type) {
-  return self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clients) {
-    clients.forEach(function(c) { c.postMessage({ type: type }); });
-  });
-}
 
 // ─── Push Notifications ───
 const recentlyShown = new Map();
@@ -51,218 +42,224 @@ function pruneDedupCache() {
   }
 }
 
-self.addEventListener('push', function(event) {
+self.addEventListener('push', (event) => {
+  if (!event.data) {
+    console.warn('[SW Push] Evento push sin payload');
+    return;
+  }
+
+  let payload;
   try {
-    if (!event.data) {
-      console.warn('[SW Push] Evento push recibido sin payload de datos.');
+    payload = event.data.json();
+  } catch (e) {
+    console.error('[SW Push] Payload JSON inválido:', e);
+    return;
+  }
+
+  const title     = payload.titulo  || payload.title  || 'Market Coffee Sweet';
+  const body      = payload.mensaje || payload.body   || '';
+  const icon      = payload.icon   || '/icon.png';
+  const badge     = payload.badge  || '/icon.png';
+  const image     = payload.imagen_url || payload.image || undefined;
+  const urlToOpen = payload.link_url || payload.url || '/';
+  const tag       = payload.tag || ('marketcoffee-' + (payload.id || Date.now()));
+  const soundUrl  = payload.sound_url || payload.sound || '/sounds/notification.mp3';
+  const priority  = payload.priority || 'normal';
+
+  // Deduplicación: ignorar notificaciones duplicadas en ventana de 60s
+  if (recentlyShown.has(tag)) {
+    const elapsed = Date.now() - recentlyShown.get(tag);
+    if (elapsed < DEDUP_TTL_MS) {
+      console.log('[SW Push] Deduplicada:', tag);
       return;
     }
+  }
+  recentlyShown.set(tag, Date.now());
+  pruneDedupCache();
 
-    const payload = event.data.json();
-    console.log('[SW Push] Notificación recibida:', payload);
+  // Tag visual único por entrega para evitar colapso en barra de notificaciones
+  const displayTag = tag + '::' + Date.now();
 
-    const title     = payload.titulo  || payload.title  || 'Marketo Supermercado';
-    const body      = payload.mensaje || payload.body   || '';
-    const icon      = payload.icon   || payload.badge || '/icon.png';
-    const badge     = '/icon.png';
-    const image     = payload.imagen_url || payload.image || undefined;
-    const urlToOpen = payload.link_url || payload.url || '/';
-    const tag       = payload.tag || ('marketcoffee-' + String(payload.id || Date.now()));
-    // Tag de VISUALIZACION unico por entrega: evita que el navegador colapse/reemplace
-    // una notificacion de estado mientras la anterior aun esta en pantalla
-    // (con requireInteraction). El dedup logico sigue por `payload.tag`.
-    const displayTag = tag + '::' + Date.now();
-    const soundUrl  = payload.sound_url || payload.sound || '/sounds/notification.mp3';
+  const options = {
+    body,
+    icon,
+    badge,
+    image,
+    vibrate: priority === 'high' ? [300, 100, 300, 100, 300] : [200, 100, 200],
+    tag: displayTag,
+    renotify: true,
+    requireInteraction: priority === 'high' || payload.requireInteraction === true,
+    silent: false,
+    data: { url: urlToOpen, tag, displayTag, soundUrl },
+    actions: [
+      { action: 'open',  title: 'Ver Detalles' },
+      { action: 'close', title: 'Cerrar' }
+    ]
+  };
 
-    const tagKey = tag;
-    if (recentlyShown.has(tagKey)) {
-      const elapsed = Date.now() - recentlyShown.get(tagKey);
-      if (elapsed < DEDUP_TTL_MS) {
-        console.log('[SW Push] Deduplicada notificación con tag:', tagKey);
-        return;
-      }
-    }
-    recentlyShown.set(tagKey, Date.now());
-    pruneDedupCache();
-
-    const options = {
-      body: body,
-      icon: icon,
-      badge: badge,
-      image: image,
-      vibrate: [200, 100, 200],
-      tag: displayTag,
-      renotify: true,
-      requireInteraction: true,
-      silent: false,
-      data: { url: urlToOpen, tag: tag, displayTag: displayTag, soundUrl: soundUrl },
-      actions: [
-        { action: 'open',  title: 'Ver Detalles' },
-        { action: 'close', title: 'Cerrar' }
-      ]
-    };
-
-    event.waitUntil(
-      self.registration.showNotification(title, options).then(function() {
-        return self.clients
-          .matchAll({ type: 'window', includeUncontrolled: true })
-          .then(function(clients) {
-            clients.forEach(function(client) {
-              client.postMessage({ type: 'PLAY_NOTIFICATION_SOUND', soundUrl: soundUrl });
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+      .then(() => {
+        // Notificar a clientes activos para reproducir sonido in-app
+        return self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+          .then((clients) => {
+            clients.forEach((client) => {
+              client.postMessage({ type: 'PLAY_NOTIFICATION_SOUND', soundUrl });
             });
           });
       })
-    );
-  } catch (error) {
-    console.error('[SW Push] Error procesando evento push:', error);
-  }
+      .catch((err) => console.error('[SW Push] Error showNotification:', err))
+  );
 });
 
-self.addEventListener('notificationclick', function(event) {
-  try {
-    event.notification.close();
-    if (event.action === 'close') return;
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  if (event.action === 'close') return;
 
-    const targetUrl = event.notification.data?.url || '/';
-    const rawTag = event.notification.data?.tag || '';
-    const notifId = rawTag.replace(/^marketcoffee-/, '');
+  const targetUrl = event.notification.data?.url || '/';
+  const rawTag = event.notification.data?.tag || '';
+  const notifId = rawTag.replace(/^marketcoffee-/, '');
 
-    // Track click event via fetch
-    if (notifId) {
-      fetch('/api/marketing/track-event', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          notification_id: notifId,
-          event_type: 'clicked',
-          anonymous_id: self._anonymous_id || ''
-        })
-      }).catch(function() {});
-    }
+  // Track click event
+  if (notifId) {
+    fetch('/api/marketing/track-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        notification_id: notifId,
+        event_type: 'clicked',
+        anonymous_id: self._anonymous_id || ''
+      })
+    }).catch(() => {});
+  }
 
-    event.waitUntil(
-      self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // Buscar ventana existente del mismo dominio
         for (const client of clientList) {
           if ('focus' in client) {
-            if (client.navigate) client.navigate(targetUrl);
-            return client.focus();
+            if (client.url.includes(self.location.origin)) {
+              client.navigate(targetUrl);
+              return client.focus();
+            }
           }
         }
-        if (self.clients.openWindow) {
-          return self.clients.openWindow(targetUrl);
-        }
+        // Abrir nueva ventana si no hay ninguna activa
+        return self.clients.openWindow(targetUrl);
       })
-    );
-  } catch (error) {
-    console.error('[SW Push] Error en clic de notificación:', error);
-  }
+      .catch(() => {})
+  );
 });
 
 // ─── Message handler ───
-self.addEventListener('message', function(event) {
-  if (event.data?.type === 'PUSH_CLIENT_ERROR') {
-    console.error('[SW Push] Error reportado desde el cliente:', event.data.error);
-  }
-
+self.addEventListener('message', (event) => {
   if (event.data?.type === 'SET_ANONYMOUS_ID') {
     self._anonymous_id = event.data.anonymous_id;
   }
 
-  // Notificar actualización de config desde el admin
   if (event.data?.type === 'CONFIG_UPDATED') {
-    console.log('[SW Push] Config actualizada desde el admin');
-    event.waitUntil(notifyClients('CONFIG_UPDATED'));
+    event.waitUntil(
+      self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+        .then((clients) => clients.forEach((c) => c.postMessage({ type: 'CONFIG_UPDATED' })))
+    );
   }
 
-  // Limpiar caches de imágenes
   if (event.data?.type === 'CLEAR_ASSETS_CACHE') {
-    console.log('[SW Push] Limpiando caches de assets...');
     event.waitUntil(
-      clearAssetsCache().then(function() {
-        return notifyClients('ASSETS_CACHE_CLEARED');
+      caches.keys().then((names) =>
+        Promise.all(names.filter((n) => n.includes('images') || n.includes('supabase')).map((n) => caches.delete(n)))
+      ).then(() => {
+        self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+          .then((clients) => clients.forEach((c) => c.postMessage({ type: 'ASSETS_CACHE_CLEARED' })));
       })
     );
   }
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Background Sync: cola offline para acciones POST (pedidos, registro o eventos)
+// Background Sync: cola offline para POSTs (pedidos, registro, eventos)
 // ═══════════════════════════════════════════════════════════════════════════
 const QUEUE_NAME = 'marketcoffee-offline-queue';
 const QUEUE_STORE = 'reqs';
+const DB_NAME = 'marketcoffee-offline-db';
 
 function openQueueDB() {
-  return new Promise(function(resolve, reject) {
-    var req = indexedDB.open('marketcoffee-offline-db', 1);
-    req.onupgradeneeded = function(e) {
-      var db = e.target.result;
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
       if (!db.objectStoreNames.contains(QUEUE_STORE)) {
         db.createObjectStore(QUEUE_STORE, { keyPath: 'id', autoIncrement: true });
       }
     };
-    req.onsuccess = function() { resolve(req.result); };
-    req.onerror = function() { reject(req.error); };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
   });
 }
 
 function withQueueStore(mode, fn) {
-  return openQueueDB().then(function(db) {
-    return new Promise(function(resolve, reject) {
-      var tx = db.transaction(QUEUE_STORE, mode);
-      var store = tx.objectStore(QUEUE_STORE);
-      var result = fn(store);
-      tx.oncomplete = function() { resolve(result && result.result !== undefined ? result.result : undefined); };
-      tx.onerror = function() { reject(tx.error); };
-      tx.onabort = function() { reject(tx.error); };
-    });
-  });
+  return openQueueDB().then((db) =>
+    new Promise((resolve, reject) => {
+      const tx = db.transaction(QUEUE_STORE, mode);
+      const store = tx.objectStore(QUEUE_STORE);
+      const result = fn(store);
+      tx.oncomplete = () => resolve(result?.result !== undefined ? result.result : undefined);
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
+    })
+  );
 }
 
 function enqueueRequest(request) {
-  // Guardar metodo y URL; el body se re-materializa usando la request en replay.
-  var entry = { url: request.url, method: request.method, ts: Date.now() };
-  return withQueue('readwrite', function(store) {
+  const entry = { url: request.url, method: request.method, ts: Date.now() };
+  return withQueueStore('readwrite', (store) => {
     store.add(entry);
-  }).catch(function() {
-    return true; // si falla IDB, continuar igualmente
-  });
+  }).catch(() => true);
 }
 
 function replayQueue() {
-  return withQueue('readwrite', function(store) {
-    var req = store.getAll();
-    req.onsuccess = function() {
-      Promise.all((req.result || []).map(function(entry) {
-        return fetch(entry.url, { method: entry.method, credentials: 'same-origin', headers: { 'Content-Type': 'application/json' } })
-          .then(function() { store.delete(entry.id); })
-          .catch(function() { /* reintentar la proxima vez */ });
-      }));
+  return withQueueStore('readwrite', (store) => {
+    const req = store.getAll();
+    req.onsuccess = () => {
+      Promise.all((req.result || []).map((entry) =>
+        fetch(entry.url, {
+          method: entry.method,
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' }
+        })
+          .then(() => store.delete(entry.id))
+          .catch(() => {})
+      ));
     };
-  }).catch(function() { /* sin cola */ });
+  }).catch(() => {});
 }
 
-// Interceptar POSTs a la API cuando NO hay conexion temporal: encolar y responder vacio.
-self.addEventListener('fetch', function(event) {
-  var req = event.request;
+// Interceptar POSTs offline
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
   if (req.method === 'POST' && req.url.indexOf('/api/') !== -1 && !navigator.onLine) {
     event.respondWith(
-      enqueueRequest(req).then(function() { return new Response('queued'); })
-        .catch(function() { return new Response('queued'); })
+      enqueueRequest(req)
+        .then(() => new Response(JSON.stringify({ queued: true }), { headers: { 'Content-Type': 'application/json' } }))
+        .catch(() => new Response(JSON.stringify({ queued: true }), { headers: { 'Content-Type': 'application/json' } }))
     );
   }
 });
 
-// Reintentar la cola cuando vuelva la conexion (Background Sync / Periodc Sync de browser).
-self.addEventListener('sync', function(event) {
+// Background Sync
+self.addEventListener('sync', (event) => {
   if (event.tag === 'marketcoffee-queue') {
     event.waitUntil(replayQueue());
   }
 });
 
-self.addEventListener('online', function() {
-  self.registration.getTags && self.registration.getTags().then(function(tags) {
-    if (tags.indexOf('marketcoffee-queue') === -1 && typeof self.registration.sync !== 'undefined') {
-      self.registration.sync.register('marketcoffee-queue');
-    }
-  });
+self.addEventListener('online', () => {
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.ready.then((reg) => {
+      if (reg.sync) {
+        reg.sync.register('marketcoffee-queue').catch(() => {});
+      }
+    });
+  }
 });

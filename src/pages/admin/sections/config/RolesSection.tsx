@@ -7,6 +7,7 @@ import { useToast } from '../../../../components/Toast';
 interface OperatorRecord {
   id: string;
   email: string;
+  username?: string;
   nombre: string;
   role: 'admin' | 'operator' | 'customer';
   created_at: string;
@@ -25,7 +26,7 @@ const RolesSection: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ email: '', nombre: '', password: '', sede_id: '', role: 'operator' as 'admin' | 'operator' | 'customer' });
+  const [formData, setFormData] = useState({ email: '', username: '', nombre: '', password: '', sede_id: '', role: 'operator' as 'admin' | 'operator' | 'customer' });
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [resetPasswordId, setResetPasswordId] = useState<string | null>(null);
@@ -41,26 +42,27 @@ const RolesSection: React.FC = () => {
   };
 
   const handleCreate = async () => {
-    if (!formData.email || !formData.nombre || (!editingId && !formData.password)) {
+    if (!formData.email || !formData.username || !formData.nombre || (!editingId && !formData.password)) {
       showToast('error', 'Todos los campos son obligatorios');
       return;
     }
     setSaving(true);
     try {
       if (editingId) {
-        const { error } = await supabase.from('admin_users').update({ email: formData.email, nombre: formData.nombre, sede_id: formData.sede_id, role: formData.role }).eq('id', editingId);
+        const { error } = await supabase.from('admin_users').update({ email: formData.email, username: formData.username, nombre: formData.nombre, sede_id: formData.sede_id, role: formData.role }).eq('id', editingId);
         if (error) throw error;
         showToast('success', 'Usuario actualizado exitosamente');
       } else {
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: formData.email.trim().toLowerCase(),
           password: formData.password.trim(),
-          options: { data: { nombre: formData.nombre.trim(), role: formData.role, sede_id: formData.sede_id } }
+          options: { data: { nombre: formData.nombre.trim(), username: formData.username.trim(), role: formData.role, sede_id: formData.sede_id } }
         });
         if (authError) throw authError;
         if (authData.user) {
           const { error: dbError } = await supabase.from('admin_users').insert({
             id: authData.user.id, email: formData.email.trim().toLowerCase(),
+            username: formData.username.trim(),
             nombre: formData.nombre.trim(), role: formData.role, active: true, sede_id: formData.sede_id
           });
           if (dbError) throw dbError;
@@ -68,7 +70,7 @@ const RolesSection: React.FC = () => {
         showToast('success', 'Usuario creado exitosamente');
       }
       setShowForm(false); setEditingId(null);
-      setFormData({ email: '', nombre: '', password: '', sede_id: '', role: 'operator' });
+      setFormData({ email: '', username: '', nombre: '', password: '', sede_id: '', role: 'operator' });
       await loadOperators();
     } catch (err: unknown) {
       showToast('error', 'Error: ' + (err instanceof Error ? err.message : 'Error desconocido'));
@@ -77,7 +79,7 @@ const RolesSection: React.FC = () => {
 
   const handleEdit = (op: OperatorRecord) => {
     setEditingId(op.id);
-    setFormData({ email: op.email, nombre: op.nombre, password: '', sede_id: op.sede_id || '', role: op.role });
+    setFormData({ email: op.email, username: op.username || '', nombre: op.nombre, password: '', sede_id: op.sede_id || '', role: op.role });
     setShowForm(true);
   };
 
@@ -108,7 +110,7 @@ const RolesSection: React.FC = () => {
         <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
           <Shield size={18} /> Administrador de Roles
         </h4>
-        <button onClick={() => { setShowForm(true); setEditingId(null); setFormData({ email: '', nombre: '', password: '', sede_id: '', role: 'operator' }); }}
+        <button onClick={() => { setShowForm(true); setEditingId(null); setFormData({ email: '', username: '', nombre: '', password: '', sede_id: '', role: 'operator' }); }}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-white cursor-pointer" style={{ background: themeColor }}>
           <Plus size={14} /> Nuevo Usuario
         </button>
@@ -125,6 +127,11 @@ const RolesSection: React.FC = () => {
             <button onClick={() => { setShowForm(false); setEditingId(null); }} className="p-1 rounded-lg hover:bg-slate-100"><X size={16} className="text-slate-400" /></button>
           </div>
           <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-600 flex items-center gap-1"><User size={12} /> Usuario (para login) *</label>
+              <input type="text" required value={formData.username} onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                placeholder="Nombre de usuario unico" className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500" />
+            </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-slate-600 flex items-center gap-1"><Mail size={12} /> Correo Electronico *</label>
               <input type="email" required value={formData.email} onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
@@ -198,7 +205,8 @@ const RolesSection: React.FC = () => {
                   </div>
                   <div>
                     <h5 className="font-bold text-slate-900 text-sm">{op.nombre}</h5>
-                    <p className="text-xs text-slate-500 font-mono">{op.email}</p>
+                    <p className="text-xs text-slate-500 font-mono">@{op.username || op.email.split('@')[0]}</p>
+                    <p className="text-[10px] text-slate-400 font-mono">{op.email}</p>
                     <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${op.role === 'admin' ? 'bg-purple-100 text-purple-700' : op.role === 'customer' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
                       {op.role === 'admin' ? 'Administrador' : op.role === 'customer' ? 'Customer' : 'Operador'}
                     </span>

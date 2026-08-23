@@ -10,6 +10,7 @@ import {
 import { SEOHead } from '../components/SEOHead';
 import { useToast } from '../components/Toast';
 import { OrderTracker } from '../components/OrderTracker';
+import { LoyaltyWidget } from '../components/LoyaltyWidget';
 import { getWhatsAppPhone } from '../utils/phone';
 import { InAppNotification } from '../types/store';
 
@@ -170,6 +171,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
 
   // Input states
   const [regName, setRegName] = useState('');
+  const [regUsername, setRegUsername] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPhone, setRegPhone] = useState('');
   const [regPassword, setRegPassword] = useState('');
@@ -222,8 +224,14 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
 
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!regName.trim() || !regEmail.trim() || !regPhone.trim() || !regPassword.trim()) {
+    if (!regName.trim() || !regUsername.trim() || !regEmail.trim() || !regPhone.trim() || !regPassword.trim()) {
       setAuthError('Todos los campos son obligatorios.');
+      return;
+    }
+
+    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+    if (!usernameRegex.test(regUsername.trim())) {
+      setAuthError('El usuario debe tener 3-20 caracteres (letras, números, guión bajo).');
       return;
     }
 
@@ -240,6 +248,18 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
       return;
     }
 
+    // Check if username is already taken
+    const { data: existingUsername } = await supabase
+      .from('usuarios_clientes')
+      .select('id')
+      .eq('username', regUsername.trim())
+      .limit(1);
+
+    if (existingUsername && existingUsername.length > 0) {
+      setAuthError('Este nombre de usuario ya está en uso.');
+      return;
+    }
+
     // Check if phone matches any registered user database-wide
     const { data: existingUser } = await supabase
       .from('usuarios_clientes')
@@ -253,7 +273,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
     }
 
     setAuthError('');
-    const userCreated = await registerUser(regName.trim(), regEmail.trim(), regPhone.trim(), regPassword.trim());
+    const userCreated = await registerUser(regName.trim(), regUsername.trim(), regEmail.trim(), regPhone.trim(), regPassword.trim());
     
     // Set Edit states
     setEditName(userCreated.nombre);
@@ -306,7 +326,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
       setEditPassword(loggedUser.contrasena);
       setActiveSubTab('orders');
     } else {
-      setAuthError('Credenciales incorrectas. Verifique el correo y contraseña.');
+      setAuthError('Credenciales incorrectas. Verifique el usuario y contraseña.');
     }
   };
 
@@ -525,14 +545,14 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
               <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3.5 text-sm">
                 <div className="flex flex-col gap-1.5">
                   <label className="font-bold text-[#5b4137] flex items-center gap-1.5 uppercase font-mono text-[10px] tracking-wider">
-                    <Mail size={11} style={{ color: themeColor }} /> Correo Electrónico
+                    <User size={11} style={{ color: themeColor }} /> Usuario
                   </label>
                   <input
-                    type="email"
+                    type="text"
                     required
                     value={logPhone}
                     onChange={(e) => setLogPhone(e.target.value)}
-                    placeholder="ejemplo@correo.com"
+                    placeholder="Tu nombre de usuario"
                     className="bg-[#f9f9fb] px-3 py-2.5 border border-[#e4beb1]/10 rounded-xl outline-none focus:border-[var(--theme-color,#FF6B35)] text-sm"
                   />
                 </div>
@@ -629,6 +649,21 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
 
                 <div className="flex flex-col gap-1.5">
                   <label className="font-bold text-[#5b4137] flex items-center gap-1.5 uppercase font-mono text-[9px] tracking-wider">
+                    <User size={11} style={{ color: themeColor }} /> Usuario (para ingresar)
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={regUsername}
+                    onChange={(e) => setRegUsername(e.target.value)}
+                    placeholder="Ej. carlos123"
+                    className="bg-[#f9f9fb] px-3 py-2 border border-[#e4beb1]/10 rounded-lg outline-none focus:border-[var(--theme-color,#FF6B35)] text-sm"
+                  />
+                  <p className="text-[10px] text-[#8f7065] italic">3-20 caracteres: letras, números o guión bajo.</p>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-bold text-[#5b4137] flex items-center gap-1.5 uppercase font-mono text-[9px] tracking-wider">
                     <Mail size={11} style={{ color: themeColor }} /> Correo Electrónico
                   </label>
                   <input
@@ -692,7 +727,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
             {/* Easy credentials reminder banner */}
             <div className="p-3 bg-blue-50/50 border border-blue-100 rounded-lg flex items-start gap-2.5 text-[10px] sm:text-xs leading-relaxed text-[#5b4137] font-mono">
               <div>
-                Tu <strong>Correo Electrónico</strong> y tu <strong>Telefono Movil</strong> combinados con tu clave elegida, seran tu usuario y contrasena vital para seguir tus pedidos en Valencia.
+                Tu <strong>Usuario</strong> y tu <strong>Contrasena</strong> seran tus credenciales para seguir tus pedidos en Valencia.
               </div>
             </div>
           </div>
@@ -1195,105 +1230,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
 
           {/* ═══ MIS PUNTOS / RECOMPENSAS ═══ */}
           {activeSubTab === 'rewards' && currentUser && (
-            <div className="flex flex-col gap-4 px-4">
-              {/* Points Balance Card */}
-              <div className="rounded-2xl p-5 text-center text-white shadow-lg" style={{ background: `linear-gradient(135deg, ${themeColor}, ${themeColor}CC)` }}>
-                <div className="flex items-center justify-center gap-2 mb-1">
-                  <Award size={18} />
-                  <p className="text-[11px] font-bold uppercase tracking-wider opacity-90">Mis Puntos</p>
-                </div>
-                <p className="text-5xl font-black mb-1">{getUserLoyaltyPoints(currentUser.id)}</p>
-                <p className="text-[11px] opacity-80">
-                  Nivel: {getUserLoyaltyTier(currentUser.id)?.name || 'Sin nivel'}
-                </p>
-                {!currentUser.is_pwa_installed && (
-                  <p className="text-[10px] mt-2 opacity-70 bg-white/20 rounded-lg px-2 py-1 inline-block">
-                    Descarga la app para ganar 1.5x puntos extra
-                  </p>
-                )}
-              </div>
-
-              {/* Tiers */}
-              {config.loyalty?.tiers && config.loyalty.tiers.length > 0 && (
-                <div className="bg-white border border-[#e4beb1]/10 rounded-2xl p-4 flex flex-col gap-2">
-                  <p className="text-[11px] text-[#8f7065] font-bold uppercase tracking-wider">Niveles</p>
-                  {config.loyalty.tiers.sort((a, b) => a.min_points - b.min_points).map((tier, idx) => {
-                    const userPoints = getUserLoyaltyPoints(currentUser.id);
-                    const isActive = userPoints >= tier.min_points;
-                    return (
-                      <div key={idx} className={`p-3 border rounded-xl flex items-center gap-3 ${isActive ? 'border-2' : 'border border-[#e4beb1]/10 opacity-60'}`} style={isActive ? { borderColor: tier.color || themeColor, backgroundColor: (tier.color || themeColor) + '08' } : {}}>
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-[11px] font-bold text-white" style={{ backgroundColor: tier.color || themeColor }}>
-                          {tier.multiplier}x
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-bold text-[#1a1c1d] text-sm">{tier.name}</p>
-                          <p className="text-[11px] text-[#8f7065]">{tier.min_points}+ puntos{tier.benefits?.length ? ` · ${tier.benefits[0]}` : ''}</p>
-                        </div>
-                        {isActive && <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg text-white" style={{ backgroundColor: tier.color || themeColor }}>ACTIVO</span>}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Canje de Puntos */}
-              {rewardCatalog.length > 0 && (
-                <div className="bg-white border border-[#e4beb1]/10 rounded-2xl p-4 flex flex-col gap-3">
-                  <p className="text-[11px] text-[#8f7065] font-bold uppercase tracking-wider">Canjear Puntos</p>
-                  {rewardCatalog.filter(r => r.active).map(reward => {
-                    const userPoints = getUserLoyaltyPoints(currentUser.id);
-                    const canRedeem = userPoints >= reward.points_cost;
-                    return (
-                      <div key={reward.id} className="p-3 border border-[#e4beb1]/10 rounded-xl flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg" style={{ backgroundColor: themeColor + '15', color: themeColor }}>
-                          {reward.reward_type === 'discount' ? '$' : reward.reward_type === 'free_shipping' ? '🚚' : '🎁'}
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-bold text-[#1a1c1d] text-sm">{reward.name}</p>
-                          <p className="text-[11px] text-[#8f7065]">{reward.points_cost} puntos</p>
-                        </div>
-                        <button
-                          onClick={async () => {
-                            if (canRedeem) {
-                              const ok = await redeemRewardItem(currentUser.id, reward.id);
-                              if (ok) showToast('success', `Canjeaste "${reward.name}" por ${reward.points_cost} puntos!`);
-                              else showToast('error', 'No se pudo completar el canje.');
-                            }
-                          }}
-                          disabled={!canRedeem}
-                          className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all ${canRedeem ? 'active:scale-95' : 'bg-[#eeeef0] text-[#8f7065]'}`}
-                          style={canRedeem ? { backgroundColor: themeColor, color: '#fff' } : {}}
-                        >
-                          {canRedeem ? 'Canjear' : `Faltan ${reward.points_cost - userPoints}`}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Historial */}
-              <div className="bg-white border border-[#e4beb1]/10 rounded-2xl p-4 flex flex-col gap-2">
-                <p className="text-[11px] text-[#8f7065] font-bold uppercase tracking-wider">Últimos Movimientos</p>
-                {getLoyaltyTransactions(currentUser.id).length === 0 ? (
-                  <p className="text-[13px] text-[#8f7065] text-center py-6">Aún no tienes movimientos de puntos</p>
-                ) : (
-                  getLoyaltyTransactions(currentUser.id).slice(0, 8).map((tx, idx) => (
-                    <div key={idx} className="p-3 border border-[#e4beb1]/10 rounded-xl flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: tx.points > 0 ? themeColor + '15' : '#FEE2E2', color: tx.points > 0 ? themeColor : '#DC2626' }}>
-                        {tx.points > 0 ? <Gift size={15} /> : <Star size={15} />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-[#1a1c1d] text-[13px] truncate">{tx.description}</p>
-                        <p className="text-[10px] text-[#8f7065] font-mono">{tx.created_at}</p>
-                      </div>
-                      <span className="font-bold text-sm shrink-0" style={{ color: tx.points > 0 ? themeColor : '#DC2626' }}>
-                        {tx.points > 0 ? '+' : ''}{tx.points}
-                      </span>
-                    </div>
-                  ))
-                )}
-              </div>
+            <div className="px-4">
+              <LoyaltyWidget themeColor={themeColor} />
             </div>
           )}
         </div>

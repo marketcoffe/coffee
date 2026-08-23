@@ -18,7 +18,7 @@ export function printOrderTicket(order: Order, config: any) {
   const deliveryLabel = order.tipo_entrega === 'delivery' ? 'DELIVERY' :
     order.tipo_entrega === 'pickup' ? 'PICKUP' :
     order.tipo_entrega === 'mesa' ? `MESA #${order.numero_mesa || ''}` :
-    order.tipo_entrega?.toUpperCase() || '';
+    (order.tipo_entrega as string)?.toUpperCase() || '';
 
   const paymentLabel = order.metodo_pago || 'N/A';
 

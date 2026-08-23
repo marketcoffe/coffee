@@ -17,7 +17,14 @@ const EstadisticasSection: React.FC = () => {
   }, [completedOrders]);
 
   const averageDeliveryTime = useMemo(() => {
-    return completedOrders.length > 0 ? '12 min' : 'N/A';
+    const deliveryOrders = completedOrders.filter(o => o.tipo_entrega === 'delivery' && o.tiempo_estimado_entrega);
+    if (deliveryOrders.length === 0) return 'N/A';
+    const totalMinutes = deliveryOrders.reduce((sum, o) => {
+      const match = o.tiempo_estimado_entrega?.match(/(\d+)/);
+      return sum + (match ? parseInt(match[1]) : 0);
+    }, 0);
+    const avg = Math.round(totalMinutes / deliveryOrders.length);
+    return avg > 0 ? `${avg} min` : 'N/A';
   }, [completedOrders]);
 
   const ordersByHour = useMemo(() => {

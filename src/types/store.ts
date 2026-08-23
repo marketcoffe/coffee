@@ -3,6 +3,7 @@ export type UserRole = 'admin' | 'operator' | 'customer';
 export interface AdminUser {
   id: string;
   email: string;
+  username?: string;
   nombre: string;
   role: UserRole;
   created_at?: string;
@@ -11,16 +12,23 @@ export interface AdminUser {
 export interface AppUser {
   id: string;
   nombre: string;
+  username?: string;
   telefono: string;
   contrasena: string;
   email?: string;
   createdAt: string;
-  loyalty_points?: number;
-  loyalty_lifetime_points?: number;
-  loyalty_tier_id?: string;
+  puntos_fidelidad?: number;
+  puntos_historicos?: number;
+  codigo_referido?: string;
+  referred_by?: string;
+  referral_count?: number;
   sede_preferida_id?: string;
   is_pwa_installed?: boolean;
   pwa_installed_at?: string;
+  // Backward-compatible aliases (deprecated, kept for AppContext)
+  loyalty_points?: number;
+  loyalty_lifetime_points?: number;
+  loyalty_tier_id?: string;
 }
 
 export interface FoodOption {
@@ -260,15 +268,6 @@ export interface FAQItem {
   answer: string;
 }
 
-export interface LoyaltyTier {
-  id: string;
-  name: string;
-  min_points: number;
-  multiplier: number;
-  benefits: string[];
-  color: string;
-}
-
 export interface LoyaltyConfig {
   enabled: boolean;
   points_per_dollar: number;
@@ -276,25 +275,91 @@ export interface LoyaltyConfig {
   redemption_rate: number;
   max_discount_percent: number;
   welcome_bonus: number;
-  bonus_actions: {
-    daily_login: number;
-    first_order: number;
-    review: number;
-    referral: number;
+  first_order_bonus: number;
+  referral_bonus_referrer: number;
+  referral_bonus_referred: number;
+  daily_login_bonus: number;
+  review_bonus: number;
+  // Backward-compatible fields (deprecated, kept for AppContext)
+  bonus_actions?: {
+    daily_login?: number;
+    first_order?: number;
+    review?: number;
+    referral?: number;
   };
-  tiers: LoyaltyTier[];
+  tiers?: LoyaltyLevel[];
 }
 
-export interface LoyaltyTransaction {
+export interface LoyaltyLevel {
+  id: string;
+  name: string;
+  min_points: number;
+  multiplier: number;
+  benefits: string[];
+  color: string;
+  icon: string;
+  sort_order: number;
+  active: boolean;
+  created_at?: string;
+}
+
+export interface LoyaltyReward {
+  id: string;
+  name: string;
+  description: string;
+  points_cost: number;
+  reward_type: 'discount_percent' | 'discount_fixed' | 'free_product' | 'free_shipping' | 'custom';
+  reward_value: number;
+  product_id?: string;
+  imagen_url?: string;
+  stock: number;
+  stock_used: number;
+  active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface LoyaltyHistory {
   id: string;
   user_id: string;
-  type: 'earn' | 'redeem' | 'bonus' | 'adjustment' | 'expire';
   points: number;
+  operation: 'suma' | 'resta';
+  reason: 'bienvenida' | 'primer_pedido' | 'compra' | 'referido' | 'referido_registro' | 'canje' | 'ajuste_admin' | 'bono_review' | 'bono_diario' | 'expiracion';
   description: string;
   order_id?: string;
-  sede_id?: string;
+  reward_id?: string;
+  created_by?: string;
   created_at: string;
-  expires_at?: string;
+}
+
+export interface LoyaltyUserLevel {
+  current_points: number;
+  lifetime_points: number;
+  current_level: LoyaltyLevel | null;
+  next_level: LoyaltyLevel | null;
+  progress_percent: number;
+}
+
+export interface ReferralTracking {
+  id: string;
+  referrer_id: string;
+  referred_id: string;
+  referred_code: string;
+  status: 'pending' | 'completed' | 'bonus_paid';
+  referrer_bonus_paid: boolean;
+  referred_bonus_paid: boolean;
+  first_order_id?: string;
+  created_at: string;
+  completed_at?: string;
+}
+
+export interface ReferralStats {
+  total_referrals: number;
+  completed_referrals: number;
+  pending_referrals: number;
+  referral_code: string;
+  referral_link: string;
+  total_earned: number;
 }
 
 export interface RewardItem {
@@ -309,6 +374,10 @@ export interface RewardItem {
   active: boolean;
   created_at?: string;
 }
+
+// Backward-compatible aliases for AppContext
+export type LoyaltyTransaction = LoyaltyHistory;
+export type LoyaltyTier = LoyaltyLevel;
 
 export const ALLERGEN_OPTIONS = [
   'Gluten', 'Lácteos', 'Frutos secos', 'Mariscos', 'Soja',
@@ -325,6 +394,7 @@ export interface StoreConfig {
     lat: number;
     lng: number;
   };
+  correo_interno?: string;
   banners: string[];
   banners_mobile?: string[];
   zelle_enabled: boolean;

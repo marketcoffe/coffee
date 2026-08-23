@@ -68,7 +68,7 @@ const PersonalizacionSection: React.FC = () => {
             <p className="text-xs mb-3" style={{ color: 'var(--ios-text-tertiary)' }}>
               Icono que aparece en la pestana del navegador. Recomendado: 32x32 o 64x64 PNG.
             </p>
-            <ImageField value={config.favicon_url || ''} onChange={url => updateConfig({ favicon_url: url })} bucket="settings" folder="favicons" maxSize={64} previewSize="sm" accept="image/png, image/jpeg, image/x-icon" />
+            <ImageField value={config.favicon_url || ''} onChange={url => updateConfig({ favicon_url: url })} bucket="settings" folder="favicons" maxSize={64} previewSize="sm" />
           </div>
         </div>
       )}

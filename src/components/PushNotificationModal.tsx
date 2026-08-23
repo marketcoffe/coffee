@@ -68,6 +68,13 @@ export const PushNotificationModal: React.FC = () => {
             const anonymousId = localStorage.getItem('trv_anonymous_id') || crypto.randomUUID();
             localStorage.setItem('trv_anonymous_id', anonymousId);
 
+            // Detectar plataforma
+            const ua = navigator.userAgent;
+            let platform = 'desktop';
+            if (/iPhone|iPad|iPod/.test(ua)) platform = 'ios';
+            else if (/Android/.test(ua)) platform = 'android';
+            else if (/Mac|Windows|Linux/.test(ua)) platform = 'desktop';
+
             try {
               const response = await fetch('/api/register-subscription', {
                 method: 'POST',
@@ -76,7 +83,9 @@ export const PushNotificationModal: React.FC = () => {
                   subscription: pushSubscription.toJSON(),
                   anonymous_id: anonymousId,
                   phone: currentUser?.telefono || '',
-                  user_id: currentUser?.id || null
+                  user_id: currentUser?.id || null,
+                  platform,
+                  user_agent: ua
                 })
               });
               const result = await response.json();

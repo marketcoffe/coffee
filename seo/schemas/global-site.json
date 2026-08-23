@@ -17,7 +17,7 @@
       "description": "Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado.",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Av. Principal El Trigal, justo al frente de Patio Trigal",
+        "streetAddress": "2001 Calle 159, C. Apolo",
         "addressLocality": "Valencia",
         "addressRegion": "Carabobo",
         "postalCode": "2001",
@@ -25,11 +25,11 @@
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": 10.2185,
-        "longitude": -68.0021
+        "latitude": 10.2279443,
+        "longitude": -67.997616
       },
       "sameAs": [
-        "https://www.instagram.com/marketcoffeesweet",
+        "https://www.instagram.com/marketcoffee_sweet",
         "https://www.tiktok.com/@marketcoffeesweet"
       ],
       "contactPoint": {
@@ -54,10 +54,10 @@
         "https://marketcoffeesweet.com/logo.png"
       ],
       "logo": "https://marketcoffeesweet.com/logo.png",
-      "description": "Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado. Ubicados en El Trigal, Valencia, frente a Patio Trigal.",
+      "description": "Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado. Ubicados en C. Apolo, Valencia, Carabobo.",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Av. Principal El Trigal, justo al frente de Patio Trigal",
+        "streetAddress": "2001 Calle 159, C. Apolo",
         "addressLocality": "Valencia",
         "addressRegion": "Carabobo",
         "postalCode": "2001",
@@ -65,8 +65,8 @@
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": 10.2185,
-        "longitude": -68.0021
+        "latitude": 10.2279443,
+        "longitude": -67.997616
       },
       "areaServed": [
         { "@type": "Place", "name": "El Trigal", "sameAs": "https://es.wikipedia.org/wiki/El_Trigal" },
