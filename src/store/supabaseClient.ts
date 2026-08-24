@@ -192,6 +192,7 @@ export const supabase = supabaseUrl && supabaseAnonKey
         autoRefreshToken: true,
         detectSessionInUrl: true,
         flowType: 'pkce',
+        lock: false,
       }
     })
   : createMockClient();

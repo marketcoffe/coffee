@@ -68,13 +68,16 @@ const ProductoFormSection: React.FC<ProductoFormSectionProps> = ({ product, onSa
   const handleImageUpload = async (index: number, file: File) => {
     setUploadingImage(index);
     try {
+      console.log('[Upload] Inicio:', file.name, file.type, file.size, 'bytes');
       const url = await uploadImage(file, 'productos', 'products', { maxWidth: 800 });
+      console.log('[Upload] OK:', url);
       const newUrls = [...imagenUrls];
       newUrls[index] = url;
       setImagenUrls(newUrls.filter(u => u));
       showToast('success', 'Imagen subida correctamente');
-    } catch (err) {
-      showToast('error', 'Error al subir imagen');
+    } catch (err: any) {
+      console.error('[Upload] Error completo:', err);
+      showToast('error', 'Error al subir imagen: ' + (err?.message || err?.error?.message || JSON.stringify(err)));
     } finally {
       setUploadingImage(null);
     }

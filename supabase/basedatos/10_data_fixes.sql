@@ -140,3 +140,20 @@ DROP POLICY IF EXISTS "productos_delete_admin" ON storage.objects;
 CREATE POLICY "productos_delete_admin" ON storage.objects
 FOR DELETE TO authenticated
 USING (bucket_id = 'productos' AND public.is_admin());
+
+-- ----------------------------------------------------------------------------
+-- 6. FIX: Asegurar que el admin exista en admin_users (requerido por RLS de Storage)
+-- Sin esto, is_admin_or_operator() retorna false y los uploads fallan con 400
+-- ----------------------------------------------------------------------------
+INSERT INTO admin_users (id, email, nombre, role, active)
+SELECT id, email, COALESCE(raw_user_meta_data->>'nombre', 'Admin'), 'admin', true
+FROM auth.users
+WHERE email = 'kecho8a@gmail.com'
+ON CONFLICT (id) DO UPDATE SET role = 'admin', active = true;
+
+-- ----------------------------------------------------------------------------
+-- 7. FIX: Configurar bucket 'productos' con settings correctos
+-- ----------------------------------------------------------------------------
+UPDATE storage.buckets
+SET public = true, file_size_limit = 0, allowed_mime_types = NULL
+WHERE id = 'productos';
