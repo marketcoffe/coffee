@@ -185,6 +185,10 @@ const createMockClient = (): SupabaseClient => {
   return mock;
 };
 
+// No-op lock: bypasses Supabase's navigator.locks which breaks in some browsers
+// (TypeError: e is not a function). Sessions use localStorage, no cross-tab lock needed.
+const noopLock = async <R>(_name: string, _acquireTimeout: number, fn: () => Promise<R>): Promise<R> => fn();
+
 export const supabase = supabaseUrl && supabaseAnonKey
   ? createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
@@ -192,9 +196,7 @@ export const supabase = supabaseUrl && supabaseAnonKey
         autoRefreshToken: true,
         detectSessionInUrl: true,
         flowType: 'pkce',
-        lock: async (name: any, acquire: any) => {
-          await acquire();
-        },
+        lock: noopLock,
       }
     })
   : createMockClient();
