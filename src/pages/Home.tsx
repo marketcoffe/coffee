@@ -1449,6 +1449,13 @@ export const Home: React.FC<HomeProps> = ({
         </section>
       )}
 
+      {/* ═══ BANNER RECARGA DE AGUA ═══ */}
+      <section className="px-4 md:px-8 max-w-[1440px] mx-auto w-full">
+        <div className="rounded-2xl overflow-hidden cursor-pointer group" onClick={() => { setSelectedCategory('Recarga de Agua'); setTab('catalog'); }}>
+          <img src="/imagen/banner_agua.webp" alt="Recarga de Agua" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
+        </div>
+      </section>
+
       {/* ═══ 13. SALSAS Y CONDIMENTOS ═══ */}
       {salsasItems.length > 0 && (
         <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full">

@@ -11,7 +11,7 @@ import {
   Sliders, Palette, Ticket, Settings, Menu, Armchair
 } from 'lucide-react';
 import { SEOHead } from '../../components/SEOHead';
-import MesaOrderAlert from '../../components/MesaOrderAlert';
+import AdminOrderAlert from '../../components/AdminOrderAlert';
 import ProductoFormSection from './sections/tienda/ProductoFormSection';
 import SidebarNav from './components/SidebarNav';
 import BottomSheet from './components/BottomSheet';
@@ -214,7 +214,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   return (
     <div className="h-screen" style={{ background: 'var(--erp-content-bg)' }}>
       <SEOHead title={`Admin - ${config.site_nombre || 'Panel'}`} type="admin" />
-      <MesaOrderAlert />
+      <AdminOrderAlert />
 
       {/* Desktop sidebar - only visible lg+ */}
       <aside className={`erp-sidebar hidden lg:flex fixed inset-y-0 left-0 z-30 ${sidebarCollapsed ? 'collapsed' : ''}`} style={{ width: sidebarCollapsed ? 'var(--erp-sidebar-collapsed)' : 'var(--erp-sidebar-width)' }}>

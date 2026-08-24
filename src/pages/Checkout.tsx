@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useApp } from '../store/AppContext';
 import { motion, AnimatePresence } from 'motion/react';
-import { ListOrdered, Trash2, MapPin, Phone, CheckCircle, X, Copy, Check, ArrowRight, ArrowLeft, Store, Truck, Navigation, Search, LocateFixed, ChevronDown, FileText, Clock, UtensilsCrossed } from 'lucide-react';
+import { ListOrdered, Trash2, MapPin, Phone, CheckCircle, X, Copy, Check, ArrowRight, ArrowLeft, Store, Truck, Navigation, Search, LocateFixed, ChevronDown, FileText, Clock, UtensilsCrossed, Plus, Minus, MessageSquare } from 'lucide-react';
 import { LeafletMap } from '../components/LeafletMap';
 import { SEOHead } from '../components/SEOHead';
 import { CartUpsell } from '../components/CartUpsell';
 import { OrderTracker } from '../components/OrderTracker';
+import { OrderTypeModal } from '../components/OrderTypeModal';
 import { FoodItem, Coupon, Order, StoreConfig, DeliveryZone } from '../types/store';
 import { haversineKm, findNearestSede } from '../utils/geo';
 import { getWhatsAppPhone } from '../utils/phone';
@@ -99,12 +100,40 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const [paymentReference, setPaymentReference] = useState('');
   const [paymentBank, setPaymentBank] = useState('');
   const [mesaOrderConfirmed, setMesaOrderConfirmed] = useState(false);
+  const [showTypeModal, setShowTypeModal] = useState(true);
+  const [orderTypeSelected, setOrderTypeSelected] = useState(false);
+  const [waitingForAdmin, setWaitingForAdmin] = useState(false);
+  const [adminAccepted, setAdminAccepted] = useState(false);
+  const [paymentConfirmedByAdmin, setPaymentConfirmedByAdmin] = useState(false);
 
   useEffect(() => {
     if (processedOrder) {
       clearCart();
     }
   }, [processedOrder, clearCart]);
+
+  // Listener de realtime para detectar aceptación del admin
+  useEffect(() => {
+    if (!waitingForAdmin || !processedOrder || adminAccepted) return;
+
+    const channel = supabase.channel(`checkout-order-${processedOrder.id}`);
+    channel
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${processedOrder.id}` }, (payload: Record<string, unknown>) => {
+        const updated = payload.new as Order;
+        if (updated.status === 'En preparación' || updated.status === 'en_preparacion' || updated.status === 'Procesando') {
+          setAdminAccepted(true);
+          setProcessedOrder(updated);
+        } else if (updated.status === 'Cancelado' || updated.status === 'cancelado') {
+          setWaitingForAdmin(false);
+          setProcessedOrder(null);
+          localStorage.removeItem('trv_active_order_id');
+          setValidationError('Tu pedido fue rechazado. Intenta de nuevo.');
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [waitingForAdmin, processedOrder, adminAccepted]);
 
   const detectNearestSede = useCallback((userLat: number, userLng: number) => {
     const nearest = findNearestSede(activeSedes, { lat: userLat, lng: userLng });
@@ -383,7 +412,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
 
   const handleNextStep = () => {
     if (orderType === 'mesa') {
-      // Flujo simplificado para mesa: solo 2 pasos
       if (currentStep === 1) {
         if (!clientName.trim()) {
           setValidationError('Ingresa tu nombre para el pedido en mesa.');
@@ -391,6 +419,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
         }
         setValidationError('');
         setCurrentStep(2);
+      } else if (currentStep === 2) {
+        setValidationError('');
+        setCurrentStep(3);
       }
       return;
     }
@@ -524,6 +555,7 @@ ${productosDetailText}
         setMesaOrderConfirmed(true);
       }
       setProcessedOrder(created);
+      setWaitingForAdmin(true);
       if (appliedCoupon) {
         updateCoupon(appliedCoupon.id, { usage_count: (appliedCoupon.usage_count || 0) + 1 });
       }
@@ -550,7 +582,170 @@ ${productosDetailText}
 
   const displayOrder = processedOrder || (cart.length === 0 && recoveredOrderId ? orders.find(o => o.id === recoveredOrderId) : undefined);
 
-  if (displayOrder) {
+  // Si estamos esperando al admin o en flujo de pago, los screens especiales se encargan
+  const inWaitingFlow = waitingForAdmin || adminAccepted || paymentConfirmedByAdmin;
+
+  if (displayOrder && !inWaitingFlow) {
+    if (mesaOrderConfirmed && displayOrder.tipo_pedido === 'mesa') {
+      return (
+        <div className="flex flex-col min-h-[100dvh]" style={{ backgroundColor: '#f9f9fb' }}>
+          <SEOHead title="Pedido en Mesa" />
+          <div className="border-b px-4 py-3 sticky top-0 z-20" style={{ backgroundColor: 'rgba(249,249,251,0.8)', backdropFilter: 'blur(20px)', borderColor: '#e4beb1/10' }}>
+            <div className="flex items-center gap-3">
+              <button onClick={() => { setMesaOrderConfirmed(false); setProcessedOrder(null); localStorage.removeItem('trv_active_order_id'); if (onClose) onClose(); else setTab('home'); }} className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#eeeef0] transition-colors cursor-pointer" style={{ backgroundColor: '#eeeef0' }}>
+                <X size={18} className="text-[#1a1c1d]" />
+              </button>
+              <div>
+                <h1 className="text-[16px] font-bold text-[#1a1c1d]">Pedido Enviado</h1>
+                <p className="text-[11px] text-[#8f7065]">Proceda con el pago en caja</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1 p-4 space-y-4 overflow-y-auto pb-28">
+            {/* Mensaje de confirmación */}
+            <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-5 text-center">
+              <div className="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center" style={{ backgroundColor: '#10b98115' }}>
+                <CheckCircle size={32} className="text-emerald-500" />
+              </div>
+              <h2 className="text-base font-bold text-[#1a1c1d] mb-1">¡Pedido Recibido!</h2>
+              <p className="text-xs text-[#8f7065] mb-3">Tu pedido está siendo procesado. Proceda con el pago en caja.</p>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ backgroundColor: `${orderTypeColor}15` }}>
+                <UtensilsCrossed size={12} style={{ color: orderTypeColor }} />
+                <span className="text-xs font-bold" style={{ color: orderTypeColor }}>Mesa #{displayOrder.numero_mesa || '?'}</span>
+              </div>
+            </div>
+
+            {/* Resumen del pedido */}
+            <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
+              <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#8f7065] mb-3">Detalle del Pedido</h3>
+              <div className="space-y-2 mb-3">
+                {displayOrder.items?.map((item, idx) => (
+                  <div key={idx} className="flex justify-between items-center text-xs">
+                    <span className="text-[#5b4137]">
+                      <span className="font-bold">{item.cantidad}x</span> {item.nombre}
+                      {item.selected_options && item.selected_options.length > 0 && (
+                        <span className="text-[#8f7065] ml-1">({item.selected_options.map(o => o.option_name).join(', ')})</span>
+                      )}
+                    </span>
+                    <span className="font-bold text-[#1a1c1d]">${((item.precio_usd + (item.options_total_usd || 0)) * item.cantidad).toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="border-t border-[#e4beb1]/10 pt-2 flex justify-between items-center">
+                <span className="text-xs font-bold text-[#1a1c1d]">Total a Pagar:</span>
+                <div className="text-right">
+                  <span className="font-black text-lg" style={{ color: themeColor }}>${displayOrder.total_usd?.toFixed(2)}</span>
+                  <span className="text-[10px] text-[#8f7065] ml-1">{displayOrder.total_bs?.toFixed(2)} Bs.</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Datos de pago */}
+            <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
+              <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#8f7065] mb-3">Método de Pago Seleccionado</h3>
+              <div className="p-3 rounded-xl mb-3" style={{ backgroundColor: `${themeColor}10` }}>
+                <p className="text-sm font-bold text-[#1a1c1d]">{displayOrder.metodo_pago}</p>
+                {displayOrder.referencia_pago && (
+                  <p className="text-xs text-[#8f7065] mt-1">Ref: {displayOrder.referencia_pago}</p>
+                )}
+                {displayOrder.banco_origen && (
+                  <p className="text-xs text-[#8f7065]">Banco: {displayOrder.banco_origen}</p>
+                )}
+              </div>
+
+              {/* Datos para pago en caja */}
+              {displayOrder.metodo_pago === 'Pago Móvil' && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase text-[#8f7065] mb-1">Datos para transferir:</p>
+                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                    <div>
+                      <span className="text-[9px] text-[#8f7065] uppercase block">Banco / Titular</span>
+                      <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || 'Banesco (0134)').split('-')[0]?.trim()}</span>
+                    </div>
+                    <CopyButton text={config.pagomovil_data || 'Banesco (0134)'} fieldId="pm-data-post" />
+                  </div>
+                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                    <div>
+                      <span className="text-[9px] text-[#8f7065] uppercase block">Teléfono</span>
+                      <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'}</span>
+                    </div>
+                    <CopyButton text={(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'} fieldId="pm-phone-post" />
+                  </div>
+                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                    <div>
+                      <span className="text-[9px] text-[#8f7065] uppercase block">Cédula / RIF</span>
+                      <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'}</span>
+                    </div>
+                    <CopyButton text={(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'} fieldId="pm-ci-post" />
+                  </div>
+                  <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {displayOrder.total_bs?.toFixed(2)} Bs.</p>
+                </div>
+              )}
+              {displayOrder.metodo_pago === 'Zelle' && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase text-[#8f7065] mb-1">Datos para transferir:</p>
+                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                    <div>
+                      <span className="text-[9px] text-[#8f7065] uppercase block">Correo Zelle</span>
+                      <span className="text-[#1a1c1d] font-bold text-xs">{config.zelle_data || 'pagos@email.com'}</span>
+                    </div>
+                    <CopyButton text={config.zelle_data || 'pagos@email.com'} fieldId="zelle-email-post" />
+                  </div>
+                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                    <div>
+                      <span className="text-[9px] text-[#8f7065] uppercase block">Monto a enviar</span>
+                      <span className="font-black text-sm" style={{ color: themeColor }}>${displayOrder.total_usd?.toFixed(2)} USD</span>
+                    </div>
+                    <CopyButton text={`$${displayOrder.total_usd?.toFixed(2)}`} fieldId="zelle-amount-post" />
+                  </div>
+                </div>
+              )}
+              {displayOrder.metodo_pago === 'Transferencia' && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase text-[#8f7065] mb-1">Datos para transferir:</p>
+                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                    <div>
+                      <span className="text-[9px] text-[#8f7065] uppercase block">Datos Bancarios</span>
+                      <span className="text-[#1a1c1d] font-bold text-xs">{config.transferencia_data || `Banesco - ${config.site_nombre}`}</span>
+                    </div>
+                    <CopyButton text={config.transferencia_data || `Banesco - ${config.site_nombre}`} fieldId="transfer-data-post" />
+                  </div>
+                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                    <div>
+                      <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
+                      <span className="font-black text-sm" style={{ color: themeColor }}>${displayOrder.total_usd?.toFixed(2)} USD</span>
+                    </div>
+                    <CopyButton text={`$${displayOrder.total_usd?.toFixed(2)}`} fieldId="transfer-amount-post" />
+                  </div>
+                </div>
+              )}
+              {displayOrder.metodo_pago === 'Efectivo' && (
+                <div className="text-center">
+                  <p className="text-xs text-[#5b4137] mb-2">{config.efectivo_data || 'Paga en caja al recibir tu pedido'}</p>
+                  <p className="font-black text-sm" style={{ color: themeColor }}>Total: ${displayOrder.total_usd?.toFixed(2)}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Número de pedido */}
+            <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 text-center">
+              <p className="text-[10px] font-bold uppercase text-[#8f7065] mb-1">Tu número de pedido</p>
+              <p className="text-lg font-black text-[#1a1c1d] font-mono">{displayOrder.id}</p>
+            </div>
+          </div>
+
+          {/* Botón fijo inferior */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e4beb1]/10 p-4 z-20">
+            <button onClick={() => { setMesaOrderConfirmed(false); setProcessedOrder(null); localStorage.removeItem('trv_active_order_id'); if (onClose) onClose(); else setTab('home'); }} className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: '#10b981' }}>
+              <CheckCircle size={16} />
+              Entendido
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <OrderTracker
         order={displayOrder}
@@ -569,6 +764,7 @@ ${productosDetailText}
   }
 
   const themeColor = config.theme_color || '#A4D045';
+  const orderTypeColor = orderType === 'mesa' ? '#e67e22' : orderType === 'pickup' ? '#8b5cf6' : '#3b82f6';
   const stepCompleted = (s: number) => s < currentStep;
   const stepActive = (s: number) => s === currentStep;
   const selectedSede = activeSedes.find(s => s.id === selectedSedeId) || activeSedes[0];
@@ -610,7 +806,7 @@ ${productosDetailText}
         </button>
         <div className="flex-1">
           <h1 className="text-[16px] font-bold text-[#1a1c1d]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Checkout</h1>
-          <p className="text-[11px] text-[#8f7065]">Paso {currentStep} de {orderType === 'mesa' ? 2 : 3}</p>
+          <p className="text-[11px] text-[#8f7065]">Paso {currentStep} de 3</p>
         </div>
       </div>
 
@@ -619,7 +815,8 @@ ${productosDetailText}
           {(orderType === 'mesa'
             ? [
                 { step: 1, label: 'Pedido', icon: <UtensilsCrossed size={14} /> },
-                { step: 2, label: 'Pago', icon: <CheckCircle size={14} /> },
+                { step: 2, label: 'Resumen', icon: <FileText size={14} /> },
+                { step: 3, label: 'Pago', icon: <CheckCircle size={14} /> },
               ]
             : [
                 { step: 1, label: 'Delivery', icon: <MapPin size={14} /> },
@@ -632,7 +829,7 @@ ${productosDetailText}
                 <div
                   className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300"
                   style={{
-                    backgroundColor: stepCompleted(step) ? '#2e7d32' : stepActive(step) ? themeColor : '#eeeef0',
+                    backgroundColor: stepCompleted(step) ? '#2e7d32' : stepActive(step) ? orderTypeColor : '#eeeef0',
                     color: stepCompleted(step) || stepActive(step) ? '#ffffff' : '#8f7065'
                   }}
                 >
@@ -663,28 +860,22 @@ ${productosDetailText}
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {/* Selector de Tipo de Pedido */}
-                  <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Tipo de Pedido</h3>
-                    <div className="flex gap-2">
-                      {[
-                        { key: 'delivery' as const, label: 'Delivery', icon: <Truck size={16} /> },
-                        { key: 'pickup' as const, label: 'Pickup', icon: <Store size={16} /> },
-                        { key: 'mesa' as const, label: 'En Mesa', icon: <UtensilsCrossed size={16} /> },
-                      ].map(opt => (
-                        <button
-                          key={opt.key}
-                          onClick={() => setOrderType(opt.key)}
-                          className={`flex-1 p-3 rounded-xl text-center text-xs font-bold transition-all cursor-pointer border-2 ${
-                            orderType === opt.key ? 'text-white shadow-md' : 'bg-[#f9f9fb] border-[#e4beb1]/10 text-[#5b4137] hover:bg-[#eeeef0]'
-                          }`}
-                          style={orderType === opt.key ? { backgroundColor: themeColor, borderColor: themeColor } : {}}
-                        >
-                          <span className="block mb-1">{opt.icon}</span>
-                          {opt.label}
-                        </button>
-                      ))}
+                  {/* Tipo de Pedido Seleccionado */}
+                  <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white" style={{ backgroundColor: orderTypeColor }}>
+                        {orderType === 'mesa' ? <UtensilsCrossed size={18} /> : orderType === 'pickup' ? <Store size={18} /> : <Truck size={18} />}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-[#1a1c1d]">
+                          {orderType === 'mesa' ? 'En Mesa' : orderType === 'pickup' ? 'Recoger en Tienda' : 'Delivery'}
+                        </p>
+                        <p className="text-[11px] text-[#8f7065]">
+                          {orderType === 'mesa' ? 'Disfruta aquí en el local' : orderType === 'pickup' ? 'Pasa a buscar tu pedido' : 'Te lo llevamos a tu ubicación'}
+                        </p>
+                      </div>
                     </div>
+                    <button onClick={() => setShowTypeModal(true)} className="text-[11px] font-bold underline cursor-pointer" style={{ color: orderTypeColor }}>Cambiar</button>
                   </div>
 
                   {/* Selector de Mesa (solo si orderType === 'mesa') */}
@@ -1013,18 +1204,47 @@ ${productosDetailText}
                 <>
                   {/* Resumen del pedido en mesa */}
                   <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <UtensilsCrossed size={14} style={{ color: themeColor }} />
-                      <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d]">Mesa #{mesaNumber} — {clientName}</h3>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <UtensilsCrossed size={14} style={{ color: orderTypeColor }} />
+                        <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d]">Mesa #{mesaNumber} — {clientName}</h3>
+                      </div>
+                      <button onClick={() => setTab('catalog')} className="flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer" style={{ backgroundColor: `${orderTypeColor}15`, color: orderTypeColor }}>
+                        <Plus size={12} /> Agregar más
+                      </button>
                     </div>
-                    <div className="space-y-2 mb-3">
+                    <div className="space-y-3 mb-3">
                       {cart.map(item => {
                         const extrasTotal = item.selected_options?.reduce((e, opt) => e + opt.precio_usd, 0) || 0;
                         const subTotalItem = (item.item.precio_usd + extrasTotal) * item.quantity;
                         return (
-                          <div key={item.item.id} className="flex justify-between items-center text-xs">
-                            <span className="text-[#5b4137]">{item.quantity}x {item.item.nombre}</span>
-                            <span className="font-bold text-[#1a1c1d]">${subTotalItem.toFixed(2)}</span>
+                          <div key={item.item.id} className="flex items-center gap-3 py-2 border-b border-[#e4beb1]/10 last:border-0">
+                            <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#eeeef0] border border-[#e4beb1]/10 shrink-0">
+                              <img src={item.item.imagen_urls[0]} alt={item.item.nombre} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-xs font-bold text-[#1a1c1d] truncate">{item.item.nombre}</h4>
+                              {item.selected_options && item.selected_options.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-0.5">
+                                  {item.selected_options.map((opt, idx) => (
+                                    <span key={idx} className="text-[9px] px-1 py-0.5 rounded-full bg-violet-50 text-violet-600 font-semibold border border-violet-100">
+                                      {opt.option_name}{opt.precio_usd > 0 ? ` +$${opt.precio_usd.toFixed(2)}` : ''}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <div className="flex items-center border border-[#e4beb1]/10 rounded-lg bg-white h-8">
+                                <button onClick={() => updateCartQuantity(item.item.id, item.quantity - 1)} className="w-7 h-full flex items-center justify-center text-[#8f7065] hover:text-[#1a1c1d] text-xs transition-all cursor-pointer">-</button>
+                                <span className="text-xs px-1.5 text-[#1a1c1d] font-bold">{item.quantity}</span>
+                                <button onClick={() => updateCartQuantity(item.item.id, item.quantity + 1)} className="w-7 h-full flex items-center justify-center text-[#8f7065] hover:text-[#1a1c1d] text-xs transition-all cursor-pointer">+</button>
+                              </div>
+                              <span className="text-xs font-bold text-[#1a1c1d] w-14 text-right">${subTotalItem.toFixed(2)}</span>
+                              <button onClick={() => removeFromCart(item.item.id)} className="text-[#8f7065] hover:text-red-500 p-1 rounded transition-all cursor-pointer">
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
                           </div>
                         );
                       })}
@@ -1032,176 +1252,34 @@ ${productosDetailText}
                     <div className="border-t border-[#e4beb1]/10 pt-2 flex justify-between items-center">
                       <span className="text-xs font-bold text-[#1a1c1d]">Total:</span>
                       <div className="text-right">
-                        <span className="font-black text-lg" style={{ color: themeColor }}>${totalUsd.toFixed(2)}</span>
+                        <span className="font-black text-lg" style={{ color: orderTypeColor }}>${totalUsd.toFixed(2)}</span>
                         <span className="text-[10px] text-[#8f7065] ml-2">{totalBs.toFixed(2)} Bs.</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Métodos de Pago (mesa) */}
-                  <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Método de Pago</h3>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { key: 'Pago Móvil', label: 'Pago Móvil Bs', icon: 'Bs', enabled: config.pagomovil_enabled },
-                        { key: 'Zelle', label: 'Zelle USD', icon: 'USD', enabled: config.zelle_enabled },
-                        { key: 'Efectivo', label: 'Efectivo', icon: '$', enabled: config.efectivo_enabled },
-                        { key: 'Transferencia', label: 'Transferencia', icon: 'Bco', enabled: config.transferencia_enabled },
-                        { key: 'Otro', label: 'Otro', icon: '?', enabled: true }
-                      ].filter(pm => pm.enabled).map(pm => (
-                        <button key={pm.key} onClick={() => setSelectedPayment(pm.key as 'Pago Móvil' | 'Zelle' | 'Efectivo' | 'Transferencia' | 'Otro')} className={`p-3 rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer border-2 text-xs ${
-                          selectedPayment === pm.key ? 'text-white shadow-md' : 'bg-[#f9f9fb] border-[#e4beb1]/10 text-[#5b4137] hover:bg-[#eeeef0]'
-                        }`} style={selectedPayment === pm.key ? { backgroundColor: themeColor, borderColor: themeColor } : {}}>
-                          <span className="text-[9px] uppercase font-mono font-bold px-1.5 py-0.5 rounded bg-white/20 shrink-0">{pm.icon}</span>
-                          <span className="font-bold">{pm.label}</span>
-                        </button>
-                      ))}
-                    </div>
+                  <CartUpsell onAddToCart={(item: FoodItem) => addToCart(item)} />
 
-                    <div className="mt-3 p-3 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl text-[11px] text-[#5b4137] leading-relaxed font-mono">
-                      {selectedPayment === 'Pago Móvil' && (
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                            <div>
-                              <span className="text-[9px] text-[#8f7065] uppercase block">Banco / Titular</span>
-                              <span className="text-[#1a1c1d] font-bold">{(config.pagomovil_data || 'Banesco (0134)').split('-')[0]?.trim()}</span>
-                            </div>
-                            <CopyButton text={config.pagomovil_data || 'Banesco (0134)'} fieldId="pm-data-mesa" />
-                          </div>
-                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                            <div>
-                              <span className="text-[9px] text-[#8f7065] uppercase block">Teléfono</span>
-                              <span className="text-[#1a1c1d] font-bold">{(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'}</span>
-                            </div>
-                            <CopyButton text={(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'} fieldId="pm-phone-mesa" />
-                          </div>
-                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                            <div>
-                              <span className="text-[9px] text-[#8f7065] uppercase block">Cédula / RIF</span>
-                              <span className="text-[#1a1c1d] font-bold">{(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'}</span>
-                            </div>
-                            <CopyButton text={(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'} fieldId="pm-ci-mesa" />
-                          </div>
-                          <p className="text-center font-black py-1 rounded" style={{ color: themeColor }}>Calcular: {totalBs.toFixed(2)} Bs.</p>
-                          <div className="space-y-2 mt-2 pt-2 border-t border-[#e4beb1]/10">
-                            <div>
-                              <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Banco Emisor *</label>
-                              <select
-                                value={paymentBank}
-                                onChange={(e) => setPaymentBank(e.target.value)}
-                                className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer"
-                              >
-                                <option value="">Seleccionar banco</option>
-                                <option value="Banesco">Banesco (0134)</option>
-                                <option value="Mercantil">Mercantil (0102)</option>
-                                <option value="Venezuela">Banco de Venezuela (0102)</option>
-                                <option value="Provincial">Provincial (0108)</option>
-                                <option value="Bancaribe">Bancaribe (0114)</option>
-                                <option value="Exterior">Banco Exterior (0115)</option>
-                                <option value="Nacional">Banco Nacional de Crédito (0191)</option>
-                                <option value="BOD">BOD (0128)</option>
-                                <option value="Plaza">Banco Plaza (0138)</option>
-                                <option value="Otros">Otros</option>
-                              </select>
-                            </div>
-                            <div>
-                              <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Número de Referencia *</label>
-                              <input
-                                type="text"
-                                value={paymentReference}
-                                onChange={(e) => setPaymentReference(e.target.value)}
-                                placeholder="Ej: 1234567890"
-                                className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      {selectedPayment === 'Zelle' && (
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                            <div>
-                              <span className="text-[9px] text-[#8f7065] uppercase block">Correo Zelle</span>
-                              <span className="text-[#1a1c1d] font-bold">{config.zelle_data || 'pagos@email.com'}</span>
-                            </div>
-                            <CopyButton text={config.zelle_data || 'pagos@email.com'} fieldId="zelle-email-mesa" />
-                          </div>
-                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                            <div>
-                              <span className="text-[9px] text-[#8f7065] uppercase block">Monto a enviar</span>
-                              <span className="font-black" style={{ color: themeColor }}>${totalUsd.toFixed(2)} USD</span>
-                            </div>
-                            <CopyButton text={`$${totalUsd.toFixed(2)}`} fieldId="zelle-amount-mesa" />
-                          </div>
-                        </div>
-                      )}
-                      {selectedPayment === 'Efectivo' && (
-                        <div className="flex flex-col gap-2">
-                          <p className="text-[#1a1c1d] font-bold text-center">{config.efectivo_data || 'Paga en caja al recibir tu pedido'}</p>
-                          <p className="text-center font-black py-1 rounded" style={{ color: themeColor }}>Total: ${totalUsd.toFixed(2)}</p>
-                        </div>
-                      )}
-                      {selectedPayment === 'Transferencia' && (
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                            <div>
-                              <span className="text-[9px] text-[#8f7065] uppercase block">Datos Bancarios</span>
-                              <span className="text-[#1a1c1d] font-bold">{config.transferencia_data || `Banesco - ${config.site_nombre}`}</span>
-                            </div>
-                            <CopyButton text={config.transferencia_data || `Banesco - ${config.site_nombre}`} fieldId="transfer-data-mesa" />
-                          </div>
-                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                            <div>
-                              <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
-                              <span className="font-black" style={{ color: themeColor }}>${totalUsd.toFixed(2)} USD</span>
-                            </div>
-                            <CopyButton text={`$${totalUsd.toFixed(2)}`} fieldId="transfer-amount-mesa" />
-                          </div>
-                        </div>
-                      )}
-                      {selectedPayment === 'Otro' && (
-                        <textarea value={customPaymentNote} onChange={(e) => setCustomPaymentNote(e.target.value)} placeholder="Describe cómo vas a pagar..." className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none focus:border-[var(--theme-color,#FF6B35)] resize-none" rows={3} />
-                      )}
-                    </div>
+                  {/* Notas del pedido */}
+                  <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
+                    <label className="text-[11px] font-bold uppercase text-[#8f7065] mb-2 flex items-center gap-1.5 block">
+                      <MessageSquare size={12} /> Notas del pedido (opcional)
+                    </label>
+                    <textarea value={orderNotes} onChange={(e) => setOrderNotes(e.target.value)} placeholder="Ej: Sin cebolla, extra salsa, bien cocido..." className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl px-3 py-2.5 text-xs outline-none focus:border-[var(--theme-color,#FF6B35)] resize-none" rows={2} />
+                  </div>
 
-                    {/* Referencia de pago para mesa (visible en todos los métodos) */}
-                    {selectedPayment !== 'Efectivo' && selectedPayment !== 'Otro' && (
-                      <div className="mt-3 space-y-2">
-                        {selectedPayment !== 'Pago Móvil' && (
-                          <>
-                            <div>
-                              <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Banco Emisor</label>
-                              <select
-                                value={paymentBank}
-                                onChange={(e) => setPaymentBank(e.target.value)}
-                                className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer"
-                              >
-                                <option value="">Seleccionar banco</option>
-                                <option value="Banesco">Banesco (0134)</option>
-                                <option value="Mercantil">Mercantil (0102)</option>
-                                <option value="Venezuela">Banco de Venezuela (0102)</option>
-                                <option value="Provincial">Provincial (0108)</option>
-                                <option value="Bancaribe">Bancaribe (0114)</option>
-                                <option value="Exterior">Banco Exterior (0115)</option>
-                                <option value="Nacional">Banco Nacional de Crédito (0191)</option>
-                                <option value="BOD">BOD (0128)</option>
-                                <option value="Plaza">Banco Plaza (0138)</option>
-                                <option value="Otros">Otros</option>
-                              </select>
-                            </div>
-                            <div>
-                              <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Número de Referencia</label>
-                              <input
-                                type="text"
-                                value={paymentReference}
-                                onChange={(e) => setPaymentReference(e.target.value)}
-                                placeholder="Ej: 1234567890"
-                                className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]"
-                              />
-                            </div>
-                          </>
-                        )}
-                      </div>
+                  {/* Cupón */}
+                  <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
+                    <label className="text-[11px] font-bold uppercase text-[#8f7065] mb-2 block">Cupón</label>
+                    <div className="flex gap-2">
+                      <input type="text" value={couponInput} onChange={(e) => setCouponInput(e.target.value)} placeholder="CÓDIGO" className="flex-1 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl px-3 py-2.5 text-xs outline-none focus:border-[var(--theme-color,#FF6B35)] font-bold uppercase" />
+                      <button onClick={handleApplyCoupon} className="px-4 py-2.5 rounded-xl text-xs font-bold hover:opacity-90 transition-colors" style={{ backgroundColor: orderTypeColor, color: '#fff' }}>Aplicar</button>
+                    </div>
+                    {couponError && <span className="text-[11px] text-red-500 mt-1 block">{couponError}</span>}
+                    {appliedCoupon && (
+                      <p className="text-xs font-bold mt-2" style={{ color: orderTypeColor }}>
+                        ✓ "{appliedCoupon.code}" aplicado: {appliedCoupon.coupon_type === 'fixed' ? `-$${appliedCoupon.discount_amount}` : appliedCoupon.coupon_type === 'free_shipping' ? 'Envio Gratis' : `-${appliedCoupon.discount_percent}%`}
+                      </p>
                     )}
                   </div>
                 </>
@@ -1299,7 +1377,7 @@ ${productosDetailText}
 
           {currentStep === 3 && (
             <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="p-4">
-              {!currentUser && (
+              {orderType !== 'mesa' && !currentUser && (
                 <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
                   <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Tus Datos</h3>
                   <div className="space-y-3">
@@ -1325,13 +1403,27 @@ ${productosDetailText}
                 </div>
               )}
 
-              {currentUser && (
+              {orderType !== 'mesa' && currentUser && (
                 <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 text-white rounded-full flex items-center justify-center font-bold text-xs" style={{ backgroundColor: themeColor }}>{currentUser.nombre[0]}</div>
                     <div>
                       <p className="text-xs font-bold text-[#1a1c1d]">{currentUser.nombre}</p>
                       <p className="text-[11px] text-[#8f7065]">{currentUser.email || currentUser.telefono}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {orderType === 'mesa' && (
+                <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white" style={{ backgroundColor: orderTypeColor }}>
+                      <UtensilsCrossed size={18} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-[#1a1c1d]">Mesa #{mesaNumber} — {clientName}</p>
+                      <p className="text-[11px] text-[#8f7065]">{cart.reduce((s, ci) => s + ci.quantity, 0)} producto{cart.reduce((s, ci) => s + ci.quantity, 0) !== 1 ? 's' : ''} · ${totalUsd.toFixed(2)}</p>
                     </div>
                   </div>
                 </div>
@@ -1349,7 +1441,7 @@ ${productosDetailText}
                   ].filter(pm => pm.enabled).map(pm => (
                     <button key={pm.key} onClick={() => setSelectedPayment(pm.key as 'Pago Móvil' | 'Zelle' | 'Efectivo' | 'Transferencia' | 'Otro')} className={`p-3 rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer border-2 text-xs ${
                       selectedPayment === pm.key ? 'text-white shadow-md' : 'bg-[#f9f9fb] border-[#e4beb1]/10 text-[#5b4137] hover:bg-[#eeeef0]'
-                    }`} style={selectedPayment === pm.key ? { backgroundColor: themeColor, borderColor: themeColor } : {}}>
+                    }`} style={selectedPayment === pm.key ? { backgroundColor: orderTypeColor, borderColor: orderTypeColor } : {}}>
                       <span className="text-[9px] uppercase font-mono font-bold px-1.5 py-0.5 rounded bg-white/20 shrink-0">{pm.icon}</span>
                       <span className="font-bold">{pm.label}</span>
                     </button>
@@ -1520,12 +1612,12 @@ ${productosDetailText}
             </div>
           )}
 
-          {(orderType === 'mesa' && currentStep === 2) || currentStep === 3 ? (
-            <button onClick={handleFormSubmit} disabled={isProcessing} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : themeColor, color: '#fff' }}>
+          {currentStep === 3 ? (
+            <button onClick={handleFormSubmit} disabled={isProcessing} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : '#10b981', color: '#fff' }}>
               {isProcessing ? 'Procesando...' : orderType === 'mesa' ? 'Confirmar Pedido en Mesa' : 'Confirmar Pedido'}
             </button>
           ) : (
-            <button onClick={handleNextStep} className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: themeColor, color: '#fff' }}>
+            <button onClick={handleNextStep} className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: orderTypeColor, color: '#fff' }}>
               Continuar <ArrowRight size={16} />
             </button>
           )}
@@ -1553,6 +1645,271 @@ ${productosDetailText}
             }}
             onClose={() => setShowLocationModal(false)}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Modal de selección de tipo de pedido */}
+      <OrderTypeModal
+        isOpen={showTypeModal && !orderTypeSelected}
+        onClose={() => { if (orderTypeSelected) setShowTypeModal(false); else setTab('cart'); }}
+        onSelect={(type) => {
+          setOrderType(type);
+          setOrderTypeSelected(true);
+          setShowTypeModal(false);
+          if (type === 'mesa') {
+            const params = new URLSearchParams(window.location.search);
+            const mesaParam = params.get('mesa');
+            if (mesaParam) {
+              const num = parseInt(mesaParam, 10);
+              if (num) { setMesaNumber(num); setMesaAutoSelected(true); }
+            }
+          }
+        }}
+        themeColor={themeColor}
+        cartTotal={totalUsd}
+        cartItems={cart.reduce((s, ci) => s + ci.quantity, 0)}
+      />
+
+      {/* Pantalla de espera - Procesando pedido */}
+      <AnimatePresence>
+        {waitingForAdmin && !adminAccepted && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex flex-col items-center justify-center p-6"
+            style={{ backgroundColor: '#f9f9fb' }}
+          >
+            <div className="w-20 h-20 mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: `${orderTypeColor}15` }}>
+              <div className="absolute w-20 h-20 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${orderTypeColor} transparent` }} />
+              <Clock size={28} style={{ color: orderTypeColor }} />
+            </div>
+            <h2 className="text-lg font-bold text-[#1a1c1d] mb-2 text-center">Procesando tu pedido...</h2>
+            <p className="text-sm text-[#8f7065] text-center mb-4">Tu pedido está siendo revisado por el equipo</p>
+            <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 w-full max-w-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white" style={{ backgroundColor: orderTypeColor }}>
+                  {orderType === 'mesa' ? <UtensilsCrossed size={18} /> : orderType === 'pickup' ? <Store size={18} /> : <Truck size={18} />}
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-[#1a1c1d]">
+                    {orderType === 'mesa' ? `Mesa #${mesaNumber}` : orderType === 'pickup' ? 'Recoger en Tienda' : 'Delivery'}
+                  </p>
+                  <p className="text-[11px] text-[#8f7065]">{processedOrder?.id}</p>
+                </div>
+              </div>
+              <div className="border-t border-[#e4beb1]/10 pt-2 flex justify-between items-center">
+                <span className="text-xs font-bold text-[#1a1c1d]">Total:</span>
+                <span className="font-black" style={{ color: orderTypeColor }}>${processedOrder?.total_usd?.toFixed(2)}</span>
+              </div>
+            </div>
+            <p className="text-[10px] text-[#8f7065] mt-4 text-center">No cierres esta página hasta que tu pedido sea confirmado</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Pantalla de confirmación de pago post-admin */}
+      <AnimatePresence>
+        {adminAccepted && !paymentConfirmedByAdmin && processedOrder && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex flex-col"
+            style={{ backgroundColor: '#f9f9fb' }}
+          >
+            <div className="border-b px-4 py-3 sticky top-0 z-20 bg-white" style={{ borderColor: '#e4beb1/10' }}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-emerald-100">
+                  <CheckCircle size={20} className="text-emerald-600" />
+                </div>
+                <div>
+                  <h1 className="text-[16px] font-bold text-[#1a1c1d]">Pedido Aceptado</h1>
+                  <p className="text-[11px] text-[#8f7065]">Proceda con el pago</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 p-4 space-y-4 overflow-y-auto pb-28">
+              {/* Resumen del pedido */}
+              <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
+                <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#8f7065] mb-3">Tu Pedido</h3>
+                <div className="space-y-2 mb-3">
+                  {processedOrder.items?.map((item, idx) => (
+                    <div key={idx} className="flex justify-between items-center text-xs">
+                      <span className="text-[#5b4137]">
+                        <span className="font-bold">{item.cantidad}x</span> {item.nombre}
+                      </span>
+                      <span className="font-bold text-[#1a1c1d]">${((item.precio_usd + (item.options_total_usd || 0)) * item.cantidad).toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="border-t border-[#e4beb1]/10 pt-2 flex justify-between items-center">
+                  <span className="text-xs font-bold text-[#1a1c1d]">Total:</span>
+                  <div className="text-right">
+                    <span className="font-black text-lg" style={{ color: themeColor }}>${processedOrder.total_usd?.toFixed(2)}</span>
+                    <span className="text-[10px] text-[#8f7065] ml-1">{processedOrder.total_bs?.toFixed(2)} Bs.</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Método de pago y datos */}
+              {processedOrder.metodo_pago === 'Efectivo' ? (
+                <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-5 text-center">
+                  <div className="w-14 h-14 mx-auto mb-3 rounded-full flex items-center justify-center bg-emerald-100">
+                    <CheckCircle size={28} className="text-emerald-600" />
+                  </div>
+                  <h3 className="text-base font-bold text-[#1a1c1d] mb-1">Pago en Efectivo</h3>
+                  <p className="text-xs text-[#8f7065] mb-3">Dirígete a caja para cancelar tu pedido</p>
+                  <p className="font-black text-xl" style={{ color: themeColor }}>${processedOrder.total_usd?.toFixed(2)}</p>
+                </div>
+              ) : (
+                <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
+                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#8f7065] mb-3">Realiza tu pago</h3>
+                  <div className="p-3 rounded-xl mb-3" style={{ backgroundColor: `${themeColor}10` }}>
+                    <p className="text-sm font-bold text-[#1a1c1d]">{processedOrder.metodo_pago}</p>
+                  </div>
+                  {processedOrder.metodo_pago === 'Pago Móvil' && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                        <div>
+                          <span className="text-[9px] text-[#8f7065] uppercase block">Banco / Titular</span>
+                          <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || 'Banesco (0134)').split('-')[0]?.trim()}</span>
+                        </div>
+                        <CopyButton text={config.pagomovil_data || 'Banesco (0134)'} fieldId="pm-bank-final" />
+                      </div>
+                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                        <div>
+                          <span className="text-[9px] text-[#8f7065] uppercase block">Teléfono</span>
+                          <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'}</span>
+                        </div>
+                        <CopyButton text={(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'} fieldId="pm-phone-final" />
+                      </div>
+                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                        <div>
+                          <span className="text-[9px] text-[#8f7065] uppercase block">Cédula / RIF</span>
+                          <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'}</span>
+                        </div>
+                        <CopyButton text={(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'} fieldId="pm-ci-final" />
+                      </div>
+                      <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {processedOrder.total_bs?.toFixed(2)} Bs.</p>
+
+                      <div className="space-y-2 mt-3 pt-3 border-t border-[#e4beb1]/10">
+                        <div>
+                          <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Banco Emisor *</label>
+                          <select value={paymentBank} onChange={(e) => setPaymentBank(e.target.value)} className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer">
+                            <option value="">Seleccionar banco</option>
+                            <option value="Banesco">Banesco (0134)</option>
+                            <option value="Mercantil">Mercantil (0102)</option>
+                            <option value="Venezuela">Banco de Venezuela (0102)</option>
+                            <option value="Provincial">Provincial (0108)</option>
+                            <option value="Bancaribe">Bancaribe (0114)</option>
+                            <option value="Exterior">Banco Exterior (0115)</option>
+                            <option value="Nacional">Banco Nacional de Crédito (0191)</option>
+                            <option value="BOD">BOD (0128)</option>
+                            <option value="Plaza">Banco Plaza (0138)</option>
+                            <option value="Otros">Otros</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia de Pago *</label>
+                          <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {processedOrder.metodo_pago === 'Zelle' && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                        <div>
+                          <span className="text-[9px] text-[#8f7065] uppercase block">Correo Zelle</span>
+                          <span className="text-[#1a1c1d] font-bold text-xs">{config.zelle_data || 'pagos@email.com'}</span>
+                        </div>
+                        <CopyButton text={config.zelle_data || 'pagos@email.com'} fieldId="zelle-email-final" />
+                      </div>
+                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                        <div>
+                          <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
+                          <span className="font-black text-sm" style={{ color: themeColor }}>${processedOrder.total_usd?.toFixed(2)} USD</span>
+                        </div>
+                        <CopyButton text={`$${processedOrder.total_usd?.toFixed(2)}`} fieldId="zelle-amount-final" />
+                      </div>
+                      <div className="mt-2 pt-2 border-t border-[#e4beb1]/10">
+                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia / Nota Zelle</label>
+                        <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: Confirmación Zelle" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
+                      </div>
+                    </div>
+                  )}
+                  {processedOrder.metodo_pago === 'Transferencia' && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                        <div>
+                          <span className="text-[9px] text-[#8f7065] uppercase block">Datos Bancarios</span>
+                          <span className="text-[#1a1c1d] font-bold text-xs">{config.transferencia_data || `Banesco - ${config.site_nombre}`}</span>
+                        </div>
+                        <CopyButton text={config.transferencia_data || `Banesco - ${config.site_nombre}`} fieldId="transfer-data-final" />
+                      </div>
+                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                        <div>
+                          <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
+                          <span className="font-black text-sm" style={{ color: themeColor }}>${processedOrder.total_usd?.toFixed(2)} USD</span>
+                        </div>
+                        <CopyButton text={`$${processedOrder.total_usd?.toFixed(2)}`} fieldId="transfer-amount-final" />
+                      </div>
+                      <div className="mt-2 pt-2 border-t border-[#e4beb1]/10">
+                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia</label>
+                        <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Botón fijo - Confirmar pago */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e4beb1]/10 p-4 z-20">
+              {processedOrder.metodo_pago !== 'Efectivo' && (!paymentReference.trim() || (processedOrder.metodo_pago === 'Pago Móvil' && !paymentBank)) && (
+                <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded-xl text-xs font-semibold text-amber-700 text-center">
+                  Complete los datos de pago para confirmar
+                </div>
+              )}
+              <button
+                onClick={async () => {
+                  if (processedOrder.metodo_pago !== 'Efectivo' && (!paymentReference.trim() || (processedOrder.metodo_pago === 'Pago Móvil' && !paymentBank))) return;
+                  setPaymentConfirmedByAdmin(true);
+                }}
+                disabled={processedOrder.metodo_pago !== 'Efectivo' && (!paymentReference.trim() || (processedOrder.metodo_pago === 'Pago Móvil' && !paymentBank))}
+                className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer ${
+                  (processedOrder.metodo_pago !== 'Efectivo' && (!paymentReference.trim() || (processedOrder.metodo_pago === 'Pago Móvil' && !paymentBank))) ? 'opacity-50' : ''
+                }`}
+                style={{ backgroundColor: '#10b981' }}
+              >
+                <CheckCircle size={16} />
+                {processedOrder.metodo_pago === 'Efectivo' ? 'Confirmo que pagué en caja' : 'Confirmar Pago'}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Pantalla de pago confirmado */}
+      <AnimatePresence>
+        {paymentConfirmedByAdmin && processedOrder && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="fixed inset-0 z-[250] flex flex-col items-center justify-center p-6"
+            style={{ backgroundColor: '#f9f9fb' }}
+          >
+            <div className="w-20 h-20 mb-4 rounded-full flex items-center justify-center bg-emerald-100">
+              <CheckCircle size={40} className="text-emerald-600" />
+            </div>
+            <h2 className="text-lg font-bold text-[#1a1c1d] mb-1 text-center">¡Pago Confirmado!</h2>
+            <p className="text-sm text-[#8f7065] text-center mb-6">Tu pedido {processedOrder.id} está siendo preparado</p>
+            <button onClick={() => { setPaymentConfirmedByAdmin(false); setProcessedOrder(null); setMesaOrderConfirmed(false); setWaitingForAdmin(false); setAdminAccepted(false); localStorage.removeItem('trv_active_order_id'); if (onClose) onClose(); else setTab('home'); }} className="w-full max-w-sm py-3.5 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: '#10b981' }}>
+              Entendido
+            </button>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

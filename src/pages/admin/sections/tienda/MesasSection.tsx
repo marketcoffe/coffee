@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { Mesa, Order } from '../../../../types/store';
-import { Edit3, Save, X, Clock, CheckCircle, XCircle, Users, Hash, Armchair } from 'lucide-react';
+import { Edit3, Save, X, Clock, CheckCircle, XCircle, Users, Hash, Armchair, QrCode } from 'lucide-react';
+import { MesaQR } from '../../../../components/MesaQR';
 
 const ESTADO_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   'Disponible': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-300' },
@@ -20,6 +21,8 @@ export default function MesasSection() {
   const [editNombre, setEditNombre] = useState('');
   const [editEstado, setEditEstado] = useState<Mesa['estado']>('Disponible');
   const [selectedMesa, setSelectedMesa] = useState<string | null>(null);
+  const [showQR, setShowQR] = useState<string | null>(null);
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
   const sortedMesas = useMemo(() =>
     [...mesas].sort((a, b) => a.numero_mesa - b.numero_mesa),
@@ -135,12 +138,21 @@ export default function MesasSection() {
                       <Armchair size={14} style={{ color: themeColor }} />
                       <span className="text-sm font-bold text-[#1a1c1d]">Mesa #{mesa.numero_mesa}</span>
                     </div>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); startEdit(mesa); }}
-                      className="p-1 rounded-lg hover:bg-[#eeeef0] text-[#8f7065] hover:text-[#5b4137] cursor-pointer"
-                    >
-                      <Edit3 size={12} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setShowQR(showQR === mesa.id ? null : mesa.id); }}
+                        className={`p-1 rounded-lg cursor-pointer transition-colors ${showQR === mesa.id ? 'bg-blue-100 text-blue-600' : 'hover:bg-[#eeeef0] text-[#8f7065] hover:text-[#5b4137]'}`}
+                        title="Generar QR"
+                      >
+                        <QrCode size={12} />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); startEdit(mesa); }}
+                        className="p-1 rounded-lg hover:bg-[#eeeef0] text-[#8f7065] hover:text-[#5b4137] cursor-pointer"
+                      >
+                        <Edit3 size={12} />
+                      </button>
+                    </div>
                   </div>
                   <p className="text-xs text-[#8f7065] mb-2 truncate">{mesa.nombre_personalizado || `Mesa ${mesa.numero_mesa}`}</p>
                   <div className="flex items-center justify-between">
@@ -154,6 +166,16 @@ export default function MesasSection() {
                     )}
                   </div>
                 </>
+              )}
+              {showQR === mesa.id && (
+                <div className="mt-2 p-3 bg-[#f9f9fb] rounded-xl border border-[#e4beb1]/10" onClick={(e) => e.stopPropagation()}>
+                  <MesaQR
+                    mesaNumero={mesa.numero_mesa}
+                    baseUrl={baseUrl}
+                    themeColor={themeColor}
+                    nombrePersonalizado={mesa.nombre_personalizado}
+                  />
+                </div>
               )}
             </div>
           );

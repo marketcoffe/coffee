@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useApp } from '../store/AppContext';
 import { Order } from '../types/store';
 import { supabase } from '../store/supabaseClient';
-import { X, CheckCircle, XCircle, Printer, Volume2, VolumeX, UtensilsCrossed } from 'lucide-react';
+import { X, CheckCircle, XCircle, Printer, Volume2, VolumeX, UtensilsCrossed, Truck, Store, Clock } from 'lucide-react';
 import { printMesaTicket } from '../utils/printMesaTicket';
 
-export default function MesaOrderAlert() {
+export default function AdminOrderAlert() {
   const { config, updateOrderStatus, mesas } = useApp();
   const themeColor = config.theme_color || '#A4D045';
   const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
@@ -17,7 +17,7 @@ export default function MesaOrderAlert() {
     if (!soundEnabled) return;
     try {
       if (!audioRef.current) {
-        audioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVggoKIeGBGPHeTnJVqO0Bvkp2XbEVCdZCdlWlEQ3aPnJZpQ0N2j5yVaENDdo+clWlDQ3aPnJVpQ0N2j5uUaURDdo+clGlEQ3aPm5NpREN2j5uTaURDdo+bk2lEQ3aPm5NpREN2j5uTaURDdY6ak2lEQ3aPm5NpREN2j5uTaURDdY6ak2lEQ3aPm5JpREN2j5uSaURDdY6ak2lEQ3aPm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3aPm5JpREN2j5uSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3aPm5JpREN2j5uSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3aPm5JpREN2j5uSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3aPm5JpREN2j5uSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURD');
+        audioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVggoKIeGBGPHeTnJVqO0Bvkp2XbEVCdZCdlWlEQ3aPnJZpQ0N2j5yVaENDdo+clWlDQ3aPnJVpQ0N2j5uUaURDdo+clGlEQ3aPm5NpREN2j5uTaURDdo+bk2lEQ3aPm5NpREN2j5uTaURDdY6ak2lEQ3aPm5NpREN2j5uTaURDdY6ak2lEQ3aPm5JpREN2j5uSaURDdY6ak2lEQ3aPm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3aPm5JpREN2j5uSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3aPm5JpREN2j5uSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3aPm5JpREN2j5uSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3aPm5JpREN2j5uSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3aPm5JpREN2j5uSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURDdY6ak2lEQ3WOm5JpREN1jpuSaURD');
         audioRef.current.volume = 0.5;
       }
       audioRef.current.currentTime = 0;
@@ -26,12 +26,12 @@ export default function MesaOrderAlert() {
   }, [soundEnabled]);
 
   useEffect(() => {
-    const channel = supabase.channel('mesa_order_alerts');
+    const channel = supabase.channel('admin_order_alerts');
 
     channel
       .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
         const order = payload.payload;
-        if (order && (order.tipo_pedido === 'mesa' || order.tipo_entrega === 'mesa') && !dismissedIds.has(order.id)) {
+        if (order && !dismissedIds.has(order.id)) {
           setPendingOrders(prev => {
             if (prev.some(o => o.id === order.id)) return prev;
             return [order, ...prev];
@@ -41,7 +41,7 @@ export default function MesaOrderAlert() {
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload: Record<string, unknown>) => {
         const order = payload.new as Order;
-        if (order && (order.tipo_pedido === 'mesa' || order.tipo_entrega === 'mesa') && !dismissedIds.has(order.id)) {
+        if (order && !dismissedIds.has(order.id)) {
           setPendingOrders(prev => {
             if (prev.some(o => o.id === order.id)) return prev;
             return [order, ...prev];
@@ -88,32 +88,35 @@ export default function MesaOrderAlert() {
   if (pendingOrders.length === 0) return null;
 
   const currentOrder = pendingOrders[0];
-  const mesa = mesas.find(m => m.numero_mesa === currentOrder.numero_mesa);
+  const mesa = currentOrder.numero_mesa ? mesas.find(m => m.numero_mesa === currentOrder.numero_mesa) : null;
+
+  const getTypeConfig = (order: Order) => {
+    const tipo = order.tipo_pedido || order.tipo_entrega;
+    if (tipo === 'mesa') return { label: `Mesa #${order.numero_mesa || '?'}`, icon: UtensilsCrossed, color: '#e67e22' };
+    if (tipo === 'pickup') return { label: 'Pickup', icon: Store, color: '#8b5cf6' };
+    return { label: 'Delivery', icon: Truck, color: '#3b82f6' };
+  };
+
+  const typeConfig = getTypeConfig(currentOrder);
+  const TypeIcon = typeConfig.icon;
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
       <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-hidden animate-in">
         {/* Header */}
-        <div className="p-4 flex items-center justify-between" style={{ background: `linear-gradient(135deg, ${themeColor}, ${themeColor}dd)` }}>
+        <div className="p-4 flex items-center justify-between" style={{ background: `linear-gradient(135deg, ${typeConfig.color}, ${typeConfig.color}dd)` }}>
           <div className="flex items-center gap-2">
-            <UtensilsCrossed size={20} className="text-white" />
+            <TypeIcon size={20} className="text-white" />
             <div>
-              <h2 className="text-white font-bold text-sm">Nuevo Pedido en Mesa</h2>
-              <p className="text-white/80 text-[11px]">{pendingOrders.length} pedido{pendingOrders.length > 1 ? 's' : ''} pendiente{pendingOrders.length > 1 ? 's' : ''}</p>
+              <h2 className="text-white font-bold text-sm">Nuevo Pedido</h2>
+              <p className="text-white/80 text-[11px]">{pendingOrders.length} pendiente{pendingOrders.length > 1 ? 's' : ''}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className="p-2 rounded-xl bg-white/20 text-white hover:bg-white/30 cursor-pointer"
-              title={soundEnabled ? 'Silenciar' : 'Activar sonido'}
-            >
+            <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-2 rounded-xl bg-white/20 text-white hover:bg-white/30 cursor-pointer" title={soundEnabled ? 'Silenciar' : 'Activar sonido'}>
               {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
             </button>
-            <button
-              onClick={() => handleDismiss(currentOrder.id)}
-              className="p-2 rounded-xl bg-white/20 text-white hover:bg-white/30 cursor-pointer"
-            >
+            <button onClick={() => handleDismiss(currentOrder.id)} className="p-2 rounded-xl bg-white/20 text-white hover:bg-white/30 cursor-pointer">
               <X size={16} />
             </button>
           </div>
@@ -121,14 +124,17 @@ export default function MesaOrderAlert() {
 
         {/* Content */}
         <div className="p-4 overflow-y-auto max-h-[calc(90vh-180px)]">
-          {/* Mesa & Cliente */}
-          <div className="flex items-center gap-3 mb-4 p-3 rounded-xl" style={{ backgroundColor: `${themeColor}10` }}>
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg" style={{ backgroundColor: themeColor, color: '#fff' }}>
-              {currentOrder.numero_mesa || '?'}
+          {/* Type & Client */}
+          <div className="flex items-center gap-3 mb-4 p-3 rounded-xl" style={{ backgroundColor: `${typeConfig.color}10` }}>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg text-white" style={{ backgroundColor: typeConfig.color }}>
+              {currentOrder.numero_mesa || <TypeIcon size={20} />}
             </div>
             <div>
               <p className="text-sm font-bold text-[#1a1c1d]">{currentOrder.nombre_cliente || currentOrder.cliente_nombre}</p>
-              <p className="text-[11px] text-[#8f7065]">Mesa #{currentOrder.numero_mesa} — {mesa?.nombre_personalizado || `Mesa ${currentOrder.numero_mesa}`}</p>
+              <p className="text-[11px] text-[#8f7065]">
+                {typeConfig.label}
+                {currentOrder.tipo_pedido === 'mesa' && mesa ? ` — ${mesa.nombre_personalizado || `Mesa ${currentOrder.numero_mesa}`}` : ''}
+              </p>
             </div>
           </div>
 
@@ -153,15 +159,15 @@ export default function MesaOrderAlert() {
           </div>
 
           {/* Total */}
-          <div className="flex justify-between items-center p-3 rounded-xl mb-4" style={{ backgroundColor: `${themeColor}10` }}>
+          <div className="flex justify-between items-center p-3 rounded-xl mb-4" style={{ backgroundColor: `${typeConfig.color}10` }}>
             <span className="text-sm font-bold text-[#1a1c1d]">Total a Pagar</span>
             <div className="text-right">
-              <span className="text-lg font-black" style={{ color: themeColor }}>${currentOrder.total_usd?.toFixed(2)}</span>
+              <span className="text-lg font-black" style={{ color: typeConfig.color }}>${currentOrder.total_usd?.toFixed(2)}</span>
               <span className="text-[10px] text-[#8f7065] ml-1">{currentOrder.total_bs?.toFixed(2)} Bs.</span>
             </div>
           </div>
 
-          {/* Método de Pago */}
+          {/* Payment Method */}
           <div className="mb-4 p-3 bg-[#f9f9fb] rounded-xl border border-[#e4beb1]/10">
             <p className="text-[10px] font-bold uppercase text-[#8f7065] mb-1">Método de Pago</p>
             <p className="text-sm font-bold text-[#1a1c1d]">{currentOrder.metodo_pago}</p>
@@ -196,7 +202,7 @@ export default function MesaOrderAlert() {
               style={{ backgroundColor: '#10b981' }}
             >
               <CheckCircle size={16} />
-              Aprobar Pago
+              Aceptar Pedido
             </button>
             <button
               onClick={() => handleReject(currentOrder.id)}
@@ -209,7 +215,7 @@ export default function MesaOrderAlert() {
           <button
             onClick={() => handlePrint(currentOrder)}
             className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 border-2 transition-all active:scale-[0.98] cursor-pointer"
-            style={{ borderColor: themeColor, color: themeColor }}
+            style={{ borderColor: typeConfig.color, color: typeConfig.color }}
           >
             <Printer size={16} />
             Imprimir Comanda
