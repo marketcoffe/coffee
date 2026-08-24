@@ -153,7 +153,8 @@ ON CONFLICT (id) DO UPDATE SET role = 'admin', active = true;
 
 -- ----------------------------------------------------------------------------
 -- 7. FIX: Configurar bucket 'productos' con settings correctos
+-- file_size_limit NULL = sin límite, allowed_mime_types NULL = todos los tipos
 -- ----------------------------------------------------------------------------
 UPDATE storage.buckets
-SET public = true, file_size_limit = 0, allowed_mime_types = NULL
+SET public = true, file_size_limit = NULL, allowed_mime_types = NULL
 WHERE id = 'productos';
