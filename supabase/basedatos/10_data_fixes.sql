@@ -168,10 +168,79 @@ ALTER TABLE public.products ADD COLUMN IF NOT EXISTS disponibilidad TEXT NOT NUL
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS combo_ids TEXT[] DEFAULT ARRAY[]::TEXT[];
 
 -- ----------------------------------------------------------------------------
--- 9. FIX: Productos con IDs no-UUID (p1_XXX, prod_XXX)
--- El código frontend ya tiene UUID_RE checks para evitar sincronizar estos IDs.
--- Para limpiar estos registros huérfanos, ejecutar manualmente:
---   DELETE FROM public.products WHERE id::text !~
---     '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
--- NOTA: Solo ejecutar si se confirma que estos productos no son necesarios.
+-- 9. FIX: Migrar IDs no-UUID de products a UUIDs válidos
+-- Los IDs tipo 'p1_012', 'prod_0071' rompen los UPDATE/DELETE en Supabase.
+-- Este script genera UUIDs nuevos, actualiza todas las FK y reemplaza el PK.
+-- SCRIPT IDEMPOTENTE: seguro de ejecutar múltiples veces.
 -- ----------------------------------------------------------------------------
+DO $$
+DECLARE
+  rec RECORD;
+  new_id UUID;
+  bad_count INTEGER;
+BEGIN
+  SELECT count(*) INTO bad_count FROM public.products
+    WHERE id::text !~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
+
+  IF bad_count = 0 THEN
+    RAISE NOTICE 'No hay IDs no-UUID. Nada que migrar.';
+    RETURN;
+  END IF;
+
+  RAISE NOTICE 'Encontrados % productos con IDs no-UUID. Migrando...', bad_count;
+
+  -- Crear tabla temporal de mapeo old_id -> new_uuid
+  CREATE TEMP TABLE IF NOT EXISTS _id_migration (
+    old_id TEXT PRIMARY KEY,
+    new_id UUID NOT NULL DEFAULT gen_random_uuid()
+  ) ON COMMIT DROP;
+
+  INSERT INTO _id_migration (old_id)
+  SELECT id::text FROM public.products
+  WHERE id::text !~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+  ON CONFLICT (old_id) DO NOTHING;
+
+  -- Actualizar FK: food_item_options.food_item_id
+  UPDATE public.food_item_options foi
+  SET food_item_id = m.new_id
+  FROM _id_migration m
+  WHERE foi.food_item_id::text = m.old_id;
+
+  -- Actualizar FK: flash_sales.product_id
+  UPDATE public.flash_sales fs
+  SET product_id = m.new_id
+  FROM _id_migration m
+  WHERE fs.product_id::text = m.old_id;
+
+  -- Actualizar FK: promotions.product_id
+  UPDATE public.promotions pr
+  SET product_id = m.new_id
+  FROM _id_migration m
+  WHERE pr.product_id::text = m.old_id;
+
+  -- Actualizar FK: product_reviews.product_id
+  UPDATE public.product_reviews pr
+  SET product_id = m.new_id
+  FROM _id_migration m
+  WHERE pr.product_id::text = m.old_id;
+
+  -- Actualizar FK: reward_catalog.product_id (sin constraint formal)
+  UPDATE public.reward_catalog rc
+  SET product_id = m.new_id
+  FROM _id_migration m
+  WHERE rc.product_id::text = m.old_id;
+
+  -- Actualizar FK: loyalty_rewards.product_id (sin constraint formal)
+  UPDATE public.loyalty_rewards lr
+  SET product_id = m.new_id
+  FROM _id_migration m
+  WHERE lr.product_id::text = m.old_id;
+
+  -- Ahora actualizar el PK de products
+  -- PostgreSQL permite UPDATE de PK si no hay FK circulares activos
+  FOR rec IN SELECT old_id, new_id FROM _id_migration LOOP
+    UPDATE public.products SET id = rec.new_id WHERE id::text = rec.old_id;
+  END LOOP;
+
+  RAISE NOTICE 'Migración completada. % productos actualizados.', bad_count;
+END $$;

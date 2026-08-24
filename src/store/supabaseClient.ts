@@ -1,6 +1,23 @@
 ﻿import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+// ═══ FIX: Deshabilitar Navigator LockManager para evitar errores de token ═══
+// El SDK de Supabase usa navigator.locks para sincronizar tokens entre pestañas.
+// En algunos navegadores/entornos esto falla con "exclusive lock immediately failed".
+if (typeof navigator !== 'undefined' && navigator.locks) {
+  const origRequest = navigator.locks.request.bind(navigator.locks);
+  navigator.locks.request = async (name: string | LockInfo, options?: LockOptions | ((lock: Lock) => Promise<Lock>), callback?: (lock: Lock) => Promise<Lock>): Promise<Lock> => {
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+    if (typeof callback === 'function') {
+      return callback({ name: typeof name === 'string' ? name : name.name, mode: options?.mode || 'exclusive' } as Lock);
+    }
+    return origRequest(name, options as any, callback as any);
+  };
+}
+
 // URL y Clave anónima de Supabase inyectadas desde las variables de entorno de Vite
 // .trim() elimina trailing newlines/whitespace del .env que causan HTTP 401 en WebSocket
 const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim();
@@ -192,7 +209,9 @@ export const supabase = supabaseUrl && supabaseAnonKey
         autoRefreshToken: true,
         detectSessionInUrl: true,
         flowType: 'pkce',
-        lock: false,
+        lock: async (name, acquire, signal) => {
+          await acquire();
+        },
       }
     })
   : createMockClient();
