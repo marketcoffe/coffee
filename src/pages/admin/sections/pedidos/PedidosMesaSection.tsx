@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../../../store/AppContext';
+import { supabase } from '../../../../store/supabaseClient';
 import { Order } from '../../../../types/store';
 import { UtensilsCrossed, Printer, CheckCircle, Clock, CreditCard, Banknote } from 'lucide-react';
 import { printMesaTicket } from '../../../../utils/printMesaTicket';
@@ -45,14 +46,44 @@ interface PedidosMesaSectionProps {
 }
 
 const PedidosMesaSection: React.FC<PedidosMesaSectionProps> = ({ scopeSedeId }) => {
-  const { orders, config, confirmMesaPayment, updateOrderStatus } = useApp();
+  const { orders, config, confirmMesaPayment, updateOrderStatus, refreshOrders } = useApp();
   const themeColor = config.theme_color || '#A4D045';
 
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
 
+  // Refuerzo: no depender solo del canal global de realtime. Nos suscribimos
+  // directamente a INSERT de pedidos de mesa y refrescamos al volver al foco.
+  useEffect(() => {
+    const channel = supabase.channel('pedidos_mesa_section_live')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'orders',
+        filter: 'tipo_pedido=eq.mesa'
+      }, () => { refreshOrders(); })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'orders',
+        filter: 'tipo_pedido=eq.mesa'
+      }, () => { refreshOrders(); })
+      .subscribe();
+
+    const onFocus = () => refreshOrders();
+    const onVisibility = () => { if (document.visibilityState === 'visible') refreshOrders(); };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      supabase.removeChannel(channel);
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [refreshOrders]);
+
   const mesaOrders = useMemo(() => {
     let result = orders.filter(o => o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa');
-    if (scopeSedeId) result = result.filter(o => o.sede_id === scopeSedeId);
+    if (scopeSedeId) result = result.filter(o => !o.sede_id || o.sede_id === scopeSedeId);
     return result.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
   }, [orders, scopeSedeId]);
 

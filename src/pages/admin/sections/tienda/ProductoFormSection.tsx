@@ -180,8 +180,10 @@ const ProductoFormSection: React.FC<ProductoFormSectionProps> = ({ product, onSa
         showToast('success', 'Producto creado correctamente');
       }
       onClose();
-    } catch (err) {
-      showToast('error', 'Error al guardar el producto');
+    } catch (err: any) {
+      const msg = err?.message || err?.error?.message || 'No se pudo guardar en la base de datos';
+      showToast('error', 'Error al guardar: ' + msg);
+      console.error('[ProductoForm] Error al guardar producto:', err);
     } finally {
       setSaving(false);
     }

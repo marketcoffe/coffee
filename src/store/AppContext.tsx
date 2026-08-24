@@ -60,6 +60,7 @@ interface AppContextProps {
   updateOrderStatus: (orderId: string, status: Order['status'], estimatedTime?: string, notas?: string) => Promise<boolean>;
   confirmMesaPayment: (orderId: string) => Promise<boolean>;
   updateOrderItems: (orderId: string, newItems: OrderItem[]) => Promise<void>;
+  refreshOrders: () => Promise<void>;
 
   // Coupon Actions
   addCoupon: (coupon: Omit<Coupon, 'id' | 'usage_count'>) => Promise<void>;
@@ -692,6 +693,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 } as NotificationOptions);
               });
             }
+          }
+        })
+        // Escuchar Pedidos Nuevos vía CDC (INSERT) — respaldo si el broadcast no llega
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload: Record<string, unknown>) => {
+          const newOrder = payload.new as Order;
+          if (!newOrder?.id) return;
+
+          setOrders(prev => {
+            if (prev.some(o => o.id === newOrder.id)) return prev;
+            return [newOrder, ...prev];
+          });
+
+          // Notificación visual para pedidos de mesa
+          if (newOrder.tipo_pedido === 'mesa' || newOrder.tipo_entrega === 'mesa') {
+            playNotificationSound('new');
           }
         })
         // Escuchar Pedidos Nuevos vía BROADCAST (Ultra Rápido)
@@ -1393,62 +1409,57 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     'order_count', 'promo_end_date', 'disponibilidad', 'combo_ids',
   ];
 
-  const addProduct = (productData: Omit<FoodItem, 'id'>) => {
-    // No generamos ID manual para productos para que Supabase use gen_random_uuid()
-    addNotification('Procesando...', `Agregando ${productData.nombre} al catálogo.`);
-    
-    // Supabase Async Sync - only include columns that exist in DB
+  const addProduct = async (productData: Omit<FoodItem, 'id'>): Promise<void> => {
+    // Supabase Async Sync - only include columns that exist in DB and avoid undefined
     const insertPayload: Record<string, unknown> = {};
     for (const key of DB_PRODUCT_COLUMNS) {
-      if (key in productData) {
+      if (key in productData && (productData as any)[key] !== undefined) {
         (insertPayload as any)[key] = (productData as any)[key];
       }
     }
-    supabase.from('products').insert([insertPayload]).select().single().then(({ data, error }) => { 
-      if (error) {
-        console.error('Add part error:', error);
-        addNotification('Error al agregar producto', error.message || 'Error de base de datos');
-      }
-      if (data) setProducts(prev => [data as FoodItem, ...prev]);
-    });
+    const { data, error } = await supabase.from('products').insert([insertPayload]).select().single();
+    if (error) {
+      console.error('Add product error:', error);
+      addNotification('Error al agregar producto', error.message || 'Error de base de datos');
+      throw error;
+    }
+    if (data) setProducts(prev => [data as FoodItem, ...prev]);
   };
 
-  const updateProduct = (id: string, updated: Partial<FoodItem>) => {
-    setProducts(prev => prev.map(p => {
-      if (p.id === id) {
-        const updatedPart = { ...p, ...updated };
-        
-        // Only sync to Supabase if ID is a valid UUID
-        if (UUID_RE.test(id)) {
-          const updatePayload: Record<string, unknown> = {};
-          for (const key of DB_PRODUCT_COLUMNS) {
-            if (key in updated) {
-              (updatePayload as any)[key] = (updated as any)[key];
-            }
-          }
-          if (Object.keys(updatePayload).length > 0) {
-            supabase.from('products').update(updatePayload).eq('id', id)
-              .then(({ error }) => { if (error) {
-                console.error('Update part error:', error);
-                addNotification('Error al actualizar producto', error.message || 'Error de base de datos');
-              } });
-          }
+  const updateProduct = async (id: string, updated: Partial<FoodItem>): Promise<void> => {
+    const prevSnapshot = products;
+    // Optimistic local update
+    setProducts(prev => prev.map(p => (p.id === id ? { ...p, ...updated } : p)));
+
+    // Only sync to Supabase if ID is a valid UUID
+    if (UUID_RE.test(id)) {
+      const updatePayload: Record<string, unknown> = {};
+      for (const key of DB_PRODUCT_COLUMNS) {
+        if (key in updated && (updated as any)[key] !== undefined) {
+          (updatePayload as any)[key] = (updated as any)[key];
         }
-          
-        return updatedPart;
       }
-      return p;
-    }));
+      if (Object.keys(updatePayload).length > 0) {
+        const { error } = await supabase.from('products').update(updatePayload).eq('id', id);
+        if (error) {
+          // Revert optimistic update on failure
+          setProducts(prevSnapshot);
+          console.error('Update product error:', error);
+          addNotification('Error al actualizar producto', error.message || 'Error de base de datos');
+          throw error;
+        }
+      }
+    }
   };
 
-  const deleteProduct = (id: string) => {
-    const targetPart = products.find(p => p.id === id);
-    if (targetPart && UUID_RE.test(id)) {
-      supabase.from('products').delete().eq('id', id)
-        .then(({ error }) => { if (error) {
-          console.error('Delete part error:', error);
-          addNotification('Error al eliminar producto', error.message || 'Error de base de datos');
-        } });
+  const deleteProduct = async (id: string): Promise<void> => {
+    if (UUID_RE.test(id)) {
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) {
+        console.error('Delete product error:', error);
+        addNotification('Error al eliminar producto', error.message || 'Error de base de datos');
+        throw error;
+      }
     }
     setProducts(prev => prev.filter(p => p.id !== id));
   };
@@ -1735,11 +1746,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     // BROADCAST: Enviar señal inmediata al Admin sin esperar a la DB
-    supabase.channel('marketo_realtime_system').send({
-      type: 'broadcast',
-      event: 'new_order_broadcast',
-      payload: newOrder
-    });
+    try {
+      const broadcastChannel = supabase.channel('marketo_realtime_system');
+      const sendResult = await broadcastChannel.send({
+        type: 'broadcast',
+        event: 'new_order_broadcast',
+        payload: newOrder
+      });
+      if (sendResult === 'ok') {
+        console.log('[Broadcast] new_order_broadcast enviado:', newOrder.id);
+      } else {
+        console.warn('[Broadcast] new_order_broadcast resultado inesperado:', sendResult);
+      }
+    } catch (broadcastErr) {
+      console.error('[Broadcast] Error enviando new_order_broadcast:', broadcastErr);
+    }
 
     // Nota: La notificacion admin del nuevo pedido la genera el trigger de Supabase
     // handle_new_order_actions (SECURITY DEFINER), no el frontend. Asi evitamos
@@ -1847,6 +1868,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     return true;
   };
+
+  // Re-fetch orders from the DB (used to guarantee the admin panel reflects the
+  // latest orders even if the realtime subscription missed an event).
+  const refreshOrders = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const sessionEmail = session?.user?.email || '';
+    const sessionRole = session?.user?.app_metadata?.role || session?.user?.user_metadata?.role;
+    const isAdmin = sessionEmail === 'kecho8a@gmail.com' || sessionRole === 'admin';
+    const isOperator = sessionRole === 'operator';
+    const principalSedeId = (config.sedes || []).find(s => s.es_principal)?.id || (config.sedes || [])[0]?.id || '';
+
+    try {
+      if (isAdmin) {
+        const { data } = await supabase.from('orders').select('*').order('fecha', { ascending: false });
+        if (data) setOrders(data as Order[]);
+      } else if (isOperator && adminScopeSedeId) {
+        const { data } = await supabase.from('orders').select('*').order('fecha', { ascending: false });
+        if (data) {
+          setOrders(data.filter(o => (o.sede_id || principalSedeId) === adminScopeSedeId) as Order[]);
+        }
+      } else if (currentUser) {
+        const { data } = await supabase.from('orders')
+          .select('*')
+          .or(`cliente_telefono.eq."${currentUser.telefono}",cliente_uid.eq."${currentUser.id}"`)
+          .order('fecha', { ascending: false });
+        if (data) setOrders(data as Order[]);
+      }
+    } catch (err) {
+      console.warn('[refreshOrders] failed:', err);
+    }
+  }, [config.sedes, adminScopeSedeId, currentUser]);
 
   const updateOrderItems = async (orderId: string, newItems: OrderItem[]) => {
     const originalOrder = ordersRef.current.find(o => o.id === orderId);
@@ -2959,6 +3011,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateOrderStatus,
       confirmMesaPayment,
       updateOrderItems,
+      refreshOrders,
       updateConfig,
       updateExchangeRate,
       fetchExchangeRate,

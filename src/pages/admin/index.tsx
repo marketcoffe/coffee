@@ -349,7 +349,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
         <BottomSheet open={true} onClose={() => setOpenEditor(null)} title="Editar Producto">
           <ProductoFormSection
             product={openEditor}
-            onSave={async (updated: Partial<FoodItem>) => { updateFoodItem(updated.id!, updated); }}
+            onSave={async (updated: Partial<FoodItem>) => { try { await updateFoodItem(updated.id!, updated); } catch { /* el formulario ya mostró el error */ } }}
             onClose={() => setOpenEditor(null)}
           />
         </BottomSheet>
@@ -359,7 +359,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
         <BottomSheet open={true} onClose={() => setShowProductForm(false)} title="Crear Producto">
           <ProductoFormSection
             product={null}
-            onSave={async (newProduct: Partial<FoodItem>) => { addFoodItem(newProduct as any); }}
+            onSave={async (newProduct: Partial<FoodItem>) => { try { await addFoodItem(newProduct as any); } catch { /* el formulario ya mostró el error */ } }}
             onClose={() => setShowProductForm(false)}
           />
         </BottomSheet>
