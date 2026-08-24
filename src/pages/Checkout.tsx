@@ -661,6 +661,10 @@ ${productosDetailText}
 
   const displayOrder = processedOrder || (cart.length === 0 && recoveredOrderId ? orders.find(o => o.id === recoveredOrderId) : undefined);
 
+  // Derived colors — must be before early returns that reference them
+  const themeColor = config.theme_color || '#A4D045';
+  const orderTypeColor = orderType === 'mesa' ? '#e67e22' : orderType === 'pickup' ? '#8b5cf6' : '#3b82f6';
+
   // Si estamos esperando al admin o en flujo de pago, los screens especiales se encargan
   const inWaitingFlow = waitingForAdmin || adminAccepted || paymentConfirmedByAdmin || mesaPaymentPhase;
 
@@ -894,8 +898,6 @@ ${productosDetailText}
     );
   }
 
-  const themeColor = config.theme_color || '#A4D045';
-  const orderTypeColor = orderType === 'mesa' ? '#e67e22' : orderType === 'pickup' ? '#8b5cf6' : '#3b82f6';
   const stepCompleted = (s: number) => s < currentStep;
   const stepActive = (s: number) => s === currentStep;
   const selectedSede = activeSedes.find(s => s.id === selectedSedeId) || activeSedes[0];

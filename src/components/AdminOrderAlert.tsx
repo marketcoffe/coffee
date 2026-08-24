@@ -26,7 +26,7 @@ export default function AdminOrderAlert() {
   }, [soundEnabled]);
 
   useEffect(() => {
-    const channel = supabase.channel('admin_order_alerts');
+    const channel = supabase.channel('marketo_realtime_system');
 
     channel
       .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
