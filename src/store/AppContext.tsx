@@ -1359,22 +1359,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Catalog CRUD Functions
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  const DB_PRODUCT_COLUMNS = [
+    'nombre', 'descripcion', 'categoria', 'precio_usd', 'precio_anterior_usd',
+    'stock', 'imagen_urls', 'es_promo', 'es_nuevo', 'es_mas_vendido',
+    'delivery_gratis', 'activo', 'ingredientes', 'alergenos', 'calorias',
+    'sizes', 'option_groups', 'related_ids', 'estimated_prep_time',
+    'order_count', 'promo_end_date', 'disponibilidad', 'combo_ids',
+  ];
+
   const addProduct = (productData: Omit<FoodItem, 'id'>) => {
     // No generamos ID manual para productos para que Supabase use gen_random_uuid()
     addNotification('Procesando...', `Agregando ${productData.nombre} al catálogo.`);
     
-    // Supabase Async Sync
-    supabase.from('products').insert([{
-      nombre: productData.nombre,
-      descripcion: productData.descripcion,
-      categoria: productData.categoria,
-      precio_usd: productData.precio_usd,
-      stock: productData.stock,
-      imagen_urls: productData.imagen_urls || [],
-      es_promo: productData.es_promo,
-      es_nuevo: productData.es_nuevo,
-      es_mas_vendido: productData.es_mas_vendido
-    }]).select().single().then(({ data, error }) => { 
+    // Supabase Async Sync - only include columns that exist in DB
+    const insertPayload: Record<string, unknown> = {};
+    for (const key of DB_PRODUCT_COLUMNS) {
+      if (key in productData) {
+        (insertPayload as any)[key] = (productData as any)[key];
+      }
+    }
+    supabase.from('products').insert([insertPayload]).select().single().then(({ data, error }) => { 
       if (error) {
         console.error('Add part error:', error);
         addNotification('Error al agregar producto', error.message || 'Error de base de datos');
@@ -1388,14 +1394,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (p.id === id) {
         const updatedPart = { ...p, ...updated };
         
-        // Supabase Async Sync
-        const updatePayload: any = { ...updated };
-        delete updatePayload.id; // avoid id conflicts
-        supabase.from('products').update(updatePayload).eq('id', updatedPart.id)
-          .then(({ error }) => { if (error) {
-            console.error('Update part error:', error);
-            addNotification('Error al actualizar producto', error.message || 'Error de base de datos');
-          } });
+        // Only sync to Supabase if ID is a valid UUID
+        if (UUID_RE.test(id)) {
+          const updatePayload: Record<string, unknown> = {};
+          for (const key of DB_PRODUCT_COLUMNS) {
+            if (key in updated) {
+              (updatePayload as any)[key] = (updated as any)[key];
+            }
+          }
+          if (Object.keys(updatePayload).length > 0) {
+            supabase.from('products').update(updatePayload).eq('id', id)
+              .then(({ error }) => { if (error) {
+                console.error('Update part error:', error);
+                addNotification('Error al actualizar producto', error.message || 'Error de base de datos');
+              } });
+          }
+        }
           
         return updatedPart;
       }
@@ -1405,8 +1419,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const deleteProduct = (id: string) => {
     const targetPart = products.find(p => p.id === id);
-    if (targetPart) {
-      supabase.from('products').delete().eq('id', targetPart.id)
+    if (targetPart && UUID_RE.test(id)) {
+      supabase.from('products').delete().eq('id', id)
         .then(({ error }) => { if (error) {
           console.error('Delete part error:', error);
           addNotification('Error al eliminar producto', error.message || 'Error de base de datos');
@@ -1772,6 +1786,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (!rpcError) continue;
       // Si el RPC no esta desplegado/habilitado: fallback con guardia de stock suficiente.
       console.warn('rpc adjust_stock fallo, usando fallback:', rpcError.message);
+      if (!UUID_RE.test(itemId)) continue;
       const { data: p } = await supabase.from('products').select('stock').eq('id', itemId).single();
       if (p && p.stock >= diff) {
         await supabase.from('products').update({ stock: p.stock - diff }).eq('id', itemId);
@@ -2087,8 +2102,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (hasCategory(p, categoryName)) {
           const newCats = getCategories(p).filter(c => c.toLowerCase() !== categoryName.toLowerCase());
           const updated = { ...p, categoria: newCats };
-          supabase.from('products').update({ categoria: newCats }).eq('id', p.id)
-            .then(({ error }) => { if (error) console.error('[Category] Product sync error:', error.message); });
+          if (UUID_RE.test(p.id)) {
+            supabase.from('products').update({ categoria: newCats }).eq('id', p.id)
+              .then(({ error }) => { if (error) console.error('[Category] Product sync error:', error.message); });
+          }
           return updated;
         }
         return p;
@@ -2112,8 +2129,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (hasCategory(p, oldCategory)) {
           const newCats = getCategories(p).map(c => c.toLowerCase() === oldCategory.toLowerCase() ? newCategory : c);
           const updated = { ...p, categoria: newCats };
-          supabase.from('products').update({ categoria: newCats }).eq('id', p.id)
-            .then(({ error }) => { if (error) console.error('[Category] Product sync error:', error.message); });
+          if (UUID_RE.test(p.id)) {
+            supabase.from('products').update({ categoria: newCats }).eq('id', p.id)
+              .then(({ error }) => { if (error) console.error('[Category] Product sync error:', error.message); });
+          }
           return updated;
         }
         return p;

@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS products (
     estimated_prep_time INTEGER,
     order_count INTEGER DEFAULT 0,
     promo_end_date TIMESTAMP WITH TIME ZONE,
+    disponibilidad TEXT NOT NULL DEFAULT 'Disponible',
+    combo_ids TEXT[] DEFAULT ARRAY[]::TEXT[],
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

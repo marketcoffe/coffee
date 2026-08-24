@@ -3,6 +3,14 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
+// Suppress Supabase Auth LockManager errors (race condition across tabs)
+window.addEventListener('unhandledrejection', (event) => {
+  const msg = event?.reason?.message || String(event?.reason || '');
+  if (msg.includes('LockManager lock') && msg.includes('auth-token')) {
+    event.preventDefault();
+  }
+});
+
 // ─── Service Worker Registration ───
 // Registra sw-push.js para recibir notificaciones push del servidor.
 // Solo registra UNA vez; si ya existe, no duplica.

@@ -1,9 +1,9 @@
 -- ========================================================
 -- MÓDULO: DATA FIXES (CORRECCIONES DE DATOS)
 -- ARCHIVO: /supabase/basedatos/10_data_fixes.sql
--- PROPÓSITO: Correcciones de datos de producción (teléfono, defaults, banners, sedes)
+-- PROPÓSITO: Correcciones de datos de producción (esquema, teléfonos, defaults, banners, sedes)
 -- ÚLTIMA REVISIÓN: 2026-08-23
--- NOTA: Estos UPDATE son idempotentes (solo actúan si los datos están desactualizados)
+-- NOTA: Estos scripts son idempotent (solo actúan si el dato/esquema falta)
 -- ========================================================
 
 -- ----------------------------------------------------------------------------
@@ -158,3 +158,20 @@ ON CONFLICT (id) DO UPDATE SET role = 'admin', active = true;
 UPDATE storage.buckets
 SET public = true, file_size_limit = NULL, allowed_mime_types = NULL
 WHERE id = 'productos';
+
+-- ----------------------------------------------------------------------------
+-- 8. FIX: Columnas faltantes en products (disponibilidad, combo_ids)
+-- Sincroniza el esquema real de producción con el tipo TypeScript FoodItem
+-- Ejecutar después de 02_tienda_productos_inventario.sql
+-- ----------------------------------------------------------------------------
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS disponibilidad TEXT NOT NULL DEFAULT 'Disponible';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS combo_ids TEXT[] DEFAULT ARRAY[]::TEXT[];
+
+-- ----------------------------------------------------------------------------
+-- 9. FIX: Productos con IDs no-UUID (p1_XXX, prod_XXX)
+-- El código frontend ya tiene UUID_RE checks para evitar sincronizar estos IDs.
+-- Para limpiar estos registros huérfanos, ejecutar manualmente:
+--   DELETE FROM public.products WHERE id::text !~
+--     '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
+-- NOTA: Solo ejecutar si se confirma que estos productos no son necesarios.
+-- ----------------------------------------------------------------------------
