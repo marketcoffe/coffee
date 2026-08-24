@@ -97,11 +97,15 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
     const params = new URLSearchParams(window.location.search);
     return !!params.get('mesa');
   });
+  // Si viene de QR con ?mesa=N, el tipo ya está seleccionado
+  const [orderTypeSelected, setOrderTypeSelected] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return !!params.get('mesa');
+  });
   const [paymentReference, setPaymentReference] = useState('');
   const [paymentBank, setPaymentBank] = useState('');
   const [mesaOrderConfirmed, setMesaOrderConfirmed] = useState(false);
-  const [showTypeModal, setShowTypeModal] = useState(true);
-  const [orderTypeSelected, setOrderTypeSelected] = useState(false);
+  const [showTypeModal, setShowTypeModal] = useState(false);
   const [waitingForAdmin, setWaitingForAdmin] = useState(false);
   const [adminAccepted, setAdminAccepted] = useState(false);
   const [paymentConfirmedByAdmin, setPaymentConfirmedByAdmin] = useState(false);
@@ -411,6 +415,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   };
 
   const handleNextStep = () => {
+    if (currentStep === 1 && !orderTypeSelected) {
+      setShowTypeModal(true);
+      return;
+    }
     if (orderType === 'mesa') {
       if (currentStep === 1) {
         if (!clientName.trim()) {
@@ -801,28 +809,44 @@ ${productosDetailText}
       )}
 
       <div className="border-b px-4 py-3 flex items-center gap-3 sticky top-0 z-20" style={{ backgroundColor: 'rgba(249,249,251,0.8)', backdropFilter: 'blur(20px)', borderColor: '#e4beb1/10' }}>
-        <button onClick={() => currentStep === 1 ? setTab('home') : handlePrevStep()} className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#eeeef0] transition-colors cursor-pointer" style={{ backgroundColor: '#eeeef0' }}>
+        <button onClick={() => {
+          if (currentStep === 1 && orderTypeSelected) {
+            setOrderTypeSelected(false);
+          } else if (currentStep === 1) {
+            setTab('home');
+          } else {
+            handlePrevStep();
+          }
+        }} className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#eeeef0] transition-colors cursor-pointer" style={{ backgroundColor: '#eeeef0' }}>
           <ArrowLeft size={18} className="text-[#1a1c1d]" />
         </button>
         <div className="flex-1">
-          <h1 className="text-[16px] font-bold text-[#1a1c1d]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Checkout</h1>
+          <h1 className="text-[16px] font-bold text-[#1a1c1d]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+            {orderTypeSelected ? 'Checkout' : 'Tu Carrito'}
+          </h1>
           <p className="text-[11px] text-[#8f7065]">Paso {currentStep} de 3</p>
         </div>
       </div>
 
       <div className="border-b px-4 py-3" style={{ backgroundColor: '#ffffff', borderColor: '#e4beb1/10' }}>
         <div className="flex items-center justify-between max-w-sm mx-auto">
-          {(orderType === 'mesa'
+          {(!orderTypeSelected
             ? [
-                { step: 1, label: 'Pedido', icon: <UtensilsCrossed size={14} /> },
-                { step: 2, label: 'Resumen', icon: <FileText size={14} /> },
+                { step: 1, label: 'Carrito', icon: <ListOrdered size={14} /> },
+                { step: 2, label: 'Entrega', icon: <MapPin size={14} /> },
                 { step: 3, label: 'Pago', icon: <CheckCircle size={14} /> },
               ]
-            : [
-                { step: 1, label: 'Delivery', icon: <MapPin size={14} /> },
-                { step: 2, label: 'Resumen', icon: <FileText size={14} /> },
-                { step: 3, label: 'Pago', icon: <CheckCircle size={14} /> },
-              ]
+            : orderType === 'mesa'
+              ? [
+                  { step: 1, label: 'Pedido', icon: <UtensilsCrossed size={14} /> },
+                  { step: 2, label: 'Resumen', icon: <FileText size={14} /> },
+                  { step: 3, label: 'Pago', icon: <CheckCircle size={14} /> },
+                ]
+              : [
+                  { step: 1, label: 'Delivery', icon: <MapPin size={14} /> },
+                  { step: 2, label: 'Resumen', icon: <FileText size={14} /> },
+                  { step: 3, label: 'Pago', icon: <CheckCircle size={14} /> },
+                ]
           ).map(({ step, label, icon }, idx, arr) => (
             <React.Fragment key={step}>
               <div className="flex flex-col items-center gap-1">
@@ -861,6 +885,7 @@ ${productosDetailText}
               ) : (
                 <div className="space-y-4">
                   {/* Tipo de Pedido Seleccionado */}
+                  {orderTypeSelected && (
                   <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white" style={{ backgroundColor: orderTypeColor }}>
@@ -877,9 +902,10 @@ ${productosDetailText}
                     </div>
                     <button onClick={() => setShowTypeModal(true)} className="text-[11px] font-bold underline cursor-pointer" style={{ color: orderTypeColor }}>Cambiar</button>
                   </div>
+                  )}
 
-                  {/* Selector de Mesa (solo si orderType === 'mesa') */}
-                  {orderType === 'mesa' && (
+                  {/* Selector de Mesa (solo si orderType === 'mesa' y ya seleccionado) */}
+                  {orderTypeSelected && orderType === 'mesa' && (
                     <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
                       <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Datos en Mesa</h3>
                       <div className="space-y-3">
@@ -967,7 +993,7 @@ ${productosDetailText}
                     </div>
                   </div>
 
-                  {orderType !== 'mesa' && (
+                  {orderTypeSelected && orderType !== 'mesa' && (
                   <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
                     <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Método de Entrega</h3>
                     <div className="flex gap-2 mb-4">
@@ -1140,7 +1166,7 @@ ${productosDetailText}
                   </div>
                   )}
 
-                  {orderType !== 'mesa' && currentUser && shippingMethod !== 'recogida' && !isLocationSet && (() => {
+                  {orderTypeSelected && orderType !== 'mesa' && currentUser && shippingMethod !== 'recogida' && !isLocationSet && (() => {
                     const lastDelivery = orders.find(o =>
                       (o.usuario_id === currentUser.id || o.cliente_telefono === currentUser.telefono) &&
                       o.tipo_entrega === 'delivery' && o.lat && o.lng
