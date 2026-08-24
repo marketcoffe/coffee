@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-import { FoodItem, Order, StoreConfig, InAppNotification, OrderItem, AppUser, Coupon, CartItem, SelectedOption, ProductReview, FlashSale, LoyaltyTransaction, LoyaltyTier, Promotion, RewardItem, UserRole } from '../types/store';
+import { FoodItem, Order, StoreConfig, InAppNotification, OrderItem, AppUser, Coupon, CartItem, SelectedOption, ProductReview, FlashSale, LoyaltyTransaction, LoyaltyTier, Promotion, RewardItem, UserRole, Mesa } from '../types/store';
 import { supabase } from './supabaseClient';
 import productsData from '../data/products.json';
 import panProductsData from '../data/productos-pan-imported.json';
@@ -57,7 +57,7 @@ interface AppContextProps {
   
   // Checkout & Order Actions
   createOrder: (orderData: Omit<Order, 'id' | 'subtotal_usd' | 'total_usd' | 'total_bs' | 'fecha' | 'status'> & { descuento_cupon_usd?: number; cupon_codigo?: string }, preGeneratedId?: string) => Promise<Order | null>;
-  updateOrderStatus: (orderId: string, status: Order['status'], estimatedTime?: string, notas?: string) => Promise<void>;
+  updateOrderStatus: (orderId: string, status: Order['status'], estimatedTime?: string, notas?: string) => Promise<boolean>;
   updateOrderItems: (orderId: string, newItems: OrderItem[]) => Promise<void>;
 
   // Coupon Actions
@@ -116,6 +116,11 @@ interface AppContextProps {
   deleteRewardItem: (id: string) => Promise<void>;
   redeemRewardItem: (userId: string, rewardId: string) => Promise<boolean>;
   
+  // Mesas
+  mesas: Mesa[];
+  fetchMesas: () => Promise<void>;
+  updateMesa: (id: string, updates: Partial<Mesa>) => Promise<void>;
+
   // Auth
   authenticateAdmin: (email: string, pass: string) => Promise<boolean>;
   logoutAdmin: () => Promise<void>;
@@ -347,6 +352,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [coupons, setCoupons] = useState<Coupon[]>(() => {
     const saved = localStorage.getItem('trv_coupons');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [mesas, setMesas] = useState<Mesa[]>(() => {
+    const saved = localStorage.getItem('trv_mesas');
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -846,6 +856,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [coupons]);
 
   useEffect(() => {
+    localStorage.setItem('trv_mesas', JSON.stringify(mesas));
+  }, [mesas]);
+
+  useEffect(() => {
     localStorage.setItem('trv_users', JSON.stringify(users));
   }, [users]);
 
@@ -1143,6 +1157,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (ordersRes.data) setOrders(ordersRes.data as Order[]);
         if (usersRes.data) setUsers(usersRes.data.map(u => ({ ...u, createdAt: u.created_at, contrasena: 'managed' })));
         if (notifsRes.data) setNotifications(notifsRes.data as InAppNotification[]);
+
+        // Cargar mesas
+        try {
+          const { data: dbMesas } = await supabase.from('mesas').select('*').order('numero_mesa');
+          if (dbMesas && dbMesas.length > 0) {
+            setMesas(dbMesas as Mesa[]);
+            localStorage.setItem('trv_mesas', JSON.stringify(dbMesas));
+          }
+        } catch (e) { console.warn('[initData] mesas failed:', e); }
       } else if (currentUser) {
         // Cargar Pedidos del usuario (por teléfono o ID)
         const { data: dbOrders } = await supabase.from('orders')
@@ -1514,8 +1537,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCart([]);
   }, []);
 
+  // Mesas Management
+  const fetchMesas = useCallback(async () => {
+    const { data, error } = await supabase.from('mesas').select('*').order('numero_mesa');
+    if (!error && data) {
+      setMesas(data as Mesa[]);
+      localStorage.setItem('trv_mesas', JSON.stringify(data));
+    }
+  }, []);
+
+  const updateMesa = useCallback(async (id: string, updates: Partial<Mesa>) => {
+    const prevMesas = mesas;
+    setMesas(prev => {
+      const next = prev.map(m => m.id === id ? { ...m, ...updates } : m);
+      localStorage.setItem('trv_mesas', JSON.stringify(next));
+      return next;
+    });
+    const { error } = await supabase.from('mesas').update(updates).eq('id', id);
+    if (error) {
+      setMesas(prevMesas);
+      localStorage.setItem('trv_mesas', JSON.stringify(prevMesas));
+      console.error('[updateMesa] Error:', error);
+    }
+  }, [mesas]);
+
   // Orders Management
-  const createOrder = async (orderData: Omit<Order, 'id' | 'subtotal_usd' | 'total_usd' | 'total_bs' | 'fecha' | 'status'> & { descuento_cupon_usd?: number; cupon_codigo?: string; guest_password?: string }, preGeneratedId?: string) => {
+  const createOrder = async (orderData: Omit<Order, 'id' | 'subtotal_usd' | 'total_usd' | 'total_bs' | 'fecha' | 'status'> & { descuento_cupon_usd?: number; cupon_codigo?: string; guest_password?: string; status_override?: string }, preGeneratedId?: string) => {
     // Recalculate Totals securely - includes extras/options pricing
     const items = cart.map(item => ({
       food_id: item.item.id,
@@ -1562,7 +1609,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       subtotal_usd: subtotal,
       total_usd: totalUsd,
       total_bs: totalBs,
-      status: 'Pendiente',
+      status: (orderData as any).status_override || 'Pendiente',
       fecha: new Date().toLocaleString()
     };
 
@@ -1594,6 +1641,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       total_usd: newOrder.total_usd,
       total_bs: newOrder.total_bs,
       metodo_pago: newOrder.metodo_pago,
+      tipo_pedido: (orderData as any).tipo_pedido || newOrder.tipo_entrega || 'delivery',
+      numero_mesa: (orderData as any).numero_mesa || null,
+      nombre_cliente: (orderData as any).nombre_cliente || '',
+      referencia_pago: (orderData as any).referencia_pago || '',
+      banco_origen: (orderData as any).banco_origen || '',
       lat: newOrder.lat,
       lng: newOrder.lng,
       direccion_envio: newOrder.direccion_envio,
@@ -1746,6 +1798,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (prevOrder) {
         setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...prevOrder } : o));
       }
+      return false;
     } else {
       // Broadcast instantáneo para que el cliente reciba el cambio en <100ms
       try {
@@ -1758,6 +1811,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       } catch (e) {
         console.warn('Broadcast status update failed:', e);
       }
+      return true;
     }
   };
 
@@ -2916,7 +2970,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addRewardItem,
       updateRewardItem,
       deleteRewardItem,
-      redeemRewardItem
+      redeemRewardItem,
+      mesas,
+      fetchMesas,
+      updateMesa
     }}>
       {children}
     </AppContext.Provider>

@@ -8,7 +8,7 @@ type AdminSection =
   // Marketing
   | 'customers' | 'messages' | 'promos' | 'coupons' | 'loyalty' | 'segments' | 'automations' | 'push-analytics'
   // Tienda
-  | 'store-general' | 'products' | 'store-promos' | 'store-combos' | 'delivery' | 'payments' | 'banners' | 'categories'
+  | 'store-general' | 'products' | 'store-promos' | 'store-combos' | 'delivery' | 'payments' | 'banners' | 'categories' | 'tables'
   // Configuración
   | 'branding' | 'pwa-config' | 'seo' | 'branches' | 'roles' | 'system' | 'extras' | 'faq';
 

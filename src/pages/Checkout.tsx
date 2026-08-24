@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useApp } from '../store/AppContext';
 import { motion, AnimatePresence } from 'motion/react';
-import { ListOrdered, Trash2, MapPin, Phone, CheckCircle, X, Copy, Check, ArrowRight, ArrowLeft, Store, Truck, Navigation, Search, LocateFixed, ChevronDown, FileText, Clock } from 'lucide-react';
+import { ListOrdered, Trash2, MapPin, Phone, CheckCircle, X, Copy, Check, ArrowRight, ArrowLeft, Store, Truck, Navigation, Search, LocateFixed, ChevronDown, FileText, Clock, UtensilsCrossed } from 'lucide-react';
 import { LeafletMap } from '../components/LeafletMap';
 import { SEOHead } from '../components/SEOHead';
 import { CartUpsell } from '../components/CartUpsell';
@@ -9,6 +9,7 @@ import { OrderTracker } from '../components/OrderTracker';
 import { FoodItem, Coupon, Order, StoreConfig, DeliveryZone } from '../types/store';
 import { haversineKm, findNearestSede } from '../utils/geo';
 import { getWhatsAppPhone } from '../utils/phone';
+import { supabase } from '../store/supabaseClient';
 
 interface CheckoutProps {
   setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout') => void;
@@ -16,7 +17,7 @@ interface CheckoutProps {
 }
 
 export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
-  const { cart, config, addToCart, updateCartQuantity, removeFromCart, createOrder, currentUser, coupons, updateCoupon, orders, earnLoyaltyPoints, clearCart } = useApp();
+  const { cart, config, addToCart, updateCartQuantity, removeFromCart, createOrder, currentUser, coupons, updateCoupon, orders, earnLoyaltyPoints, clearCart, mesas } = useApp();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
@@ -79,6 +80,25 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const [locationError, setLocationError] = useState('');
 
   const [showLocationModal, setShowLocationModal] = useState(false);
+
+  // Estado para pedidos en mesa
+  const [orderType, setOrderType] = useState<'delivery' | 'pickup' | 'mesa'>(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('mesa')) return 'mesa';
+    return 'delivery';
+  });
+  const [mesaNumber, setMesaNumber] = useState<number>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const mesaParam = params.get('mesa');
+    return mesaParam ? parseInt(mesaParam, 10) || 1 : 1;
+  });
+  const [mesaAutoSelected] = useState<boolean>(() => {
+    const params = new URLSearchParams(window.location.search);
+    return !!params.get('mesa');
+  });
+  const [paymentReference, setPaymentReference] = useState('');
+  const [paymentBank, setPaymentBank] = useState('');
+  const [mesaOrderConfirmed, setMesaOrderConfirmed] = useState(false);
 
   useEffect(() => {
     if (processedOrder) {
@@ -362,6 +382,18 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   };
 
   const handleNextStep = () => {
+    if (orderType === 'mesa') {
+      // Flujo simplificado para mesa: solo 2 pasos
+      if (currentStep === 1) {
+        if (!clientName.trim()) {
+          setValidationError('Ingresa tu nombre para el pedido en mesa.');
+          return;
+        }
+        setValidationError('');
+        setCurrentStep(2);
+      }
+      return;
+    }
     if (currentStep === 1 && !validateStep1()) return;
     setValidationError('');
     setCurrentStep(prev => (prev < 3 ? (prev + 1) as 1 | 2 | 3 : prev));
@@ -374,46 +406,64 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentUser && !validateGuestContact()) return;
-    if (!paymentConfirmed) {
-      setValidationError('Confirma el método de pago para continuar.');
-      return;
+    if (orderType === 'mesa') {
+      // Validación simplificada para mesa
+      if (!clientName.trim()) {
+        setValidationError('Ingresa tu nombre.');
+        return;
+      }
+      if (!paymentConfirmed) {
+        setValidationError('Confirma el método de pago para continuar.');
+        return;
+      }
+      if (selectedPayment === 'Pago Móvil' && !paymentReference.trim()) {
+        setValidationError('Ingresa el número de referencia del pago móvil.');
+        return;
+      }
+    } else {
+      if (!currentUser && !validateGuestContact()) return;
+      if (!paymentConfirmed) {
+        setValidationError('Confirma el método de pago para continuar.');
+        return;
+      }
     }
     setIsProcessing(true);
 
     const finalUserId = currentUser?.id;
-    const finalClientName = currentUser?.nombre || clientName;
+    const finalClientName = orderType === 'mesa' ? clientName : (currentUser?.nombre || clientName);
     const cleanedPhone = clientPhone.replace(/[\s\-()]/g, '');
-
-    const deliveryLabel = shippingMethod === 'recogida'
-      ? 'Recogida en Tienda'
-      : shippingMethod === 'zonas'
-        ? `Entrega por Zonas (${shippingZone})`
-        : effectiveShippingCost === 0
-          ? 'Retiro en Tienda'
-          : `Delivery por Mapa (${shippingDistance} KM)`;
 
     const preOrderId = `PED-${Math.floor(1000 + Math.random() * 9000)}-VAL-${new Date().getFullYear()}`;
 
-    let productosDetailText = '';
-    cart.forEach(ci => {
-      const extrasTotal = ci.selected_options?.reduce((e, opt) => e + opt.precio_usd, 0) || 0;
-      const itemTotal = (ci.item.precio_usd + extrasTotal) * ci.quantity;
-      productosDetailText += `- ${ci.quantity}x ${ci.item.nombre} - $${itemTotal.toFixed(2)}\n`;
-      if (ci.selected_options && ci.selected_options.length > 0) {
-        ci.selected_options.forEach(opt => {
-          productosDetailText += opt.precio_usd > 0
-            ? `   + ${opt.option_name} (+$${opt.precio_usd.toFixed(2)})\n`
-            : `   + ${opt.option_name}\n`;
-        });
-      }
-    });
+    // Para pedidos en mesa, NO se envía a WhatsApp
+    if (orderType !== 'mesa') {
+      const deliveryLabel = shippingMethod === 'recogida'
+        ? 'Recogida en Tienda'
+        : shippingMethod === 'zonas'
+          ? `Entrega por Zonas (${shippingZone})`
+          : effectiveShippingCost === 0
+            ? 'Retiro en Tienda'
+            : `Delivery por Mapa (${shippingDistance} KM)`;
 
-    const sedeInfo = hasMultipleSedes && selectedSedeId
-      ? `\n*Sede Destino:* ${activeSedes.find(s => s.id === selectedSedeId)?.nombre || 'N/A'}`
-      : '';
+      let productosDetailText = '';
+      cart.forEach(ci => {
+        const extrasTotal = ci.selected_options?.reduce((e, opt) => e + opt.precio_usd, 0) || 0;
+        const itemTotal = (ci.item.precio_usd + extrasTotal) * ci.quantity;
+        productosDetailText += `- ${ci.quantity}x ${ci.item.nombre} - $${itemTotal.toFixed(2)}\n`;
+        if (ci.selected_options && ci.selected_options.length > 0) {
+          ci.selected_options.forEach(opt => {
+            productosDetailText += opt.precio_usd > 0
+              ? `   + ${opt.option_name} (+$${opt.precio_usd.toFixed(2)})\n`
+              : `   + ${opt.option_name}\n`;
+          });
+        }
+      });
 
-    const whatsappMessage =
+      const sedeInfo = hasMultipleSedes && selectedSedeId
+        ? `\n*Sede Destino:* ${activeSedes.find(s => s.id === selectedSedeId)?.nombre || 'N/A'}`
+        : '';
+
+      const whatsappMessage =
 `*Nuevo Pedido en ${config.site_nombre || 'Market Coffee Sweet'}*${sedeInfo}
 ----------------------------------
 *Pedido ID:* ${preOrderId}
@@ -429,13 +479,15 @@ ${productosDetailText}
 *Metodo de Pago:* ${selectedPayment}${selectedPayment === 'Otro' && customPaymentNote ? `\n*Detalle Pago:* ${customPaymentNote}` : ''}${selectedPayment === 'Efectivo' && cashBills ? `\n*Billetes:* ${cashBills}` : ''}
 ----------------------------------`;
 
-    let cleanPhone = checkoutWhatsAppPhone().replace(/\D/g, '');
-    if (cleanPhone.startsWith('0')) cleanPhone = '58' + cleanPhone.substring(1);
-    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMessage)}`;
+      let cleanPhone = checkoutWhatsAppPhone().replace(/\D/g, '');
+      if (cleanPhone.startsWith('0')) cleanPhone = '58' + cleanPhone.substring(1);
+      const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMessage)}`;
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    }
 
     const created = await createOrder({
       cliente_nombre: finalClientName || 'Cliente sin nombre',
-      cliente_telefono: cleanedPhone,
+      cliente_telefono: cleanedPhone || '00000000',
       cliente_email: clientEmail || '',
       usuario_id: finalUserId,
       items: cart.map(ci => ({
@@ -447,40 +499,49 @@ ${productosDetailText}
         options_total_usd: ci.options_total_usd,
         ingredientes_removidos: ci.ingredientes_removidos || []
       })),
-      tipo_entrega: shippingMethod === 'recogida' ? 'pickup' : 'delivery',
-      costo_envio_usd: effectiveShippingAfterCoupon,
+      tipo_entrega: orderType === 'mesa' ? 'mesa' : (shippingMethod === 'recogida' ? 'pickup' : 'delivery'),
+      tipo_pedido: orderType === 'mesa' ? 'mesa' : undefined,
+      numero_mesa: orderType === 'mesa' ? mesaNumber : undefined,
+      nombre_cliente: orderType === 'mesa' ? clientName : undefined,
+      referencia_pago: orderType === 'mesa' ? paymentReference : undefined,
+      banco_origen: orderType === 'mesa' ? paymentBank : undefined,
+      costo_envio_usd: orderType === 'mesa' ? 0 : effectiveShippingAfterCoupon,
       descuento_cupon_usd: discountFromCoupon,
       cupon_codigo: appliedCoupon?.code,
       metodo_pago: selectedPayment,
-      lat: shippingLat,
-      lng: shippingLng,
-      direccion_envio: `${shippingZone} (Distancia: ${shippingDistance}km)`,
-      distancia_km: shippingDistance,
+      lat: orderType === 'mesa' ? config.coordenadas_tienda.lat : shippingLat,
+      lng: orderType === 'mesa' ? config.coordenadas_tienda.lng : shippingLng,
+      direccion_envio: orderType === 'mesa' ? `Mesa #${mesaNumber}` : `${shippingZone} (Distancia: ${shippingDistance}km)`,
+      distancia_km: orderType === 'mesa' ? 0 : shippingDistance,
       notas_admin: orderNotes,
       sede_id: selectedSedeId || undefined,
       guest_phone: !currentUser ? cleanedPhone : undefined,
-    }, preOrderId);
+      status_override: orderType === 'mesa' ? 'pendiente_verificacion' : undefined,
+    } as any, preOrderId);
 
     if (created) {
+      if (orderType === 'mesa') {
+        setMesaOrderConfirmed(true);
+      }
       setProcessedOrder(created);
       if (appliedCoupon) {
         updateCoupon(appliedCoupon.id, { usage_count: (appliedCoupon.usage_count || 0) + 1 });
       }
-      // Legacy: earnLoyaltyPoints removed — points are now awarded via SQL trigger on order delivery
       localStorage.setItem('trv_active_order_id', created.id);
-      localStorage.setItem('trv_checkout_contact', JSON.stringify({ nombre: clientName, telefono: clientPhone, email: clientEmail }));
-      localStorage.setItem('trv_checkout_method', shippingMethod);
-      localStorage.setItem('trv_last_delivery', JSON.stringify({
-        lat: shippingLat,
-        lng: shippingLng,
-        method: shippingMethod,
-        zone: shippingZone,
-        distance: shippingDistance,
-        cost: shippingCost,
-        zoneIndex: selectedZoneIndex,
-        sedeId: selectedSedeId
-      }));
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      if (orderType !== 'mesa') {
+        localStorage.setItem('trv_checkout_contact', JSON.stringify({ nombre: clientName, telefono: clientPhone, email: clientEmail }));
+        localStorage.setItem('trv_checkout_method', shippingMethod);
+        localStorage.setItem('trv_last_delivery', JSON.stringify({
+          lat: shippingLat,
+          lng: shippingLng,
+          method: shippingMethod,
+          zone: shippingZone,
+          distance: shippingDistance,
+          cost: shippingCost,
+          zoneIndex: selectedZoneIndex,
+          sedeId: selectedSedeId
+        }));
+      }
     } else {
       setValidationError('Error: No se pudo registrar el pedido. Verifique su conexión.');
     }
@@ -549,17 +610,23 @@ ${productosDetailText}
         </button>
         <div className="flex-1">
           <h1 className="text-[16px] font-bold text-[#1a1c1d]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Checkout</h1>
-          <p className="text-[11px] text-[#8f7065]">Paso {currentStep} de 3</p>
+          <p className="text-[11px] text-[#8f7065]">Paso {currentStep} de {orderType === 'mesa' ? 2 : 3}</p>
         </div>
       </div>
 
       <div className="border-b px-4 py-3" style={{ backgroundColor: '#ffffff', borderColor: '#e4beb1/10' }}>
         <div className="flex items-center justify-between max-w-sm mx-auto">
-          {[
-            { step: 1, label: 'Delivery', icon: <MapPin size={14} /> },
-            { step: 2, label: 'Resumen', icon: <FileText size={14} /> },
-            { step: 3, label: 'Pago', icon: <CheckCircle size={14} /> },
-          ].map(({ step, label, icon }, idx) => (
+          {(orderType === 'mesa'
+            ? [
+                { step: 1, label: 'Pedido', icon: <UtensilsCrossed size={14} /> },
+                { step: 2, label: 'Pago', icon: <CheckCircle size={14} /> },
+              ]
+            : [
+                { step: 1, label: 'Delivery', icon: <MapPin size={14} /> },
+                { step: 2, label: 'Resumen', icon: <FileText size={14} /> },
+                { step: 3, label: 'Pago', icon: <CheckCircle size={14} /> },
+              ]
+          ).map(({ step, label, icon }, idx, arr) => (
             <React.Fragment key={step}>
               <div className="flex flex-col items-center gap-1">
                 <div
@@ -573,7 +640,7 @@ ${productosDetailText}
                 </div>
                 <span className="text-[11px] font-bold" style={{ color: stepActive(step) ? '#1a1c1d' : '#8f7065' }}>{label}</span>
               </div>
-              {idx < 2 && (
+              {idx < arr.length - 1 && (
                 <div className="flex-1 h-0.5 mx-2 rounded-full mt-[-12px]" style={{ backgroundColor: stepCompleted(step + 1) ? '#2e7d32' : stepActive(step + 1) ? themeColor : '#e2e2e4' }} />
               )}
             </React.Fragment>
@@ -596,6 +663,79 @@ ${productosDetailText}
                 </div>
               ) : (
                 <div className="space-y-4">
+                  {/* Selector de Tipo de Pedido */}
+                  <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Tipo de Pedido</h3>
+                    <div className="flex gap-2">
+                      {[
+                        { key: 'delivery' as const, label: 'Delivery', icon: <Truck size={16} /> },
+                        { key: 'pickup' as const, label: 'Pickup', icon: <Store size={16} /> },
+                        { key: 'mesa' as const, label: 'En Mesa', icon: <UtensilsCrossed size={16} /> },
+                      ].map(opt => (
+                        <button
+                          key={opt.key}
+                          onClick={() => setOrderType(opt.key)}
+                          className={`flex-1 p-3 rounded-xl text-center text-xs font-bold transition-all cursor-pointer border-2 ${
+                            orderType === opt.key ? 'text-white shadow-md' : 'bg-[#f9f9fb] border-[#e4beb1]/10 text-[#5b4137] hover:bg-[#eeeef0]'
+                          }`}
+                          style={orderType === opt.key ? { backgroundColor: themeColor, borderColor: themeColor } : {}}
+                        >
+                          <span className="block mb-1">{opt.icon}</span>
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Selector de Mesa (solo si orderType === 'mesa') */}
+                  {orderType === 'mesa' && (
+                    <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
+                      <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Datos en Mesa</h3>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-[11px] font-bold uppercase text-[#8f7065] mb-1 block">Tu Nombre *</label>
+                          <input
+                            type="text"
+                            value={clientName}
+                            onChange={(e) => setClientName(e.target.value)}
+                            placeholder="Nombre para el pedido"
+                            className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[var(--theme-color,#FF6B35)] transition-colors"
+                            required
+                          />
+                        </div>
+                        {!mesaAutoSelected && (
+                          <div>
+                            <label className="text-[11px] font-bold uppercase text-[#8f7065] mb-1 block">Número de Mesa *</label>
+                            <select
+                              value={mesaNumber}
+                              onChange={(e) => setMesaNumber(parseInt(e.target.value))}
+                              className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[var(--theme-color,#FF6B35)] transition-colors appearance-none cursor-pointer"
+                            >
+                              {mesas.length > 0
+                                ? mesas
+                                    .filter(m => m.estado !== 'Inactiva')
+                                    .sort((a, b) => a.numero_mesa - b.numero_mesa)
+                                    .map(m => (
+                                      <option key={m.id} value={m.numero_mesa}>
+                                        Mesa {m.numero_mesa}{m.nombre_personalizado ? ` — ${m.nombre_personalizado}` : ''}{m.estado === 'Ocupada' ? ' (Ocupada)' : ''}
+                                      </option>
+                                    ))
+                                : Array.from({ length: config.total_mesas || 10 }, (_, i) => i + 1).map(n => (
+                                    <option key={n} value={n}>Mesa {n}</option>
+                                  ))
+                              }
+                            </select>
+                          </div>
+                        )}
+                        {mesaAutoSelected && (
+                          <div className="p-3 rounded-xl" style={{ backgroundColor: `${themeColor}10`, border: `1px solid ${themeColor}30` }}>
+                            <p className="text-xs font-bold" style={{ color: themeColor }}>Mesa {mesaNumber} seleccionada automáticamente</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d]">Tu Carrito ({cart.reduce((s, ci) => s + ci.quantity, 0)} items)</h3>
@@ -636,6 +776,7 @@ ${productosDetailText}
                     </div>
                   </div>
 
+                  {orderType !== 'mesa' && (
                   <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
                     <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Método de Entrega</h3>
                     <div className="flex gap-2 mb-4">
@@ -806,8 +947,9 @@ ${productosDetailText}
                       </span>
                     </div>
                   </div>
+                  )}
 
-                  {currentUser && shippingMethod !== 'recogida' && !isLocationSet && (() => {
+                  {orderType !== 'mesa' && currentUser && shippingMethod !== 'recogida' && !isLocationSet && (() => {
                     const lastDelivery = orders.find(o =>
                       (o.usuario_id === currentUser.id || o.cliente_telefono === currentUser.telefono) &&
                       o.tipo_entrega === 'delivery' && o.lat && o.lng
@@ -867,90 +1009,123 @@ ${productosDetailText}
 
           {currentStep === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="p-4">
-              <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
-                <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Tu Pedido</h3>
-                <div className="space-y-2">
-                  {cart.map(item => {
-                    const extrasTotal = item.selected_options?.reduce((e, opt) => e + opt.precio_usd, 0) || 0;
-                    const subTotalItem = (item.item.precio_usd + extrasTotal) * item.quantity;
-                    return (
-                      <div key={item.item.id} className="flex justify-between items-center text-xs">
-                        <span className="text-[#5b4137]">{item.quantity}x {item.item.nombre}</span>
-                        <span className="font-bold text-[#1a1c1d]">${subTotalItem.toFixed(2)}</span>
+              {orderType === 'mesa' ? (
+                <>
+                  {/* Resumen del pedido en mesa */}
+                  <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <UtensilsCrossed size={14} style={{ color: themeColor }} />
+                      <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d]">Mesa #{mesaNumber} — {clientName}</h3>
+                    </div>
+                    <div className="space-y-2 mb-3">
+                      {cart.map(item => {
+                        const extrasTotal = item.selected_options?.reduce((e, opt) => e + opt.precio_usd, 0) || 0;
+                        const subTotalItem = (item.item.precio_usd + extrasTotal) * item.quantity;
+                        return (
+                          <div key={item.item.id} className="flex justify-between items-center text-xs">
+                            <span className="text-[#5b4137]">{item.quantity}x {item.item.nombre}</span>
+                            <span className="font-bold text-[#1a1c1d]">${subTotalItem.toFixed(2)}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="border-t border-[#e4beb1]/10 pt-2 flex justify-between items-center">
+                      <span className="text-xs font-bold text-[#1a1c1d]">Total:</span>
+                      <div className="text-right">
+                        <span className="font-black text-lg" style={{ color: themeColor }}>${totalUsd.toFixed(2)}</span>
+                        <span className="text-[10px] text-[#8f7065] ml-2">{totalBs.toFixed(2)} Bs.</span>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
-                <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Detalle de Costos</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-[#8f7065]">Subtotal:</span>
-                    <span className="font-bold">${subtotalUsd.toFixed(2)}</span>
+                    </div>
                   </div>
-                  {appliedCoupon && (
-                    <div className="flex justify-between text-xs" style={{ color: themeColor }}>
-                      <span>Descuento ({appliedCoupon.coupon_type === 'fixed' ? `-$${appliedCoupon.discount_amount}` : appliedCoupon.coupon_type === 'free_shipping' ? 'Envio Gratis' : `-${appliedCoupon.discount_percent}%`}):</span>
-                      <span className="font-bold">{appliedCoupon.coupon_type === 'free_shipping' ? 'Envio Gratis' : `-$${discountFromCoupon.toFixed(2)}`}</span>
+                </>
+              ) : (
+                <>
+                  <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Tu Pedido</h3>
+                    <div className="space-y-2">
+                      {cart.map(item => {
+                        const extrasTotal = item.selected_options?.reduce((e, opt) => e + opt.precio_usd, 0) || 0;
+                        const subTotalItem = (item.item.precio_usd + extrasTotal) * item.quantity;
+                        return (
+                          <div key={item.item.id} className="flex justify-between items-center text-xs">
+                            <span className="text-[#5b4137]">{item.quantity}x {item.item.nombre}</span>
+                            <span className="font-bold text-[#1a1c1d]">${subTotalItem.toFixed(2)}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Detalle de Costos</h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-[#8f7065]">Subtotal:</span>
+                        <span className="font-bold">${subtotalUsd.toFixed(2)}</span>
+                      </div>
+                      {appliedCoupon && (
+                        <div className="flex justify-between text-xs" style={{ color: themeColor }}>
+                          <span>Descuento ({appliedCoupon.coupon_type === 'fixed' ? `-$${appliedCoupon.discount_amount}` : appliedCoupon.coupon_type === 'free_shipping' ? 'Envio Gratis' : `-${appliedCoupon.discount_percent}%`}):</span>
+                          <span className="font-bold">{appliedCoupon.coupon_type === 'free_shipping' ? 'Envio Gratis' : `-$${discountFromCoupon.toFixed(2)}`}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between text-xs">
+                        <span className="text-[#8f7065]">Envío ({shippingMethod === 'recogida' ? 'Recogida' : shippingZone}):</span>
+                        <span className="font-bold">{appliedCoupon?.coupon_type === 'free_shipping' ? 'Gratis (Cupon)' : effectiveShippingAfterCoupon === 0 ? 'Gratis' : `$${effectiveShippingAfterCoupon.toFixed(2)}`}</span>
+                      </div>
+                      <div className="flex justify-between text-sm pt-2 border-t border-[#e4beb1]/10">
+                        <span className="font-bold text-[#1a1c1d]">Total:</span>
+                        <div className="text-right">
+                          <span className="font-black text-lg" style={{ color: themeColor }}>${totalUsd.toFixed(2)}</span>
+                          <span className="text-[10px] text-[#8f7065] ml-2">{totalBs.toFixed(2)} Bs.</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {shippingMethod !== 'recogida' && (
+                    <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
+                      <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-2">Dirección de Entrega</h3>
+                      <div className="flex items-start gap-2">
+                        <MapPin size={14} className="text-[#8f7065] mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-xs font-bold text-[#1a1c1d]">{shippingZone}</p>
+                          <p className="text-[11px] text-[#8f7065]">{shippingDistance > 0 ? `${shippingDistance.toFixed(1)} km de distancia` : ''}</p>
+                          <a
+                            href={`https://www.google.com/maps?q=${shippingLat},${shippingLng}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] font-bold underline mt-1 inline-block"
+                            style={{ color: themeColor }}
+                          >Ver en mapa</a>
+                        </div>
+                      </div>
                     </div>
                   )}
-                  <div className="flex justify-between text-xs">
-                    <span className="text-[#8f7065]">Envío ({shippingMethod === 'recogida' ? 'Recogida' : shippingZone}):</span>
-                    <span className="font-bold">{appliedCoupon?.coupon_type === 'free_shipping' ? 'Gratis (Cupon)' : effectiveShippingAfterCoupon === 0 ? 'Gratis' : `$${effectiveShippingAfterCoupon.toFixed(2)}`}</span>
-                  </div>
-                  <div className="flex justify-between text-sm pt-2 border-t border-[#e4beb1]/10">
-                    <span className="font-bold text-[#1a1c1d]">Total:</span>
-                    <div className="text-right">
-                      <span className="font-black text-lg" style={{ color: themeColor }}>${totalUsd.toFixed(2)}</span>
-                      <span className="text-[10px] text-[#8f7065] ml-2">{totalBs.toFixed(2)} Bs.</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              {shippingMethod !== 'recogida' && (
-                <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
-                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-2">Dirección de Entrega</h3>
-                  <div className="flex items-start gap-2">
-                    <MapPin size={14} className="text-[#8f7065] mt-0.5 shrink-0" />
-                    <div>
-                      <p className="text-xs font-bold text-[#1a1c1d]">{shippingZone}</p>
-                      <p className="text-[11px] text-[#8f7065]">{shippingDistance > 0 ? `${shippingDistance.toFixed(1)} km de distancia` : ''}</p>
-                      <a
-                        href={`https://www.google.com/maps?q=${shippingLat},${shippingLng}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[10px] font-bold underline mt-1 inline-block"
-                        style={{ color: themeColor }}
-                      >Ver en mapa</a>
+                  {shippingMethod === 'recogida' && selectedSede && (
+                    <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
+                      <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-2">Retiro en Tienda</h3>
+                      <div className="flex items-start gap-2">
+                        <Store size={14} className="text-[#8f7065] mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-xs font-bold text-[#1a1c1d]">{selectedSede.nombre}</p>
+                          <p className="text-[11px] text-[#8f7065]">{selectedSede.direccion || config.direccion_fisica}</p>
+                          <p className="text-[10px] text-[#8f7065] font-mono mt-1">
+                            Coordenadas: {selectedSede.coordenadas.lat}, {selectedSede.coordenadas.lng}
+                          </p>
+                          <a
+                            href={`https://www.google.com/maps?q=${selectedSede.coordenadas.lat},${selectedSede.coordenadas.lng}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] font-bold underline mt-1 inline-block"
+                            style={{ color: themeColor }}
+                          >Cómo llegar</a>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
-
-              {shippingMethod === 'recogida' && selectedSede && (
-                <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
-                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-2">Retiro en Tienda</h3>
-                  <div className="flex items-start gap-2">
-                    <Store size={14} className="text-[#8f7065] mt-0.5 shrink-0" />
-                    <div>
-                      <p className="text-xs font-bold text-[#1a1c1d]">{selectedSede.nombre}</p>
-                      <p className="text-[11px] text-[#8f7065]">{selectedSede.direccion || config.direccion_fisica}</p>
-                      <p className="text-[10px] text-[#8f7065] font-mono mt-1">
-                        Coordenadas: {selectedSede.coordenadas.lat}, {selectedSede.coordenadas.lng}
-                      </p>
-                      <a
-                        href={`https://www.google.com/maps?q=${selectedSede.coordenadas.lat},${selectedSede.coordenadas.lng}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[10px] font-bold underline mt-1 inline-block"
-                        style={{ color: themeColor }}
-                      >Cómo llegar</a>
-                    </div>
-                  </div>
-                </div>
+                  )}
+                </>
               )}
             </motion.div>
           )}
@@ -1039,6 +1214,40 @@ ${productosDetailText}
                         <CopyButton text={(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'} fieldId="pm-ci" />
                       </div>
                       <p className="text-center font-black py-1 rounded" style={{ color: themeColor }}>Calcular: {totalBs.toFixed(2)} Bs.</p>
+                      {orderType === 'mesa' && (
+                        <div className="space-y-2 mt-2 pt-2 border-t border-[#e4beb1]/10">
+                          <div>
+                            <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Banco Emisor *</label>
+                            <select
+                              value={paymentBank}
+                              onChange={(e) => setPaymentBank(e.target.value)}
+                              className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer"
+                            >
+                              <option value="">Seleccionar banco</option>
+                              <option value="Banesco">Banesco (0134)</option>
+                              <option value="Mercantil">Mercantil (0102)</option>
+                              <option value="Venezuela">Banco de Venezuela (0102)</option>
+                              <option value="Provincial">Provincial (0108)</option>
+                              <option value="Bancaribe">Bancaribe (0114)</option>
+                              <option value="Exterior">Banco Exterior (0115)</option>
+                              <option value="Nacional">Banco Nacional de Crédito (0191)</option>
+                              <option value="BOD">BOD (0128)</option>
+                              <option value="Plaza">Banco Plaza (0138)</option>
+                              <option value="Otros">Otros</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Número de Referencia *</label>
+                            <input
+                              type="text"
+                              value={paymentReference}
+                              onChange={(e) => setPaymentReference(e.target.value)}
+                              placeholder="Ej: 1234567890"
+                              className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]"
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                   {selectedPayment === 'Zelle' && (
@@ -1094,7 +1303,9 @@ ${productosDetailText}
                   <div className="mb-3 p-3 rounded-xl border" style={{ backgroundColor: `${themeColor}08`, borderColor: `${themeColor}20` }}>
                     <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: themeColor }}>Importante</p>
                     <p className="text-xs text-[#5b4137] leading-relaxed">
-                      Adjunta el <span className="font-bold">capture del pago</span> en el chat de WhatsApp al enviar el pedido para que podamos procesarlo más rápido.
+                      {orderType === 'mesa'
+                        ? 'Indica el número de referencia y banco para verificar tu pago en caja.'
+                        : 'Adjunta el capture del pago en el chat de WhatsApp al enviar el pedido para que podamos procesarlo más rápido.'}
                     </p>
                   </div>
                 )}
@@ -1121,9 +1332,11 @@ ${productosDetailText}
                     style={{ color: themeColor }}
                   />
                   <span className="text-xs text-[#5b4137] leading-relaxed">
-                    {selectedPayment === 'Efectivo'
-                      ? 'Confirmo los billetes indicados para gestionar el cambio.'
-                      : 'Confirmo que enviaré el capture del pago por WhatsApp.'}
+                    {orderType === 'mesa'
+                      ? 'Confirmo que los datos de pago son correctos.'
+                      : selectedPayment === 'Efectivo'
+                        ? 'Confirmo los billetes indicados para gestionar el cambio.'
+                        : 'Confirmo que enviaré el capture del pago por WhatsApp.'}
                   </span>
                 </label>
               </div>
@@ -1140,13 +1353,13 @@ ${productosDetailText}
             </div>
           )}
 
-          {currentStep < 3 ? (
-            <button onClick={handleNextStep} className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: themeColor, color: '#fff' }}>
-              Continuar <ArrowRight size={16} />
+          {(orderType === 'mesa' && currentStep === 2) || currentStep === 3 ? (
+            <button onClick={handleFormSubmit} disabled={isProcessing} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : themeColor, color: '#fff' }}>
+              {isProcessing ? 'Procesando...' : orderType === 'mesa' ? 'Confirmar Pedido en Mesa' : 'Confirmar Pedido'}
             </button>
           ) : (
-            <button onClick={handleFormSubmit} disabled={isProcessing} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : themeColor, color: '#fff' }}>
-              {isProcessing ? 'Procesando...' : 'Confirmar Pedido'}
+            <button onClick={handleNextStep} className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: themeColor, color: '#fff' }}>
+              Continuar <ArrowRight size={16} />
             </button>
           )}
         </div>

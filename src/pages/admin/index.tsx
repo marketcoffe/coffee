@@ -8,9 +8,10 @@ import {
   LayoutGrid, ChevronLeft, ChevronRight, MapPin, Shield, Store,
   TrendingUp, Smartphone, Activity, Clock, Users, Zap, Tag,
   Truck, CreditCard, Image, Grid, Search, Building2, HelpCircle,
-  Sliders, Palette, Ticket, Settings, Menu
+  Sliders, Palette, Ticket, Settings, Menu, Armchair
 } from 'lucide-react';
 import { SEOHead } from '../../components/SEOHead';
+import MesaOrderAlert from '../../components/MesaOrderAlert';
 import ProductoFormSection from './sections/tienda/ProductoFormSection';
 import SidebarNav from './components/SidebarNav';
 import BottomSheet from './components/BottomSheet';
@@ -47,6 +48,7 @@ const DeliverySection = lazy(() => import('./sections/tienda/DeliverySection'));
 const PaymentsSection = lazy(() => import('./sections/tienda/PaymentsSection'));
 const BannersSection = lazy(() => import('./sections/tienda/BannersSection'));
 const CategoriasSection = lazy(() => import('./sections/tienda/CategoriasSection'));
+const MesasSection = lazy(() => import('./sections/tienda/MesasSection'));
 
 // Lazy Imports: Configuracion
 const PersonalizacionSection = lazy(() => import('./sections/config/PersonalizacionSection'));
@@ -99,6 +101,7 @@ const ALL_SECTIONS = [
   { id: 'payments',        label: 'Pagos',             icon: CreditCard,      group: 'tienda' },
   { id: 'banners',         label: 'Banners',           icon: Image,           group: 'tienda' },
   { id: 'categories',      label: 'Categorias',        icon: Grid,            group: 'tienda' },
+  { id: 'tables',          label: 'Mesas',             icon: Armchair,        group: 'tienda' },
 
   { id: 'branding',        label: 'Personalizacion',   icon: Palette,         group: 'config', groupLabel: 'Configuracion', adminOnly: true },
   { id: 'pwa-config',      label: 'PWA',               icon: Smartphone,      group: 'config', adminOnly: true },
@@ -193,6 +196,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
       case 'payments':        return <PaymentsSection />;
       case 'banners':         return <BannersSection />;
       case 'categories':      return <CategoriasSection />;
+      case 'tables':          return <MesasSection />;
 
       case 'branding':        return <PersonalizacionSection />;
       case 'pwa-config':      return <PWASection />;
@@ -210,6 +214,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   return (
     <div className="h-screen" style={{ background: 'var(--erp-content-bg)' }}>
       <SEOHead title={`Admin - ${config.site_nombre || 'Panel'}`} type="admin" />
+      <MesaOrderAlert />
 
       {/* Desktop sidebar - only visible lg+ */}
       <aside className={`erp-sidebar hidden lg:flex fixed inset-y-0 left-0 z-30 ${sidebarCollapsed ? 'collapsed' : ''}`} style={{ width: sidebarCollapsed ? 'var(--erp-sidebar-collapsed)' : 'var(--erp-sidebar-width)' }}>

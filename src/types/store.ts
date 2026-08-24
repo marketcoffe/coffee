@@ -97,6 +97,15 @@ export interface OrderItem {
   ingredientes_removidos?: string[];
 }
 
+export interface Mesa {
+  id: string;
+  numero_mesa: number;
+  nombre_personalizado: string;
+  estado: 'Disponible' | 'Ocupada' | 'Reservada' | 'Inactiva';
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface Order {
   id: string;
   cliente_nombre: string;
@@ -117,12 +126,16 @@ export interface Order {
   total_bs: number;
   metodo_pago: 'Pago Móvil' | 'Zelle' | 'Efectivo' | 'Transferencia' | 'Otro';
   tipo_entrega: 'delivery' | 'mesa' | 'pickup';
+  tipo_pedido?: 'delivery' | 'pickup' | 'mesa';
   numero_mesa?: number;
+  nombre_cliente?: string;
+  referencia_pago?: string;
+  banco_origen?: string;
   lat: number;
   lng: number;
   direccion_envio: string;
   distancia_km: number;
-  status: 'Pendiente' | 'Procesando' | 'En preparación' | 'Listo' | 'En camino' | 'Entregado' | 'Cancelado';
+  status: 'Pendiente' | 'Procesando' | 'En preparación' | 'En preparacion' | 'Listo' | 'En camino' | 'Entregado' | 'Cancelado' | 'pendiente_verificacion' | 'en_preparacion' | 'completado' | 'cancelado';
   tiempo_estimado_entrega?: string;
   notas_admin?: string;
   fecha: string;
