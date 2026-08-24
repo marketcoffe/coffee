@@ -2,17 +2,28 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 // ═══ FIX: Deshabilitar Navigator LockManager para evitar errores de token ═══
-// El SDK de Supabase usa navigator.locks para sincronizar tokens entre pestañas.
-// En algunos navegadores/entornos esto falla con "exclusive lock immediately failed".
-if (typeof navigator !== 'undefined' && navigator.locks) {
-  (navigator as any).locks = {
-    async request(_name: any, _options: any, callback: any) {
-      if (typeof callback === 'function') {
-        const lock = { name: String(_name || 'supabase'), mode: (_options?.mode as string) || 'exclusive' };
-        return callback(lock);
-      }
+// El SDK de Supabase intenta modificar navigator.locks internamente.
+// En algunos navegadores/entornos esto falla porque es una propiedad getter-only.
+if (typeof navigator !== 'undefined') {
+  try {
+    const locksDescriptor = Object.getOwnPropertyDescriptor(Navigator.prototype, 'locks');
+    if (locksDescriptor && locksDescriptor.configurable) {
+      const originalLocks = navigator.locks;
+      Object.defineProperty(Navigator.prototype, 'locks', {
+        configurable: true,
+        get() {
+          return originalLocks || {
+            async request(_name: any, _options: any, callback: any) {
+              if (typeof callback === 'function') {
+                const lock = { name: String(_name || 'supabase'), mode: 'exclusive' };
+                return callback(lock);
+              }
+            }
+          };
+        }
+      });
     }
-  };
+  } catch { /* ignore - env already handled */ }
 }
 
 // URL y Clave anónima de Supabase inyectadas desde las variables de entorno de Vite
@@ -206,6 +217,9 @@ export const supabase = supabaseUrl && supabaseAnonKey
         autoRefreshToken: true,
         detectSessionInUrl: true,
         flowType: 'pkce',
+        lock: async (name: any, acquire: any) => {
+          await acquire();
+        },
       }
     })
   : createMockClient();
