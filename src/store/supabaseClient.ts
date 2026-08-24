@@ -5,16 +5,13 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 // El SDK de Supabase usa navigator.locks para sincronizar tokens entre pestañas.
 // En algunos navegadores/entornos esto falla con "exclusive lock immediately failed".
 if (typeof navigator !== 'undefined' && navigator.locks) {
-  const origRequest = navigator.locks.request.bind(navigator.locks);
-  navigator.locks.request = async (name: string | LockInfo, options?: LockOptions | ((lock: Lock) => Promise<Lock>), callback?: (lock: Lock) => Promise<Lock>): Promise<Lock> => {
-    if (typeof options === 'function') {
-      callback = options;
-      options = {};
+  (navigator as any).locks = {
+    async request(_name: any, _options: any, callback: any) {
+      if (typeof callback === 'function') {
+        const lock = { name: String(_name || 'supabase'), mode: (_options?.mode as string) || 'exclusive' };
+        return callback(lock);
+      }
     }
-    if (typeof callback === 'function') {
-      return callback({ name: typeof name === 'string' ? name : name.name, mode: options?.mode || 'exclusive' } as Lock);
-    }
-    return origRequest(name, options as any, callback as any);
   };
 }
 
@@ -209,9 +206,6 @@ export const supabase = supabaseUrl && supabaseAnonKey
         autoRefreshToken: true,
         detectSessionInUrl: true,
         flowType: 'pkce',
-        lock: async (name, acquire, signal) => {
-          await acquire();
-        },
       }
     })
   : createMockClient();
