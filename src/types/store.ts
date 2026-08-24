@@ -135,7 +135,7 @@ export interface Order {
   lng: number;
   direccion_envio: string;
   distancia_km: number;
-  status: 'Pendiente' | 'Procesando' | 'En preparación' | 'En preparacion' | 'Listo' | 'En camino' | 'Entregado' | 'Cancelado' | 'pendiente_verificacion' | 'en_preparacion' | 'completado' | 'cancelado';
+  status: 'Pendiente' | 'Procesando' | 'En preparación' | 'En preparacion' | 'Listo' | 'En camino' | 'Entregado' | 'Cancelado' | 'pendiente_verificacion' | 'en_preparacion' | 'completado' | 'cancelado' | 'pago_enviado' | 'pendiente_pago';
   tiempo_estimado_entrega?: string;
   notas_admin?: string;
   fecha: string;

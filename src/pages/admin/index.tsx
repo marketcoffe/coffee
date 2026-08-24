@@ -8,7 +8,7 @@ import {
   LayoutGrid, ChevronLeft, ChevronRight, MapPin, Shield, Store,
   TrendingUp, Smartphone, Activity, Clock, Users, Zap, Tag,
   Truck, CreditCard, Image, Grid, Search, Building2, HelpCircle,
-  Sliders, Palette, Ticket, Settings, Menu, Armchair
+  Sliders, Palette, Ticket, Settings, Menu, Armchair, UtensilsCrossed
 } from 'lucide-react';
 import { SEOHead } from '../../components/SEOHead';
 import AdminOrderAlert from '../../components/AdminOrderAlert';
@@ -28,6 +28,7 @@ const EstadisticasSection = lazy(() => import('./sections/reports/EstadisticasSe
 const ComandasSection = lazy(() => import('./sections/pedidos/ComandasSection'));
 const HistorialPedidosSection = lazy(() => import('./sections/pedidos/HistorialPedidosSection'));
 const MapaDeliverySection = lazy(() => import('./sections/pedidos/MapaDeliverySection'));
+const PedidosMesaSection = lazy(() => import('./sections/pedidos/PedidosMesaSection'));
 
 // Lazy Imports: Marketing
 const ClientesSection = lazy(() => import('./sections/marketing/ClientesSection'));
@@ -81,6 +82,7 @@ const ALL_SECTIONS = [
   { id: 'analytics',       label: 'Estadisticas',      icon: Activity,        group: 'reportes' },
 
   { id: 'orders',          label: 'Comandas',          icon: ShoppingBag,     group: 'pedidos', groupLabel: 'Pedidos' },
+  { id: 'mesa-orders',     label: 'Pedidos Mesa',      icon: UtensilsCrossed, group: 'pedidos' },
   { id: 'order-history',   label: 'Historial',         icon: Clock,           group: 'pedidos' },
   { id: 'delivery-map',    label: 'Mapa Delivery',     icon: MapPin,          group: 'pedidos' },
 
@@ -176,6 +178,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
       case 'analytics':       return <EstadisticasSection />;
 
       case 'orders':          return <ComandasSection scopeSedeId={scopeSedeId} />;
+      case 'mesa-orders':     return <PedidosMesaSection scopeSedeId={scopeSedeId} />;
       case 'order-history':   return <HistorialPedidosSection scopeSedeId={scopeSedeId} />;
       case 'delivery-map':    return <MapaDeliverySection scopeSedeId={scopeSedeId} />;
 

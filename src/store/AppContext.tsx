@@ -58,6 +58,7 @@ interface AppContextProps {
   // Checkout & Order Actions
   createOrder: (orderData: Omit<Order, 'id' | 'subtotal_usd' | 'total_usd' | 'total_bs' | 'fecha' | 'status'> & { descuento_cupon_usd?: number; cupon_codigo?: string }, preGeneratedId?: string) => Promise<Order | null>;
   updateOrderStatus: (orderId: string, status: Order['status'], estimatedTime?: string, notas?: string) => Promise<boolean>;
+  confirmMesaPayment: (orderId: string) => Promise<boolean>;
   updateOrderItems: (orderId: string, newItems: OrderItem[]) => Promise<void>;
 
   // Coupon Actions
@@ -1815,6 +1816,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const confirmMesaPayment = async (orderId: string) => {
+    const prevOrder = ordersRef.current.find(o => o.id === orderId);
+    if (!prevOrder) return false;
+
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'completado' as Order['status'] } : o));
+
+    const { error } = await supabase.from('orders')
+      .update({ status: 'completado' })
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('confirmMesaPayment error:', error);
+      if (prevOrder) {
+        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...prevOrder } : o));
+      }
+      return false;
+    }
+
+    try {
+      const updatedOrder = { ...prevOrder, status: 'completado' } as Order;
+      supabase.channel('marketo_realtime_system').send({
+        type: 'broadcast',
+        event: 'order_status_broadcast',
+        payload: updatedOrder
+      });
+    } catch (e) {
+      console.warn('Broadcast confirm payment failed:', e);
+    }
+
+    return true;
+  };
+
   const updateOrderItems = async (orderId: string, newItems: OrderItem[]) => {
     const originalOrder = ordersRef.current.find(o => o.id === orderId);
     if (!originalOrder) return;
@@ -2924,6 +2957,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       clearCart,
       createOrder,
       updateOrderStatus,
+      confirmMesaPayment,
       updateOrderItems,
       updateConfig,
       updateExchangeRate,

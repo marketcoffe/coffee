@@ -109,6 +109,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const [waitingForAdmin, setWaitingForAdmin] = useState(false);
   const [adminAccepted, setAdminAccepted] = useState(false);
   const [paymentConfirmedByAdmin, setPaymentConfirmedByAdmin] = useState(false);
+  // Fase de pago para pedidos de mesa
+  const [mesaPaymentPhase, setMesaPaymentPhase] = useState(false);
+  const [mesaPaymentMethod, setMesaPaymentMethod] = useState<'Pago Móvil' | 'Efectivo' | 'Punto' | 'Zelle' | 'Transferencia' | 'Otro'>('Pago Móvil');
+  const [mesaPaymentSent, setMesaPaymentSent] = useState(false);
 
   useEffect(() => {
     if (processedOrder) {
@@ -138,6 +142,30 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
 
     return () => { supabase.removeChannel(channel); };
   }, [waitingForAdmin, processedOrder, adminAccepted]);
+
+  // Listener de realtime para detectar confirmación de pago del admin (mesa)
+  useEffect(() => {
+    if (!mesaPaymentSent || !processedOrder || paymentConfirmedByAdmin) return;
+
+    const channel = supabase.channel(`checkout-mesa-payment-${processedOrder.id}`);
+    channel
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${processedOrder.id}` }, (payload: Record<string, unknown>) => {
+        const updated = payload.new as Order;
+        if (updated.status === 'completado') {
+          setPaymentConfirmedByAdmin(true);
+          setProcessedOrder(updated);
+        } else if (updated.status === 'Cancelado' || updated.status === 'cancelado') {
+          setMesaPaymentSent(false);
+          setMesaPaymentPhase(false);
+          setProcessedOrder(null);
+          localStorage.removeItem('trv_active_order_id');
+          setValidationError('Tu pedido fue cancelado.');
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [mesaPaymentSent, processedOrder, paymentConfirmedByAdmin]);
 
   const detectNearestSede = useCallback((userLat: number, userLng: number) => {
     const nearest = findNearestSede(activeSedes, { lat: userLat, lng: userLng });
@@ -446,17 +474,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (orderType === 'mesa') {
-      // Validación simplificada para mesa
+      // Validación simplificada para mesa - solo nombre, el pago se maneja después
       if (!clientName.trim()) {
         setValidationError('Ingresa tu nombre.');
-        return;
-      }
-      if (!paymentConfirmed) {
-        setValidationError('Confirma el método de pago para continuar.');
-        return;
-      }
-      if (selectedPayment === 'Pago Móvil' && !paymentReference.trim()) {
-        setValidationError('Ingresa el número de referencia del pago móvil.');
         return;
       }
     } else {
@@ -542,12 +562,12 @@ ${productosDetailText}
       tipo_pedido: orderType === 'mesa' ? 'mesa' : undefined,
       numero_mesa: orderType === 'mesa' ? mesaNumber : undefined,
       nombre_cliente: orderType === 'mesa' ? clientName : undefined,
-      referencia_pago: orderType === 'mesa' ? paymentReference : undefined,
-      banco_origen: orderType === 'mesa' ? paymentBank : undefined,
+      referencia_pago: undefined,
+      banco_origen: undefined,
       costo_envio_usd: orderType === 'mesa' ? 0 : effectiveShippingAfterCoupon,
       descuento_cupon_usd: discountFromCoupon,
       cupon_codigo: appliedCoupon?.code,
-      metodo_pago: selectedPayment,
+      metodo_pago: orderType === 'mesa' ? mesaPaymentMethod : selectedPayment,
       lat: orderType === 'mesa' ? config.coordenadas_tienda.lat : shippingLat,
       lng: orderType === 'mesa' ? config.coordenadas_tienda.lng : shippingLng,
       direccion_envio: orderType === 'mesa' ? `Mesa #${mesaNumber}` : `${shippingZone} (Distancia: ${shippingDistance}km)`,
@@ -555,15 +575,18 @@ ${productosDetailText}
       notas_admin: orderNotes,
       sede_id: selectedSedeId || undefined,
       guest_phone: !currentUser ? cleanedPhone : undefined,
-      status_override: orderType === 'mesa' ? 'pendiente_verificacion' : undefined,
+      status_override: orderType === 'mesa' ? 'En preparacion' : undefined,
     } as any, preOrderId);
 
     if (created) {
       if (orderType === 'mesa') {
         setMesaOrderConfirmed(true);
+        setMesaPaymentPhase(true);
       }
       setProcessedOrder(created);
-      setWaitingForAdmin(true);
+      if (orderType !== 'mesa') {
+        setWaitingForAdmin(true);
+      }
       if (appliedCoupon) {
         updateCoupon(appliedCoupon.id, { usage_count: (appliedCoupon.usage_count || 0) + 1 });
       }
@@ -588,10 +611,58 @@ ${productosDetailText}
     setIsProcessing(false);
   };
 
+  const handleSendMesaPayment = async () => {
+    if (!processedOrder) return;
+    if (mesaPaymentMethod === 'Pago Móvil' && (!paymentBank || !paymentReference.trim())) {
+      setValidationError('Completa el banco emisor y la referencia de pago.');
+      return;
+    }
+    if (mesaPaymentMethod === 'Zelle' && !paymentReference.trim()) {
+      setValidationError('Ingresa la referencia de pago.');
+      return;
+    }
+    if (mesaPaymentMethod === 'Transferencia' && !paymentReference.trim()) {
+      setValidationError('Ingresa la referencia de transferencia.');
+      return;
+    }
+    setValidationError('');
+    setIsProcessing(true);
+
+    const updateData: any = { metodo_pago: mesaPaymentMethod };
+    if (mesaPaymentMethod === 'Pago Móvil') {
+      updateData.referencia_pago = paymentReference;
+      updateData.banco_origen = paymentBank;
+    } else if (mesaPaymentMethod === 'Zelle' || mesaPaymentMethod === 'Transferencia') {
+      updateData.referencia_pago = paymentReference;
+    }
+
+    const { error } = await supabase.from('orders').update(updateData).eq('id', processedOrder.id);
+    if (error) {
+      setValidationError('Error al enviar los datos de pago.');
+      setIsProcessing(false);
+      return;
+    }
+
+    setProcessedOrder(prev => prev ? { ...prev, ...updateData } : prev);
+    setMesaPaymentSent(true);
+    setIsProcessing(false);
+  };
+
+  const handleMesaPayAtRegister = async () => {
+    if (!processedOrder) return;
+    setIsProcessing(true);
+    const { error } = await supabase.from('orders').update({ status: 'pendiente_pago' }).eq('id', processedOrder.id);
+    if (!error) {
+      setProcessedOrder(prev => prev ? { ...prev, status: 'pendiente_pago' } : prev);
+    }
+    setIsProcessing(false);
+    setMesaPaymentSent(true);
+  };
+
   const displayOrder = processedOrder || (cart.length === 0 && recoveredOrderId ? orders.find(o => o.id === recoveredOrderId) : undefined);
 
   // Si estamos esperando al admin o en flujo de pago, los screens especiales se encargan
-  const inWaitingFlow = waitingForAdmin || adminAccepted || paymentConfirmedByAdmin;
+  const inWaitingFlow = waitingForAdmin || adminAccepted || paymentConfirmedByAdmin || mesaPaymentPhase;
 
   if (displayOrder && !inWaitingFlow) {
     if (mesaOrderConfirmed && displayOrder.tipo_pedido === 'mesa') {
@@ -600,12 +671,12 @@ ${productosDetailText}
           <SEOHead title="Pedido en Mesa" />
           <div className="border-b px-4 py-3 sticky top-0 z-20" style={{ backgroundColor: 'rgba(249,249,251,0.8)', backdropFilter: 'blur(20px)', borderColor: '#e4beb1/10' }}>
             <div className="flex items-center gap-3">
-              <button onClick={() => { setMesaOrderConfirmed(false); setProcessedOrder(null); localStorage.removeItem('trv_active_order_id'); if (onClose) onClose(); else setTab('home'); }} className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#eeeef0] transition-colors cursor-pointer" style={{ backgroundColor: '#eeeef0' }}>
+              <button onClick={() => { setMesaOrderConfirmed(false); setMesaPaymentPhase(false); setMesaPaymentSent(false); setProcessedOrder(null); localStorage.removeItem('trv_active_order_id'); if (onClose) onClose(); else setTab('home'); }} className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#eeeef0] transition-colors cursor-pointer" style={{ backgroundColor: '#eeeef0' }}>
                 <X size={18} className="text-[#1a1c1d]" />
               </button>
               <div>
                 <h1 className="text-[16px] font-bold text-[#1a1c1d]">Pedido Enviado</h1>
-                <p className="text-[11px] text-[#8f7065]">Proceda con el pago en caja</p>
+                <p className="text-[11px] text-[#8f7065]">Seleccione su método de pago</p>
               </div>
             </div>
           </div>
@@ -616,8 +687,8 @@ ${productosDetailText}
               <div className="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center" style={{ backgroundColor: '#10b98115' }}>
                 <CheckCircle size={32} className="text-emerald-500" />
               </div>
-              <h2 className="text-base font-bold text-[#1a1c1d] mb-1">¡Pedido Recibido!</h2>
-              <p className="text-xs text-[#8f7065] mb-3">Tu pedido está siendo procesado. Proceda con el pago en caja.</p>
+              <h2 className="text-base font-bold text-[#1a1c1d] mb-1">¡Pedido Enviado a Cocina!</h2>
+              <p className="text-xs text-[#8f7065] mb-3">Tu pedido se está preparando. Ahora selecciona cómo vas a pagar.</p>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ backgroundColor: `${orderTypeColor}15` }}>
                 <UtensilsCrossed size={12} style={{ color: orderTypeColor }} />
                 <span className="text-xs font-bold" style={{ color: orderTypeColor }}>Mesa #{displayOrder.numero_mesa || '?'}</span>
@@ -649,91 +720,133 @@ ${productosDetailText}
               </div>
             </div>
 
-            {/* Datos de pago */}
+            {/* Selección de método de pago */}
             <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
-              <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#8f7065] mb-3">Método de Pago Seleccionado</h3>
-              <div className="p-3 rounded-xl mb-3" style={{ backgroundColor: `${themeColor}10` }}>
-                <p className="text-sm font-bold text-[#1a1c1d]">{displayOrder.metodo_pago}</p>
-                {displayOrder.referencia_pago && (
-                  <p className="text-xs text-[#8f7065] mt-1">Ref: {displayOrder.referencia_pago}</p>
-                )}
-                {displayOrder.banco_origen && (
-                  <p className="text-xs text-[#8f7065]">Banco: {displayOrder.banco_origen}</p>
-                )}
+              <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Método de Pago</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { key: 'Pago Móvil', label: 'Pago Móvil Bs', icon: 'Bs', enabled: config.pagomovil_enabled },
+                  { key: 'Efectivo', label: 'Efectivo', icon: '$', enabled: config.efectivo_enabled },
+                  { key: 'Punto', label: 'Punto de Venta', icon: 'Pt', enabled: true },
+                  { key: 'Zelle', label: 'Zelle USD', icon: 'USD', enabled: config.zelle_enabled },
+                  { key: 'Transferencia', label: 'Transferencia', icon: 'Bco', enabled: config.transferencia_enabled },
+                ].filter(pm => pm.enabled).map(pm => (
+                  <button key={pm.key} onClick={() => setMesaPaymentMethod(pm.key as typeof mesaPaymentMethod)} className={`p-3 rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer border-2 text-xs ${
+                    mesaPaymentMethod === pm.key ? 'text-white shadow-md' : 'bg-[#f9f9fb] border-[#e4beb1]/10 text-[#5b4137] hover:bg-[#eeeef0]'
+                  }`} style={mesaPaymentMethod === pm.key ? { backgroundColor: orderTypeColor, borderColor: orderTypeColor } : {}}>
+                    <span className="text-[9px] uppercase font-mono font-bold px-1.5 py-0.5 rounded bg-white/20 shrink-0">{pm.icon}</span>
+                    <span className="font-bold">{pm.label}</span>
+                  </button>
+                ))}
               </div>
 
-              {/* Datos para pago en caja */}
-              {displayOrder.metodo_pago === 'Pago Móvil' && (
-                <div className="space-y-2">
-                  <p className="text-[10px] font-bold uppercase text-[#8f7065] mb-1">Datos para transferir:</p>
-                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                    <div>
-                      <span className="text-[9px] text-[#8f7065] uppercase block">Banco / Titular</span>
-                      <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || 'Banesco (0134)').split('-')[0]?.trim()}</span>
+              {/* Datos de pago según método seleccionado */}
+              <div className="mt-3 p-3 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl">
+                {mesaPaymentMethod === 'Pago Móvil' && (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                      <div>
+                        <span className="text-[9px] text-[#8f7065] uppercase block">Banco / Titular</span>
+                        <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || 'Banesco (0134)').split('-')[0]?.trim()}</span>
+                      </div>
+                      <CopyButton text={config.pagomovil_data || 'Banesco (0134)'} fieldId="pm-data-payment" />
                     </div>
-                    <CopyButton text={config.pagomovil_data || 'Banesco (0134)'} fieldId="pm-data-post" />
-                  </div>
-                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                    <div>
-                      <span className="text-[9px] text-[#8f7065] uppercase block">Teléfono</span>
-                      <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'}</span>
+                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                      <div>
+                        <span className="text-[9px] text-[#8f7065] uppercase block">Teléfono</span>
+                        <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'}</span>
+                      </div>
+                      <CopyButton text={(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'} fieldId="pm-phone-payment" />
                     </div>
-                    <CopyButton text={(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'} fieldId="pm-phone-post" />
-                  </div>
-                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                    <div>
-                      <span className="text-[9px] text-[#8f7065] uppercase block">Cédula / RIF</span>
-                      <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'}</span>
+                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                      <div>
+                        <span className="text-[9px] text-[#8f7065] uppercase block">Cédula / RIF</span>
+                        <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'}</span>
+                      </div>
+                      <CopyButton text={(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'} fieldId="pm-ci-payment" />
                     </div>
-                    <CopyButton text={(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'} fieldId="pm-ci-post" />
-                  </div>
-                  <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {displayOrder.total_bs?.toFixed(2)} Bs.</p>
-                </div>
-              )}
-              {displayOrder.metodo_pago === 'Zelle' && (
-                <div className="space-y-2">
-                  <p className="text-[10px] font-bold uppercase text-[#8f7065] mb-1">Datos para transferir:</p>
-                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                    <div>
-                      <span className="text-[9px] text-[#8f7065] uppercase block">Correo Zelle</span>
-                      <span className="text-[#1a1c1d] font-bold text-xs">{config.zelle_data || 'pagos@email.com'}</span>
+                    <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {displayOrder.total_bs?.toFixed(2)} Bs.</p>
+                    <div className="space-y-2 mt-2 pt-2 border-t border-[#e4beb1]/10">
+                      <div>
+                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Banco Emisor *</label>
+                        <select value={paymentBank} onChange={(e) => setPaymentBank(e.target.value)} className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer">
+                          <option value="">Seleccionar banco</option>
+                          <option value="Banesco">Banesco (0134)</option>
+                          <option value="Mercantil">Mercantil (0102)</option>
+                          <option value="Venezuela">Banco de Venezuela (0102)</option>
+                          <option value="Provincial">Provincial (0108)</option>
+                          <option value="Bancaribe">Bancaribe (0114)</option>
+                          <option value="Exterior">Banco Exterior (0115)</option>
+                          <option value="Nacional">Nacional de Crédito (0191)</option>
+                          <option value="BOD">BOD (0128)</option>
+                          <option value="Plaza">Banco Plaza (0138)</option>
+                          <option value="Otros">Otros</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia de Pago *</label>
+                        <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
+                      </div>
                     </div>
-                    <CopyButton text={config.zelle_data || 'pagos@email.com'} fieldId="zelle-email-post" />
                   </div>
-                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                    <div>
-                      <span className="text-[9px] text-[#8f7065] uppercase block">Monto a enviar</span>
-                      <span className="font-black text-sm" style={{ color: themeColor }}>${displayOrder.total_usd?.toFixed(2)} USD</span>
+                )}
+                {mesaPaymentMethod === 'Efectivo' && (
+                  <div className="text-center py-2">
+                    <p className="text-xs text-[#5b4137] mb-2">{config.efectivo_data || 'Paga en caja al recibir tu pedido'}</p>
+                    <p className="font-black text-sm" style={{ color: themeColor }}>Total: ${displayOrder.total_usd?.toFixed(2)}</p>
+                  </div>
+                )}
+                {mesaPaymentMethod === 'Punto' && (
+                  <div className="text-center py-2">
+                    <p className="text-xs text-[#5b4137] mb-2">Paga con tu punto de venta en caja</p>
+                    <p className="font-black text-sm" style={{ color: themeColor }}>Total: ${displayOrder.total_usd?.toFixed(2)}</p>
+                  </div>
+                )}
+                {mesaPaymentMethod === 'Zelle' && (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                      <div>
+                        <span className="text-[9px] text-[#8f7065] uppercase block">Correo Zelle</span>
+                        <span className="text-[#1a1c1d] font-bold text-xs">{config.zelle_data || 'pagos@email.com'}</span>
+                      </div>
+                      <CopyButton text={config.zelle_data || 'pagos@email.com'} fieldId="zelle-email-payment" />
                     </div>
-                    <CopyButton text={`$${displayOrder.total_usd?.toFixed(2)}`} fieldId="zelle-amount-post" />
-                  </div>
-                </div>
-              )}
-              {displayOrder.metodo_pago === 'Transferencia' && (
-                <div className="space-y-2">
-                  <p className="text-[10px] font-bold uppercase text-[#8f7065] mb-1">Datos para transferir:</p>
-                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                    <div>
-                      <span className="text-[9px] text-[#8f7065] uppercase block">Datos Bancarios</span>
-                      <span className="text-[#1a1c1d] font-bold text-xs">{config.transferencia_data || `Banesco - ${config.site_nombre}`}</span>
+                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                      <div>
+                        <span className="text-[9px] text-[#8f7065] uppercase block">Monto a enviar</span>
+                        <span className="font-black text-sm" style={{ color: themeColor }}>${displayOrder.total_usd?.toFixed(2)} USD</span>
+                      </div>
+                      <CopyButton text={`$${displayOrder.total_usd?.toFixed(2)}`} fieldId="zelle-amount-payment" />
                     </div>
-                    <CopyButton text={config.transferencia_data || `Banesco - ${config.site_nombre}`} fieldId="transfer-data-post" />
-                  </div>
-                  <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                    <div>
-                      <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
-                      <span className="font-black text-sm" style={{ color: themeColor }}>${displayOrder.total_usd?.toFixed(2)} USD</span>
+                    <div className="mt-2 pt-2 border-t border-[#e4beb1]/10">
+                      <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia / Nota Zelle</label>
+                      <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: Confirmación Zelle" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
                     </div>
-                    <CopyButton text={`$${displayOrder.total_usd?.toFixed(2)}`} fieldId="transfer-amount-post" />
                   </div>
-                </div>
-              )}
-              {displayOrder.metodo_pago === 'Efectivo' && (
-                <div className="text-center">
-                  <p className="text-xs text-[#5b4137] mb-2">{config.efectivo_data || 'Paga en caja al recibir tu pedido'}</p>
-                  <p className="font-black text-sm" style={{ color: themeColor }}>Total: ${displayOrder.total_usd?.toFixed(2)}</p>
-                </div>
-              )}
+                )}
+                {mesaPaymentMethod === 'Transferencia' && (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                      <div>
+                        <span className="text-[9px] text-[#8f7065] uppercase block">Datos Bancarios</span>
+                        <span className="text-[#1a1c1d] font-bold text-xs">{config.transferencia_data || `Banesco - ${config.site_nombre}`}</span>
+                      </div>
+                      <CopyButton text={config.transferencia_data || `Banesco - ${config.site_nombre}`} fieldId="transfer-data-payment" />
+                    </div>
+                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                      <div>
+                        <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
+                        <span className="font-black text-sm" style={{ color: themeColor }}>${displayOrder.total_usd?.toFixed(2)} USD</span>
+                      </div>
+                      <CopyButton text={`$${displayOrder.total_usd?.toFixed(2)}`} fieldId="transfer-amount-payment" />
+                    </div>
+                    <div className="mt-2 pt-2 border-t border-[#e4beb1]/10">
+                      <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia</label>
+                      <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Número de pedido */}
@@ -745,10 +858,20 @@ ${productosDetailText}
 
           {/* Botón fijo inferior */}
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e4beb1]/10 p-4 z-20">
-            <button onClick={() => { setMesaOrderConfirmed(false); setProcessedOrder(null); localStorage.removeItem('trv_active_order_id'); if (onClose) onClose(); else setTab('home'); }} className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: '#10b981' }}>
-              <CheckCircle size={16} />
-              Entendido
-            </button>
+            {validationError && (
+              <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-xl text-xs font-semibold text-red-600 text-center">
+                {validationError}
+              </div>
+            )}
+            {(mesaPaymentMethod === 'Efectivo' || mesaPaymentMethod === 'Punto') ? (
+              <button onClick={handleMesaPayAtRegister} disabled={isProcessing} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : '#10b981' }}>
+                {isProcessing ? 'Procesando...' : 'Pagar en Caja'}
+              </button>
+            ) : (
+              <button onClick={handleSendMesaPayment} disabled={isProcessing || (mesaPaymentMethod === 'Pago Móvil' && (!paymentBank || !paymentReference.trim())) || ((mesaPaymentMethod === 'Zelle' || mesaPaymentMethod === 'Transferencia') && !paymentReference.trim())} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : '#10b981' }}>
+                {isProcessing ? 'Procesando...' : 'Enviar Pago'}
+              </button>
+            )}
           </div>
         </div>
       );
@@ -1455,6 +1578,7 @@ ${productosDetailText}
                 </div>
               )}
 
+              {orderType !== 'mesa' && (
               <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
                 <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Método de Pago</h3>
                 <div className="grid grid-cols-2 gap-2">
@@ -1499,40 +1623,6 @@ ${productosDetailText}
                         <CopyButton text={(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'} fieldId="pm-ci" />
                       </div>
                       <p className="text-center font-black py-1 rounded" style={{ color: themeColor }}>Calcular: {totalBs.toFixed(2)} Bs.</p>
-                      {orderType === 'mesa' && (
-                        <div className="space-y-2 mt-2 pt-2 border-t border-[#e4beb1]/10">
-                          <div>
-                            <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Banco Emisor *</label>
-                            <select
-                              value={paymentBank}
-                              onChange={(e) => setPaymentBank(e.target.value)}
-                              className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer"
-                            >
-                              <option value="">Seleccionar banco</option>
-                              <option value="Banesco">Banesco (0134)</option>
-                              <option value="Mercantil">Mercantil (0102)</option>
-                              <option value="Venezuela">Banco de Venezuela (0102)</option>
-                              <option value="Provincial">Provincial (0108)</option>
-                              <option value="Bancaribe">Bancaribe (0114)</option>
-                              <option value="Exterior">Banco Exterior (0115)</option>
-                              <option value="Nacional">Banco Nacional de Crédito (0191)</option>
-                              <option value="BOD">BOD (0128)</option>
-                              <option value="Plaza">Banco Plaza (0138)</option>
-                              <option value="Otros">Otros</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Número de Referencia *</label>
-                            <input
-                              type="text"
-                              value={paymentReference}
-                              onChange={(e) => setPaymentReference(e.target.value)}
-                              placeholder="Ej: 1234567890"
-                              className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]"
-                            />
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )}
                   {selectedPayment === 'Zelle' && (
@@ -1582,15 +1672,15 @@ ${productosDetailText}
                   )}
                 </div>
               </div>
+              )}
 
+              {orderType !== 'mesa' && (
               <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
                 {(selectedPayment === 'Pago Móvil' || selectedPayment === 'Zelle' || selectedPayment === 'Transferencia') && (
                   <div className="mb-3 p-3 rounded-xl border" style={{ backgroundColor: `${themeColor}08`, borderColor: `${themeColor}20` }}>
                     <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: themeColor }}>Importante</p>
                     <p className="text-xs text-[#5b4137] leading-relaxed">
-                      {orderType === 'mesa'
-                        ? 'Indica el número de referencia y banco para verificar tu pago en caja.'
-                        : 'Adjunta el capture del pago en el chat de WhatsApp al enviar el pedido para que podamos procesarlo más rápido.'}
+                      Adjunta el capture del pago en el chat de WhatsApp al enviar el pedido para que podamos procesarlo más rápido.
                     </p>
                   </div>
                 )}
@@ -1617,14 +1707,13 @@ ${productosDetailText}
                     style={{ color: themeColor }}
                   />
                   <span className="text-xs text-[#5b4137] leading-relaxed">
-                    {orderType === 'mesa'
-                      ? 'Confirmo que los datos de pago son correctos.'
-                      : selectedPayment === 'Efectivo'
-                        ? 'Confirmo los billetes indicados para gestionar el cambio.'
-                        : 'Confirmo que enviaré el capture del pago por WhatsApp.'}
+                    {selectedPayment === 'Efectivo'
+                      ? 'Confirmo los billetes indicados para gestionar el cambio.'
+                      : 'Confirmo que enviaré el capture del pago por WhatsApp.'}
                   </span>
                 </label>
               </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -1695,6 +1784,45 @@ ${productosDetailText}
         cartTotal={totalUsd}
         cartItems={cart.reduce((s, ci) => s + ci.quantity, 0)}
       />
+
+      {/* Pantalla de espera - Pago enviado, esperando confirmación del admin */}
+      <AnimatePresence>
+        {mesaPaymentSent && processedOrder && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex flex-col items-center justify-center p-6"
+            style={{ backgroundColor: '#f9f9fb' }}
+          >
+            <div className="w-20 h-20 mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: '#10b98115' }}>
+              <div className="absolute w-20 h-20 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#10b981 transparent' }} />
+              <Clock size={28} className="text-emerald-500" />
+            </div>
+            <h2 className="text-lg font-bold text-[#1a1c1d] mb-2 text-center">Esperando Confirmación de Pago</h2>
+            <p className="text-sm text-[#8f7065] text-center mb-4">El personal está verificando tu pago</p>
+            <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 w-full max-w-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white" style={{ backgroundColor: orderTypeColor }}>
+                  <UtensilsCrossed size={18} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-[#1a1c1d]">Mesa #{processedOrder.numero_mesa}</p>
+                  <p className="text-[11px] text-[#8f7065]">{processedOrder.id}</p>
+                </div>
+              </div>
+              <div className="border-t border-[#e4beb1]/10 pt-2 flex justify-between items-center">
+                <span className="text-xs font-bold text-[#1a1c1d]">Total:</span>
+                <span className="font-black" style={{ color: orderTypeColor }}>${processedOrder.total_usd?.toFixed(2)}</span>
+              </div>
+              <div className="border-t border-[#e4beb1]/10 pt-2 mt-2">
+                <span className="text-[10px] text-[#8f7065]">Método: {processedOrder.metodo_pago}</span>
+              </div>
+            </div>
+            <p className="text-[10px] text-[#8f7065] mt-4 text-center">No cierres esta página hasta que tu pago sea confirmado</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Pantalla de espera - Procesando pedido */}
       <AnimatePresence>
@@ -1930,9 +2058,19 @@ ${productosDetailText}
             <div className="w-20 h-20 mb-4 rounded-full flex items-center justify-center bg-emerald-100">
               <CheckCircle size={40} className="text-emerald-600" />
             </div>
-            <h2 className="text-lg font-bold text-[#1a1c1d] mb-1 text-center">¡Pago Confirmado!</h2>
-            <p className="text-sm text-[#8f7065] text-center mb-6">Tu pedido {processedOrder.id} está siendo preparado</p>
-            <button onClick={() => { setPaymentConfirmedByAdmin(false); setProcessedOrder(null); setMesaOrderConfirmed(false); setWaitingForAdmin(false); setAdminAccepted(false); localStorage.removeItem('trv_active_order_id'); if (onClose) onClose(); else setTab('home'); }} className="w-full max-w-sm py-3.5 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: '#10b981' }}>
+            <h2 className="text-lg font-bold text-[#1a1c1d] mb-1 text-center">
+              {processedOrder.tipo_pedido === 'mesa' ? '¡Pago Exitoso!' : '¡Pago Confirmado!'}
+            </h2>
+            <p className="text-sm text-[#8f7065] text-center mb-2">
+              {processedOrder.tipo_pedido === 'mesa' ? 'Buen provecho' : `Tu pedido ${processedOrder.id} está siendo preparado`}
+            </p>
+            {processedOrder.tipo_pedido === 'mesa' && (
+              <p className="text-xs text-[#8f7065] text-center mb-6">Mesa #{processedOrder.numero_mesa} — Tu pedido está listo</p>
+            )}
+            {processedOrder.tipo_pedido !== 'mesa' && (
+              <p className="text-xs text-[#8f7065] text-center mb-6">{processedOrder.id}</p>
+            )}
+            <button onClick={() => { setPaymentConfirmedByAdmin(false); setProcessedOrder(null); setMesaOrderConfirmed(false); setMesaPaymentPhase(false); setMesaPaymentSent(false); setWaitingForAdmin(false); setAdminAccepted(false); localStorage.removeItem('trv_active_order_id'); if (onClose) onClose(); else setTab('home'); }} className="w-full max-w-sm py-3.5 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: '#10b981' }}>
               Entendido
             </button>
           </motion.div>

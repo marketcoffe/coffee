@@ -164,3 +164,22 @@ CREATE TRIGGER trigger_mesa_order_status
 AFTER UPDATE ON public.orders
 FOR EACH ROW
 EXECUTE FUNCTION public.handle_mesa_order_status_change();
+
+-- ----------------------------------------------------------------------------
+-- 7. MIGRACIÓN: Agregar status 'pago_enviado' y 'pendiente_pago'
+-- ----------------------------------------------------------------------------
+DO $$
+BEGIN
+    -- Actualizar el CHECK constraint del status para incluir los nuevos valores
+    -- Primero eliminar el constraint existente
+    ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_status_check;
+    
+    -- Crear el nuevo constraint con todos los status incluidos
+    ALTER TABLE orders ADD CONSTRAINT orders_status_check 
+        CHECK (status IN (
+            'Pendiente', 'Procesando', 'En preparación', 'En preparacion', 
+            'Listo', 'En camino', 'Entregado', 'Cancelado',
+            'pendiente_verificacion', 'en_preparacion', 'completado', 'cancelado',
+            'pago_enviado', 'pendiente_pago'
+        ));
+END $$;

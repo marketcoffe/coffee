@@ -6,7 +6,7 @@ import { X, CheckCircle, XCircle, Printer, Volume2, VolumeX, UtensilsCrossed, Tr
 import { printMesaTicket } from '../utils/printMesaTicket';
 
 export default function AdminOrderAlert() {
-  const { config, updateOrderStatus, mesas } = useApp();
+  const { config, updateOrderStatus, confirmMesaPayment, mesas } = useApp();
   const themeColor = config.theme_color || '#A4D045';
   const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
@@ -78,6 +78,13 @@ export default function AdminOrderAlert() {
 
   const handlePrint = (order: Order) => {
     printMesaTicket(order, config);
+  };
+
+  const handleConfirmPayment = async (orderId: string) => {
+    const result = await confirmMesaPayment(orderId);
+    if (result === false) return;
+    setPendingOrders(prev => prev.filter(o => o.id !== orderId));
+    setDismissedIds(prev => new Set([...prev, orderId]));
   };
 
   const handleDismiss = (orderId: string) => {
@@ -195,23 +202,34 @@ export default function AdminOrderAlert() {
 
         {/* Actions */}
         <div className="p-4 border-t border-[#e4beb1]/10 space-y-2">
-          <div className="flex gap-2">
+          {currentOrder.status === 'pago_enviado' ? (
             <button
-              onClick={() => handleApprove(currentOrder.id)}
-              className="flex-1 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer"
+              onClick={() => handleConfirmPayment(currentOrder.id)}
+              className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer"
               style={{ backgroundColor: '#10b981' }}
             >
               <CheckCircle size={16} />
-              Aceptar Pedido
+              Verificar Pago
             </button>
-            <button
-              onClick={() => handleReject(currentOrder.id)}
-              className="flex-1 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 bg-red-500 text-white transition-all active:scale-[0.98] cursor-pointer"
-            >
-              <XCircle size={16} />
-              Rechazar
-            </button>
-          </div>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleApprove(currentOrder.id)}
+                className="flex-1 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer"
+                style={{ backgroundColor: '#10b981' }}
+              >
+                <CheckCircle size={16} />
+                Aceptar Pedido
+              </button>
+              <button
+                onClick={() => handleReject(currentOrder.id)}
+                className="flex-1 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 bg-red-500 text-white transition-all active:scale-[0.98] cursor-pointer"
+              >
+                <XCircle size={16} />
+                Rechazar
+              </button>
+            </div>
+          )}
           <button
             onClick={() => handlePrint(currentOrder)}
             className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 border-2 transition-all active:scale-[0.98] cursor-pointer"
