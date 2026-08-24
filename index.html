@@ -66,6 +66,22 @@
     <!-- Clear old caches + apply config before React loads -->
     <script>
       (function() {
+        // ═══ FIX: Hacer navigator.locks writable antes de que Supabase SDK cargue ═══
+        // El SDK intenta reasignar navigator.locks como propiedad, pero en algunos
+        // navegadores es getter-only y lanza TypeError.
+        try {
+          var desc = Object.getOwnPropertyDescriptor(Navigator.prototype, 'locks');
+          if (desc && typeof desc.get === 'function') {
+            var originalGet = desc.get;
+            Object.defineProperty(Navigator.prototype, 'locks', {
+              configurable: true,
+              enumerable: true,
+              get: originalGet,
+              set: function(v) { /* noop - evitar "setting getter-only property" */ }
+            });
+          }
+        } catch(e) {}
+
         if ('caches' in window) {
           caches.keys().then(function(names) {
             names.forEach(function(name) {

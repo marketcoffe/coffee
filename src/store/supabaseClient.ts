@@ -1,31 +1,6 @@
 ﻿import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-// ═══ FIX: Deshabilitar Navigator LockManager para evitar errores de token ═══
-// El SDK de Supabase intenta modificar navigator.locks internamente.
-// En algunos navegadores/entornos esto falla porque es una propiedad getter-only.
-if (typeof navigator !== 'undefined') {
-  try {
-    const locksDescriptor = Object.getOwnPropertyDescriptor(Navigator.prototype, 'locks');
-    if (locksDescriptor && locksDescriptor.configurable) {
-      const originalLocks = navigator.locks;
-      Object.defineProperty(Navigator.prototype, 'locks', {
-        configurable: true,
-        get() {
-          return originalLocks || {
-            async request(_name: any, _options: any, callback: any) {
-              if (typeof callback === 'function') {
-                const lock = { name: String(_name || 'supabase'), mode: 'exclusive' };
-                return callback(lock);
-              }
-            }
-          };
-        }
-      });
-    }
-  } catch { /* ignore - env already handled */ }
-}
-
 // URL y Clave anónima de Supabase inyectadas desde las variables de entorno de Vite
 // .trim() elimina trailing newlines/whitespace del .env que causan HTTP 401 en WebSocket
 const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim();
