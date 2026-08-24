@@ -1037,6 +1037,173 @@ ${productosDetailText}
                       </div>
                     </div>
                   </div>
+
+                  {/* Métodos de Pago (mesa) */}
+                  <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Método de Pago</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { key: 'Pago Móvil', label: 'Pago Móvil Bs', icon: 'Bs', enabled: config.pagomovil_enabled },
+                        { key: 'Zelle', label: 'Zelle USD', icon: 'USD', enabled: config.zelle_enabled },
+                        { key: 'Efectivo', label: 'Efectivo', icon: '$', enabled: config.efectivo_enabled },
+                        { key: 'Transferencia', label: 'Transferencia', icon: 'Bco', enabled: config.transferencia_enabled },
+                        { key: 'Otro', label: 'Otro', icon: '?', enabled: true }
+                      ].filter(pm => pm.enabled).map(pm => (
+                        <button key={pm.key} onClick={() => setSelectedPayment(pm.key as 'Pago Móvil' | 'Zelle' | 'Efectivo' | 'Transferencia' | 'Otro')} className={`p-3 rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer border-2 text-xs ${
+                          selectedPayment === pm.key ? 'text-white shadow-md' : 'bg-[#f9f9fb] border-[#e4beb1]/10 text-[#5b4137] hover:bg-[#eeeef0]'
+                        }`} style={selectedPayment === pm.key ? { backgroundColor: themeColor, borderColor: themeColor } : {}}>
+                          <span className="text-[9px] uppercase font-mono font-bold px-1.5 py-0.5 rounded bg-white/20 shrink-0">{pm.icon}</span>
+                          <span className="font-bold">{pm.label}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="mt-3 p-3 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl text-[11px] text-[#5b4137] leading-relaxed font-mono">
+                      {selectedPayment === 'Pago Móvil' && (
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                            <div>
+                              <span className="text-[9px] text-[#8f7065] uppercase block">Banco / Titular</span>
+                              <span className="text-[#1a1c1d] font-bold">{(config.pagomovil_data || 'Banesco (0134)').split('-')[0]?.trim()}</span>
+                            </div>
+                            <CopyButton text={config.pagomovil_data || 'Banesco (0134)'} fieldId="pm-data-mesa" />
+                          </div>
+                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                            <div>
+                              <span className="text-[9px] text-[#8f7065] uppercase block">Teléfono</span>
+                              <span className="text-[#1a1c1d] font-bold">{(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'}</span>
+                            </div>
+                            <CopyButton text={(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'} fieldId="pm-phone-mesa" />
+                          </div>
+                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                            <div>
+                              <span className="text-[9px] text-[#8f7065] uppercase block">Cédula / RIF</span>
+                              <span className="text-[#1a1c1d] font-bold">{(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'}</span>
+                            </div>
+                            <CopyButton text={(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'} fieldId="pm-ci-mesa" />
+                          </div>
+                          <p className="text-center font-black py-1 rounded" style={{ color: themeColor }}>Calcular: {totalBs.toFixed(2)} Bs.</p>
+                          <div className="space-y-2 mt-2 pt-2 border-t border-[#e4beb1]/10">
+                            <div>
+                              <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Banco Emisor *</label>
+                              <select
+                                value={paymentBank}
+                                onChange={(e) => setPaymentBank(e.target.value)}
+                                className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer"
+                              >
+                                <option value="">Seleccionar banco</option>
+                                <option value="Banesco">Banesco (0134)</option>
+                                <option value="Mercantil">Mercantil (0102)</option>
+                                <option value="Venezuela">Banco de Venezuela (0102)</option>
+                                <option value="Provincial">Provincial (0108)</option>
+                                <option value="Bancaribe">Bancaribe (0114)</option>
+                                <option value="Exterior">Banco Exterior (0115)</option>
+                                <option value="Nacional">Banco Nacional de Crédito (0191)</option>
+                                <option value="BOD">BOD (0128)</option>
+                                <option value="Plaza">Banco Plaza (0138)</option>
+                                <option value="Otros">Otros</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Número de Referencia *</label>
+                              <input
+                                type="text"
+                                value={paymentReference}
+                                onChange={(e) => setPaymentReference(e.target.value)}
+                                placeholder="Ej: 1234567890"
+                                className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {selectedPayment === 'Zelle' && (
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                            <div>
+                              <span className="text-[9px] text-[#8f7065] uppercase block">Correo Zelle</span>
+                              <span className="text-[#1a1c1d] font-bold">{config.zelle_data || 'pagos@email.com'}</span>
+                            </div>
+                            <CopyButton text={config.zelle_data || 'pagos@email.com'} fieldId="zelle-email-mesa" />
+                          </div>
+                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                            <div>
+                              <span className="text-[9px] text-[#8f7065] uppercase block">Monto a enviar</span>
+                              <span className="font-black" style={{ color: themeColor }}>${totalUsd.toFixed(2)} USD</span>
+                            </div>
+                            <CopyButton text={`$${totalUsd.toFixed(2)}`} fieldId="zelle-amount-mesa" />
+                          </div>
+                        </div>
+                      )}
+                      {selectedPayment === 'Efectivo' && (
+                        <div className="flex flex-col gap-2">
+                          <p className="text-[#1a1c1d] font-bold text-center">{config.efectivo_data || 'Paga en caja al recibir tu pedido'}</p>
+                          <p className="text-center font-black py-1 rounded" style={{ color: themeColor }}>Total: ${totalUsd.toFixed(2)}</p>
+                        </div>
+                      )}
+                      {selectedPayment === 'Transferencia' && (
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                            <div>
+                              <span className="text-[9px] text-[#8f7065] uppercase block">Datos Bancarios</span>
+                              <span className="text-[#1a1c1d] font-bold">{config.transferencia_data || `Banesco - ${config.site_nombre}`}</span>
+                            </div>
+                            <CopyButton text={config.transferencia_data || `Banesco - ${config.site_nombre}`} fieldId="transfer-data-mesa" />
+                          </div>
+                          <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                            <div>
+                              <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
+                              <span className="font-black" style={{ color: themeColor }}>${totalUsd.toFixed(2)} USD</span>
+                            </div>
+                            <CopyButton text={`$${totalUsd.toFixed(2)}`} fieldId="transfer-amount-mesa" />
+                          </div>
+                        </div>
+                      )}
+                      {selectedPayment === 'Otro' && (
+                        <textarea value={customPaymentNote} onChange={(e) => setCustomPaymentNote(e.target.value)} placeholder="Describe cómo vas a pagar..." className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none focus:border-[var(--theme-color,#FF6B35)] resize-none" rows={3} />
+                      )}
+                    </div>
+
+                    {/* Referencia de pago para mesa (visible en todos los métodos) */}
+                    {selectedPayment !== 'Efectivo' && selectedPayment !== 'Otro' && (
+                      <div className="mt-3 space-y-2">
+                        {selectedPayment !== 'Pago Móvil' && (
+                          <>
+                            <div>
+                              <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Banco Emisor</label>
+                              <select
+                                value={paymentBank}
+                                onChange={(e) => setPaymentBank(e.target.value)}
+                                className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer"
+                              >
+                                <option value="">Seleccionar banco</option>
+                                <option value="Banesco">Banesco (0134)</option>
+                                <option value="Mercantil">Mercantil (0102)</option>
+                                <option value="Venezuela">Banco de Venezuela (0102)</option>
+                                <option value="Provincial">Provincial (0108)</option>
+                                <option value="Bancaribe">Bancaribe (0114)</option>
+                                <option value="Exterior">Banco Exterior (0115)</option>
+                                <option value="Nacional">Banco Nacional de Crédito (0191)</option>
+                                <option value="BOD">BOD (0128)</option>
+                                <option value="Plaza">Banco Plaza (0138)</option>
+                                <option value="Otros">Otros</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Número de Referencia</label>
+                              <input
+                                type="text"
+                                value={paymentReference}
+                                onChange={(e) => setPaymentReference(e.target.value)}
+                                placeholder="Ej: 1234567890"
+                                className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]"
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </>
               ) : (
                 <>
