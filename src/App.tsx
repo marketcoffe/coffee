@@ -16,6 +16,8 @@ import { OfflineBanner } from './components/OfflineBanner';
 import { FreeDeliveryBar } from './components/FreeDeliveryBar';
 import { ProductModal } from './components/ProductModal';
 import { SplashScreen } from './components/SplashScreen';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { log } from './utils/logger';
 
 import { ToastProvider, useToast } from './components/Toast';
 
@@ -321,56 +323,68 @@ function AppContent() {
         )}
 
         {/* ═══ MAIN CONTENT AREA ═══ */}
-        <main className="flex-1 overflow-y-auto w-full pb-14 lg:pb-0">
+        <main className={`flex-1 overflow-y-auto w-full${tab !== 'admin' ? ' pb-14 lg:pb-0' : ' max-h-screen'} `}>
           {tab === 'home' && (
-            <Home
-              setTab={setTab}
-              setSelectedCategory={setSelectedCategory}
-              onViewProductDetails={setSelectedProductDetails}
-              globalSearch={globalSearch}
-              setGlobalSearch={setGlobalSearch}
-              navigateToCatalog={navigateToCatalog}
-              deferredPrompt={deferredPrompt}
-              onInstallClick={handleInstallClick}
-              onAdminClick={handleAdminAccess}
-              isAdminAuthenticated={isAdminAuthenticated}
-            />
+            <ErrorBoundary moduleName="Home">
+              <Home
+                setTab={setTab}
+                setSelectedCategory={setSelectedCategory}
+                onViewProductDetails={setSelectedProductDetails}
+                globalSearch={globalSearch}
+                setGlobalSearch={setGlobalSearch}
+                navigateToCatalog={navigateToCatalog}
+                deferredPrompt={deferredPrompt}
+                onInstallClick={handleInstallClick}
+                onAdminClick={handleAdminAccess}
+                isAdminAuthenticated={isAdminAuthenticated}
+              />
+            </ErrorBoundary>
           )}
 
           {tab === 'catalog' && (
-            <Catalog
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-              onViewProductDetails={setSelectedProductDetails}
-              passedSearchTerm={globalSearch}
-              clearPassedSearchTerm={() => setGlobalSearch('')}
-              resetGlobalFilters={resetAllFilters}
-              setTab={setTab}
-              onOpenDrawer={() => setDrawerOpen(true)}
-            />
+            <ErrorBoundary moduleName="Catalog">
+              <Catalog
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+                onViewProductDetails={setSelectedProductDetails}
+                passedSearchTerm={globalSearch}
+                clearPassedSearchTerm={() => setGlobalSearch('')}
+                resetGlobalFilters={resetAllFilters}
+                setTab={setTab}
+                onOpenDrawer={() => setDrawerOpen(true)}
+              />
+            </ErrorBoundary>
           )}
 
           {tab === 'checkout' && (
-            <div className="fixed inset-0 z-[100] flex items-end justify-center lg:items-center lg:p-4">
-              <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setTab('home')} />
-              <div className="relative w-full max-w-lg bg-white rounded-t-2xl lg:rounded-2xl shadow-2xl max-h-[92vh] lg:max-h-[90vh] overflow-y-auto no-scrollbar">
-                <div className="flex justify-center pt-3 pb-1 lg:hidden"><div className="w-10 h-1 rounded-full bg-zinc-300" /></div>
-                <button type="button" onClick={() => setTab('home')} className="absolute top-3 right-3 z-20 w-8 h-8 bg-zinc-100 hover:bg-zinc-200 rounded-full flex items-center justify-center cursor-pointer"><X size={14} className="text-zinc-500" /></button>
-                <Checkout setTab={setTab} onClose={() => setTab('home')} />
+            <ErrorBoundary moduleName="Checkout">
+              <div className="fixed inset-0 z-[100] flex items-end justify-center lg:items-center lg:p-4">
+                <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setTab('home')} />
+                <div className="relative w-full max-w-lg bg-white rounded-t-2xl lg:rounded-2xl shadow-2xl max-h-[92vh] lg:max-h-[90vh] overflow-y-auto no-scrollbar">
+                  <div className="flex justify-center pt-3 pb-1 lg:hidden"><div className="w-10 h-1 rounded-full bg-zinc-300" /></div>
+                  <button type="button" onClick={() => setTab('home')} className="absolute top-3 right-3 z-20 w-8 h-8 bg-zinc-100 hover:bg-zinc-200 rounded-full flex items-center justify-center cursor-pointer"><X size={14} className="text-zinc-500" /></button>
+                  <Checkout setTab={setTab} onClose={() => setTab('home')} />
+                </div>
               </div>
-            </div>
+            </ErrorBoundary>
           )}
 
           {tab === 'admin' && (
-            <Admin setTab={setTab} />
+            <ErrorBoundary moduleName="Admin">
+              <Admin setTab={setTab} />
+            </ErrorBoundary>
           )}
 
           {tab === 'profile' && (
-            <UserProfile setTab={setTab} deferredPrompt={deferredPrompt} onInstallClick={handleInstallClick} />
+            <ErrorBoundary moduleName="UserProfile">
+              <UserProfile setTab={setTab} deferredPrompt={deferredPrompt} onInstallClick={handleInstallClick} />
+            </ErrorBoundary>
           )}
 
           {is404 && (
-            <NotFound onGoHome={() => { window.history.pushState({}, '', '/'); setTab('home'); setIs404(false); }} />
+            <ErrorBoundary moduleName="NotFound">
+              <NotFound onGoHome={() => { window.history.pushState({}, '', '/'); setTab('home'); setIs404(false); }} />
+            </ErrorBoundary>
           )}
         </main>
 

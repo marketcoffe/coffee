@@ -3,6 +3,7 @@ import { useApp } from '../../store/AppContext';
 import { useAdminStore } from '../../store/stores/adminStore';
 import { useOrders } from './hooks/useOrders';
 import { Order, FoodItem } from '../../types/store';
+import { log } from '../../utils/logger';
 import {
   BarChart3, ShoppingBag, X, MessageSquare, Megaphone, Package, Award,
   LayoutGrid, ChevronLeft, ChevronRight, MapPin, Shield, Store,
@@ -160,6 +161,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   }, [] as { group: string; groupLabel: string; sections: typeof visibleSections }[]);
 
   const handleSectionChange = (sectionId: string) => {
+    log.info('Admin', `Sección cambiada: ${sectionId}`);
     setActiveSection(sectionId as Parameters<typeof setActiveSection>[0]);
     setShowMoreSheet(false);
     setSidebarOpen(false);
@@ -215,7 +217,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   };
 
   return (
-    <div className="h-screen" style={{ background: 'var(--erp-content-bg)' }}>
+    <div className="h-full" style={{ background: 'var(--erp-content-bg)' }}>
       <SEOHead title={`Admin - ${config.site_nombre || 'Panel'}`} type="admin" />
       <AdminOrderAlert />
 

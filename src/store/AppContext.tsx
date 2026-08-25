@@ -2614,7 +2614,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         password: pass.trim()
       });
       if (error) {
-        console.error('Supabase Auth Error:', error.message);
+        console.error('[Auth] signInWithPassword failed:', error.message, '| email:', authEmail);
         return false;
       }
       if (data.session) {
