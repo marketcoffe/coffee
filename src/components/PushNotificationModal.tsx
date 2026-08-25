@@ -75,10 +75,13 @@ export const PushNotificationModal: React.FC = () => {
       const existingSub = await registration.pushManager.getSubscription();
       if (!existingSub) return;
 
-      // La suscripcion existe en el SW pero puede no estar registrada en BD
-      // Re-sincronizar con el servidor
       const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
       if (!vapidKey) return;
+
+      // Si el usuario está logueado, syncPushSubscription ya sincroniza la suscripción
+      // con Supabase directamente. Llamar al endpoint aquí genera un UPDATE duplicado
+      // que falla con 500 porque el endpoint usa anon key y RLS no permite UPDATE a anon.
+      if (currentUser?.id) return;
 
       const anonymousId = localStorage.getItem('trv_anonymous_id') || crypto.randomUUID();
       localStorage.setItem('trv_anonymous_id', anonymousId);

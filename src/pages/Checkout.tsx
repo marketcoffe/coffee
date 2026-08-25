@@ -13,7 +13,7 @@ import { getWhatsAppPhone } from '../utils/phone';
 import { supabase } from '../store/supabaseClient';
 
 interface CheckoutProps {
-  setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout') => void;
+  setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout') => void;
   onClose?: () => void;
 }
 
@@ -1758,6 +1758,10 @@ ${productosDetailText}
         isOpen={showTypeModal && !orderTypeSelected}
         onClose={() => { if (orderTypeSelected) setShowTypeModal(false); else setTab('cart'); }}
         onSelect={(type) => {
+          if (type === 'mesa') {
+            setTab('mesa_checkout');
+            return;
+          }
           setOrderType(type);
           setOrderTypeSelected(true);
           setShowTypeModal(false);
@@ -1783,22 +1787,22 @@ ${productosDetailText}
             </div>
             <h2 className="text-lg font-bold text-[#1a1c1d] mb-2 text-center">Esperando Confirmación de Pago</h2>
             <p className="text-sm text-[#8f7065] text-center mb-4">El personal está verificando tu pago</p>
-            <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 w-full max-w-sm">
+              <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 w-full max-w-sm">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white" style={{ backgroundColor: orderTypeColor }}>
                   <UtensilsCrossed size={18} />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-[#1a1c1d]">Mesa #{processedOrder.numero_mesa}</p>
-                  <p className="text-[11px] text-[#8f7065]">{processedOrder.id}</p>
+                  <p className="text-sm font-bold text-[#1a1c1d]">Mesa #{(processedOrder as any)?.numero_mesa}</p>
+                  <p className="text-[11px] text-[#8f7065]">{(processedOrder as any)?.id}</p>
                 </div>
               </div>
               <div className="border-t border-[#e4beb1]/10 pt-2 flex justify-between items-center">
                 <span className="text-xs font-bold text-[#1a1c1d]">Total:</span>
-                <span className="font-black" style={{ color: orderTypeColor }}>${processedOrder.total_usd?.toFixed(2)}</span>
+                <span className="font-black" style={{ color: orderTypeColor }}>${(processedOrder as any)?.total_usd?.toFixed(2)}</span>
               </div>
               <div className="border-t border-[#e4beb1]/10 pt-2 mt-2">
-                <span className="text-[10px] text-[#8f7065]">Método: {processedOrder.metodo_pago}</span>
+                <span className="text-[10px] text-[#8f7065]">Método: {(processedOrder as any)?.metodo_pago}</span>
               </div>
             </div>
             <p className="text-[10px] text-[#8f7065] mt-4 text-center">No cierres esta página hasta que tu pago sea confirmado</p>
@@ -1831,12 +1835,12 @@ ${productosDetailText}
                   <p className="text-sm font-bold text-[#1a1c1d]">
                     {orderType === 'mesa' ? `Mesa #${mesaNumber}` : orderType === 'pickup' ? 'Recoger en Tienda' : 'Delivery'}
                   </p>
-                  <p className="text-[11px] text-[#8f7065]">{processedOrder?.id}</p>
+                  <p className="text-[11px] text-[#8f7065]">{(processedOrder as any)?.id}</p>
                 </div>
               </div>
               <div className="border-t border-[#e4beb1]/10 pt-2 flex justify-between items-center">
                 <span className="text-xs font-bold text-[#1a1c1d]">Total:</span>
-                <span className="font-black" style={{ color: orderTypeColor }}>${processedOrder?.total_usd?.toFixed(2)}</span>
+                <span className="font-black" style={{ color: orderTypeColor }}>${(processedOrder as any)?.total_usd?.toFixed(2)}</span>
               </div>
             </div>
             <p className="text-[10px] text-[#8f7065] mt-4 text-center">No cierres esta página hasta que tu pedido sea confirmado</p>
@@ -1871,7 +1875,7 @@ ${productosDetailText}
               <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
                 <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#8f7065] mb-3">Tu Pedido</h3>
                 <div className="space-y-2 mb-3">
-                  {processedOrder.items?.map((item, idx) => (
+                   {(processedOrder as Order).items?.map((item: any, idx: number) => (
                     <div key={idx} className="flex justify-between items-center text-xs">
                       <span className="text-[#5b4137]">
                         <span className="font-bold">{item.cantidad}x</span> {item.nombre}
@@ -1883,29 +1887,29 @@ ${productosDetailText}
                 <div className="border-t border-[#e4beb1]/10 pt-2 flex justify-between items-center">
                   <span className="text-xs font-bold text-[#1a1c1d]">Total:</span>
                   <div className="text-right">
-                    <span className="font-black text-lg" style={{ color: themeColor }}>${processedOrder.total_usd?.toFixed(2)}</span>
-                    <span className="text-[10px] text-[#8f7065] ml-1">{processedOrder.total_bs?.toFixed(2)} Bs.</span>
+                    <span className="font-black text-lg" style={{ color: themeColor }}>${(processedOrder as Order).total_usd?.toFixed(2)}</span>
+                    <span className="text-[10px] text-[#8f7065] ml-1">{(processedOrder as Order).total_bs?.toFixed(2)} Bs.</span>
                   </div>
                 </div>
               </div>
 
               {/* Método de pago y datos */}
-              {processedOrder.metodo_pago === 'Efectivo' ? (
+              {(processedOrder as Order).metodo_pago === 'Efectivo' ? (
                 <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-5 text-center">
                   <div className="w-14 h-14 mx-auto mb-3 rounded-full flex items-center justify-center bg-emerald-100">
                     <CheckCircle size={28} className="text-emerald-600" />
                   </div>
                   <h3 className="text-base font-bold text-[#1a1c1d] mb-1">Pago en Efectivo</h3>
                   <p className="text-xs text-[#8f7065] mb-3">Dirígete a caja para cancelar tu pedido</p>
-                  <p className="font-black text-xl" style={{ color: themeColor }}>${processedOrder.total_usd?.toFixed(2)}</p>
+                  <p className="font-black text-xl" style={{ color: themeColor }}>${(processedOrder as Order).total_usd?.toFixed(2)}</p>
                 </div>
               ) : (
                 <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
                   <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#8f7065] mb-3">Realiza tu pago</h3>
                   <div className="p-3 rounded-xl mb-3" style={{ backgroundColor: `${themeColor}10` }}>
-                    <p className="text-sm font-bold text-[#1a1c1d]">{processedOrder.metodo_pago}</p>
+                    <p className="text-sm font-bold text-[#1a1c1d]">{(processedOrder as Order).metodo_pago}</p>
                   </div>
-                  {processedOrder.metodo_pago === 'Pago Móvil' && (
+                  {(processedOrder as Order).metodo_pago === 'Pago Móvil' && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
                         <div>
@@ -1928,7 +1932,7 @@ ${productosDetailText}
                         </div>
                         <CopyButton text={(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'} fieldId="pm-ci-final" />
                       </div>
-                      <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {processedOrder.total_bs?.toFixed(2)} Bs.</p>
+                       <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {(processedOrder as Order).total_bs?.toFixed(2)} Bs.</p>
 
                       <div className="space-y-2 mt-3 pt-3 border-t border-[#e4beb1]/10">
                         <div>
@@ -1954,7 +1958,7 @@ ${productosDetailText}
                       </div>
                     </div>
                   )}
-                  {processedOrder.metodo_pago === 'Zelle' && (
+                   {(processedOrder as Order).metodo_pago === 'Zelle' && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
                         <div>
@@ -1966,9 +1970,9 @@ ${productosDetailText}
                       <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
                         <div>
                           <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
-                          <span className="font-black text-sm" style={{ color: themeColor }}>${processedOrder.total_usd?.toFixed(2)} USD</span>
+                          <span className="font-black text-sm" style={{ color: themeColor }}>${(processedOrder as Order).total_usd?.toFixed(2)} USD</span>
                         </div>
-                        <CopyButton text={`$${processedOrder.total_usd?.toFixed(2)}`} fieldId="zelle-amount-final" />
+                        <CopyButton text={`$${(processedOrder as Order).total_usd?.toFixed(2)}`} fieldId="zelle-amount-final" />
                       </div>
                       <div className="mt-2 pt-2 border-t border-[#e4beb1]/10">
                         <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia / Nota Zelle</label>
@@ -1976,7 +1980,7 @@ ${productosDetailText}
                       </div>
                     </div>
                   )}
-                  {processedOrder.metodo_pago === 'Transferencia' && (
+                   {(processedOrder as Order).metodo_pago === 'Transferencia' && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
                         <div>
@@ -1988,9 +1992,9 @@ ${productosDetailText}
                       <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
                         <div>
                           <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
-                          <span className="font-black text-sm" style={{ color: themeColor }}>${processedOrder.total_usd?.toFixed(2)} USD</span>
+                          <span className="font-black text-sm" style={{ color: themeColor }}>${(processedOrder as Order).total_usd?.toFixed(2)} USD</span>
                         </div>
-                        <CopyButton text={`$${processedOrder.total_usd?.toFixed(2)}`} fieldId="transfer-amount-final" />
+                        <CopyButton text={`$${(processedOrder as Order).total_usd?.toFixed(2)}`} fieldId="transfer-amount-final" />
                       </div>
                       <div className="mt-2 pt-2 border-t border-[#e4beb1]/10">
                         <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia</label>
@@ -2004,24 +2008,24 @@ ${productosDetailText}
 
             {/* Botón fijo - Confirmar pago */}
             <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e4beb1]/10 p-4 z-20">
-              {processedOrder.metodo_pago !== 'Efectivo' && (!paymentReference.trim() || (processedOrder.metodo_pago === 'Pago Móvil' && !paymentBank)) && (
+               {(processedOrder as Order).metodo_pago !== 'Efectivo' && (!paymentReference.trim() || ((processedOrder as Order).metodo_pago === 'Pago Móvil' && !paymentBank)) && (
                 <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded-xl text-xs font-semibold text-amber-700 text-center">
                   Complete los datos de pago para confirmar
                 </div>
               )}
               <button
                 onClick={async () => {
-                  if (processedOrder.metodo_pago !== 'Efectivo' && (!paymentReference.trim() || (processedOrder.metodo_pago === 'Pago Móvil' && !paymentBank))) return;
+                  if ((processedOrder as Order).metodo_pago !== 'Efectivo' && (!paymentReference.trim() || ((processedOrder as Order).metodo_pago === 'Pago Móvil' && !paymentBank))) return;
                   setPaymentConfirmedByAdmin(true);
                 }}
-                disabled={processedOrder.metodo_pago !== 'Efectivo' && (!paymentReference.trim() || (processedOrder.metodo_pago === 'Pago Móvil' && !paymentBank))}
+                disabled={(processedOrder as Order).metodo_pago !== 'Efectivo' && (!paymentReference.trim() || ((processedOrder as Order).metodo_pago === 'Pago Móvil' && !paymentBank))}
                 className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer ${
-                  (processedOrder.metodo_pago !== 'Efectivo' && (!paymentReference.trim() || (processedOrder.metodo_pago === 'Pago Móvil' && !paymentBank))) ? 'opacity-50' : ''
+                  ((processedOrder as Order).metodo_pago !== 'Efectivo' && (!paymentReference.trim() || ((processedOrder as Order).metodo_pago === 'Pago Móvil' && !paymentBank))) ? 'opacity-50' : ''
                 }`}
                 style={{ backgroundColor: '#10b981' }}
               >
                 <CheckCircle size={16} />
-                {processedOrder.metodo_pago === 'Efectivo' ? 'Confirmo que pagué en caja' : 'Confirmar Pago'}
+                {(processedOrder as Order).metodo_pago === 'Efectivo' ? 'Confirmo que pagué en caja' : 'Confirmar Pago'}
               </button>
             </div>
           </motion.div>
@@ -2040,17 +2044,17 @@ ${productosDetailText}
             <div className="w-20 h-20 mb-4 rounded-full flex items-center justify-center bg-emerald-100">
               <CheckCircle size={40} className="text-emerald-600" />
             </div>
-            <h2 className="text-lg font-bold text-[#1a1c1d] mb-1 text-center">
-              {processedOrder.tipo_pedido === 'mesa' ? '¡Pago Exitoso!' : '¡Pago Confirmado!'}
+             <h2 className="text-lg font-bold text-[#1a1c1d] mb-1 text-center">
+              {(processedOrder as Order).tipo_pedido === 'mesa' ? '¡Pago Exitoso!' : '¡Pago Confirmado!'}
             </h2>
             <p className="text-sm text-[#8f7065] text-center mb-2">
-              {processedOrder.tipo_pedido === 'mesa' ? 'Buen provecho' : `Tu pedido ${processedOrder.id} está siendo preparado`}
+              {(processedOrder as Order).tipo_pedido === 'mesa' ? 'Buen provecho' : `Tu pedido ${(processedOrder as Order).id} está siendo preparado`}
             </p>
-            {processedOrder.tipo_pedido === 'mesa' && (
-              <p className="text-xs text-[#8f7065] text-center mb-6">Mesa #{processedOrder.numero_mesa} — Tu pedido está listo</p>
+            {(processedOrder as Order).tipo_pedido === 'mesa' && (
+              <p className="text-xs text-[#8f7065] text-center mb-6">Mesa #{(processedOrder as Order).numero_mesa} — Tu pedido está listo</p>
             )}
-            {processedOrder.tipo_pedido !== 'mesa' && (
-              <p className="text-xs text-[#8f7065] text-center mb-6">{processedOrder.id}</p>
+            {(processedOrder as Order).tipo_pedido !== 'mesa' && (
+              <p className="text-xs text-[#8f7065] text-center mb-6">{(processedOrder as Order).id}</p>
             )}
             <button onClick={() => { setPaymentConfirmedByAdmin(false); setProcessedOrder(null); setMesaOrderConfirmed(false); setMesaPaymentPhase(false); setMesaPaymentSent(false); setWaitingForAdmin(false); setAdminAccepted(false); localStorage.removeItem('trv_active_order_id'); if (onClose) onClose(); else setTab('home'); }} className="w-full max-w-sm py-3.5 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: '#10b981' }}>
               Entendido

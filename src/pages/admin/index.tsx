@@ -30,6 +30,7 @@ const ComandasSection = lazy(() => import('./sections/pedidos/ComandasSection'))
 const HistorialPedidosSection = lazy(() => import('./sections/pedidos/HistorialPedidosSection'));
 const MapaDeliverySection = lazy(() => import('./sections/pedidos/MapaDeliverySection'));
 const PedidosMesaSection = lazy(() => import('./sections/pedidos/PedidosMesaSection'));
+const GridComanderaMesas = lazy(() => import('./sections/pedidos/GridComanderaMesas'));
 
 // Lazy Imports: Marketing
 const ClientesSection = lazy(() => import('./sections/marketing/ClientesSection'));
@@ -51,6 +52,7 @@ const PaymentsSection = lazy(() => import('./sections/tienda/PaymentsSection'));
 const BannersSection = lazy(() => import('./sections/tienda/BannersSection'));
 const CategoriasSection = lazy(() => import('./sections/tienda/CategoriasSection'));
 const MesasSection = lazy(() => import('./sections/tienda/MesasSection'));
+const GestionMesasConfig = lazy(() => import('./sections/tienda/GestionMesasConfig'));
 
 // Lazy Imports: Configuracion
 const PersonalizacionSection = lazy(() => import('./sections/config/PersonalizacionSection'));
@@ -72,7 +74,7 @@ const SectionLoader = () => (
 );
 
 interface AdminIndexProps {
-  setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout') => void;
+  setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout') => void;
 }
 
 const ALL_SECTIONS = [
@@ -180,7 +182,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
       case 'analytics':       return <EstadisticasSection />;
 
       case 'orders':          return <ComandasSection scopeSedeId={scopeSedeId} />;
-      case 'mesa-orders':     return <PedidosMesaSection scopeSedeId={scopeSedeId} />;
+      case 'mesa-orders':     return <GridComanderaMesas scopeSedeId={scopeSedeId} />;
       case 'order-history':   return <HistorialPedidosSection scopeSedeId={scopeSedeId} />;
       case 'delivery-map':    return <MapaDeliverySection scopeSedeId={scopeSedeId} />;
 
@@ -201,7 +203,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
       case 'payments':        return <PaymentsSection />;
       case 'banners':         return <BannersSection />;
       case 'categories':      return <CategoriasSection />;
-      case 'tables':          return <MesasSection />;
+      case 'tables':          return <GestionMesasConfig />;
 
       case 'branding':        return <PersonalizacionSection />;
       case 'pwa-config':      return <PWASection />;

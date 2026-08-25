@@ -30,6 +30,8 @@ const STATUS_CONFIG: Record<Order['status'], { color: string; bg: string; border
   'pago_enviado':           { color: 'text-amber-700',  bg: 'bg-amber-100',  border: 'border-l-amber-400',  label: 'Pago Enviado' },
   'pendiente_pago':         { color: 'text-orange-700', bg: 'bg-orange-100', border: 'border-l-orange-400', label: 'Pendiente Pago' },
   'cancelado':              { color: 'text-red-700',    bg: 'bg-red-100',    border: 'border-l-red-400',    label: 'Cancelado' },
+  'enviado_cocina':         { color: 'text-blue-700',   bg: 'bg-blue-100',   border: 'border-l-blue-400',   label: 'En Cocina' },
+  'pago_en_verificacion':   { color: 'text-yellow-700', bg: 'bg-yellow-100', border: 'border-l-yellow-400', label: 'Verificando Pago' },
 };
 
 function getElapsed(fecha: string): { text: string; colorClass: string } {

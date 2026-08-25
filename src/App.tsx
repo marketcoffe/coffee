@@ -3,6 +3,10 @@ import { AppProvider, useApp } from './store/AppContext';
 import { Home } from './pages/Home';
 import { Catalog } from './pages/Catalog';
 import { Checkout } from './pages/Checkout';
+import { MesaCheckout } from './components/mesa/MesaCheckout';
+import { PantallaPagoMesa } from './components/mesa/PantallaPagoMesa';
+import { TicketDigitalModal } from './components/mesa/TicketDigitalModal';
+import { OrderSuccessStep } from './components/mesa/OrderSuccessStep';
 import Admin from './pages/admin/index';
 import { UserProfile } from './pages/UserProfile';
 import { NotFound } from './pages/NotFound';
@@ -50,7 +54,7 @@ interface WebAppManifest {
 }
 
 function AppContent() {
-  const { cart, config, addToCart, authenticateAdmin, isGlobalLoading, isAdminAuthenticated, currentUser, markUserAsPwaInstalled, isDarkMode } = useApp();
+  const { cart, config, addToCart, authenticateAdmin, isGlobalLoading, isAdminAuthenticated, currentUser, markUserAsPwaInstalled, isDarkMode, clearCart } = useApp();
   const { showToast } = useToast();
 
   // PWA Install Prompt State
@@ -204,7 +208,12 @@ function AppContent() {
   const isAdminUrl = pathname.startsWith('/admin') || pathname.startsWith('/admin');
   const isHome = pathname === '/' || pathname === '/coffe' || pathname === '/' || pathname === '';
   const is404Url = !isHome && !isAdminUrl;
-  const [tab, setTab] = useState<'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout'>((isAdminAuthenticated || isAdminUrl) ? 'admin' : 'home');
+  const [tab, setTab] = useState<'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout'>((isAdminAuthenticated || isAdminUrl) ? 'admin' : 'home');
+  const [mesaOrderCreated, setMesaOrderCreated] = useState<any>(null);
+  const [mesaPaymentSent, setMesaPaymentSent] = useState(false);
+  const [mesaPayAtRegister, setMesaPayAtRegister] = useState(false);
+  const [showTicketModal, setShowTicketModal] = useState(false);
+  const [mesaOrderForPayment, setMesaOrderForPayment] = useState<any>(null);
   const [is404, setIs404] = useState(is404Url);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -366,6 +375,54 @@ function AppContent() {
                   <Checkout setTab={setTab} onClose={() => setTab('home')} />
                 </div>
               </div>
+            </ErrorBoundary>
+          )}
+
+          {tab === 'mesa_checkout' && (
+            <ErrorBoundary moduleName="MesaCheckout">
+              {mesaOrderCreated && !mesaPaymentSent && !mesaPayAtRegister ? (
+                <PantallaPagoMesa
+                  order={mesaOrderCreated}
+                  onPaymentSent={() => { setMesaPaymentSent(true); setMesaOrderForPayment(mesaOrderCreated); }}
+                  onPayAtRegister={() => { setMesaPayAtRegister(true); setMesaOrderForPayment(mesaOrderCreated); }}
+                  onBack={() => { setMesaOrderCreated(null); setTab('cart'); }}
+                />
+              ) : mesaPaymentSent || mesaPayAtRegister ? (
+                <OrderSuccessStep
+                  order={mesaOrderForPayment || mesaOrderCreated}
+                  onContinueShopping={() => {
+                    setMesaOrderCreated(null);
+                    setMesaPaymentSent(false);
+                    setMesaPayAtRegister(false);
+                    setMesaOrderForPayment(null);
+                    localStorage.removeItem('trv_active_order_id');
+                    setTab('catalog');
+                  }}
+                  onClose={() => {
+                    setMesaOrderCreated(null);
+                    setMesaPaymentSent(false);
+                    setMesaPayAtRegister(false);
+                    setMesaOrderForPayment(null);
+                    localStorage.removeItem('trv_active_order_id');
+                    setTab('home');
+                  }}
+                />
+              ) : (
+                <MesaCheckout
+                  setTab={setTab}
+                  onOrderCreated={(order) => {
+                    setMesaOrderCreated(order);
+                    clearCart();
+                  }}
+                />
+              )}
+              {showTicketModal && mesaOrderForPayment && (
+                <TicketDigitalModal
+                  order={mesaOrderForPayment}
+                  isOpen={showTicketModal}
+                  onClose={() => setShowTicketModal(false)}
+                />
+              )}
             </ErrorBoundary>
           )}
 

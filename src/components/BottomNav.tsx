@@ -3,8 +3,8 @@ import { Home, UtensilsCrossed, Search, ShoppingCart, User } from 'lucide-react'
 import { useApp } from '../store/AppContext';
 
 interface BottomNavProps {
-  currentTab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout';
-  setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout') => void;
+  currentTab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout';
+  setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout') => void;
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setTab }) => {

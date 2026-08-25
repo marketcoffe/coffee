@@ -54,7 +54,7 @@ function startContinuousAlert(): void {
     alertGain.connect(ctx.destination);
 
     alertOscillator.start(ctx.currentTime);
-    alertOscillator.loop = true;
+    (alertOscillator as any).loop = true;
   } catch {}
 }
 

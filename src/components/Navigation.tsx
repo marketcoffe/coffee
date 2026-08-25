@@ -24,8 +24,8 @@ const CATEGORY_ICON_MAP: Record<string, React.ElementType> = {
 };
 
 interface NavigationProps {
-  currentTab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout';
-  setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout') => void;
+  currentTab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout';
+  setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout') => void;
   drawerOpen: boolean;
   setDrawerOpen: (value: boolean) => void;
   navigateToCatalog?: (filters?: { category?: string }) => void;

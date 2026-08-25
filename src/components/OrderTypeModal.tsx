@@ -9,6 +9,7 @@ interface OrderTypeModalProps {
   themeColor: string;
   cartTotal: number;
   cartItems: number;
+  onMesaSelect?: () => void;
 }
 
 const ORDER_TYPES = [
