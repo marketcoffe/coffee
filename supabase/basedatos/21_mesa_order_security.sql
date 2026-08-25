@@ -128,8 +128,8 @@ EXECUTE FUNCTION public.validate_mesa_number();
 -- ----------------------------------------------------------------------------
 -- 5. RLS mejorado: restringir INSERT de pedidos de mesa
 -- ----------------------------------------------------------------------------
-ALTER TABLE orders DROP POLICY IF EXISTS "orders_insert_allow_anon";
-ALTER TABLE orders DROP POLICY IF EXISTS "orders_insert mesa_seguro";
+DROP POLICY IF EXISTS "orders_insert_allow_anon" ON orders;
+DROP POLICY IF EXISTS "orders_insert mesa_seguro" ON orders;
 
 CREATE POLICY "orders_insert_mesa_seguro" ON orders
   FOR INSERT

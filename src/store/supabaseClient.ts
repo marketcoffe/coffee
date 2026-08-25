@@ -180,7 +180,15 @@ const createMockClient = (): SupabaseClient => {
     },
     removeChannel: async () => {},
     removeAllChannels: async () => {},
-    rpc: async () => ({ data: [], error: null }),
+    rpc: async (fn: string, params?: { [key: string]: unknown }) => {
+      if (fn === 'lookup_admin_email') {
+        const users = getMockUsers();
+        const username = (params?.p_username as string || '').toLowerCase();
+        const user = users.find(u => u.username.toLowerCase() === username);
+        return user ? { data: user.email, error: null } : { data: null, error: null };
+      }
+      return { data: [], error: null };
+    },
   };
   return mock;
 };

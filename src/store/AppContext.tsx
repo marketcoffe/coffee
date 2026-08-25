@@ -2598,15 +2598,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const isEmail = identifier.includes('@');
       let authEmail = identifier.trim();
       if (!isEmail) {
-        const { data: lookupData } = await supabase
-          .from('admin_users')
-          .select('email')
-          .eq('username', identifier.trim())
-          .single();
-        if (lookupData?.email) {
-          authEmail = lookupData.email;
+        // Usar RPC que bypasea RLS (SECURITY DEFINER en DB)
+        const { data: rpcEmail } = await supabase
+          .rpc('lookup_admin_email', { p_username: identifier.trim() });
+        if (rpcEmail) {
+          authEmail = rpcEmail;
         } else {
-          return false;
+          // Fallback: intentar el identifier como email directamente
+          authEmail = identifier.trim();
         }
       }
 

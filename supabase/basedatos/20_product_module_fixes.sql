@@ -23,7 +23,9 @@ END $$;
 --    Esto es seguro porque la política RLS "Allow admin changes to catalog"
 --    ya requiere authenticated + is_admin_or_operator().
 REVOKE INSERT ON products FROM anon;
-RAISE NOTICE 'INSERT revocado de role anon en tabla products';
+DO $$ BEGIN
+    RAISE NOTICE 'INSERT revocado de role anon en tabla products';
+END $$;
 
 -- 3) Policy de storage: usuarios_select_own con fallback admin
 --    (ya aplicado en 07_storage_imagenes_archivos.sql, reproducido aquí por si se ejecuta primero)
@@ -37,4 +39,6 @@ USING (
         OR public.is_admin()
     )
 );
-RAISE NOTICE 'Policy usuarios_select_own actualizada con fallback admin';
+DO $$ BEGIN
+    RAISE NOTICE 'Policy usuarios_select_own actualizada con fallback admin';
+END $$;

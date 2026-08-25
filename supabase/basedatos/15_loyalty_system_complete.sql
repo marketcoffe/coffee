@@ -896,5 +896,6 @@ CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user_active ON push_subscripti
 CREATE INDEX IF NOT EXISTS idx_push_subscriptions_phone_active ON push_subscriptions(destinatario_telefono) WHERE is_active = true AND destinatario_telefono IS NOT NULL;
 
 -- Products: busqueda por categoria y stock
-CREATE INDEX IF NOT EXISTS idx_products_categoria ON products USING GIN(categoria);
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX IF NOT EXISTS idx_products_categoria ON products USING GIN(categoria gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_products_stock_low ON products(stock) WHERE stock <= 5 AND activo = true;
