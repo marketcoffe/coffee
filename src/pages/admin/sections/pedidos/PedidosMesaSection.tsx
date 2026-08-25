@@ -51,8 +51,7 @@ const PedidosMesaSection: React.FC<PedidosMesaSectionProps> = ({ scopeSedeId }) 
 
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
 
-  // Refuerzo: no depender solo del canal global de realtime. Nos suscribimos
-  // directamente a INSERT de pedidos de mesa y refrescamos al volver al foco.
+  // Refuerzo: escuchar broadcast global para pedidos de mesa (bypasea RLS/cache)
   useEffect(() => {
     const channel = supabase.channel('pedidos_mesa_section_live')
       .on('postgres_changes', {
@@ -67,6 +66,12 @@ const PedidosMesaSection: React.FC<PedidosMesaSectionProps> = ({ scopeSedeId }) 
         table: 'orders',
         filter: 'tipo_pedido=eq.mesa'
       }, () => { refreshOrders(); })
+      .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
+        const o = payload.payload;
+        if (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') {
+          refreshOrders();
+        }
+      })
       .subscribe();
 
     const onFocus = () => refreshOrders();

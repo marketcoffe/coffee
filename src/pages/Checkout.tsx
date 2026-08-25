@@ -661,16 +661,16 @@ ${productosDetailText}
   const orderTypeColor = orderType === 'mesa' ? '#e67e22' : orderType === 'pickup' ? '#8b5cf6' : '#3b82f6';
 
   // Si estamos esperando al admin o en flujo de pago, los screens especiales se encargan
-  const inWaitingFlow = waitingForAdmin || adminAccepted || paymentConfirmedByAdmin || mesaPaymentPhase;
+  const inWaitingFlow = waitingForAdmin || adminAccepted || paymentConfirmedByAdmin || (mesaOrderConfirmed && mesaPaymentSent);
 
-  if (displayOrder && !inWaitingFlow) {
-    if (mesaOrderConfirmed && displayOrder.tipo_pedido === 'mesa') {
+  if (displayOrder) {
+    if (mesaOrderConfirmed && displayOrder.tipo_pedido === 'mesa' && !mesaPaymentSent) {
       return (
         <div className="flex flex-col min-h-[100dvh]" style={{ backgroundColor: '#f9f9fb' }}>
           <SEOHead title="Pedido en Mesa" />
           <div className="border-b px-4 py-3 sticky top-0 z-20" style={{ backgroundColor: 'rgba(249,249,251,0.8)', backdropFilter: 'blur(20px)', borderColor: '#e4beb1/10' }}>
             <div className="flex items-center gap-3">
-              <button onClick={() => { setMesaOrderConfirmed(false); setMesaPaymentPhase(false); setMesaPaymentSent(false); setProcessedOrder(null); localStorage.removeItem('trv_active_order_id'); if (onClose) onClose(); else setTab('home'); }} className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#eeeef0] transition-colors cursor-pointer" style={{ backgroundColor: '#eeeef0' }}>
+              <button onClick={() => { setMesaOrderConfirmed(false); setMesaPaymentSent(false); setProcessedOrder(null); localStorage.removeItem('trv_active_order_id'); if (onClose) onClose(); else setTab('home'); }} className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#eeeef0] transition-colors cursor-pointer" style={{ backgroundColor: '#eeeef0' }}>
                 <X size={18} className="text-[#1a1c1d]" />
               </button>
               <div>
@@ -1718,7 +1718,7 @@ ${productosDetailText}
           )}
 
           {currentStep === 3 ? (
-            <button onClick={handleFormSubmit} disabled={isProcessing} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : '#10b981', color: '#fff' }}>
+            <button onClick={handleFormSubmit} disabled={isProcessing || (orderType === 'mesa' && mesaOrderConfirmed)} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : '#10b981', color: '#fff' }}>
               {isProcessing ? 'Procesando...' : orderType === 'mesa' ? 'Confirmar Pedido en Mesa' : 'Confirmar Pedido'}
             </button>
           ) : (
