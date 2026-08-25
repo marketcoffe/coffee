@@ -1808,7 +1808,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         event: 'new_order_broadcast',
         payload: newOrder
       });
-      if (sendResult === 'ok') {
+      if (sendResult && sendResult.error === null) {
+        console.log('[Broadcast] new_order_broadcast enviado:', newOrder.id);
+      } else if (sendResult === 'ok') {
         console.log('[Broadcast] new_order_broadcast enviado:', newOrder.id);
       } else {
         console.warn('[Broadcast] new_order_broadcast resultado inesperado:', sendResult);
