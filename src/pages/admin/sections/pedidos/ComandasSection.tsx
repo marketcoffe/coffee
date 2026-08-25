@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { useOrders } from '../../hooks/useOrders';
 import { Order } from '../../../../types/store';
-import { Download, LayoutGrid, List, CheckSquare, XCircle, ArrowRight } from 'lucide-react';
+import { Download, LayoutGrid, List, XCircle, ArrowRight, Monitor, Smartphone } from 'lucide-react';
 import { OrderCard, sortOrdersByPriority } from '../../components/OrderCard';
 import { AdminTrackingMap } from '../../components/AdminTrackingMap';
 import { printOrderTicket } from '../../utils/printUtils';
@@ -50,6 +50,7 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
   const themeColor = config.theme_color || '#A4D045';
 
   const [viewMode, setViewMode] = useState<'kanban' | 'lista' | 'mapa'>('kanban');
+  const [kitchenMode, setKitchenMode] = useState(false);
   const [sedeFilter, setSedeFilter] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -164,6 +165,12 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
               <Download size={12} /> <span className="hidden sm:inline">CSV</span>
             </button>
           </Tooltip>
+          <Tooltip content={kitchenMode ? 'Vista normal' : 'Modo Cocina: tarjetas grandes para pantalla de cocina'}>
+            <button onClick={() => setKitchenMode(!kitchenMode)} className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all shadow-sm cursor-pointer ${kitchenMode ? 'bg-amber-500 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>
+              {kitchenMode ? <Smartphone size={12} /> : <Monitor size={12} />}
+              <span className="hidden sm:inline">{kitchenMode ? 'Normal' : 'Cocina'}</span>
+            </button>
+          </Tooltip>
           {activeSedes.length > 1 && !lockedSede && (
             <Tooltip content="Filtrar pedidos por sucursal">
               <select value={sedeFilter} onChange={(e) => setSedeFilter(e.target.value)} className="px-2.5 py-1.5 rounded-lg text-[10px] font-bold bg-white border border-slate-200 cursor-pointer">
@@ -193,7 +200,7 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
       )}
 
       {viewMode === 'kanban' && (
-        <div className="erp-kanban-grid">
+        <div className={kitchenMode ? 'erp-kanban-grid kitchen-display-grid' : 'erp-kanban-grid'}>
           {KANBAN_COLUMNS.map(col => {
             const cfg = COLUMN_CONFIG[col];
             const columnOrders = ordersByColumn[col];
@@ -229,6 +236,7 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
                           onPrint={printOrder}
                           onWhatsApp={handleWhatsApp}
                           themeColor={themeColor}
+                          kitchenMode={kitchenMode}
                         />
                       </div>
                     </div>

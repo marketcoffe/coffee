@@ -115,31 +115,13 @@ ALTER TABLE store_config ADD COLUMN IF NOT EXISTS banner_cta_urls TEXT[] DEFAULT
 ALTER TABLE store_config ADD COLUMN IF NOT EXISTS hero_cta_url TEXT DEFAULT '';
 
 -- ----------------------------------------------------------------------------
--- 5. FIX: Bucket de Storage 'productos' (faltaba en producción)
+-- 5. FIX: Bucket de Storage 'productos' 
+-- NOTA: Este bucket se crea en 07_storage_imagenes_archivos.sql
+-- Solo mantener la configuracion de settings si es necesario
 -- ----------------------------------------------------------------------------
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('productos', 'productos', true)
-ON CONFLICT (id) DO NOTHING;
-
-DROP POLICY IF EXISTS "productos_select_public" ON storage.objects;
-CREATE POLICY "productos_select_public" ON storage.objects
-FOR SELECT USING (bucket_id = 'productos');
-
-DROP POLICY IF EXISTS "productos_insert_admin" ON storage.objects;
-CREATE POLICY "productos_insert_admin" ON storage.objects
-FOR INSERT TO authenticated
-WITH CHECK (bucket_id = 'productos' AND public.is_admin_or_operator());
-
-DROP POLICY IF EXISTS "productos_update_admin" ON storage.objects;
-CREATE POLICY "productos_update_admin" ON storage.objects
-FOR UPDATE TO authenticated
-USING (bucket_id = 'productos' AND public.is_admin_or_operator())
-WITH CHECK (bucket_id = 'productos' AND public.is_admin_or_operator());
-
-DROP POLICY IF EXISTS "productos_delete_admin" ON storage.objects;
-CREATE POLICY "productos_delete_admin" ON storage.objects
-FOR DELETE TO authenticated
-USING (bucket_id = 'productos' AND public.is_admin());
+UPDATE storage.buckets
+SET public = true, file_size_limit = NULL, allowed_mime_types = NULL
+WHERE id = 'productos';
 
 -- ----------------------------------------------------------------------------
 -- 6. FIX: Asegurar que el admin exista en admin_users (requerido por RLS de Storage)
@@ -152,15 +134,7 @@ WHERE email = 'kecho8a@gmail.com'
 ON CONFLICT (id) DO UPDATE SET role = 'admin', active = true;
 
 -- ----------------------------------------------------------------------------
--- 7. FIX: Configurar bucket 'productos' con settings correctos
--- file_size_limit NULL = sin límite, allowed_mime_types NULL = todos los tipos
--- ----------------------------------------------------------------------------
-UPDATE storage.buckets
-SET public = true, file_size_limit = NULL, allowed_mime_types = NULL
-WHERE id = 'productos';
-
--- ----------------------------------------------------------------------------
--- 8. FIX: Columnas faltantes en products (disponibilidad, combo_ids)
+-- 7. FIX: Columnas faltantes en products (disponibilidad, combo_ids)
 -- Sincroniza el esquema real de producción con el tipo TypeScript FoodItem
 -- Ejecutar después de 02_tienda_productos_inventario.sql
 -- ----------------------------------------------------------------------------
@@ -168,7 +142,7 @@ ALTER TABLE public.products ADD COLUMN IF NOT EXISTS disponibilidad TEXT NOT NUL
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS combo_ids TEXT[] DEFAULT ARRAY[]::TEXT[];
 
 -- ----------------------------------------------------------------------------
--- 9. FIX: Migrar IDs no-UUID de products a UUIDs válidos
+-- 8. FIX: Migrar IDs no-UUID de products a UUIDs válidos
 -- Los IDs tipo 'p1_012', 'prod_0071' rompen los UPDATE/DELETE en Supabase.
 -- Este script genera UUIDs nuevos, actualiza todas las FK y reemplaza el PK.
 -- SCRIPT IDEMPOTENTE: seguro de ejecutar múltiples veces.
@@ -225,16 +199,21 @@ BEGIN
   WHERE pr.product_id::text = m.old_id;
 
   -- Actualizar FK: reward_catalog.product_id (sin constraint formal)
-  UPDATE public.reward_catalog rc
-  SET product_id = m.new_id
-  FROM _id_migration m
-  WHERE rc.product_id::text = m.old_id;
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='reward_catalog') THEN
+    UPDATE public.reward_catalog rc
+    SET product_id = m.new_id
+    FROM _id_migration m
+    WHERE rc.product_id::text = m.old_id;
+  END IF;
 
   -- Actualizar FK: loyalty_rewards.product_id (sin constraint formal)
-  UPDATE public.loyalty_rewards lr
-  SET product_id = m.new_id
-  FROM _id_migration m
-  WHERE lr.product_id::text = m.old_id;
+  -- Solo si la tabla existe (se crea en archivo 15)
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='loyalty_rewards') THEN
+    UPDATE public.loyalty_rewards lr
+    SET product_id = m.new_id
+    FROM _id_migration m
+    WHERE lr.product_id::text = m.old_id;
+  END IF;
 
   -- Ahora actualizar el PK de products
   -- PostgreSQL permite UPDATE de PK si no hay FK circulares activos

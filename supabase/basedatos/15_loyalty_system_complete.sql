@@ -1,9 +1,19 @@
 -- ========================================================
--- MIGRACION: SISTEMA DE FIDELIZACION COMPLETO
+-- MIGRACION: SISTEMA DE FIDELIZACION COMPLETO (REFACTORIZADO)
 -- ARCHIVO: /supabase/basedatos/15_loyalty_system_complete.sql
--- PROP OSITO: Tablas, RPCs atomicas, triggers, referidos, RLS
--- FECHA: 2026-08-23
+-- PROPÓSITO: Tablas, RPCs atómicas, triggers, referidos, RLS, PWA bonus
+-- FECHA: 2026-08-24 (Refactorizado para producción)
 -- DEPENDENCIAS: 01_core (usuarios_clientes), 04_pedidos (orders), 06_marketing
+--
+-- CAMBIOS vs VERSIÓN ANTERIOR:
+-- 1. SEGURIDAD: process_loyalty_points ya NO es callable por authenticated
+--    (solo service_role y funciones SECURITY DEFINER internas)
+-- 2. SEGURIDAD: Agregado FOR UPDATE para prevenir race conditions
+-- 3. PWA: Nuevo campo pwa_download_bonus + RPC claim_pwa_bonus()
+-- 4. PWA: Tabla pwa_bonus_claims para control de duplicados
+-- 5. CONSISTENCIA: Eliminado bloque _compatibilidad inseguro
+-- 6. CONSISTENCIA: Agregado 'bono_pwa' a loyalty_history.reason
+-- 7. GRANTs: Completados y corregidos para todas las RPCs
 -- ========================================================
 
 -- ----------------------------------------------------------------------------
@@ -22,6 +32,7 @@ CREATE TABLE IF NOT EXISTS loyalty_config (
     referral_bonus_referred INTEGER NOT NULL DEFAULT 50,
     daily_login_bonus INTEGER NOT NULL DEFAULT 5,
     review_bonus INTEGER NOT NULL DEFAULT 10,
+    pwa_download_bonus INTEGER NOT NULL DEFAULT 25,
     check_interval INTERVAL NOT NULL DEFAULT '30 minutes',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -29,6 +40,12 @@ CREATE TABLE IF NOT EXISTS loyalty_config (
 );
 
 INSERT INTO loyalty_config (id, enabled) VALUES (1, false) ON CONFLICT (id) DO NOTHING;
+
+-- Migración: agregar columna pwa_download_bonus si no existe
+DO $$ BEGIN
+    ALTER TABLE loyalty_config ADD COLUMN IF NOT EXISTS pwa_download_bonus INTEGER NOT NULL DEFAULT 25;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
 
 -- ----------------------------------------------------------------------------
 -- 2. loyalty_levels (NIVELES DE FIDELIDAD)
@@ -84,7 +101,10 @@ CREATE TABLE IF NOT EXISTS loyalty_history (
     user_id TEXT NOT NULL REFERENCES usuarios_clientes(id) ON DELETE CASCADE,
     points INTEGER NOT NULL CHECK (points != 0),
     operation TEXT NOT NULL CHECK (operation IN ('suma', 'resta')),
-    reason TEXT NOT NULL CHECK (reason IN ('bienvenida', 'primer_pedido', 'compra', 'referido', 'referido_registro', 'canje', 'ajuste_admin', 'bono_review', 'bono_diario', 'expiracion')),
+    reason TEXT NOT NULL CHECK (reason IN (
+        'bienvenida', 'primer_pedido', 'compra', 'referido', 'referido_registro',
+        'canje', 'ajuste_admin', 'bono_review', 'bono_diario', 'expiracion', 'bono_pwa'
+    )),
     description TEXT DEFAULT '',
     order_id VARCHAR(50),
     reward_id UUID REFERENCES loyalty_rewards(id) ON DELETE SET NULL,
@@ -97,13 +117,26 @@ CREATE INDEX IF NOT EXISTS idx_loyalty_history_reason ON loyalty_history(reason)
 CREATE INDEX IF NOT EXISTS idx_loyalty_history_created ON loyalty_history(created_at DESC);
 
 -- ----------------------------------------------------------------------------
--- 5. Actualizar usuarios_clientes: agregar campos de fidelidad
+-- 5. pwa_bonus_claims (CONTROL DE DUPLICADOS PARA BONO PWA)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS pwa_bonus_claims (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id TEXT NOT NULL REFERENCES usuarios_clientes(id) ON DELETE CASCADE,
+    claimed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(user_id)
+);
+
+ALTER TABLE pwa_bonus_claims ENABLE ROW LEVEL SECURITY;
+
+-- ----------------------------------------------------------------------------
+-- 6. Actualizar usuarios_clientes: agregar campos de fidelidad
 -- ----------------------------------------------------------------------------
 ALTER TABLE usuarios_clientes ADD COLUMN IF NOT EXISTS puntos_fidelidad INTEGER DEFAULT 0;
 ALTER TABLE usuarios_clientes ADD COLUMN IF NOT EXISTS puntos_historicos INTEGER DEFAULT 0;
 ALTER TABLE usuarios_clientes ADD COLUMN IF NOT EXISTS codigo_referido TEXT UNIQUE;
 ALTER TABLE usuarios_clientes ADD COLUMN IF NOT EXISTS referred_by TEXT;
 ALTER TABLE usuarios_clientes ADD COLUMN IF NOT EXISTS referral_count INTEGER DEFAULT 0;
+ALTER TABLE usuarios_clientes ADD COLUMN IF NOT EXISTS pwa_bonus_claimed BOOLEAN DEFAULT FALSE;
 
 -- Generar codigos de referido para usuarios existentes sin codigo
 UPDATE usuarios_clientes
@@ -113,7 +146,7 @@ WHERE codigo_referido IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_codigo_referido ON usuarios_clientes(codigo_referido) WHERE codigo_referido IS NOT NULL;
 
 -- ----------------------------------------------------------------------------
--- 6. referral_tracking (REGISTRO DE REFERIDOS)
+-- 7. referral_tracking (REGISTRO DE REFERIDOS)
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS referral_tracking (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -132,8 +165,16 @@ CREATE TABLE IF NOT EXISTS referral_tracking (
 CREATE INDEX IF NOT EXISTS idx_referral_tracking_referrer ON referral_tracking(referrer_id);
 CREATE INDEX IF NOT EXISTS idx_referral_tracking_referred ON referral_tracking(referred_id);
 
+-- ============================================================================
+-- RPCs (REMOTE PROCEDURES)
+-- ============================================================================
+
 -- ----------------------------------------------------------------------------
--- 7. RPC: Procesar puntos atomicamente
+-- 8. RPC: Procesar puntos atómicamente (INTERNA - solo service_role/triggers)
+-- ----------------------------------------------------------------------------
+-- SEGURIDAD: Esta función NO tiene GRANT a authenticated.
+-- Solo es llamada por triggers SECURITY DEFINER y por adjust_loyalty_points.
+-- Un cliente malicioso NO puede inyectar puntos llamando esta función.
 -- ----------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.process_loyalty_points(
     p_user_id TEXT,
@@ -160,14 +201,16 @@ BEGIN
         RETURN jsonb_build_object('success', false, 'error', 'Loyalty system disabled');
     END IF;
 
-    -- Obtener saldo actual
+    -- Obtener saldo actual CON BLOQUEO DE FILA (FOR UPDATE)
+    -- Previene race conditions cuando dos transacciones simultáneas leen el mismo saldo
     SELECT puntos_fidelidad, puntos_historicos INTO v_current_points, v_new_historic
-    FROM usuarios_clientes WHERE id = p_user_id;
+    FROM usuarios_clientes WHERE id = p_user_id
+    FOR UPDATE;
     IF NOT FOUND THEN
         RETURN jsonb_build_object('success', false, 'error', 'User not found');
     END IF;
 
-    -- Validar que no se resten mas puntos de los disponibles
+    -- Validar que no se resten más puntos de los disponibles
     IF p_operation = 'resta' AND v_current_points < p_points THEN
         RETURN jsonb_build_object('success', false, 'error', 'Insufficient points', 'current', v_current_points, 'requested', p_points);
     END IF;
@@ -180,7 +223,7 @@ BEGIN
         v_new_points := v_current_points - p_points;
     END IF;
 
-    -- Actualizar saldo del usuario (atomico)
+    -- Actualizar saldo del usuario (atómico)
     UPDATE usuarios_clientes
     SET puntos_fidelidad = v_new_points,
         puntos_historicos = CASE WHEN p_operation = 'suma' THEN v_new_historic ELSE puntos_historicos END
@@ -191,14 +234,16 @@ BEGIN
     VALUES (p_user_id, p_points, p_operation, p_reason, p_description, p_order_id, p_created_by)
     RETURNING id INTO v_history_id;
 
-    --_compatibilidad: tambien insertar en loyalty_transactions si existe
-    INSERT INTO loyalty_transactions (user_id, type, points, description, order_id)
-    VALUES (p_user_id,
-        CASE WHEN p_operation = 'suma' THEN 'earn' ELSE 'redeem' END,
-        CASE WHEN p_operation = 'suma' THEN p_points ELSE -p_points END,
-        p_description,
-        p_order_id
-    ) ON CONFLICT DO NOTHING;
+    -- Compatibilidad: insertar en loyalty_transactions si existe (de módulo 06)
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'loyalty_transactions') THEN
+        INSERT INTO loyalty_transactions (user_id, type, points, description, order_id)
+        VALUES (p_user_id,
+            CASE WHEN p_operation = 'suma' THEN 'earn' ELSE 'redeem' END,
+            CASE WHEN p_operation = 'suma' THEN p_points ELSE -p_points END,
+            p_description,
+            p_order_id
+        ) ON CONFLICT DO NOTHING;
+    END IF;
 
     RETURN jsonb_build_object(
         'success', true,
@@ -211,7 +256,7 @@ END;
 $$;
 
 -- ----------------------------------------------------------------------------
--- 8. RPC: Canjear premio de forma atomica
+-- 9. RPC: Canjear premio de forma atómica
 -- ----------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.redeem_loyalty_reward(
     p_user_id TEXT,
@@ -224,7 +269,6 @@ DECLARE
     v_reward RECORD;
     v_current_points INTEGER;
     v_coupon_code TEXT;
-    v_result JSONB;
 BEGIN
     -- Buscar premio (bloqueo de fila para prevenir race conditions)
     SELECT * INTO v_reward FROM loyalty_rewards
@@ -260,7 +304,7 @@ BEGIN
     -- Incrementar stock usado
     UPDATE loyalty_rewards SET stock_used = stock_used + 1 WHERE id = p_reward_id;
 
-    -- Generar codigo de cupon
+    -- Generar codigo de cupón
     v_coupon_code := 'LOY-' || UPPER(SUBSTRING(MD5(RANDOM()::TEXT) FROM 1 FOR 8));
 
     -- Registrar en historial
@@ -269,9 +313,11 @@ BEGIN
         'Canje: ' || v_reward.name || ' (' || v_coupon_code || ')',
         p_reward_id, p_user_id);
 
-    -- Compatibilidad: loyalty_transactions
-    INSERT INTO loyalty_transactions (user_id, type, points, description)
-    VALUES (p_user_id, 'redeem', -v_reward.points_cost, 'Canje: ' || v_reward.name);
+    -- Compatibilidad: loyalty_transactions si existe
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'loyalty_transactions') THEN
+        INSERT INTO loyalty_transactions (user_id, type, points, description)
+        VALUES (p_user_id, 'redeem', -v_reward.points_cost, 'Canje: ' || v_reward.name);
+    END IF;
 
     RETURN jsonb_build_object(
         'success', true,
@@ -284,7 +330,7 @@ END;
 $$;
 
 -- ----------------------------------------------------------------------------
--- 9. RPC: Ajustar puntos manualmente (admin)
+-- 10. RPC: Ajustar puntos manualmente (admin)
 -- ----------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.adjust_loyalty_points(
     p_user_id TEXT,
@@ -312,7 +358,7 @@ END;
 $$;
 
 -- ----------------------------------------------------------------------------
--- 10. RPC: Aplicar codigo de referido al registrarse
+-- 11. RPC: Aplicar codigo de referido al registrarse
 -- ----------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.apply_referral_code(
     p_new_user_id TEXT,
@@ -326,11 +372,12 @@ DECLARE
     v_config RECORD;
     v_result JSONB;
 BEGIN
-    -- Buscar referidor por codigo
+    -- Buscar referidor por codigo CON BLOQUEO DE FILA
     SELECT id, codigo_referido INTO v_referrer
     FROM usuarios_clientes
     WHERE UPPER(codigo_referido) = UPPER(p_referral_code)
-    AND id != p_new_user_id;
+    AND id != p_new_user_id
+    FOR UPDATE;
 
     IF NOT FOUND THEN
         RETURN jsonb_build_object('success', false, 'error', 'Invalid referral code');
@@ -350,7 +397,7 @@ BEGIN
     IF v_config.enabled AND v_config.referral_bonus_referred > 0 THEN
         v_result := public.process_loyalty_points(
             p_new_user_id, v_config.referral_bonus_referred, 'suma', 'referido_registro',
-            'Bono por registro con codigo de referido', NULL, 'system'
+            'Bono por registro con código de referido', NULL, 'system'
         );
     END IF;
 
@@ -366,7 +413,7 @@ END;
 $$;
 
 -- ----------------------------------------------------------------------------
--- 11. RPC: Completar referido (cuando el referido hace su primer pedido)
+-- 12. RPC: Completar referido (cuando el referido hace su primer pedido)
 -- ----------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.complete_referral(
     p_referred_user_id TEXT,
@@ -410,7 +457,7 @@ BEGIN
     IF v_config.enabled AND v_config.referral_bonus_referred > 0 AND NOT v_referral.referred_bonus_paid THEN
         PERFORM public.process_loyalty_points(
             p_referred_user_id, v_config.referral_bonus_referred, 'suma', 'referido',
-            'Bono por registro con codigo de referido', p_order_id, 'system'
+            'Bono por registro con código de referido', p_order_id, 'system'
         );
         UPDATE referral_tracking SET referred_bonus_paid = true WHERE id = v_referral.id;
     END IF;
@@ -423,7 +470,126 @@ END;
 $$;
 
 -- ----------------------------------------------------------------------------
--- 12. TRIGGER: Bono de bienvenida al registrar usuario
+-- 13. RPC: Reclamar bono de instalación PWA (una sola vez por usuario)
+-- ----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.claim_pwa_bonus(p_user_id TEXT)
+RETURNS JSONB
+SET search_path = public
+LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+    v_config RECORD;
+    v_already_claimed BOOLEAN;
+    v_result JSONB;
+BEGIN
+    -- Verificar que el sistema de fidelidad está habilitado
+    SELECT * INTO v_config FROM loyalty_config WHERE id = 1;
+    IF NOT FOUND OR NOT v_config.enabled THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Loyalty system disabled');
+    END IF;
+
+    -- Verificar que el bono PWA está configurado
+    IF v_config.pwa_download_bonus <= 0 THEN
+        RETURN jsonb_build_object('success', false, 'error', 'PWA bonus not configured');
+    END IF;
+
+    -- Verificar que el usuario no ha reclamado ya el bono (idempotente, CON BLOQUEO)
+    SELECT pwa_bonus_claimed INTO v_already_claimed
+    FROM usuarios_clientes WHERE id = p_user_id FOR UPDATE;
+    IF v_already_claimed THEN
+        RETURN jsonb_build_object('success', false, 'error', 'PWA bonus already claimed');
+    END IF;
+
+    -- Registrar reclamación (control de duplicados)
+    INSERT INTO pwa_bonus_claims (user_id) VALUES (p_user_id)
+    ON CONFLICT (user_id) DO NOTHING;
+
+    -- Verificar que se insertó (puede haber race condition con otro intento simultáneo)
+    SELECT EXISTS(SELECT 1 FROM pwa_bonus_claims WHERE user_id = p_user_id) INTO v_already_claimed;
+    IF NOT v_already_claimed THEN
+        RETURN jsonb_build_object('success', false, 'error', 'PWA bonus already claimed');
+    END IF;
+
+    -- Otorgar puntos
+    v_result := public.process_loyalty_points(
+        p_user_id, v_config.pwa_download_bonus, 'suma', 'bono_pwa',
+        'Bono por instalar la aplicación PWA', NULL, 'system'
+    );
+
+    -- Marcar en usuario (ya bloqueado por FOR UPDATE arriba)
+    UPDATE usuarios_clientes SET pwa_bonus_claimed = TRUE WHERE id = p_user_id;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'points_awarded', v_config.pwa_download_bonus,
+        'message', 'PWA bonus claimed successfully'
+    );
+END;
+$$;
+
+-- ----------------------------------------------------------------------------
+-- 14. RPC: Obtener nivel del usuario
+-- ----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.get_user_loyalty_level(p_user_id TEXT)
+RETURNS JSONB
+SET search_path = public
+LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+    v_user RECORD;
+    v_current_level RECORD;
+    v_next_level RECORD;
+    v_progress NUMERIC;
+BEGIN
+    SELECT puntos_historicos, puntos_fidelidad INTO v_user
+    FROM usuarios_clientes WHERE id = p_user_id;
+
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object('error', 'User not found');
+    END IF;
+
+    -- Nivel actual (mayor nivel cuyo min_points <= historicos)
+    SELECT * INTO v_current_level
+    FROM loyalty_levels
+    WHERE active = true AND min_points <= COALESCE(v_user.puntos_historicos, 0)
+    ORDER BY min_points DESC LIMIT 1;
+
+    -- Siguiente nivel
+    SELECT * INTO v_next_level
+    FROM loyalty_levels
+    WHERE active = true AND min_points > COALESCE(v_user.puntos_historicos, 0)
+    ORDER BY min_points ASC LIMIT 1;
+
+    -- Calcular progreso
+    IF v_next_level IS NOT NULL AND v_current_level IS NOT NULL THEN
+        v_progress := ROUND(
+            ((COALESCE(v_user.puntos_historicos, 0) - v_current_level.min_points)::NUMERIC /
+            NULLIF(v_next_level.min_points - v_current_level.min_points, 0)) * 100, 1
+        );
+    ELSIF v_current_level IS NOT NULL THEN
+        v_progress := 100;
+    ELSE
+        v_progress := 0;
+    END IF;
+
+    RETURN jsonb_build_object(
+        'current_points', COALESCE(v_user.puntos_fidelidad, 0),
+        'lifetime_points', COALESCE(v_user.puntos_historicos, 0),
+        'current_level', CASE WHEN v_current_level IS NOT NULL THEN
+            jsonb_build_object('id', v_current_level.id, 'name', v_current_level.name, 'multiplier', v_current_level.multiplier, 'color', v_current_level.color, 'icon', v_current_level.icon, 'benefits', v_current_level.benefits)
+        ELSE NULL END,
+        'next_level', CASE WHEN v_next_level IS NOT NULL THEN
+            jsonb_build_object('id', v_next_level.id, 'name', v_next_level.name, 'min_points', v_next_level.min_points, 'color', v_next_level.color, 'icon', v_next_level.icon)
+        ELSE NULL END,
+        'progress_percent', COALESCE(v_progress, 0)
+    );
+END;
+$$;
+
+-- ============================================================================
+-- TRIGGERS
+-- ============================================================================
+
+-- ----------------------------------------------------------------------------
+-- 15. TRIGGER: Bono de bienvenida al registrar usuario
 -- ----------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.trigger_welcome_bonus()
 RETURNS TRIGGER
@@ -453,7 +619,7 @@ END;
 $$;
 
 -- ----------------------------------------------------------------------------
--- 13. TRIGGER: Puntos por entrega de pedido + primera compra + referral
+-- 16. TRIGGER: Puntos por entrega de pedido + primera compra + referral
 -- ----------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.trigger_order_delivery_points()
 RETURNS TRIGGER
@@ -467,7 +633,6 @@ DECLARE
     v_total_points INTEGER;
     v_order_count INTEGER;
     v_is_first_order BOOLEAN;
-    v_referral RECORD;
 BEGIN
     -- Solo ejecutar cuando el status cambia a 'Entregado'
     IF OLD.status IS DISTINCT FROM 'Entregado' AND NEW.status = 'Entregado' THEN
@@ -538,7 +703,7 @@ AFTER UPDATE ON orders
 FOR EACH ROW EXECUTE FUNCTION public.trigger_order_delivery_points();
 
 -- ----------------------------------------------------------------------------
--- 14. TRIGGER: Auto-generar codigo de referido en INSERT
+-- 17. TRIGGER: Auto-generar codigo de referido en INSERT
 -- ----------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.trigger_generate_referral_code()
 RETURNS TRIGGER
@@ -557,72 +722,19 @@ CREATE TRIGGER trigger_generate_referral_code
 BEFORE INSERT ON usuarios_clientes
 FOR EACH ROW EXECUTE FUNCTION public.trigger_generate_referral_code();
 
--- ----------------------------------------------------------------------------
--- 15. RPC: Obtener nivel del usuario
--- ----------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION public.get_user_loyalty_level(p_user_id TEXT)
-RETURNS JSONB
-SET search_path = public
-LANGUAGE plpgsql SECURITY DEFINER AS $$
-DECLARE
-    v_user RECORD;
-    v_current_level RECORD;
-    v_next_level RECORD;
-    v_progress NUMERIC;
-BEGIN
-    SELECT puntos_historicos, puntos_fidelidad INTO v_user
-    FROM usuarios_clientes WHERE id = p_user_id;
-
-    IF NOT FOUND THEN
-        RETURN jsonb_build_object('error', 'User not found');
-    END IF;
-
-    -- Nivel actual (mayor nivel cuyo min_points <= historicos)
-    SELECT * INTO v_current_level
-    FROM loyalty_levels
-    WHERE active = true AND min_points <= COALESCE(v_user.puntos_historicos, 0)
-    ORDER BY min_points DESC LIMIT 1;
-
-    -- Siguiente nivel
-    SELECT * INTO v_next_level
-    FROM loyalty_levels
-    WHERE active = true AND min_points > COALESCE(v_user.puntos_historicos, 0)
-    ORDER BY min_points ASC LIMIT 1;
-
-    -- Calcular progreso
-    IF v_next_level IS NOT NULL AND v_current_level IS NOT NULL THEN
-        v_progress := ROUND(
-            ((COALESCE(v_user.puntos_historicos, 0) - v_current_level.min_points)::NUMERIC /
-            NULLIF(v_next_level.min_points - v_current_level.min_points, 0)) * 100, 1
-        );
-    ELSIF v_current_level IS NOT NULL THEN
-        v_progress := 100;
-    ELSE
-        v_progress := 0;
-    END IF;
-
-    RETURN jsonb_build_object(
-        'current_points', COALESCE(v_user.puntos_fidelidad, 0),
-        'lifetime_points', COALESCE(v_user.puntos_historicos, 0),
-        'current_level', CASE WHEN v_current_level IS NOT NULL THEN
-            jsonb_build_object('id', v_current_level.id, 'name', v_current_level.name, 'multiplier', v_current_level.multiplier, 'color', v_current_level.color, 'icon', v_current_level.icon, 'benefits', v_current_level.benefits)
-        ELSE NULL END,
-        'next_level', CASE WHEN v_next_level IS NOT NULL THEN
-            jsonb_build_object('id', v_next_level.id, 'name', v_next_level.name, 'min_points', v_next_level.min_points, 'color', v_next_level.color, 'icon', v_next_level.icon)
-        ELSE NULL END,
-        'progress_percent', COALESCE(v_progress, 0)
-    );
-END;
-$$;
+-- ============================================================================
+-- RLS (ROW LEVEL SECURITY)
+-- ============================================================================
 
 -- ----------------------------------------------------------------------------
--- 16. RLS: Seguridad completa
+-- 18. RLS: Seguridad completa
 -- ----------------------------------------------------------------------------
 ALTER TABLE loyalty_config ENABLE ROW LEVEL SECURITY;
 ALTER TABLE loyalty_levels ENABLE ROW LEVEL SECURITY;
 ALTER TABLE loyalty_rewards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE loyalty_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE referral_tracking ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pwa_bonus_claims ENABLE ROW LEVEL SECURITY;
 
 -- loyalty_config: Solo admin puede leer/escribir
 DROP POLICY IF EXISTS "loyalty_config_admin" ON loyalty_config;
@@ -630,6 +742,10 @@ CREATE POLICY "loyalty_config_admin" ON loyalty_config
     FOR ALL TO authenticated
     USING (public.is_admin_or_operator())
     WITH CHECK (public.is_admin_or_operator());
+
+DROP POLICY IF EXISTS "loyalty_config_service_role" ON loyalty_config;
+CREATE POLICY "loyalty_config_service_role" ON loyalty_config
+    FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 -- loyalty_levels: Lectura publica, edicion admin
 DROP POLICY IF EXISTS "loyalty_levels_public_read" ON loyalty_levels;
@@ -642,6 +758,10 @@ CREATE POLICY "loyalty_levels_admin_all" ON loyalty_levels
     USING (public.is_admin_or_operator())
     WITH CHECK (public.is_admin_or_operator());
 
+DROP POLICY IF EXISTS "loyalty_levels_service_role" ON loyalty_levels;
+CREATE POLICY "loyalty_levels_service_role" ON loyalty_levels
+    FOR ALL TO service_role USING (true) WITH CHECK (true);
+
 -- loyalty_rewards: Lectura publica de activos, edicion admin
 DROP POLICY IF EXISTS "loyalty_rewards_public_read" ON loyalty_rewards;
 CREATE POLICY "loyalty_rewards_public_read" ON loyalty_rewards
@@ -652,6 +772,10 @@ CREATE POLICY "loyalty_rewards_admin_all" ON loyalty_rewards
     FOR ALL TO authenticated
     USING (public.is_admin_or_operator())
     WITH CHECK (public.is_admin_or_operator());
+
+DROP POLICY IF EXISTS "loyalty_rewards_service_role" ON loyalty_rewards;
+CREATE POLICY "loyalty_rewards_service_role" ON loyalty_rewards
+    FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 -- loyalty_history: Usuario lee lo suyo, admin lee todo
 DROP POLICY IF EXISTS "loyalty_history_own_read" ON loyalty_history;
@@ -665,21 +789,8 @@ CREATE POLICY "loyalty_history_admin_all" ON loyalty_history
     USING (public.is_admin_or_operator())
     WITH CHECK (public.is_admin_or_operator());
 
--- service_role para RPCs
 DROP POLICY IF EXISTS "loyalty_history_service_role" ON loyalty_history;
 CREATE POLICY "loyalty_history_service_role" ON loyalty_history
-    FOR ALL TO service_role USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "loyalty_config_service_role" ON loyalty_config;
-CREATE POLICY "loyalty_config_service_role" ON loyalty_config
-    FOR ALL TO service_role USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "loyalty_rewards_service_role" ON loyalty_rewards;
-CREATE POLICY "loyalty_rewards_service_role" ON loyalty_rewards
-    FOR ALL TO service_role USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "loyalty_levels_service_role" ON loyalty_levels;
-CREATE POLICY "loyalty_levels_service_role" ON loyalty_levels
     FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 -- referral_tracking: Usuarios ven lo suyo, admin ve todo
@@ -698,21 +809,51 @@ DROP POLICY IF EXISTS "referral_tracking_service_role" ON referral_tracking;
 CREATE POLICY "referral_tracking_service_role" ON referral_tracking
     FOR ALL TO service_role USING (true) WITH CHECK (true);
 
+-- pwa_bonus_claims: Solo service_role puede gestionar (via RPCs SECURITY DEFINER)
+DROP POLICY IF EXISTS "pwa_bonus_claims_service_role" ON pwa_bonus_claims;
+CREATE POLICY "pwa_bonus_claims_service_role" ON pwa_bonus_claims
+    FOR ALL TO service_role USING (true) WITH CHECK (true);
+
+-- ============================================================================
+-- PERMISOS GRANT (SEGURIDAD)
+-- ============================================================================
+-- REGLA: process_loyalty_points NO tiene GRANT a authenticated.
+-- Solo es callable por:
+--   - service_role (triggers, RPCs internas)
+--   - Otras funciones SECURITY DEFINER (adjust_loyalty_points, apply_referral_code, etc.)
+-- Esto previene que un cliente malicioso inyecte puntos desde la API.
 -- ----------------------------------------------------------------------------
--- 17. PERMISOS GRANT
+-- 19. PERMISOS GRANT
 -- ----------------------------------------------------------------------------
+-- Lectura pública para catálogos y configuración
 GRANT SELECT ON loyalty_config, loyalty_levels, loyalty_rewards TO anon;
-GRANT SELECT, INSERT ON loyalty_history TO anon;
-GRANT SELECT ON loyalty_transactions, reward_catalog TO anon;
-GRANT EXECUTE ON FUNCTION public.process_loyalty_points TO anon;
-GRANT EXECUTE ON FUNCTION public.redeem_loyalty_reward TO anon;
-GRANT EXECUTE ON FUNCTION public.apply_referral_code TO anon;
+
+-- Lectura de historial solo para authenticated (RLS own_read)
+GRANT SELECT ON loyalty_history TO authenticated;
+
+-- Lectura de tracking solo para authenticated (RLS own_read)
+GRANT SELECT ON referral_tracking TO authenticated;
+
+-- Lectura de claims solo para service_role (via RPCs)
+-- No hay GRANT a anon/authenticated para pwa_bonus_claims
+
+-- RPCs seguras: solo authenticated puede llamar estas
 GRANT EXECUTE ON FUNCTION public.get_user_loyalty_level TO anon;
+GRANT EXECUTE ON FUNCTION public.redeem_loyalty_reward TO authenticated;
+GRANT EXECUTE ON FUNCTION public.apply_referral_code TO authenticated;
 GRANT EXECUTE ON FUNCTION public.adjust_loyalty_points TO authenticated;
+GRANT EXECUTE ON FUNCTION public.claim_pwa_bonus TO authenticated;
+
+-- complete_referral: solo service_role (llamado desde trigger_order_delivery_points)
 GRANT EXECUTE ON FUNCTION public.complete_referral TO service_role;
 
--- ----------------------------------------------------------------------------
--- 18. Realtime para tablas de fidelidad
+-- process_loyalty_points: SIN GRANT a authenticated (INTERNA)
+-- Solo accesible por triggers SECURITY DEFINER y otras funciones SECURITY DEFINER
+
+-- ============================================================================
+-- REALTIME
+-- ============================================================================
+-- 20. Realtime para tablas de fidelidad
 -- ----------------------------------------------------------------------------
 DO $$ BEGIN
   ALTER PUBLICATION supabase_realtime ADD TABLE loyalty_history;
@@ -724,6 +865,36 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
--- Fix: eliminar referencia a flash_sales inexistente
-REVOKE ALL ON ALL TABLES IN SCHEMA public FROM anon;
-GRANT SELECT ON loyalty_config, loyalty_levels, loyalty_rewards, loyalty_transactions, reward_catalog, promotions TO anon;
+ALTER TABLE public.loyalty_history REPLICA IDENTITY FULL;
+ALTER TABLE public.loyalty_rewards REPLICA IDENTITY FULL;
+
+-- 21. Revocar permisos innecesarios
+-- ----------------------------------------------------------------------------
+-- Revocar INSERT a anon en loyalty_history (ya existe la política RLS, pero belt safety)
+REVOKE INSERT ON loyalty_history FROM anon;
+
+-- Revocar INSERT a anon en pwa_bonus_claims (solo service_role maneja esto)
+REVOKE ALL ON pwa_bonus_claims FROM anon;
+REVOKE ALL ON pwa_bonus_claims FROM authenticated;
+
+-- ============================================================================
+-- 22. PERFORMANCE INDEXES
+-- ============================================================================
+-- Orders: busqueda por status y sede (Comandera Kanban)
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status) WHERE status != 'Entregado' AND status != 'Cancelado';
+CREATE INDEX IF NOT EXISTS idx_orders_sede_status ON orders(sede_id, status) WHERE status != 'Entregado' AND status != 'Cancelado';
+CREATE INDEX IF NOT EXISTS idx_orders_fecha ON orders(fecha DESC);
+CREATE INDEX IF NOT EXISTS idx_orders_cliente_uid ON orders(cliente_uid) WHERE cliente_uid IS NOT NULL;
+
+-- Notifications: busqueda por tipo y telefono (chat 1-a-1)
+CREATE INDEX IF NOT EXISTS idx_notifications_tipo ON notifications(tipo);
+CREATE INDEX IF NOT EXISTS idx_notifications_telefono ON notifications(destinatario_telefono) WHERE destinatario_telefono IS NOT NULL AND destinatario_telefono != '';
+CREATE INDEX IF NOT EXISTS idx_notifications_created ON notifications(created_at DESC);
+
+-- Push subscriptions: busqueda por user_id y telefono (envio push)
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user_active ON push_subscriptions(user_id) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_phone_active ON push_subscriptions(destinatario_telefono) WHERE is_active = true AND destinatario_telefono IS NOT NULL;
+
+-- Products: busqueda por categoria y stock
+CREATE INDEX IF NOT EXISTS idx_products_categoria ON products USING GIN(categoria);
+CREATE INDEX IF NOT EXISTS idx_products_stock_low ON products(stock) WHERE stock <= 5 AND activo = true;

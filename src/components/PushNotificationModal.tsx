@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useApp } from '../store/AppContext';
 import { Bell, X } from 'lucide-react';
 
-// Función auxiliar para convertir la llave VAPID de Base64 a Uint8Array
+// Funcion auxiliar para convertir la llave VAPID de Base64 a Uint8Array
 const urlBase64ToUint8Array = (base64String: string) => {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -13,6 +13,14 @@ const urlBase64ToUint8Array = (base64String: string) => {
     outputArray[i] = rawData.charCodeAt(i);
   }
   return outputArray;
+};
+
+// Funcion para detectar plataforma desde user agent
+const detectPlatform = (): string => {
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/.test(ua)) return 'ios';
+  if (/Android/.test(ua)) return 'android';
+  return 'desktop';
 };
 
 export const PushNotificationModal: React.FC = () => {
@@ -32,17 +40,65 @@ export const PushNotificationModal: React.FC = () => {
     const currentPermission = Notification.permission as 'default' | 'granted' | 'denied';
     setPermissionType(currentPermission);
 
-    // If permission has already been decided or user previously dismissed the custom modal
-    const dismissed = localStorage.getItem('trv_push_dismissed') === 'true';
+    // Si ya tiene permiso concedido, verificar y renovar suscripcion periodicamente
+    if (currentPermission === 'granted') {
+      renewSubscription();
+    }
 
+    // Si el permiso es default y el usuario no descarto el modal, mostrarlo
+    const dismissed = localStorage.getItem('trv_push_dismissed') === 'true';
     if (currentPermission === 'default' && !dismissed) {
-      // Show the beautifully animated modal after a small delay (e.g. 1.2 seconds) to let page content load
       const timer = setTimeout(() => {
         setIsOpen(true);
       }, 1200);
       return () => clearTimeout(timer);
     }
   }, []);
+
+  // Cuando el usuario se autentica, vincular la suscripcion existente a su cuenta
+  useEffect(() => {
+    if (!currentUser?.id || !navigator.serviceWorker) return;
+    if (Notification.permission !== 'granted') return;
+
+    // Pequeño delay para asegurar que el SW esta listo
+    const timer = setTimeout(() => {
+      renewSubscription();
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [currentUser?.id]);
+
+  // Renovar suscripcion existente al cargar la pagina (maneja expiraciones del SW)
+  const renewSubscription = async () => {
+    try {
+      if (!navigator.serviceWorker) return;
+      const registration = await navigator.serviceWorker.ready;
+      const existingSub = await registration.pushManager.getSubscription();
+      if (!existingSub) return;
+
+      // La suscripcion existe en el SW pero puede no estar registrada en BD
+      // Re-sincronizar con el servidor
+      const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+      if (!vapidKey) return;
+
+      const anonymousId = localStorage.getItem('trv_anonymous_id') || crypto.randomUUID();
+      localStorage.setItem('trv_anonymous_id', anonymousId);
+
+      await fetch('/api/register-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subscription: existingSub.toJSON(),
+          anonymous_id: anonymousId,
+          phone: currentUser?.telefono || '',
+          user_id: currentUser?.id || null,
+          platform: detectPlatform(),
+          user_agent: navigator.userAgent
+        })
+      });
+    } catch (err) {
+      console.warn('[PushRenew] Subscription renewal check failed:', err);
+    }
+  };
 
   const handleRequestPermission = async () => {
     if (typeof window === 'undefined' || !('Notification' in window)) return;
@@ -55,7 +111,6 @@ export const PushNotificationModal: React.FC = () => {
       if (res === 'granted') {
         // Suscribirse al Push Manager con VAPID keys
         const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-        console.warn('VAPID key exists:', !!vapidKey, 'serviceWorker exists:', !!navigator.serviceWorker);
         if (vapidKey && navigator.serviceWorker) {
           try {
             const registration = await navigator.serviceWorker.ready;
@@ -64,16 +119,11 @@ export const PushNotificationModal: React.FC = () => {
               applicationServerKey: urlBase64ToUint8Array(vapidKey)
             });
 
-            // Enviar suscripción al endpoint para guardarla en la base de datos
+            // Enviar suscripcion al endpoint para guardarla en la base de datos
             const anonymousId = localStorage.getItem('trv_anonymous_id') || crypto.randomUUID();
             localStorage.setItem('trv_anonymous_id', anonymousId);
 
-            // Detectar plataforma
-            const ua = navigator.userAgent;
-            let platform = 'desktop';
-            if (/iPhone|iPad|iPod/.test(ua)) platform = 'ios';
-            else if (/Android/.test(ua)) platform = 'android';
-            else if (/Mac|Windows|Linux/.test(ua)) platform = 'desktop';
+            const platform = detectPlatform();
 
             try {
               const response = await fetch('/api/register-subscription', {
@@ -85,7 +135,7 @@ export const PushNotificationModal: React.FC = () => {
                   phone: currentUser?.telefono || '',
                   user_id: currentUser?.id || null,
                   platform,
-                  user_agent: ua
+                  user_agent: navigator.userAgent
                 })
               });
               const result = await response.json();
@@ -103,8 +153,8 @@ export const PushNotificationModal: React.FC = () => {
 
         // Trigger a gorgeous, helpful native welcoming notification
         navigator.serviceWorker.ready.then(reg => {
-          reg.showNotification('¡Notificaciones Activas! 🔔', {
-            body: '¡Genial! Ahora recibirás alertas en tiempo real sobre tus pedidos y ofertas frescas de ' + (config.site_nombre || 'nuestra tienda') + '.',
+          reg.showNotification('Notificaciones Activas!', {
+            body: 'Ahora recibiras alertas en tiempo real sobre tus pedidos y ofertas frescas de ' + (config.site_nombre || 'nuestra tienda') + '.',
             icon: '/icon.png',
             badge: '/icon.png',
             vibrate: [200, 100, 200],

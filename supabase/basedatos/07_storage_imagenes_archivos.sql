@@ -94,7 +94,10 @@ CREATE POLICY "usuarios_select_own" ON storage.objects
 FOR SELECT TO authenticated
 USING (
     bucket_id = 'usuarios'
-    AND (storage.foldername(name))[1] = auth.uid()::text
+    AND (
+        (storage.foldername(name))[1] = auth.uid()::text
+        OR public.is_admin()
+    )
 );
 
 DROP POLICY IF EXISTS "usuarios_insert_own" ON storage.objects;

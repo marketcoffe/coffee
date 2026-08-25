@@ -1217,6 +1217,59 @@ svg {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Kitchen Display Mode - larger cards for kitchen screens */
+.kitchen-display-grid {
+  grid-template-columns: repeat(6, 1fr) !important;
+  gap: 10px;
+}
+
+.kitchen-display-grid .erp-kanban-body {
+  max-height: calc(100vh - 180px);
+  min-height: 300px;
+}
+
+.kitchen-display-grid .order-card-kitchen {
+  border-left-width: 6px;
+  padding: 12px;
+}
+
+.kitchen-display-grid .order-card-kitchen .order-number {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.kitchen-display-grid .order-card-kitchen .order-items {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.kitchen-display-grid .order-card-kitchen .order-timer {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.kitchen-display-grid .order-card-kitchen .order-action-btn {
+  padding: 10px 16px;
+  font-size: 12px;
+}
+
+@media (max-width: 1280px) {
+  .kitchen-display-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .kitchen-display-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  .kitchen-display-grid .erp-kanban-body {
+    max-height: 400px;
+  }
+}
+
 .erp-kanban-header {
   display: flex;
   align-items: center;

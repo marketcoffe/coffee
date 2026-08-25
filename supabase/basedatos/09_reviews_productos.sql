@@ -31,11 +31,11 @@ CREATE POLICY "reviews_select_public" ON product_reviews FOR SELECT USING (true)
 
 DROP POLICY IF EXISTS "reviews_insert_auth" ON product_reviews;
 CREATE POLICY "reviews_insert_auth" ON product_reviews
-    FOR INSERT TO authenticated WITH CHECK (true);
+    FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid()::text);
 
 DROP POLICY IF EXISTS "reviews_insert_anon" ON product_reviews;
 CREATE POLICY "reviews_insert_anon" ON product_reviews
-    FOR INSERT TO anon WITH CHECK (true);
+    FOR INSERT TO anon WITH CHECK (user_id IS NULL OR user_id = '');
 
 -- ----------------------------------------------------------------------------
 -- 3. PERMISOS

@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { Mesa, Order } from '../../../../types/store';
-import { Edit3, Save, X, Clock, CheckCircle, XCircle, Users, Hash, Armchair, QrCode } from 'lucide-react';
-import { MesaQR } from '../../../../components/MesaQR';
+import { Edit3, Save, X, Armchair, Plus, Trash2 } from 'lucide-react';
 
 const ESTADO_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   'Disponible': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-300' },
@@ -14,15 +13,16 @@ const ESTADO_COLORS: Record<string, { bg: string; text: string; border: string }
 const ESTADOS = ['Disponible', 'Ocupada', 'Reservada', 'Inactiva'] as const;
 
 export default function MesasSection() {
-  const { mesas, updateMesa, orders, config } = useApp();
+  const { mesas, updateMesa, addMesa, deleteMesa, orders, config } = useApp();
   const themeColor = config.theme_color || '#A4D045';
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editNombre, setEditNombre] = useState('');
   const [editEstado, setEditEstado] = useState<Mesa['estado']>('Disponible');
   const [selectedMesa, setSelectedMesa] = useState<string | null>(null);
-  const [showQR, setShowQR] = useState<string | null>(null);
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newMesaNumber, setNewMesaNumber] = useState('');
+  const [newMesaName, setNewMesaName] = useState('');
 
   const sortedMesas = useMemo(() =>
     [...mesas].sort((a, b) => a.numero_mesa - b.numero_mesa),
@@ -64,6 +64,22 @@ export default function MesasSection() {
     cancelEdit();
   };
 
+  const handleAddMesa = async () => {
+    const num = parseInt(newMesaNumber);
+    if (isNaN(num) || num < 1) return;
+    const ok = await addMesa(num, newMesaName || undefined);
+    if (ok) {
+      setShowAddForm(false);
+      setNewMesaNumber('');
+      setNewMesaName('');
+    }
+  };
+
+  const handleDeleteMesa = async (id: string, numero: number) => {
+    if (!confirm(`¿Eliminar la Mesa #${numero}? Esta acción no se puede deshacer.`)) return;
+    await deleteMesa(id);
+  };
+
   return (
     <div className="space-y-4">
       {/* Stats */}
@@ -81,6 +97,60 @@ export default function MesasSection() {
           </div>
         ))}
       </div>
+
+      {/* Add Mesa Button + Form */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-bold text-white transition-all cursor-pointer active:scale-95"
+          style={{ backgroundColor: themeColor }}
+        >
+          <Plus size={14} />
+          Agregar Mesa
+        </button>
+      </div>
+
+      {showAddForm && (
+        <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 flex flex-col sm:flex-row gap-2 items-end">
+          <div className="flex-1 w-full">
+            <label className="text-[10px] font-bold uppercase text-[#8f7065] mb-1 block">Número de Mesa *</label>
+            <input
+              type="number"
+              min="1"
+              value={newMesaNumber}
+              onChange={(e) => setNewMesaNumber(e.target.value)}
+              placeholder="Ej: 11"
+              className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]"
+            />
+          </div>
+          <div className="flex-1 w-full">
+            <label className="text-[10px] font-bold uppercase text-[#8f7065] mb-1 block">Nombre (opcional)</label>
+            <input
+              type="text"
+              value={newMesaName}
+              onChange={(e) => setNewMesaName(e.target.value)}
+              placeholder="Ej: Terraza A"
+              className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleAddMesa}
+              disabled={!newMesaNumber || parseInt(newMesaNumber) < 1}
+              className="px-4 py-2 rounded-xl text-[11px] font-bold text-white transition-all cursor-pointer disabled:opacity-50"
+              style={{ backgroundColor: '#10b981' }}
+            >
+              Crear
+            </button>
+            <button
+              onClick={() => { setShowAddForm(false); setNewMesaNumber(''); setNewMesaName(''); }}
+              className="px-4 py-2 rounded-xl text-[11px] font-bold bg-[#eeeef0] text-[#5b4137] transition-all cursor-pointer"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Grid de Mesas */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -138,21 +208,19 @@ export default function MesasSection() {
                       <Armchair size={14} style={{ color: themeColor }} />
                       <span className="text-sm font-bold text-[#1a1c1d]">Mesa #{mesa.numero_mesa}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setShowQR(showQR === mesa.id ? null : mesa.id); }}
-                        className={`p-1 rounded-lg cursor-pointer transition-colors ${showQR === mesa.id ? 'bg-blue-100 text-blue-600' : 'hover:bg-[#eeeef0] text-[#8f7065] hover:text-[#5b4137]'}`}
-                        title="Generar QR"
-                      >
-                        <QrCode size={12} />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); startEdit(mesa); }}
-                        className="p-1 rounded-lg hover:bg-[#eeeef0] text-[#8f7065] hover:text-[#5b4137] cursor-pointer"
-                      >
-                        <Edit3 size={12} />
-                      </button>
-                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); startEdit(mesa); }}
+                      className="p-1 rounded-lg hover:bg-[#eeeef0] text-[#8f7065] hover:text-[#5b4137] cursor-pointer"
+                    >
+                      <Edit3 size={12} />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDeleteMesa(mesa.id, mesa.numero_mesa); }}
+                      className="p-1 rounded-lg hover:bg-red-50 text-[#8f7065] hover:text-red-500 cursor-pointer"
+                      title="Eliminar mesa"
+                    >
+                      <Trash2 size={12} />
+                    </button>
                   </div>
                   <p className="text-xs text-[#8f7065] mb-2 truncate">{mesa.nombre_personalizado || `Mesa ${mesa.numero_mesa}`}</p>
                   <div className="flex items-center justify-between">
@@ -166,16 +234,6 @@ export default function MesasSection() {
                     )}
                   </div>
                 </>
-              )}
-              {showQR === mesa.id && (
-                <div className="mt-2 p-3 bg-[#f9f9fb] rounded-xl border border-[#e4beb1]/10" onClick={(e) => e.stopPropagation()}>
-                  <MesaQR
-                    mesaNumero={mesa.numero_mesa}
-                    baseUrl={baseUrl}
-                    themeColor={themeColor}
-                    nombrePersonalizado={mesa.nombre_personalizado}
-                  />
-                </div>
               )}
             </div>
           );
@@ -204,7 +262,7 @@ export default function MesasSection() {
                       <span className="text-xs font-bold text-[#1a1c1d]">{order.id.slice(-8)}</span>
                       <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                         order.status === 'Pendiente' || order.status === 'pendiente_verificacion' ? 'bg-amber-100 text-amber-700' :
-                        order.status === 'En preparación' || order.status === 'en_preparacion' ? 'bg-violet-100 text-violet-700' :
+                        order.status === 'En preparación' || order.status === 'En preparacion' || order.status === 'en_preparacion' ? 'bg-violet-100 text-violet-700' :
                         order.status === 'Entregado' || order.status === 'completado' ? 'bg-emerald-100 text-emerald-700' :
                         order.status === 'Cancelado' || order.status === 'cancelado' ? 'bg-red-100 text-red-700' :
                         'bg-gray-100 text-gray-700'

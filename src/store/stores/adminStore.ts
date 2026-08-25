@@ -4,7 +4,7 @@ type AdminSection =
   // Reportes
   | 'dashboard' | 'sales-report' | 'products-report' | 'app-report' | 'analytics'
   // Pedidos
-  | 'orders' | 'order-history' | 'delivery-map'
+  | 'orders' | 'mesa-orders' | 'order-history' | 'delivery-map'
   // Marketing
   | 'customers' | 'messages' | 'promos' | 'coupons' | 'loyalty' | 'segments' | 'automations' | 'push-analytics'
   // Tienda

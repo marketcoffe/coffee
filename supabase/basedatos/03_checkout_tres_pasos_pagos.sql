@@ -69,5 +69,5 @@ CREATE POLICY "user_carts_delete_own" ON user_carts
 -- ----------------------------------------------------------------------------
 -- 4. PERMISOS
 -- ----------------------------------------------------------------------------
-GRANT SELECT, INSERT ON coupons TO anon;
+GRANT SELECT ON coupons TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON user_carts TO authenticated;

@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle, Clock, Truck, Package, ChefHat, MapPin, MessageSquare, X, ShoppingBag, Zap, Heart } from 'lucide-react';
 import { Order } from '../types/store';
 import { useApp } from '../store/AppContext';
 import { getWhatsAppPhone as resolveBusinessPhone } from '../utils/phone';
+import { supabase } from '../store/supabaseClient';
 
 interface OrderTrackerProps {
   order: Order;
   onClose: () => void;
   onContinueShopping: () => void;
+  onStatusUpdate?: (newStatus: string) => void;
 }
 
 const STATUS_STEPS = [
@@ -33,14 +35,17 @@ const MOTIVATIONAL_MESSAGES = [
 
 const AD_INTERVAL = 6000;
 
-export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onContinueShopping }) => {
+export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onContinueShopping, onStatusUpdate }) => {
   const { config, foodItems } = useApp();
   const themeColor = config.theme_color || '#A4D045';
   const [currentMsgIdx, setCurrentMsgIdx] = useState(0);
   const [adIdx, setAdIdx] = useState(0);
+  const [liveStatus, setLiveStatus] = useState(order.status);
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   const statusOrder = ['Pendiente', 'Procesando', 'En preparación', 'Listo', 'En camino', 'Entregado'];
-  const currentStepIdx = statusOrder.indexOf(order.status);
+  const currentStepIdx = statusOrder.indexOf(liveStatus);
 
   const adProducts = useMemo(() => {
     return foodItems
@@ -59,6 +64,43 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
     return () => { clearInterval(msgTimer); clearInterval(adTimer); };
   }, [adProducts.length]);
 
+  useEffect(() => {
+    setLiveStatus(order.status);
+  }, [order.status]);
+
+  useEffect(() => {
+    if (!order.id) return;
+
+    const channel = supabase
+      .channel(`order-tracker-${order.id}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${order.id}` },
+        (payload) => {
+          const newStatus = payload.new?.status;
+          if (newStatus && newStatus !== liveStatus) {
+            setLiveStatus(newStatus);
+            setLastUpdate(new Date());
+            onStatusUpdate?.(newStatus);
+          }
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('[OrderTracker] Realtime connected for order', order.id);
+        }
+      });
+
+    channelRef.current = channel;
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+    };
+  }, [order.id]);
+
   const getWhatsAppPhone = (): string => {
     const sede = order.sede_id
       ? config.sedes?.find(s => s.id === order.sede_id)
@@ -67,12 +109,12 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
   };
 
   const handleSendMessage = () => {
-    const msg = `Hola! Quiero saber sobre mi pedido *${order.id}*\nEstado actual: ${order.status}`;
+    const msg = `Hola! Quiero saber sobre mi pedido *${order.id}*\nEstado actual: ${liveStatus}`;
     window.open(`https://wa.me/${getWhatsAppPhone()}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
-  const isDelivered = order.status === 'Entregado';
-  const isFinal = order.status === 'Entregado' || order.status === 'Cancelado';
+  const isDelivered = liveStatus === 'Entregado';
+  const isFinal = liveStatus === 'Entregado' || liveStatus === 'Cancelado';
 
   return (
     <div className="fixed inset-0 z-[120] flex items-end lg:items-center justify-center">
@@ -106,7 +148,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
           {/* Status Badge */}
           <div className="px-5 pt-5 pb-3">
             <motion.div
-              key={order.status}
+              key={liveStatus}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -127,7 +169,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
                 )}
               </motion.div>
               <span className="text-xs font-black" style={{ color: isDelivered ? '#10B981' : themeColor }}>
-                {STATUS_STEPS.find(s => s.key === order.status)?.label || order.status}
+                {STATUS_STEPS.find(s => s.key === liveStatus)?.label || liveStatus}
               </span>
             </motion.div>
           </div>

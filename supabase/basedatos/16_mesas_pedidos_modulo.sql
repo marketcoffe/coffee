@@ -33,17 +33,17 @@ ALTER TABLE public.mesas REPLICA IDENTITY FULL;
 -- ----------------------------------------------------------------------------
 ALTER TABLE mesas ENABLE ROW LEVEL SECURITY;
 
--- Lectura: todos los usuarios autenticados + anon
+-- Lectura: todos (anon + authenticated) — las mesas son públicas
 DROP POLICY IF EXISTS "mesas_select_all" ON mesas;
 CREATE POLICY "mesas_select_all" ON mesas
     FOR SELECT USING (true);
 
--- Edición: admin, operator y customer autenticados
-DROP POLICY IF EXISTS "mesas_update_authenticated" ON mesas;
-CREATE POLICY "mesas_update_authenticated" ON mesas
+-- Edición (UPDATE): solo admin/operator — clientes NUNCA deben modificar mesas
+DROP POLICY IF EXISTS "mesas_update_admin_operator" ON mesas;
+CREATE POLICY "mesas_update_admin_operator" ON mesas
     FOR UPDATE TO authenticated
-    USING (true)
-    WITH CHECK (true);
+    USING (public.is_admin_or_operator())
+    WITH CHECK (public.is_admin_or_operator());
 
 -- Insert/Delete: solo admin
 DROP POLICY IF EXISTS "mesas_insert_admin" ON mesas;
@@ -56,9 +56,9 @@ CREATE POLICY "mesas_delete_admin" ON mesas
     FOR DELETE TO authenticated
     USING (public.is_admin());
 
--- Permisos
+-- Permisos: anon solo lectura, authenticated solo lectura (RLS controla write)
 GRANT SELECT ON mesas TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON mesas TO authenticated;
+GRANT SELECT ON mesas TO authenticated;
 
 -- ----------------------------------------------------------------------------
 -- 3. Realtime para mesas
@@ -170,15 +170,18 @@ EXECUTE FUNCTION public.handle_mesa_order_status_change();
 -- ----------------------------------------------------------------------------
 DO $$
 BEGIN
-    -- Actualizar el CHECK constraint del status para incluir los nuevos valores
-    -- Primero eliminar el constraint existente
+    -- Actualizar el CHECK constraint del status para incluir todos los valores usados en el sistema
+    -- NOTA: Incluir variantes con/ sin tilde y mayusculas/minusculas por compatibilidad
     ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_status_check;
     
     -- Crear el nuevo constraint con todos los status incluidos
+    -- NOTA: 'En preparación' (con tilde) es lo que el frontend envía desde useOrders.ts advanceStatus()
     ALTER TABLE orders ADD CONSTRAINT orders_status_check 
         CHECK (status IN (
-            'Pendiente', 'Procesando', 'En preparación', 'En preparacion', 
-            'Listo', 'En camino', 'Entregado', 'Cancelado',
+            'Pendiente', 'Procesando', 
+            'En Preparacion', 'En preparacion', 'En preparación',
+            'Listo', 'En Camino', 'En camino',
+            'Entregado', 'Cancelado',
             'pendiente_verificacion', 'en_preparacion', 'completado', 'cancelado',
             'pago_enviado', 'pendiente_pago'
         ));

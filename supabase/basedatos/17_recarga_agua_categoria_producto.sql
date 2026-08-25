@@ -30,7 +30,7 @@ INSERT INTO products (
 ) VALUES (
     'Botellón de 20L',
     'Recarga de agua pura para tu botellón de 20 litros. Limpia y fresca.',
-    ARRAY['Recarga de Agua']::TEXT[],
+    'Recarga de Agua',
     0.50,
     100,
     ARRAY['/productos-pan/recarga_de_agua.webp']::TEXT[],

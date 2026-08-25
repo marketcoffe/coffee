@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     nombre TEXT NOT NULL,
     descripcion TEXT DEFAULT '',
+    descripcion_completa TEXT DEFAULT '',
     categoria TEXT NOT NULL DEFAULT 'Hamburguesas',
     precio_usd NUMERIC(10,2) NOT NULL DEFAULT 0.00,
     precio_anterior_usd NUMERIC(10,2),
@@ -102,6 +103,8 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
+ALTER TABLE public.products REPLICA IDENTITY FULL;
+
 -- ----------------------------------------------------------------------------
 -- 6. POLÍTICAS RLS
 -- ----------------------------------------------------------------------------
@@ -139,5 +142,5 @@ CREATE POLICY "flash_sales_admin_all" ON flash_sales FOR ALL TO authenticated
 -- ----------------------------------------------------------------------------
 -- 7. PERMISOS
 -- ----------------------------------------------------------------------------
-GRANT SELECT, INSERT ON products TO anon;
+GRANT SELECT ON products TO anon;
 GRANT SELECT ON flash_sales TO anon;

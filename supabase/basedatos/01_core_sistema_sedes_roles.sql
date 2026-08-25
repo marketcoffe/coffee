@@ -331,6 +331,8 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
+ALTER TABLE public.store_config REPLICA IDENTITY FULL;
+
 -- ----------------------------------------------------------------------------
 -- 7. POLÍTICAS RLS
 -- ----------------------------------------------------------------------------
@@ -391,7 +393,7 @@ CREATE POLICY "admin_users_operator_read" ON admin_users
 -- 8. PERMISOS BASE
 -- ----------------------------------------------------------------------------
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
-GRANT SELECT, INSERT ON store_config, usuarios_clientes TO anon;
+GRANT SELECT ON store_config, usuarios_clientes TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO authenticated;

@@ -121,7 +121,9 @@ interface AppContextProps {
   // Mesas
   mesas: Mesa[];
   fetchMesas: () => Promise<void>;
+  addMesa: (numeroMesa: number, nombrePersonalizado?: string) => Promise<boolean>;
   updateMesa: (id: string, updates: Partial<Mesa>) => Promise<void>;
+  deleteMesa: (id: string) => Promise<void>;
 
   // Auth
   authenticateAdmin: (email: string, pass: string) => Promise<boolean>;
@@ -1198,6 +1200,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           .order('id', { ascending: false });
         if (dbNotifs) setNotifications(dbNotifs as InAppNotification[]);
 
+        // Cargar mesas para que el checkout pueda mostrar el selector
+        try {
+          const { data: dbMesasUser } = await supabase.from('mesas').select('*').order('numero_mesa');
+          if (dbMesasUser && dbMesasUser.length > 0) {
+            setMesas(dbMesasUser as Mesa[]);
+            localStorage.setItem('trv_mesas', JSON.stringify(dbMesasUser));
+          }
+        } catch (e) { console.warn('[initData] mesas load for user failed:', e); }
+
         // Cargar datos del usuario actual para que users[] tenga loyalty_points
         try {
           const { data: dbUser } = await supabase.from('usuarios_clientes')
@@ -1207,6 +1218,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             setCurrentUser(prev => prev ? { ...prev, ...dbUser } : prev);
           }
         } catch (e) { console.warn('[initData] user profile load failed:', e); }
+      } else {
+        // Visitante anónimo (sin sesión): cargar solo mesas para el selector de checkout
+        try {
+          const { data: dbMesasGuest } = await supabase.from('mesas').select('*').order('numero_mesa');
+          if (dbMesasGuest && dbMesasGuest.length > 0) {
+            setMesas(dbMesasGuest as Mesa[]);
+            localStorage.setItem('trv_mesas', JSON.stringify(dbMesasGuest));
+          }
+        } catch (e) { console.warn('[initData] mesas load for guest failed:', e); }
       }
 
       if (needsRateUpdate()) {
@@ -1402,7 +1422,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
   const DB_PRODUCT_COLUMNS = [
-    'nombre', 'descripcion', 'categoria', 'precio_usd', 'precio_anterior_usd',
+    'nombre', 'descripcion', 'descripcion_completa', 'categoria', 'precio_usd', 'precio_anterior_usd',
     'stock', 'imagen_urls', 'es_promo', 'es_nuevo', 'es_mas_vendido',
     'delivery_gratis', 'activo', 'ingredientes', 'alergenos', 'calorias',
     'sizes', 'option_groups', 'related_ids', 'estimated_prep_time',
@@ -1557,6 +1577,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.setItem('trv_mesas', JSON.stringify(data));
     }
   }, []);
+
+  const addMesa = useCallback(async (numeroMesa: number, nombrePersonalizado?: string): Promise<boolean> => {
+    // Verificar que no exista una mesa con ese número
+    if (mesas.some(m => m.numero_mesa === numeroMesa)) {
+      console.warn(`[addMesa] Ya existe una mesa con el número ${numeroMesa}`);
+      return false;
+    }
+    const newMesa = {
+      numero_mesa: numeroMesa,
+      nombre_personalizado: nombrePersonalizado || `Mesa ${numeroMesa}`,
+      estado: 'Disponible' as const,
+    };
+    const { data, error } = await supabase.from('mesas').insert([newMesa]).select().single();
+    if (error) {
+      console.error('[addMesa] Error:', error);
+      return false;
+    }
+    if (data) {
+      setMesas(prev => [...prev, data as Mesa].sort((a, b) => a.numero_mesa - b.numero_mesa));
+      localStorage.setItem('trv_mesas', JSON.stringify([...mesas, data].sort((a, b) => a.numero_mesa - b.numero_mesa)));
+    }
+    return true;
+  }, [mesas]);
+
+  const deleteMesa = useCallback(async (id: string): Promise<void> => {
+    const prevMesas = mesas;
+    setMesas(prev => prev.filter(m => m.id !== id));
+    localStorage.setItem('trv_mesas', JSON.stringify(prevMesas.filter(m => m.id !== id)));
+    const { error } = await supabase.from('mesas').delete().eq('id', id);
+    if (error) {
+      setMesas(prevMesas);
+      localStorage.setItem('trv_mesas', JSON.stringify(prevMesas));
+      console.error('[deleteMesa] Error:', error);
+    }
+  }, [mesas]);
 
   const updateMesa = useCallback(async (id: string, updates: Partial<Mesa>) => {
     const prevMesas = mesas;
@@ -3060,7 +3115,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       redeemRewardItem,
       mesas,
       fetchMesas,
-      updateMesa
+      addMesa,
+      updateMesa,
+      deleteMesa
     }}>
       {children}
     </AppContext.Provider>

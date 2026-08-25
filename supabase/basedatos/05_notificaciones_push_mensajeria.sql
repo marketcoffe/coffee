@@ -52,6 +52,9 @@ CREATE TABLE IF NOT EXISTS push_events (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- FK para campaign_id se agrega en archivo 06 (despues de crear campaigns)
+-- Ver 06_marketing_fidelizacion_cupones.sql
+
 CREATE INDEX IF NOT EXISTS idx_push_events_notif ON push_events(notification_id);
 CREATE INDEX IF NOT EXISTS idx_push_events_campaign ON push_events(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_push_events_type ON push_events(event_type);
@@ -274,6 +277,8 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
+ALTER TABLE public.notifications REPLICA IDENTITY FULL;
+
 -- ----------------------------------------------------------------------------
 -- 15. POLÍTICAS RLS
 -- ----------------------------------------------------------------------------
@@ -303,7 +308,9 @@ CREATE POLICY "Lectura de notificaciones" ON notifications
 
 DROP POLICY IF EXISTS "notifications_update_auth_only" ON notifications;
 CREATE POLICY "notifications_update_auth_only" ON notifications
-    FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+    FOR UPDATE TO authenticated
+    USING (is_admin_or_operator() OR (tipo = 'personal' AND destinatario_telefono IS NOT NULL AND destinatario_telefono != ''))
+    WITH CHECK (is_admin_or_operator() OR (tipo = 'personal' AND destinatario_telefono IS NOT NULL AND destinatario_telefono != ''));
 
 -- push_subscriptions
 DROP POLICY IF EXISTS "manage_own_push_subscriptions_safe" ON push_subscriptions;
@@ -320,6 +327,10 @@ CREATE POLICY "allow_anonymous_push_subscriptions" ON push_subscriptions
 DROP POLICY IF EXISTS "push_events_insert_anon" ON push_events;
 CREATE POLICY "push_events_insert_anon" ON push_events
     FOR INSERT TO anon WITH CHECK (true);
+
+DROP POLICY IF EXISTS "push_events_insert_auth" ON push_events;
+CREATE POLICY "push_events_insert_auth" ON push_events
+    FOR INSERT TO authenticated WITH CHECK (true);
 
 DROP POLICY IF EXISTS "push_events_admin_all" ON push_events;
 CREATE POLICY "push_events_admin_all" ON push_events

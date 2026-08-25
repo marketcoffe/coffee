@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS orders (
     cliente_nombre TEXT NOT NULL,
     cliente_telefono TEXT NOT NULL,
     cliente_email TEXT,
+    usuario_id TEXT,
     cliente_uid TEXT,
     guest_phone TEXT,
     guest_email TEXT,
@@ -47,6 +48,18 @@ CREATE INDEX IF NOT EXISTS idx_orders_guest_email ON orders (guest_email)
 CREATE INDEX IF NOT EXISTS idx_orders_cliente_telefono ON orders (cliente_telefono);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_fecha ON orders(fecha DESC);
+CREATE INDEX IF NOT EXISTS idx_orders_status_fecha ON orders(status, fecha DESC);
+
+-- Migración: Agregar usuario_id si no existe (para tablas pre-existentes)
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'orders' AND column_name = 'usuario_id'
+    ) THEN
+        ALTER TABLE orders ADD COLUMN usuario_id TEXT DEFAULT '';
+    END IF;
+END $$;
 
 -- Migración: Agregar sede_id si no existe (para tablas pre-existentes)
 DO $$ 
@@ -63,6 +76,8 @@ CREATE INDEX IF NOT EXISTS idx_orders_sede ON orders(sede_id)
     WHERE sede_id IS NOT NULL AND sede_id != '';
 CREATE INDEX IF NOT EXISTS idx_orders_cliente_uid ON orders(cliente_uid)
     WHERE cliente_uid IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_orders_usuario_id ON orders(usuario_id)
+    WHERE usuario_id IS NOT NULL AND usuario_id != '';
 
 -- REPLICA IDENTITY FULL para Supabase Realtime
 ALTER TABLE public.orders REPLICA IDENTITY FULL;
@@ -125,20 +140,22 @@ BEGIN
         WHERE code = NEW.cupon_codigo AND (usage_limit IS NULL OR usage_count < usage_limit);
     END IF;
 
-    -- Crear notificación admin (notifications se crea en 06, pero el trigger puede referenciarla)
-    v_notif_id := 'notif-' || substring(replace(gen_random_uuid()::text, '-', '') from 1 for 12);
-    SELECT telefono_soporte INTO v_admin_phone FROM public.store_config WHERE id = 1;
+    -- Crear notificación admin (solo si la tabla notifications existe - se crea en archivo 05)
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='notifications') THEN
+        v_notif_id := 'notif-' || substring(replace(gen_random_uuid()::text, '-', '') from 1 for 12);
+        SELECT telefono_soporte INTO v_admin_phone FROM public.store_config WHERE id = 1;
 
-    INSERT INTO public.notifications (id, titulo, mensaje, fecha, tipo, destinatario_telefono, leida)
-    VALUES (
-        v_notif_id,
-        'Nuevo Pedido: ' || NEW.id,
-        'El cliente ' || COALESCE(NEW.cliente_nombre, 'N/A') || ' ha realizado una compra por $' || COALESCE(NEW.total_usd::text, '0'),
-        to_char(NOW(), 'DD/MM/YYYY HH24:MI'),
-        'admin',
-        COALESCE(v_admin_phone, ''),
-        FALSE
-    );
+        INSERT INTO public.notifications (id, titulo, mensaje, fecha, tipo, destinatario_telefono, leida)
+        VALUES (
+            v_notif_id,
+            'Nuevo Pedido: ' || NEW.id,
+            'El cliente ' || COALESCE(NEW.cliente_nombre, 'N/A') || ' ha realizado una compra por $' || COALESCE(NEW.total_usd::text, '0'),
+            to_char(NOW(), 'DD/MM/YYYY HH24:MI'),
+            'admin',
+            COALESCE(v_admin_phone, ''),
+            FALSE
+        );
+    END IF;
 
     RETURN NEW;
 EXCEPTION WHEN OTHERS THEN
@@ -164,7 +181,7 @@ DECLARE
     v_reversed_points int;
     v_client_uid text;
 BEGIN
-    IF (OLD.status IS DISTINCT FROM NEW.status) AND NEW.status = 'Cancelado' THEN
+    IF (OLD.status IS DISTINCT FROM NEW.status) AND NEW.status IN ('Cancelado', 'cancelado') THEN
         v_client_uid := COALESCE(NEW.cliente_uid, '');
         IF v_client_uid != '' THEN
             SELECT COALESCE(SUM(points), 0) INTO v_reversed_points
@@ -217,7 +234,6 @@ DROP POLICY IF EXISTS "orders_select_own_or_admin" ON orders;
 CREATE POLICY "orders_select_own_or_admin" ON orders
     FOR SELECT USING (
         auth.uid()::text = cliente_uid
-        OR (cliente_uid IS NOT NULL AND cliente_uid LIKE 'guest-%')
         OR public.is_admin_or_operator()
     );
 

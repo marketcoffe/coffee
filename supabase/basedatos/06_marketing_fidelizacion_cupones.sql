@@ -424,6 +424,19 @@ CREATE POLICY "campaigns_admin_all" ON campaigns
     WITH CHECK (public.is_admin_or_operator());
 
 -- ----------------------------------------------------------------------------
--- 12. PERMISOS
+-- 12. FK para push_events.campaign_id (campaigns ahora existe)
 -- ----------------------------------------------------------------------------
-GRANT SELECT ON promotions, flash_sales, reward_catalog, loyalty_transactions TO anon;
+DO $$ BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'push_events_campaign_id_fkey'
+    ) THEN
+        ALTER TABLE public.push_events
+            ADD CONSTRAINT push_events_campaign_id_fkey
+            FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE SET NULL;
+    END IF;
+END $$;
+
+-- ----------------------------------------------------------------------------
+-- 13. PERMISOS
+-- ----------------------------------------------------------------------------
+GRANT SELECT ON promotions, reward_catalog TO anon;

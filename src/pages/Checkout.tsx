@@ -18,7 +18,7 @@ interface CheckoutProps {
 }
 
 export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
-  const { cart, config, addToCart, updateCartQuantity, removeFromCart, createOrder, currentUser, coupons, updateCoupon, orders, earnLoyaltyPoints, clearCart, mesas } = useApp();
+  const { cart, config, addToCart, updateCartQuantity, removeFromCart, createOrder, currentUser, coupons, updateCoupon, orders, earnLoyaltyPoints, clearCart, mesas, fetchMesas } = useApp();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
@@ -83,25 +83,13 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const [showLocationModal, setShowLocationModal] = useState(false);
 
   // Estado para pedidos en mesa
-  const [orderType, setOrderType] = useState<'delivery' | 'pickup' | 'mesa'>(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('mesa')) return 'mesa';
-    return 'delivery';
-  });
+  const [orderType, setOrderType] = useState<'delivery' | 'pickup' | 'mesa'>('delivery');
   const [mesaNumber, setMesaNumber] = useState<number>(() => {
-    const params = new URLSearchParams(window.location.search);
-    const mesaParam = params.get('mesa');
-    return mesaParam ? parseInt(mesaParam, 10) || 1 : 1;
+    // Intentar obtener la primera mesa disponible
+    const availableMesas = mesas.filter(m => m.estado === 'Disponible');
+    return availableMesas.length > 0 ? availableMesas[0].numero_mesa : 1;
   });
-  const [mesaAutoSelected] = useState<boolean>(() => {
-    const params = new URLSearchParams(window.location.search);
-    return !!params.get('mesa');
-  });
-  // Si viene de QR con ?mesa=N, el tipo ya está seleccionado
-  const [orderTypeSelected, setOrderTypeSelected] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return !!params.get('mesa');
-  });
+  const [orderTypeSelected, setOrderTypeSelected] = useState(false);
   const [paymentReference, setPaymentReference] = useState('');
   const [paymentBank, setPaymentBank] = useState('');
   const [mesaOrderConfirmed, setMesaOrderConfirmed] = useState(false);
@@ -113,6 +101,13 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const [mesaPaymentPhase, setMesaPaymentPhase] = useState(false);
   const [mesaPaymentMethod, setMesaPaymentMethod] = useState<'Pago Móvil' | 'Efectivo' | 'Punto' | 'Zelle' | 'Transferencia' | 'Otro'>('Pago Móvil');
   const [mesaPaymentSent, setMesaPaymentSent] = useState(false);
+
+  // Cargar mesas disponibles cuando el usuario selecciona "mesa"
+  useEffect(() => {
+    if (mesas.length === 0) {
+      fetchMesas();
+    }
+  }, [mesas.length, fetchMesas]);
 
   useEffect(() => {
     if (processedOrder) {
@@ -1045,35 +1040,28 @@ ${productosDetailText}
                             required
                           />
                         </div>
-                        {!mesaAutoSelected && (
-                          <div>
-                            <label className="text-[11px] font-bold uppercase text-[#8f7065] mb-1 block">Número de Mesa *</label>
-                            <select
-                              value={mesaNumber}
-                              onChange={(e) => setMesaNumber(parseInt(e.target.value))}
-                              className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[var(--theme-color,#FF6B35)] transition-colors appearance-none cursor-pointer"
-                            >
-                              {mesas.length > 0
-                                ? mesas
-                                    .filter(m => m.estado !== 'Inactiva')
-                                    .sort((a, b) => a.numero_mesa - b.numero_mesa)
-                                    .map(m => (
-                                      <option key={m.id} value={m.numero_mesa}>
-                                        Mesa {m.numero_mesa}{m.nombre_personalizado ? ` — ${m.nombre_personalizado}` : ''}{m.estado === 'Ocupada' ? ' (Ocupada)' : ''}
-                                      </option>
-                                    ))
-                                : Array.from({ length: config.total_mesas || 10 }, (_, i) => i + 1).map(n => (
-                                    <option key={n} value={n}>Mesa {n}</option>
+                        <div>
+                          <label className="text-[11px] font-bold uppercase text-[#8f7065] mb-1 block">Número de Mesa *</label>
+                          <select
+                            value={mesaNumber}
+                            onChange={(e) => setMesaNumber(parseInt(e.target.value))}
+                            className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[var(--theme-color,#FF6B35)] transition-colors appearance-none cursor-pointer"
+                          >
+                            {mesas.length > 0
+                              ? mesas
+                                  .filter(m => m.estado !== 'Inactiva')
+                                  .sort((a, b) => a.numero_mesa - b.numero_mesa)
+                                  .map(m => (
+                                    <option key={m.id} value={m.numero_mesa}>
+                                      Mesa {m.numero_mesa}{m.nombre_personalizado ? ` — ${m.nombre_personalizado}` : ''}{m.estado === 'Ocupada' ? ' (Ocupada)' : ''}
+                                    </option>
                                   ))
-                              }
-                            </select>
-                          </div>
-                        )}
-                        {mesaAutoSelected && (
-                          <div className="p-3 rounded-xl" style={{ backgroundColor: `${themeColor}10`, border: `1px solid ${themeColor}30` }}>
-                            <p className="text-xs font-bold" style={{ color: themeColor }}>Mesa {mesaNumber} seleccionada automáticamente</p>
-                          </div>
-                        )}
+                              : Array.from({ length: config.total_mesas || 10 }, (_, i) => i + 1).map(n => (
+                                  <option key={n} value={n}>Mesa {n}</option>
+                                ))
+                            }
+                          </select>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1773,14 +1761,6 @@ ${productosDetailText}
           setOrderType(type);
           setOrderTypeSelected(true);
           setShowTypeModal(false);
-          if (type === 'mesa') {
-            const params = new URLSearchParams(window.location.search);
-            const mesaParam = params.get('mesa');
-            if (mesaParam) {
-              const num = parseInt(mesaParam, 10);
-              if (num) { setMesaNumber(num); setMesaAutoSelected(true); }
-            }
-          }
         }}
         themeColor={themeColor}
         cartTotal={totalUsd}

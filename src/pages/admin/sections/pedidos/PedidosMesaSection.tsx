@@ -15,7 +15,7 @@ const COLUMN_CONFIG: Record<MesaColumn, { label: string; color: string; bg: stri
 
 function getMesaColumn(order: Order): MesaColumn {
   const s = order.status;
-  if (s === 'pago_enviado') return 'esperando_pago';
+  if (s === 'pago_enviado' || s === 'pendiente_pago') return 'esperando_pago';
   if (s === 'completado' || s === 'Entregado') return 'pagado';
   return 'en_cocina';
 }
@@ -187,7 +187,7 @@ const PedidosMesaSection: React.FC<PedidosMesaSectionProps> = ({ scopeSedeId }) 
               <Printer size={12} />
               Imprimir Comanda
             </button>
-            {order.status === 'pago_enviado' && (
+            {(order.status === 'pago_enviado' || order.status === 'pendiente_pago') && (
               <button
                 onClick={(e) => { e.stopPropagation(); handleConfirmPayment(order.id); }}
                 className="w-full py-2 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1.5 text-white transition-all cursor-pointer"
