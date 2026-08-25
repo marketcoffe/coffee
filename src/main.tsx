@@ -11,6 +11,18 @@ import './index.css';
 
 // Errores de JavaScript no capturados
 window.addEventListener('error', (event) => {
+  const msg = event?.message || '';
+  const isCorrupted = msg.includes('NS_ERROR_CORRUPTED_CONTENT') || msg.includes('error loading dynamically imported module');
+  
+  if (isCorrupted) {
+    log.warn('Main', 'Modulo dinamico corrupto detectado, limpiando cache y recargando...', { message: msg });
+    if ('caches' in window) {
+      caches.keys().then(names => Promise.all(names.map(n => caches.delete(n)))).catch(() => {});
+    }
+    setTimeout(() => window.location.reload(), 500);
+    return;
+  }
+
   log.error('Global', 'Uncaught error', {
     message: event.message,
     filename: event.filename,
