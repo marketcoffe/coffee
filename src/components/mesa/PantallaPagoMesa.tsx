@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useApp } from '../../store/AppContext';
 import { supabase } from '../../store/supabaseClient';
 import { motion, AnimatePresence } from 'motion/react';
@@ -12,6 +12,19 @@ interface PantallaPagoMesaProps {
   onPaymentSent: () => void;
   onPayAtRegister: () => void;
   onBack: () => void;
+}
+
+interface BankConfig {
+  id: string;
+  banco_nombre: string;
+  titular_cuenta: string;
+  numero_cuenta: string;
+  cedula_rif: string;
+  telefono: string;
+  tipo_cuenta: string;
+  activo: boolean;
+  es_principal: boolean;
+  notas: string;
 }
 
 export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
@@ -28,6 +41,18 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [validationError, setValidationError] = useState('');
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [bankConfigs, setBankConfigs] = useState<BankConfig[]>([]);
+
+  useEffect(() => {
+    const fetchBankData = async () => {
+      const { data } = await supabase.from('configuracion_pagos')
+        .select('*')
+        .eq('activo', true)
+        .order('es_principal', { ascending: false });
+      if (data) setBankConfigs(data);
+    };
+    fetchBankData();
+  }, []);
 
   const handleCopy = async (text: string, fieldId: string) => {
     try { await navigator.clipboard.writeText(text); } catch {
@@ -169,33 +194,53 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
           <div className="mt-3 p-3 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl">
             {paymentMethod === 'Pago Móvil' && (
               <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                  <div>
-                    <span className="text-[9px] text-[#8f7065] uppercase block">Banco / Titular</span>
-                    <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || 'Banesco (0134)').split('-')[0]?.trim()}</span>
+                {bankConfigs.length > 0 && bankConfigs.map((bank) => (
+                  <div key={bank.id} className={`p-2 rounded-lg border ${bank.es_principal ? 'border-[#e67e22]/30 bg-[#e67e22]/5' : 'border-[#e4beb1]/10 bg-white'}`}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] font-bold uppercase" style={{ color: bank.es_principal ? mesaColor : '#8f7065' }}>{bank.banco_nombre}</span>
+                      {bank.es_principal && <span className="text-[8px] px-1 py-0.5 rounded-full text-white font-bold" style={{ backgroundColor: mesaColor }}>Principal</span>}
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] text-[#8f7065]">Titular</span>
+                        <span className="text-[#1a1c1d] font-bold text-[11px]">{bank.titular_cuenta}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] text-[#8f7065]">Cuenta</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[#1a1c1d] font-bold text-[11px] font-mono">{bank.numero_cuenta}</span>
+                          <CopyBtn text={bank.numero_cuenta} id={`pm-account-${bank.id}`} />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] text-[#8f7065]">Teléfono</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[#1a1c1d] font-bold text-[11px]">{bank.telefono}</span>
+                          <CopyBtn text={bank.telefono} id={`pm-phone-${bank.id}`} />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] text-[#8f7065]">Cédula/RIF</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[#1a1c1d] font-bold text-[11px]">{bank.cedula_rif}</span>
+                          <CopyBtn text={bank.cedula_rif} id={`pm-ci-${bank.id}`} />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <CopyBtn text={config.pagomovil_data || 'Banesco (0134)'} id="pm-data" />
-                </div>
-                <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                  <div>
-                    <span className="text-[9px] text-[#8f7065] uppercase block">Teléfono</span>
-                    <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'}</span>
-                  </div>
-                  <CopyBtn text={(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'} id="pm-phone" />
-                </div>
-                <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                  <div>
-                    <span className="text-[9px] text-[#8f7065] uppercase block">Cédula / RIF</span>
-                    <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'}</span>
-                  </div>
-                  <CopyBtn text={(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'} id="pm-ci" />
-                </div>
+                ))}
+                {bankConfigs.length === 0 && (
+                  <p className="text-xs text-[#8f7065] text-center py-2">No hay datos bancarios configurados</p>
+                )}
                 <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {order.total_bs?.toFixed(2)} Bs.</p>
-                <div className="space-y-2 mt-2 pt-2 border-t border-[#e4beb1]/10">
+                <div className="space-y-2 mt-2 pt-2 border border-[#e4beb1]/10 rounded-xl p-3">
                   <div>
                     <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Banco Emisor *</label>
                     <select value={paymentBank} onChange={(e) => setPaymentBank(e.target.value)} className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer">
                       <option value="">Seleccionar banco</option>
+                      {bankConfigs.map((bank) => (
+                        <option key={bank.id} value={bank.banco_nombre}>{bank.banco_nombre}</option>
+                      ))}
                       <option value="Banesco">Banesco (0134)</option>
                       <option value="Mercantil">Mercantil (0102)</option>
                       <option value="Venezuela">Banco de Venezuela (0102)</option>
@@ -229,13 +274,30 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
             )}
             {paymentMethod === 'Zelle' && (
               <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                  <div>
-                    <span className="text-[9px] text-[#8f7065] uppercase block">Correo Zelle</span>
-                    <span className="text-[#1a1c1d] font-bold text-xs">{config.zelle_data || 'pagos@email.com'}</span>
+                {bankConfigs.filter(b => b.banco_nombre.toLowerCase().includes('zelle') || b.notas?.toLowerCase().includes('zelle')).length > 0 ? (
+                  bankConfigs.filter(b => b.banco_nombre.toLowerCase().includes('zelle') || b.notas?.toLowerCase().includes('zelle')).map((bank) => (
+                    <div key={bank.id} className="p-2 rounded-lg border border-[#e4beb1]/10 bg-white">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[9px] font-bold uppercase text-[#8f7065]">{bank.banco_nombre}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] text-[#8f7065]">Correo / Cuenta</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[#1a1c1d] font-bold text-[11px]">{bank.numero_cuenta}</span>
+                          <CopyBtn text={bank.numero_cuenta} id={`zelle-${bank.id}`} />
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                    <div>
+                      <span className="text-[9px] text-[#8f7065] uppercase block">Correo Zelle</span>
+                      <span className="text-[#1a1c1d] font-bold text-xs">{config.zelle_data || 'pagos@email.com'}</span>
+                    </div>
+                    <CopyBtn text={config.zelle_data || 'pagos@email.com'} id="zelle-email" />
                   </div>
-                  <CopyBtn text={config.zelle_data || 'pagos@email.com'} id="zelle-email" />
-                </div>
+                )}
                 <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
                   <div>
                     <span className="text-[9px] text-[#8f7065] uppercase block">Monto a enviar</span>
@@ -251,13 +313,40 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
             )}
             {paymentMethod === 'Transferencia' && (
               <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                  <div>
-                    <span className="text-[9px] text-[#8f7065] uppercase block">Datos Bancarios</span>
-                    <span className="text-[#1a1c1d] font-bold text-xs">{config.transferencia_data || `Banesco - ${config.site_nombre}`}</span>
+                {bankConfigs.length > 0 && bankConfigs.map((bank) => (
+                  <div key={bank.id} className={`p-2 rounded-lg border ${bank.es_principal ? 'border-[#e67e22]/30 bg-[#e67e22]/5' : 'border-[#e4beb1]/10 bg-white'}`}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] font-bold uppercase" style={{ color: bank.es_principal ? mesaColor : '#8f7065' }}>{bank.banco_nombre}</span>
+                      {bank.es_principal && <span className="text-[8px] px-1 py-0.5 rounded-full text-white font-bold" style={{ backgroundColor: mesaColor }}>Principal</span>}
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] text-[#8f7065]">Titular</span>
+                        <span className="text-[#1a1c1d] font-bold text-[11px]">{bank.titular_cuenta}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] text-[#8f7065]">Cuenta</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[#1a1c1d] font-bold text-[11px] font-mono">{bank.numero_cuenta}</span>
+                          <CopyBtn text={bank.numero_cuenta} id={`transfer-${bank.id}`} />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] text-[#8f7065]">Cédula/RIF</span>
+                        <span className="text-[#1a1c1d] font-bold text-[11px]">{bank.cedula_rif}</span>
+                      </div>
+                    </div>
                   </div>
-                  <CopyBtn text={config.transferencia_data || `Banesco - ${config.site_nombre}`} id="transfer-data" />
-                </div>
+                ))}
+                {bankConfigs.length === 0 && (
+                  <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                    <div>
+                      <span className="text-[9px] text-[#8f7065] uppercase block">Datos Bancarios</span>
+                      <span className="text-[#1a1c1d] font-bold text-xs">{config.transferencia_data || `Banesco - ${config.site_nombre}`}</span>
+                    </div>
+                    <CopyBtn text={config.transferencia_data || `Banesco - ${config.site_nombre}`} id="transfer-data" />
+                  </div>
+                )}
                 <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
                   <div>
                     <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>

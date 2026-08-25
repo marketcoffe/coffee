@@ -297,6 +297,9 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
               <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
                 <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Selecciona tu Mesa</h3>
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  {availableMesas.length === 0 && (
+                    <p className="col-span-full text-xs text-[#8f7065] text-center py-4">No hay mesas disponibles</p>
+                  )}
                   {availableMesas.map(mesa => {
                     const isSelected = selectedMesa === mesa.numero_mesa;
                     const isOcupada = mesa.estado === 'Ocupada';

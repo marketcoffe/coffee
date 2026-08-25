@@ -118,7 +118,7 @@ CREATE POLICY "config_pagos_admin_only" ON public.configuracion_pagos
 
 -- Permisos
 GRANT SELECT ON public.configuracion_pagos TO anon;
-GRANT SELECT ON public.configuracion_pagos TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.configuracion_pagos TO authenticated;
 
 -- ============================================================================
 -- PASO 5: RLS para mesas (mantener mejoras)
@@ -147,7 +147,7 @@ CREATE POLICY "mesas_delete_admin" ON public.mesas
     USING (public.is_admin());
 
 GRANT SELECT ON public.mesas TO anon;
-GRANT SELECT ON public.mesas TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.mesas TO authenticated;
 
 -- ============================================================================
 -- PASO 6: Realtime para mesas y configuracion_pagos
