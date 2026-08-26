@@ -99,7 +99,7 @@ export const Home: React.FC<HomeProps> = ({
   const combosFamiliaresItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Combos Familiares')).slice(0, 8), [activeItems]);
 
   const masVendidosItems = useMemo(() => activeItems.filter(p => p.es_mas_vendido).slice(0, 8), [activeItems]);
-  const combosCategoriaItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Combos') || hasCategory(p, 'Combos') || p.categoria.some(c => c.toLowerCase() === 'combos')).slice(0, 8), [activeItems]);
+  const combosCategoriaItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Combos') || hasCategory(p, 'Combos') || (p.categoria ?? []).some(c => c.toLowerCase() === 'combos')).slice(0, 8), [activeItems]);
 
   const coveredCategoryKeywords = useMemo(() => [
     'panaderia', 'panadería', 'comida rapida', 'comida rápida', 'repostería', 'reposteria',
@@ -122,7 +122,7 @@ export const Home: React.FC<HomeProps> = ({
   }, [config.categories, activeItems, coveredCategoryKeywords]);
 
   const [heroSlide, setHeroSlide] = useState(0);
-  const heroBanners = config.banners.slice(0, 3);
+  const heroBanners = (config.banners || []).slice(0, 3);
   const [activeCategory, setActiveCategory] = useState('Todas');
 
   const [openFaq, setOpenFaq] = useState<string | null>(null);
