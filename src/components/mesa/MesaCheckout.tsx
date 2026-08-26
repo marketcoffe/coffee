@@ -453,7 +453,16 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
             </div>
           )}
           {currentStep === 1 ? (
-            <button onClick={handleNextStep} className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: mesaColor }}>
+            <button
+              onClick={handleNextStep}
+              disabled={!clientName.trim() || !selectedMesa}
+              className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${
+                clientName.trim() && selectedMesa
+                  ? 'text-white'
+                  : 'text-white/60 cursor-not-allowed'
+              }`}
+              style={{ backgroundColor: clientName.trim() && selectedMesa ? mesaColor : `${mesaColor}60` }}
+            >
               Continuar <ArrowRight size={16} />
             </button>
           ) : (

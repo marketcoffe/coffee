@@ -875,6 +875,7 @@ svg {
   background: var(--erp-content-bg);
   flex: 1;
   overflow-y: auto;
+  min-height: 0;
 }
 
 /* Desktop: offset content for fixed sidebar */

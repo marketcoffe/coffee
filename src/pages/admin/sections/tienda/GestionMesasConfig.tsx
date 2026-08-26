@@ -37,6 +37,7 @@ export default function GestionMesasConfig() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newMesaNumber, setNewMesaNumber] = useState('');
   const [newMesaName, setNewMesaName] = useState('');
+  const [mesaError, setMesaError] = useState('');
 
   // Payment config state
   const [pagos, setPagos] = useState<PagoConfig[]>([]);
@@ -85,13 +86,24 @@ export default function GestionMesasConfig() {
   };
 
   const handleAddMesa = async () => {
+    setMesaError('');
     const num = parseInt(newMesaNumber);
-    if (isNaN(num) || num < 1) return;
+    if (isNaN(num) || num < 1) {
+      setMesaError('Ingresa un número válido.');
+      return;
+    }
+    if (mesas.some(m => m.numero_mesa === num)) {
+      setMesaError(`Ya existe la Mesa #${num}.`);
+      return;
+    }
     const ok = await addMesa(num, newMesaName || undefined);
     if (ok) {
       setShowAddForm(false);
       setNewMesaNumber('');
       setNewMesaName('');
+      setMesaError('');
+    } else {
+      setMesaError('Error al crear la mesa. Verifica que la tabla "mesas" exista en la base de datos.');
     }
   };
 
@@ -200,9 +212,12 @@ export default function GestionMesasConfig() {
                 <button onClick={handleAddMesa} disabled={!newMesaNumber || parseInt(newMesaNumber) < 1}
                   className="px-4 py-2 rounded-xl text-[11px] font-bold text-white transition-all cursor-pointer disabled:opacity-50"
                   style={{ backgroundColor: '#10b981' }}>Crear</button>
-                <button onClick={() => { setShowAddForm(false); setNewMesaNumber(''); setNewMesaName(''); }}
+                <button onClick={() => { setShowAddForm(false); setNewMesaNumber(''); setNewMesaName(''); setMesaError(''); }}
                   className="px-4 py-2 rounded-xl text-[11px] font-bold bg-[#eeeef0] text-[#5b4137] transition-all cursor-pointer">Cancelar</button>
               </div>
+              {mesaError && (
+                <p className="text-[11px] font-semibold text-red-500 mt-2">{mesaError}</p>
+              )}
             </div>
           )}
 

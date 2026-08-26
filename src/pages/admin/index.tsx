@@ -219,7 +219,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   };
 
   return (
-    <div className="h-full" style={{ background: 'var(--erp-content-bg)' }}>
+    <div className="h-screen overflow-hidden flex flex-col" style={{ background: 'var(--erp-content-bg)' }}>
       <SEOHead title={`Admin - ${config.site_nombre || 'Panel'}`} type="admin" />
       <AdminOrderAlert />
 
@@ -244,7 +244,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
         </div>
       </aside>
 
-      <div className="erp-main-content flex-1 flex flex-col min-h-0 relative" data-collapsed={sidebarCollapsed}>
+      <div className="erp-main-content flex-1 flex flex-col min-h-0 overflow-hidden relative" data-collapsed={sidebarCollapsed}>
         {/* Desktop Header */}
         <header className="erp-header shrink-0 hidden lg:flex">
           <Tooltip content="Abrir menu de navegacion" position="bottom">

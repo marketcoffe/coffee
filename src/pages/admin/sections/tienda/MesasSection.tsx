@@ -23,6 +23,7 @@ export default function MesasSection() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newMesaNumber, setNewMesaNumber] = useState('');
   const [newMesaName, setNewMesaName] = useState('');
+  const [mesaError, setMesaError] = useState('');
 
   const sortedMesas = useMemo(() =>
     [...mesas].sort((a, b) => a.numero_mesa - b.numero_mesa),
@@ -65,13 +66,24 @@ export default function MesasSection() {
   };
 
   const handleAddMesa = async () => {
+    setMesaError('');
     const num = parseInt(newMesaNumber);
-    if (isNaN(num) || num < 1) return;
+    if (isNaN(num) || num < 1) {
+      setMesaError('Ingresa un número válido.');
+      return;
+    }
+    if (mesas.some(m => m.numero_mesa === num)) {
+      setMesaError(`Ya existe la Mesa #${num}.`);
+      return;
+    }
     const ok = await addMesa(num, newMesaName || undefined);
     if (ok) {
       setShowAddForm(false);
       setNewMesaNumber('');
       setNewMesaName('');
+      setMesaError('');
+    } else {
+      setMesaError('Error al crear la mesa. Verifica que la tabla "mesas" exista en la base de datos.');
     }
   };
 
@@ -143,12 +155,15 @@ export default function MesasSection() {
               Crear
             </button>
             <button
-              onClick={() => { setShowAddForm(false); setNewMesaNumber(''); setNewMesaName(''); }}
+              onClick={() => { setShowAddForm(false); setNewMesaNumber(''); setNewMesaName(''); setMesaError(''); }}
               className="px-4 py-2 rounded-xl text-[11px] font-bold bg-[#eeeef0] text-[#5b4137] transition-all cursor-pointer"
             >
               Cancelar
             </button>
           </div>
+          {mesaError && (
+            <p className="text-[11px] font-semibold text-red-500 mt-2">{mesaError}</p>
+          )}
         </div>
       )}
 
