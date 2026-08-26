@@ -1006,9 +1006,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       // Cargar productos de Supabase (si es admin, incluir inactivos)
-      let productsQuery = supabase.from('products').select('*');
+      let productsQuery = supabase.from('products').select('*').range(0, 9999);
       if (!isAdmin) {
-        productsQuery = productsQuery.eq('activo', true);
+        productsQuery = productsQuery.or('activo.is.true,activo.is.null');
       }
       const { data: dbProducts } = await productsQuery;
       if (dbProducts && dbProducts.length > 0) {

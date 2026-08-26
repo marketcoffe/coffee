@@ -71,6 +71,7 @@ export const Home: React.FC<HomeProps> = ({
   const { showToast } = useToast();
   const tc = config.theme_color || '#A4D045';
   const vesRate = config.tasa_cambio && config.tasa_cambio > 10 ? config.tasa_cambio : null;
+  const safeImg = (urls?: string[]) => urls?.[0] || '';
 
   const activeItems = useMemo(() => foodItems.filter(p => p.activo !== false), [foodItems]);
   const promoItems = useMemo(() => activeItems.filter(p => p.es_promo), [activeItems]);
@@ -436,7 +437,7 @@ export const Home: React.FC<HomeProps> = ({
                   className="w-full flex items-center gap-3 p-3 text-left transition-colors hover:bg-black/5 border-b last:border-b-0"
                   style={{ borderColor: cardBorder }}>
                   <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
-                    <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover" />
+                    <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold truncate" style={{ color: text1 }}>{item.nombre}</p>
@@ -594,7 +595,7 @@ export const Home: React.FC<HomeProps> = ({
                     <Zap size={10} fill="currentColor" /> FLASH
                   </div>
                   <div className="relative h-36 overflow-hidden">
-                    <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     {discount > 0 && <div className="absolute top-2 right-2 bg-red-500 text-white font-bold px-2 py-0.5 rounded-lg text-[10px]">-{discount}%</div>}
                     {item.estimated_prep_time && (
                       <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
@@ -647,7 +648,7 @@ export const Home: React.FC<HomeProps> = ({
                     <Zap size={8} fill="currentColor" /> FLASH
                   </div>
                   <div className="relative h-[130px]">
-                    <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover" />
+                    <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-cover" />
                     {discount > 0 && <div className="absolute top-1.5 right-1.5 bg-red-500 text-white font-bold px-1.5 py-0.5 rounded-md text-[9px]">-{discount}%</div>}
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                       className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow"
@@ -711,7 +712,7 @@ export const Home: React.FC<HomeProps> = ({
                   <TrendingUp size={10} fill="currentColor" /> MÁS VENDIDO
                 </div>
                 <div className="relative h-36 overflow-hidden">
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   {item.estimated_prep_time && (
                     <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
                       <Clock size={10} /> {item.estimated_prep_time}min
@@ -755,7 +756,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   <span className="absolute top-1.5 left-1.5 text-[7px] font-bold text-white px-1 py-px rounded"
                     style={{ backgroundColor: '#f97316' }}>
                     <TrendingUp size={7} className="inline mr-px" fill="currentColor" /> TOP
@@ -819,7 +820,7 @@ export const Home: React.FC<HomeProps> = ({
                   <ShoppingCart size={10} /> COMBO
                 </div>
                 <div className="relative h-36 overflow-hidden">
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   {item.estimated_prep_time && (
                     <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
                       <Clock size={10} /> {item.estimated_prep_time}min
@@ -863,7 +864,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   <span className="absolute top-1.5 left-1.5 text-[7px] font-bold text-white px-1 py-px rounded"
                     style={{ backgroundColor: tc }}>
                     COMBO
@@ -996,7 +997,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1055,7 +1056,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1111,7 +1112,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1163,7 +1164,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1215,7 +1216,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1267,7 +1268,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1319,7 +1320,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1371,7 +1372,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1423,7 +1424,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1482,7 +1483,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1534,7 +1535,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1586,7 +1587,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1638,7 +1639,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1690,7 +1691,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1742,7 +1743,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1794,7 +1795,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
@@ -1844,7 +1845,7 @@ export const Home: React.FC<HomeProps> = ({
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
                 <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
-                  <img src={item.imagen_urls[0]} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
+                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   {item.es_nuevo && <span className="absolute top-1.5 left-1.5 text-[8px] font-bold text-white px-1.5 py-0.5 rounded" style={{ backgroundColor: tc }}>NEW</span>}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
