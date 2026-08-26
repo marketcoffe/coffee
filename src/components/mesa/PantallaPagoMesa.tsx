@@ -1,10 +1,7 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../store/AppContext';
 import { supabase } from '../../store/supabaseClient';
-import { motion, AnimatePresence } from 'motion/react';
-import {
-  CheckCircle, Clock, CreditCard, Banknote, Smartphone, ArrowRight, Copy, Check, X
-} from 'lucide-react';
+import { CheckCircle, Copy, Check, X } from 'lucide-react';
 import { Order } from '../../types/store';
 
 interface PantallaPagoMesaProps {
@@ -14,19 +11,6 @@ interface PantallaPagoMesaProps {
   onBack: () => void;
 }
 
-interface BankConfig {
-  id: string;
-  banco_nombre: string;
-  titular_cuenta: string;
-  numero_cuenta: string;
-  cedula_rif: string;
-  telefono: string;
-  tipo_cuenta: string;
-  activo: boolean;
-  es_principal: boolean;
-  notas: string;
-}
-
 export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
   order, onPaymentSent, onPayAtRegister, onBack
 }) => {
@@ -34,25 +18,13 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
   const themeColor = config.theme_color || '#A4D045';
   const mesaColor = '#e67e22';
 
-  const [paymentMethod, setPaymentMethod] = useState<'Pago Móvil' | 'Efectivo' | 'Punto' | 'Zelle' | 'Transferencia'>('Pago Móvil');
-  const [paymentBank, setPaymentBank] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'Pago Móvil' | 'Efectivo' | 'Punto'>('Pago Móvil');
+  const [paymentBank, setPaymentBank] = useState('Banesco');
   const [paymentReference, setPaymentReference] = useState('');
   const [paymentPhone, setPaymentPhone] = useState(currentUser?.telefono || '');
   const [isProcessing, setIsProcessing] = useState(false);
   const [validationError, setValidationError] = useState('');
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [bankConfigs, setBankConfigs] = useState<BankConfig[]>([]);
-
-  useEffect(() => {
-    const fetchBankData = async () => {
-      const { data } = await supabase.from('configuracion_pagos')
-        .select('*')
-        .eq('activo', true)
-        .order('es_principal', { ascending: false });
-      if (data) setBankConfigs(data);
-    };
-    fetchBankData();
-  }, []);
 
   const handleCopy = async (text: string, fieldId: string) => {
     try { await navigator.clipboard.writeText(text); } catch {
@@ -75,11 +47,7 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
   );
 
   const handleSendPayment = async () => {
-    if (paymentMethod === 'Pago Móvil' && (!paymentBank || !paymentReference.trim())) {
-      setValidationError('Completa el banco emisor y la referencia de pago.');
-      return;
-    }
-    if ((paymentMethod === 'Zelle' || paymentMethod === 'Transferencia') && !paymentReference.trim()) {
+    if (paymentMethod === 'Pago Móvil' && !paymentReference.trim()) {
       setValidationError('Ingresa la referencia de pago.');
       return;
     }
@@ -89,7 +57,7 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
     try {
       const { error } = await supabase.rpc('reportar_pago_movil', {
         p_order_id: order.id,
-        p_banco_origen: paymentBank,
+        p_banco_origen: 'Banesco (0134)',
         p_referencia: paymentReference,
         p_telefono_emisor: paymentPhone || order.cliente_telefono,
         p_monto: order.total_usd
@@ -171,14 +139,12 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
         {/* Método de pago */}
         <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
           <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Método de Pago</h3>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             {[
-              { key: 'Pago Móvil', label: 'Pago Móvil Bs', icon: 'Bs', enabled: config.pagomovil_enabled },
-              { key: 'Efectivo', label: 'Efectivo', icon: '$', enabled: config.efectivo_enabled },
-              { key: 'Punto', label: 'Punto de Venta', icon: 'Pt', enabled: true },
-              { key: 'Zelle', label: 'Zelle USD', icon: 'USD', enabled: config.zelle_enabled },
-              { key: 'Transferencia', label: 'Transferencia', icon: 'Bco', enabled: config.transferencia_enabled },
-            ].filter(pm => pm.enabled).map(pm => (
+              { key: 'Pago Móvil', label: 'Pago Móvil', icon: 'Bs' },
+              { key: 'Efectivo', label: 'Efectivo', icon: '$' },
+              { key: 'Punto', label: 'Punto de Venta', icon: 'Pt' },
+            ].map(pm => (
               <button key={pm.key} onClick={() => setPaymentMethod(pm.key as typeof paymentMethod)}
                 className={`p-3 rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer border-2 text-xs ${
                   paymentMethod === pm.key ? 'text-white shadow-md' : 'bg-[#f9f9fb] border-[#e4beb1]/10 text-[#5b4137] hover:bg-[#eeeef0]'
@@ -194,53 +160,34 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
           <div className="mt-3 p-3 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl">
             {paymentMethod === 'Pago Móvil' && (
               <div className="flex flex-col gap-2">
-                {bankConfigs.length > 0 && bankConfigs.map((bank) => (
-                  <div key={bank.id} className={`p-2 rounded-lg border ${bank.es_principal ? 'border-[#e67e22]/30 bg-[#e67e22]/5' : 'border-[#e4beb1]/10 bg-white'}`}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[9px] font-bold uppercase" style={{ color: bank.es_principal ? mesaColor : '#8f7065' }}>{bank.banco_nombre}</span>
-                      {bank.es_principal && <span className="text-[8px] px-1 py-0.5 rounded-full text-white font-bold" style={{ backgroundColor: mesaColor }}>Principal</span>}
+                {/* Datos hardcoded Banesco */}
+                <div className="p-2 rounded-lg border border-[#e67e22]/30 bg-[#e67e22]/5">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[9px] font-bold uppercase" style={{ color: mesaColor }}>Banesco (0134)</span>
+                    <span className="text-[8px] px-1 py-0.5 rounded-full text-white font-bold" style={{ backgroundColor: mesaColor }}>Principal</span>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] text-[#8f7065]">Teléfono</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-[#1a1c1d] font-bold text-[11px]">04123758879</span>
+                        <CopyBtn text="04123758879" id="pm-phone" />
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] text-[#8f7065]">Titular</span>
-                        <span className="text-[#1a1c1d] font-bold text-[11px]">{bank.titular_cuenta}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] text-[#8f7065]">Cuenta</span>
-                        <div className="flex items-center gap-1">
-                          <span className="text-[#1a1c1d] font-bold text-[11px] font-mono">{bank.numero_cuenta}</span>
-                          <CopyBtn text={bank.numero_cuenta} id={`pm-account-${bank.id}`} />
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] text-[#8f7065]">Teléfono</span>
-                        <div className="flex items-center gap-1">
-                          <span className="text-[#1a1c1d] font-bold text-[11px]">{bank.telefono}</span>
-                          <CopyBtn text={bank.telefono} id={`pm-phone-${bank.id}`} />
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] text-[#8f7065]">Cédula/RIF</span>
-                        <div className="flex items-center gap-1">
-                          <span className="text-[#1a1c1d] font-bold text-[11px]">{bank.cedula_rif}</span>
-                          <CopyBtn text={bank.cedula_rif} id={`pm-ci-${bank.id}`} />
-                        </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] text-[#8f7065]">Cédula/RIF</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-[#1a1c1d] font-bold text-[11px]">V-33112679</span>
+                        <CopyBtn text="V-33112679" id="pm-ci" />
                       </div>
                     </div>
                   </div>
-                ))}
-                {bankConfigs.length === 0 && (
-                  <p className="text-xs text-[#8f7065] text-center py-2">No hay datos bancarios configurados</p>
-                )}
+                </div>
                 <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {order.total_bs?.toFixed(2)} Bs.</p>
                 <div className="space-y-2 mt-2 pt-2 border border-[#e4beb1]/10 rounded-xl p-3">
                   <div>
-                    <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Banco Emisor *</label>
+                    <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Tu Banco Emisor *</label>
                     <select value={paymentBank} onChange={(e) => setPaymentBank(e.target.value)} className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer">
-                      <option value="">Seleccionar banco</option>
-                      {bankConfigs.map((bank) => (
-                        <option key={bank.id} value={bank.banco_nombre}>{bank.banco_nombre}</option>
-                      ))}
                       <option value="Banesco">Banesco (0134)</option>
                       <option value="Mercantil">Mercantil (0102)</option>
                       <option value="Venezuela">Banco de Venezuela (0102)</option>
@@ -262,7 +209,7 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
             )}
             {paymentMethod === 'Efectivo' && (
               <div className="text-center py-2">
-                <p className="text-xs text-[#5b4137] mb-2">{config.efectivo_data || 'Paga en caja al recibir tu pedido'}</p>
+                <p className="text-xs text-[#5b4137] mb-2">Paga en caja al recibir tu pedido</p>
                 <p className="font-black text-sm" style={{ color: themeColor }}>Total: ${order.total_usd?.toFixed(2)}</p>
               </div>
             )}
@@ -270,94 +217,6 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
               <div className="text-center py-2">
                 <p className="text-xs text-[#5b4137] mb-2">Paga con tu punto de venta en caja</p>
                 <p className="font-black text-sm" style={{ color: themeColor }}>Total: ${order.total_usd?.toFixed(2)}</p>
-              </div>
-            )}
-            {paymentMethod === 'Zelle' && (
-              <div className="flex flex-col gap-2">
-                {bankConfigs.filter(b => b.banco_nombre.toLowerCase().includes('zelle') || b.notas?.toLowerCase().includes('zelle')).length > 0 ? (
-                  bankConfigs.filter(b => b.banco_nombre.toLowerCase().includes('zelle') || b.notas?.toLowerCase().includes('zelle')).map((bank) => (
-                    <div key={bank.id} className="p-2 rounded-lg border border-[#e4beb1]/10 bg-white">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-[9px] font-bold uppercase text-[#8f7065]">{bank.banco_nombre}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] text-[#8f7065]">Correo / Cuenta</span>
-                        <div className="flex items-center gap-1">
-                          <span className="text-[#1a1c1d] font-bold text-[11px]">{bank.numero_cuenta}</span>
-                          <CopyBtn text={bank.numero_cuenta} id={`zelle-${bank.id}`} />
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                    <div>
-                      <span className="text-[9px] text-[#8f7065] uppercase block">Correo Zelle</span>
-                      <span className="text-[#1a1c1d] font-bold text-xs">{config.zelle_data || 'pagos@email.com'}</span>
-                    </div>
-                    <CopyBtn text={config.zelle_data || 'pagos@email.com'} id="zelle-email" />
-                  </div>
-                )}
-                <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                  <div>
-                    <span className="text-[9px] text-[#8f7065] uppercase block">Monto a enviar</span>
-                    <span className="font-black text-sm" style={{ color: themeColor }}>${order.total_usd?.toFixed(2)} USD</span>
-                  </div>
-                  <CopyBtn text={`$${order.total_usd?.toFixed(2)}`} id="zelle-amount" />
-                </div>
-                <div className="mt-2 pt-2 border-t border-[#e4beb1]/10">
-                  <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia / Nota Zelle</label>
-                  <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: Confirmación Zelle" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
-                </div>
-              </div>
-            )}
-            {paymentMethod === 'Transferencia' && (
-              <div className="flex flex-col gap-2">
-                {bankConfigs.length > 0 && bankConfigs.map((bank) => (
-                  <div key={bank.id} className={`p-2 rounded-lg border ${bank.es_principal ? 'border-[#e67e22]/30 bg-[#e67e22]/5' : 'border-[#e4beb1]/10 bg-white'}`}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[9px] font-bold uppercase" style={{ color: bank.es_principal ? mesaColor : '#8f7065' }}>{bank.banco_nombre}</span>
-                      {bank.es_principal && <span className="text-[8px] px-1 py-0.5 rounded-full text-white font-bold" style={{ backgroundColor: mesaColor }}>Principal</span>}
-                    </div>
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] text-[#8f7065]">Titular</span>
-                        <span className="text-[#1a1c1d] font-bold text-[11px]">{bank.titular_cuenta}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] text-[#8f7065]">Cuenta</span>
-                        <div className="flex items-center gap-1">
-                          <span className="text-[#1a1c1d] font-bold text-[11px] font-mono">{bank.numero_cuenta}</span>
-                          <CopyBtn text={bank.numero_cuenta} id={`transfer-${bank.id}`} />
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] text-[#8f7065]">Cédula/RIF</span>
-                        <span className="text-[#1a1c1d] font-bold text-[11px]">{bank.cedula_rif}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {bankConfigs.length === 0 && (
-                  <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                    <div>
-                      <span className="text-[9px] text-[#8f7065] uppercase block">Datos Bancarios</span>
-                      <span className="text-[#1a1c1d] font-bold text-xs">{config.transferencia_data || `Banesco - ${config.site_nombre}`}</span>
-                    </div>
-                    <CopyBtn text={config.transferencia_data || `Banesco - ${config.site_nombre}`} id="transfer-data" />
-                  </div>
-                )}
-                <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                  <div>
-                    <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
-                    <span className="font-black text-sm" style={{ color: themeColor }}>${order.total_usd?.toFixed(2)} USD</span>
-                  </div>
-                  <CopyBtn text={`$${order.total_usd?.toFixed(2)}`} id="transfer-amount" />
-                </div>
-                <div className="mt-2 pt-2 border-t border-[#e4beb1]/10">
-                  <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia</label>
-                  <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
-                </div>
               </div>
             )}
           </div>
@@ -385,7 +244,7 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
             {isProcessing ? 'Procesando...' : 'Pagar en Caja'}
           </button>
         ) : (
-          <button onClick={handleSendPayment} disabled={isProcessing || (paymentMethod === 'Pago Móvil' && (!paymentBank || !paymentReference.trim()))}
+          <button onClick={handleSendPayment} disabled={isProcessing || (paymentMethod === 'Pago Móvil' && !paymentReference.trim())}
             className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`}
             style={{ backgroundColor: isProcessing ? '#9ca3af' : '#10b981' }}>
             {isProcessing ? 'Procesando...' : 'Enviar Pago'}

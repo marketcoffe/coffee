@@ -111,7 +111,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const [paymentConfirmedByAdmin, setPaymentConfirmedByAdmin] = useState(false);
   // Fase de pago para pedidos de mesa
   const [mesaPaymentPhase, setMesaPaymentPhase] = useState(false);
-  const [mesaPaymentMethod, setMesaPaymentMethod] = useState<'Pago Móvil' | 'Efectivo' | 'Punto' | 'Zelle' | 'Transferencia' | 'Otro'>('Pago Móvil');
+  const [mesaPaymentMethod, setMesaPaymentMethod] = useState<'Pago Móvil' | 'Efectivo' | 'Punto'>('Pago Móvil');
   const [mesaPaymentSent, setMesaPaymentSent] = useState(false);
 
   // Cargar mesas disponibles cuando el usuario selecciona "mesa"
@@ -636,16 +636,8 @@ ${productosDetailText}
 
   const handleSendMesaPayment = async () => {
     if (!processedOrder) return;
-    if (mesaPaymentMethod === 'Pago Móvil' && (!paymentBank || !paymentReference.trim())) {
-      setValidationError('Completa el banco emisor y la referencia de pago.');
-      return;
-    }
-    if (mesaPaymentMethod === 'Zelle' && !paymentReference.trim()) {
+    if (mesaPaymentMethod === 'Pago Móvil' && !paymentReference.trim()) {
       setValidationError('Ingresa la referencia de pago.');
-      return;
-    }
-    if (mesaPaymentMethod === 'Transferencia' && !paymentReference.trim()) {
-      setValidationError('Ingresa la referencia de transferencia.');
       return;
     }
     setValidationError('');
@@ -654,9 +646,7 @@ ${productosDetailText}
     const updateData: any = { metodo_pago: mesaPaymentMethod };
     if (mesaPaymentMethod === 'Pago Móvil') {
       updateData.referencia_pago = paymentReference;
-      updateData.banco_origen = paymentBank;
-    } else if (mesaPaymentMethod === 'Zelle' || mesaPaymentMethod === 'Transferencia') {
-      updateData.referencia_pago = paymentReference;
+      updateData.banco_origen = 'Banesco (0134)';
     }
 
     const { error } = await supabase.from('orders').update(updateData).eq('id', processedOrder.id);
@@ -750,14 +740,12 @@ ${productosDetailText}
             {/* Selección de método de pago */}
             <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
               <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Método de Pago</h3>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {[
-                  { key: 'Pago Móvil', label: 'Pago Móvil Bs', icon: 'Bs', enabled: config.pagomovil_enabled },
-                  { key: 'Efectivo', label: 'Efectivo', icon: '$', enabled: config.efectivo_enabled },
-                  { key: 'Punto', label: 'Punto de Venta', icon: 'Pt', enabled: true },
-                  { key: 'Zelle', label: 'Zelle USD', icon: 'USD', enabled: config.zelle_enabled },
-                  { key: 'Transferencia', label: 'Transferencia', icon: 'Bco', enabled: config.transferencia_enabled },
-                ].filter(pm => pm.enabled).map(pm => (
+                  { key: 'Pago Móvil', label: 'Pago Móvil', icon: 'Bs' },
+                  { key: 'Efectivo', label: 'Efectivo', icon: '$' },
+                  { key: 'Punto', label: 'Punto de Venta', icon: 'Pt' },
+                ].map(pm => (
                   <button key={pm.key} onClick={() => setMesaPaymentMethod(pm.key as typeof mesaPaymentMethod)} className={`p-3 rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer border-2 text-xs ${
                     mesaPaymentMethod === pm.key ? 'text-white shadow-md' : 'bg-[#f9f9fb] border-[#e4beb1]/10 text-[#5b4137] hover:bg-[#eeeef0]'
                   }`} style={mesaPaymentMethod === pm.key ? { backgroundColor: orderTypeColor, borderColor: orderTypeColor } : {}}>
@@ -771,33 +759,34 @@ ${productosDetailText}
               <div className="mt-3 p-3 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl">
                 {mesaPaymentMethod === 'Pago Móvil' && (
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                      <div>
-                        <span className="text-[9px] text-[#8f7065] uppercase block">Banco / Titular</span>
-                        <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || 'Banesco (0134)').split('-')[0]?.trim()}</span>
+                    {/* Datos hardcoded Banesco */}
+                    <div className="p-2 rounded-lg border border-[#e67e22]/30 bg-[#e67e22]/5">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[9px] font-bold uppercase" style={{ color: orderTypeColor }}>Banesco (0134)</span>
+                        <span className="text-[8px] px-1 py-0.5 rounded-full text-white font-bold" style={{ backgroundColor: orderTypeColor }}>Principal</span>
                       </div>
-                      <CopyButton text={config.pagomovil_data || 'Banesco (0134)'} fieldId="pm-data-payment" />
-                    </div>
-                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                      <div>
-                        <span className="text-[9px] text-[#8f7065] uppercase block">Teléfono</span>
-                        <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'}</span>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] text-[#8f7065]">Teléfono</span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-[#1a1c1d] font-bold text-[11px]">04123758879</span>
+                            <CopyButton text="04123758879" fieldId="pm-phone-checkout" />
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] text-[#8f7065]">Cédula/RIF</span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-[#1a1c1d] font-bold text-[11px]">V-33112679</span>
+                            <CopyButton text="V-33112679" fieldId="pm-ci-checkout" />
+                          </div>
+                        </div>
                       </div>
-                      <CopyButton text={(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'} fieldId="pm-phone-payment" />
-                    </div>
-                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                      <div>
-                        <span className="text-[9px] text-[#8f7065] uppercase block">Cédula / RIF</span>
-                        <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'}</span>
-                      </div>
-                      <CopyButton text={(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'} fieldId="pm-ci-payment" />
                     </div>
                     <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {displayOrder.total_bs?.toFixed(2)} Bs.</p>
                     <div className="space-y-2 mt-2 pt-2 border-t border-[#e4beb1]/10">
                       <div>
-                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Banco Emisor *</label>
+                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Tu Banco Emisor *</label>
                         <select value={paymentBank} onChange={(e) => setPaymentBank(e.target.value)} className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer">
-                          <option value="">Seleccionar banco</option>
                           <option value="Banesco">Banesco (0134)</option>
                           <option value="Mercantil">Mercantil (0102)</option>
                           <option value="Venezuela">Banco de Venezuela (0102)</option>
@@ -819,7 +808,7 @@ ${productosDetailText}
                 )}
                 {mesaPaymentMethod === 'Efectivo' && (
                   <div className="text-center py-2">
-                    <p className="text-xs text-[#5b4137] mb-2">{config.efectivo_data || 'Paga en caja al recibir tu pedido'}</p>
+                    <p className="text-xs text-[#5b4137] mb-2">Paga en caja al recibir tu pedido</p>
                     <p className="font-black text-sm" style={{ color: themeColor }}>Total: ${displayOrder.total_usd?.toFixed(2)}</p>
                   </div>
                 )}
@@ -827,50 +816,6 @@ ${productosDetailText}
                   <div className="text-center py-2">
                     <p className="text-xs text-[#5b4137] mb-2">Paga con tu punto de venta en caja</p>
                     <p className="font-black text-sm" style={{ color: themeColor }}>Total: ${displayOrder.total_usd?.toFixed(2)}</p>
-                  </div>
-                )}
-                {mesaPaymentMethod === 'Zelle' && (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                      <div>
-                        <span className="text-[9px] text-[#8f7065] uppercase block">Correo Zelle</span>
-                        <span className="text-[#1a1c1d] font-bold text-xs">{config.zelle_data || 'pagos@email.com'}</span>
-                      </div>
-                      <CopyButton text={config.zelle_data || 'pagos@email.com'} fieldId="zelle-email-payment" />
-                    </div>
-                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                      <div>
-                        <span className="text-[9px] text-[#8f7065] uppercase block">Monto a enviar</span>
-                        <span className="font-black text-sm" style={{ color: themeColor }}>${displayOrder.total_usd?.toFixed(2)} USD</span>
-                      </div>
-                      <CopyButton text={`$${displayOrder.total_usd?.toFixed(2)}`} fieldId="zelle-amount-payment" />
-                    </div>
-                    <div className="mt-2 pt-2 border-t border-[#e4beb1]/10">
-                      <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia / Nota Zelle</label>
-                      <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: Confirmación Zelle" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
-                    </div>
-                  </div>
-                )}
-                {mesaPaymentMethod === 'Transferencia' && (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                      <div>
-                        <span className="text-[9px] text-[#8f7065] uppercase block">Datos Bancarios</span>
-                        <span className="text-[#1a1c1d] font-bold text-xs">{config.transferencia_data || `Banesco - ${config.site_nombre}`}</span>
-                      </div>
-                      <CopyButton text={config.transferencia_data || `Banesco - ${config.site_nombre}`} fieldId="transfer-data-payment" />
-                    </div>
-                    <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                      <div>
-                        <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
-                        <span className="font-black text-sm" style={{ color: themeColor }}>${displayOrder.total_usd?.toFixed(2)} USD</span>
-                      </div>
-                      <CopyButton text={`$${displayOrder.total_usd?.toFixed(2)}`} fieldId="transfer-amount-payment" />
-                    </div>
-                    <div className="mt-2 pt-2 border-t border-[#e4beb1]/10">
-                      <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia</label>
-                      <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
-                    </div>
                   </div>
                 )}
               </div>
@@ -895,7 +840,7 @@ ${productosDetailText}
                 {isProcessing ? 'Procesando...' : 'Pagar en Caja'}
               </button>
             ) : (
-              <button onClick={handleSendMesaPayment} disabled={isProcessing || (mesaPaymentMethod === 'Pago Móvil' && (!paymentBank || !paymentReference.trim())) || ((mesaPaymentMethod === 'Zelle' || mesaPaymentMethod === 'Transferencia') && !paymentReference.trim())} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : '#10b981' }}>
+              <button onClick={handleSendMesaPayment} disabled={isProcessing || (mesaPaymentMethod === 'Pago Móvil' && !paymentReference.trim())} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : '#10b981' }}>
                 {isProcessing ? 'Procesando...' : 'Enviar Pago'}
               </button>
             )}

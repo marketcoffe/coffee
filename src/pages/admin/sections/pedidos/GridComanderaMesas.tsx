@@ -37,12 +37,12 @@ function getStatusBadge(status: Order['status']): { label: string; className: st
   }
 }
 
-function getElapsedTime(fecha: string): { text: string; color: string } {
+function getElapsedTime(fecha: string): { text: string; color: string; urgent: boolean } {
   const diff = Date.now() - new Date(fecha).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 5) return { text: `${mins}m`, color: 'text-emerald-600' };
-  if (mins < 15) return { text: `${mins}m`, color: 'text-amber-600' };
-  return { text: `${mins}m`, color: 'text-red-600' };
+  if (mins < 5) return { text: `${mins}m`, color: 'text-emerald-600', urgent: false };
+  if (mins < 15) return { text: `${mins}m`, color: 'text-amber-600', urgent: false };
+  return { text: `${mins}m`, color: 'text-red-600', urgent: true };
 }
 
 interface GridComanderaMesasProps {
@@ -62,23 +62,33 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
   const [rejectReason, setRejectReason] = useState('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const prevOrderCountRef = useRef(0);
+  const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set());
 
   // Sound alert for new orders
   useEffect(() => {
-    if (orders.length > prevOrderCountRef.current && soundEnabled) {
-      const newOrders = orders.filter(o =>
-        o.tipo_pedido === 'mesa' && o.status === 'enviado_cocina' &&
-        !['Cancelado', 'cancelado', 'completado', 'Entregado'].includes(o.status)
-      );
-      if (newOrders.length > 0) {
-        try {
-          const audio = new Audio('/sounds/notification.mp3');
-          audio.volume = 0.8;
-          audio.play().catch(() => {});
-        } catch {}
-      }
+    const mesaOrders = orders.filter(o =>
+      (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') &&
+      o.status === 'enviado_cocina' &&
+      !['Cancelado', 'cancelado', 'completado', 'Entregado'].includes(o.status)
+    );
+    if (mesaOrders.length > prevOrderCountRef.current && soundEnabled) {
+      try {
+        const audio = new Audio('/sounds/notification.mp3');
+        audio.volume = 0.8;
+        audio.play().catch(() => {});
+      } catch {}
     }
-    prevOrderCountRef.current = orders.length;
+    // Mark new orders for flash animation
+    if (mesaOrders.length > prevOrderCountRef.current) {
+      const newIds = mesaOrders.filter(o => !prevOrderCountRef.current || true).slice(0, 3).map(o => o.id);
+      setNewOrderIds(prev => new Set([...prev, ...newIds]));
+      setTimeout(() => setNewOrderIds(prev => {
+        const next = new Set(prev);
+        newIds.forEach(id => next.delete(id));
+        return next;
+      }), 3000);
+    }
+    prevOrderCountRef.current = mesaOrders.length;
   }, [orders, soundEnabled]);
 
   // Realtime subscription
@@ -87,6 +97,19 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders', filter: 'tipo_pedido=eq.mesa' }, () => refreshOrders())
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: 'tipo_pedido=eq.mesa' }, () => refreshOrders())
       .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
+        const o = payload.payload;
+        if (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') {
+          refreshOrders();
+          // Flash animation for new order
+          setNewOrderIds(prev => new Set([...prev, o.id]));
+          setTimeout(() => setNewOrderIds(prev => {
+            const next = new Set(prev);
+            next.delete(o.id);
+            return next;
+          }), 3000);
+        }
+      })
+      .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
         const o = payload.payload;
         if (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') refreshOrders();
       })
@@ -166,6 +189,7 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
     const elapsed = getElapsedTime(order.fecha);
     const isPendingKitchen = order.status === 'enviado_cocina';
     const isPendingPayment = order.status === 'pago_enviado' || order.status === 'pendiente_pago';
+    const isNew = newOrderIds.has(order.id);
 
     return (
       <div
@@ -173,7 +197,9 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
         onClick={() => setSelectedOrder(isSelected ? null : order.id)}
         className={`bg-white rounded-2xl border-2 p-4 transition-all cursor-pointer hover:shadow-md ${
           isSelected ? 'ring-2 ring-offset-2' : ''
-        } ${isPendingKitchen ? 'border-blue-300 animate-pulse' : isPendingPayment ? 'border-amber-300' : 'border-[#e4beb1]/20'}`}
+        } ${isNew ? 'animate-pulse border-amber-400 shadow-lg shadow-amber-100' : ''} ${
+          isPendingKitchen && !isNew ? 'border-blue-300' : isPendingPayment ? 'border-amber-300' : 'border-[#e4beb1]/20'
+        }`}
         style={isSelected ? { outlineColor: themeColor } : {}}
       >
         {/* Header */}
@@ -191,7 +217,10 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
             <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${statusBadge.className}`}>
               {statusBadge.label}
             </span>
-            <span className={`text-[9px] font-bold ${elapsed.color}`}>{elapsed.text}</span>
+            <span className={`text-[9px] font-bold flex items-center gap-1 ${elapsed.color}`}>
+              {elapsed.urgent && <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />}
+              {elapsed.text}
+            </span>
           </div>
         </div>
 
@@ -246,28 +275,28 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
 
         {/* Actions */}
         {isSelected && (
-          <div className="space-y-2 pt-2 border-t border-[#e4beb1]/10">
+          <div className="space-y-2 pt-3 border-t border-[#e4beb1]/10">
             <button onClick={(e) => { e.stopPropagation(); handlePrint(order); }}
-              className="w-full py-2 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1.5 border-2 transition-all cursor-pointer"
+              className="w-full py-2.5 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1.5 border-2 transition-all cursor-pointer hover:opacity-80"
               style={{ borderColor: themeColor, color: themeColor }}>
               <Printer size={12} /> Imprimir Comanda
             </button>
             {isPendingKitchen && (
-              <>
+              <div className="flex gap-2">
                 <button onClick={(e) => { e.stopPropagation(); handleAccept(order.id); }}
-                  className="w-full py-2 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1.5 text-white transition-all cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1.5 text-white transition-all cursor-pointer hover:brightness-110 active:scale-95"
                   style={{ backgroundColor: '#10b981' }}>
-                  <CheckCircle size={12} /> Aceptar Pedido
+                  <CheckCircle size={12} /> Aceptar
                 </button>
                 <button onClick={(e) => { e.stopPropagation(); setRejectModal(order.id); }}
-                  className="w-full py-2 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1.5 bg-red-500 text-white transition-all cursor-pointer">
-                  <Ban size={12} /> Rechazar Pedido
+                  className="flex-1 py-2.5 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1.5 bg-red-500 text-white transition-all cursor-pointer hover:brightness-110 active:scale-95">
+                  <Ban size={12} /> Rechazar
                 </button>
-              </>
+              </div>
             )}
             {isPendingPayment && (
               <button onClick={(e) => { e.stopPropagation(); setShowPaymentModal(order.id); }}
-                className="w-full py-2 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1.5 text-white transition-all cursor-pointer"
+                className="w-full py-2.5 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1.5 text-white transition-all cursor-pointer hover:brightness-110 active:scale-95"
                 style={{ backgroundColor: '#10b981' }}>
                 <CheckCircle size={12} /> Verificar Pago
               </button>
@@ -292,6 +321,12 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
           <p className="text-[10px] text-slate-400 mt-0.5">{activeMesaOrders.length} pedidos activos</p>
         </div>
         <div className="flex items-center gap-2">
+          {newOrderIds.size > 0 && (
+            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-amber-100 text-amber-700 text-[9px] font-bold animate-pulse">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              Nuevo
+            </span>
+          )}
           <button onClick={() => setSoundEnabled(!soundEnabled)}
             className="p-2 rounded-xl bg-white border border-[#e4beb1]/10 cursor-pointer hover:bg-[#f9f9fb] transition-colors">
             {soundEnabled ? <Volume2 size={14} className="text-[#1a1c1d]" /> : <VolumeX size={14} className="text-[#8f7065]" />}

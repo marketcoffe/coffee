@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { useOrders } from '../../hooks/useOrders';
 import { Order } from '../../../../types/store';
@@ -7,6 +7,7 @@ import { OrderCard, sortOrdersByPriority } from '../../components/OrderCard';
 import { OrderDetailModal } from '../../components/OrderDetailModal';
 import { printOrderTicket } from '../../utils/printUtils';
 import { Tooltip } from '../../components/Tooltip';
+import { supabase } from '../../../../store/supabaseClient';
 
 type TabStatus = 'Pendiente' | 'En preparacion' | 'En camino' | 'Entregado' | 'Cancelado' | 'Todos';
 
@@ -47,7 +48,7 @@ function getUrgencyClass(fecha: string, status: Order['status']): string {
 interface ComandasSectionProps { scopeSedeId?: string; }
 
 const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
-  const { orders, config } = useApp();
+  const { orders, config, refreshOrders } = useApp();
   const { advanceStatus, cancelOrder, bulkAdvance } = useOrders();
   const themeColor = config.theme_color || '#A4D045';
 
@@ -56,6 +57,34 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
   const [sedeFilter, setSedeFilter] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
+  // Escuchar broadcasts para updates instantáneos (<100ms)
+  useEffect(() => {
+    const channel = supabase
+      .channel('comandas_section_realtime')
+      .on('broadcast', { event: 'new_order_broadcast' }, () => {
+        // Cuando llega un pedido nuevo, forzar refresh
+        refreshOrders();
+      })
+      .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
+        // Cuando cambia un estado, forzar refresh
+        const updated = payload.payload;
+        if (updated?.id) {
+          refreshOrders();
+        }
+      })
+      .subscribe();
+
+    channelRef.current = channel;
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+    };
+  }, [refreshOrders]);
 
   const activeSedes = config.sedes?.filter(s => s.activa) || [];
   const lockedSede = scopeSedeId || '';

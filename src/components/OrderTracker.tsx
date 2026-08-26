@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle, Clock, Truck, Package, ChefHat, MapPin, MessageSquare, X, ShoppingBag, Zap, Heart } from 'lucide-react';
+import { CheckCircle, Clock, Truck, Package, ChefHat, MapPin, MessageSquare, X, ShoppingBag, Zap, Heart, Bell } from 'lucide-react';
 import { Order } from '../types/store';
 import { useApp } from '../store/AppContext';
 import { getWhatsAppPhone as resolveBusinessPhone } from '../utils/phone';
@@ -16,21 +16,39 @@ interface OrderTrackerProps {
 function getStatusSteps(orderType?: string) {
   if (orderType === 'mesa' || orderType === 'pickup') {
     return [
-      { key: 'Pendiente', label: 'Recibido', icon: CheckCircle, description: 'Tu pedido fue recibido' },
-      { key: 'enviado_cocina', label: 'En Cocina', icon: ChefHat, description: 'Estamos preparando tu comida' },
-      { key: 'En preparación', label: 'En Preparación', icon: ChefHat, description: 'Tu pedido se está preparando' },
-      { key: 'Listo', label: 'Listo', icon: Package, description: '¡Tu pedido está listo para recoger!' },
-      { key: 'Entregado', label: 'Entregado', icon: CheckCircle, description: '¡Pedido completado!' },
+      { key: 'Pendiente', label: 'Recibido', icon: CheckCircle, description: 'Tu pedido fue recibido', notification: 'Tu pedido fue recibido correctamente' },
+      { key: 'En preparación', label: 'En Preparación', icon: ChefHat, description: 'Estamos preparando tu comida', notification: 'Tu pedido está siendo preparado con amor' },
+      { key: 'Entregado', label: 'Entregado', icon: CheckCircle, description: '¡Pedido completado!', notification: '¡Tu pedido está listo!' },
     ];
   }
   return [
-    { key: 'Pendiente', label: 'Aceptado', icon: CheckCircle, description: 'Tu pedido fue recibido' },
-    { key: 'Procesando', label: 'En Preparación', icon: ChefHat, description: 'Estamos preparando tu comida' },
-    { key: 'En preparación', label: 'Se asignó motorizado', icon: Package, description: 'Un repartidor va por tu pedido' },
-    { key: 'Listo', label: 'Listo para entregar', icon: Package, description: 'Tu pedido está empacado' },
-    { key: 'En camino', label: 'En Camino', icon: Truck, description: 'Tu pedido está en camino' },
-    { key: 'Entregado', label: 'Entregado', icon: MapPin, description: '¡Pedido entregado!' },
+    { key: 'Pendiente', label: 'Aceptado', icon: CheckCircle, description: 'Tu pedido fue recibido', notification: 'Tu pedido fue recibido correctamente' },
+    { key: 'En preparación', label: 'En Preparación', icon: ChefHat, description: 'Estamos preparando tu comida', notification: 'Tu pedido está siendo preparado' },
+    { key: 'En camino', label: 'En Camino', icon: Truck, description: 'Tu pedido va en camino', notification: '¡Tu pedido va en camino!' },
+    { key: 'Entregado', label: 'Entregado', icon: MapPin, description: '¡Pedido entregado!', notification: '¡Tu pedido fue entregado!' },
   ];
+}
+
+function getStatusLabel(status: string): string {
+  const labels: Record<string, string> = {
+    'Pendiente': 'Aceptado',
+    'Procesando': 'En Preparación',
+    'enviado_cocina': 'En Cocina',
+    'En preparación': 'En Preparación',
+    'En preparacion': 'En Preparación',
+    'en_preparacion': 'En Preparación',
+    'Listo': 'Listo',
+    'En camino': 'En Camino',
+    'Entregado': 'Entregado',
+    'Cancelado': 'Cancelado',
+    'completado': 'Completado',
+    'cancelado': 'Cancelado',
+    'pago_enviado': 'Pago Enviado',
+    'pendiente_pago': 'Pendiente Pago',
+    'pendiente_verificacion': 'Verificando',
+    'pago_en_verificacion': 'Verificando Pago',
+  };
+  return labels[status] || status;
 }
 
 const MOTIVATIONAL_MESSAGES = [
@@ -53,7 +71,9 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
   const [adIdx, setAdIdx] = useState(0);
   const [liveStatus, setLiveStatus] = useState(order.status);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const orderType = order.tipo_entrega || order.tipo_pedido || 'delivery';
   const STATUS_STEPS = useMemo(() => getStatusSteps(orderType), [orderType]);
@@ -66,6 +86,22 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
       .sort(() => Math.random() - 0.5)
       .slice(0, 6);
   }, [foodItems]);
+
+  const showToast = useCallback((message: string) => {
+    setToast({ message, visible: true });
+    setTimeout(() => setToast({ message: '', visible: false }), 4000);
+  }, []);
+
+  const playUpdateSound = useCallback(() => {
+    try {
+      if (!audioRef.current) {
+        audioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVggoKIeGBGPHeTnJVqO0Bvkp2XbEVCdZCdlWlEQ3aPnJZpQ0N2j5yVaUN');
+        audioRef.current.volume = 0.3;
+      }
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {});
+    } catch {}
+  }, []);
 
   useEffect(() => {
     const msgTimer = setInterval(() => {
@@ -84,20 +120,39 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
   useEffect(() => {
     if (!order.id) return;
 
+    const handleStatusChange = (newStatus: string) => {
+      if (newStatus && newStatus !== liveStatus) {
+        setLiveStatus(newStatus as Order['status']);
+        setLastUpdate(new Date());
+        onStatusUpdate?.(newStatus);
+
+        const step = STATUS_STEPS.find(s => s.key === newStatus);
+        if (step) {
+          showToast(step.notification);
+          playUpdateSound();
+        }
+      }
+    };
+
+    // Canal dual: CDC (respaldo) + Broadcast (instantáneo)
     const channel = supabase
       .channel(`order-tracker-${order.id}`)
+      // CDC listener (respaldo, ~200-500ms)
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${order.id}` },
         (payload) => {
           const newStatus = payload.new?.status;
-          if (newStatus && newStatus !== liveStatus) {
-            setLiveStatus(newStatus);
-            setLastUpdate(new Date());
-            onStatusUpdate?.(newStatus);
-          }
+          handleStatusChange(newStatus);
         }
       )
+      // Broadcast listener (instantáneo, <100ms)
+      .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
+        const updated = payload.payload;
+        if (updated?.id === order.id) {
+          handleStatusChange(updated.status);
+        }
+      })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           console.log('[OrderTracker] Realtime connected for order', order.id);
@@ -112,7 +167,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
         channelRef.current = null;
       }
     };
-  }, [order.id]);
+  }, [order.id, liveStatus, onStatusUpdate, showToast, playUpdateSound, STATUS_STEPS]);
 
   const getWhatsAppPhone = (): string => {
     const sede = order.sede_id
@@ -122,7 +177,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
   };
 
   const handleSendMessage = () => {
-    const msg = `Hola! Quiero saber sobre mi pedido *${order.id}*\nEstado actual: ${liveStatus}`;
+    const msg = `Hola! Quiero saber sobre mi pedido *${order.id}*\nEstado actual: ${getStatusLabel(liveStatus)}`;
     window.open(`https://wa.me/${getWhatsAppPhone()}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
@@ -132,6 +187,22 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
   return (
     <div className="fixed inset-0 z-[120] flex items-end lg:items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={isDelivered ? onClose : undefined} />
+
+      {/* Toast notification */}
+      <AnimatePresence>
+        {toast.visible && (
+          <motion.div
+            initial={{ opacity: 0, y: -50, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: -50, x: '-50%' }}
+            className="fixed top-6 left-1/2 z-[130] flex items-center gap-2 px-4 py-3 rounded-2xl shadow-2xl border"
+            style={{ backgroundColor: themeColor, borderColor: `${themeColor}40`, maxWidth: '90vw' }}
+          >
+            <Bell size={16} className="text-white shrink-0" />
+            <span className="text-xs font-bold text-white">{toast.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <motion.div
         initial={{ opacity: 0, y: 40 }}
@@ -182,7 +253,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
                 )}
               </motion.div>
               <span className="text-xs font-black" style={{ color: isDelivered ? '#10B981' : themeColor }}>
-                {STATUS_STEPS.find(s => s.key === liveStatus)?.label || liveStatus}
+                {getStatusLabel(liveStatus)}
               </span>
             </motion.div>
           </div>
