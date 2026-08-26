@@ -91,9 +91,9 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
     prevOrderCountRef.current = mesaOrders.length;
   }, [orders, soundEnabled]);
 
-  // Realtime subscription
+  // Realtime subscription — escucha en canal global marketo_realtime_system
   useEffect(() => {
-    const channel = supabase.channel('grid_comandera_live')
+    const channel = supabase.channel('marketo_realtime_system')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders', filter: 'tipo_pedido=eq.mesa' }, () => refreshOrders())
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: 'tipo_pedido=eq.mesa' }, () => refreshOrders())
       .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {

@@ -53,7 +53,7 @@ const PedidosMesaSection: React.FC<PedidosMesaSectionProps> = ({ scopeSedeId }) 
 
   // Refuerzo: escuchar broadcast global para pedidos de mesa (bypasea RLS/cache)
   useEffect(() => {
-    const channel = supabase.channel('pedidos_mesa_section_live')
+    const channel = supabase.channel('marketo_realtime_system')
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
@@ -67,6 +67,12 @@ const PedidosMesaSection: React.FC<PedidosMesaSectionProps> = ({ scopeSedeId }) 
         filter: 'tipo_pedido=eq.mesa'
       }, () => { refreshOrders(); })
       .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
+        const o = payload.payload;
+        if (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') {
+          refreshOrders();
+        }
+      })
+      .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
         const o = payload.payload;
         if (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') {
           refreshOrders();

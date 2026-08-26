@@ -1885,13 +1885,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     if (estimatedTime) statusMsg += ` Tiempo estimado: ${estimatedTime}.`;
 
-    // Enviar notificación (await para garantizar que se inserta antes del update)
-    if (targetPhone) {
-      await addNotification('Estado de Pedido Actualizado', statusMsg, 'personal', targetPhone);
-    } else {
-      await addNotification('Estado de Pedido Actualizado', statusMsg, 'todos');
-    }
-
     const { error } = await supabase.from('orders')
       .update(updatePayload)
       .eq('id', orderId);
@@ -1903,6 +1896,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
       return false;
     } else {
+      // Enviar notificación DESPUÉS del UPDATE exitoso (fire-and-forget, no bloquea)
+      if (targetPhone) {
+        addNotification('Estado de Pedido Actualizado', statusMsg, 'personal', targetPhone);
+      } else {
+        addNotification('Estado de Pedido Actualizado', statusMsg, 'todos');
+      }
+
       // Broadcast instantáneo para que el cliente reciba el cambio en <100ms
       try {
         const updatedOrder = { ...prevOrder, ...updatePayload } as Order;

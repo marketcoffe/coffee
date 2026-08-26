@@ -62,7 +62,7 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
   // Escuchar broadcasts para updates instantáneos (<100ms)
   useEffect(() => {
     const channel = supabase
-      .channel('comandas_section_realtime')
+      .channel('marketo_realtime_system')
       .on('broadcast', { event: 'new_order_broadcast' }, () => {
         // Cuando llega un pedido nuevo, forzar refresh
         refreshOrders();

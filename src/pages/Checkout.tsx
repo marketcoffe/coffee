@@ -677,20 +677,23 @@ ${productosDetailText}
     setValidationError('');
     setIsProcessing(true);
 
-    const updateData: any = { metodo_pago: mesaPaymentMethod };
+    const updates: any = { metodo_pago: mesaPaymentMethod };
     if (mesaPaymentMethod === 'Pago Móvil') {
-      updateData.referencia_pago = paymentReference;
-      updateData.banco_origen = 'Banesco (0134)';
+      updates.referencia_pago = paymentReference;
+      updates.banco_origen = 'Banesco (0134)';
     }
 
-    const { error } = await supabase.from('orders').update(updateData).eq('id', processedOrder.id);
+    const { error } = await supabase.rpc('actualizar_pedido_cliente', {
+      p_order_id: processedOrder.id,
+      p_updates: updates
+    });
     if (error) {
       setValidationError('Error al enviar los datos de pago.');
       setIsProcessing(false);
       return;
     }
 
-    setProcessedOrder(prev => prev ? { ...prev, ...updateData } : prev);
+    setProcessedOrder(prev => prev ? { ...prev, ...updates } : prev);
     setMesaPaymentSent(true);
     setIsProcessing(false);
   };
@@ -698,7 +701,10 @@ ${productosDetailText}
   const handleMesaPayAtRegister = async () => {
     if (!processedOrder) return;
     setIsProcessing(true);
-    const { error } = await supabase.from('orders').update({ status: 'pendiente_pago' }).eq('id', processedOrder.id);
+    const { error } = await supabase.rpc('actualizar_pedido_cliente', {
+      p_order_id: processedOrder.id,
+      p_updates: { status: 'pendiente_pago' }
+    });
     if (!error) {
       setProcessedOrder(prev => prev ? { ...prev, status: 'pendiente_pago' } : prev);
     }

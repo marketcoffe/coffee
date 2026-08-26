@@ -76,12 +76,8 @@ export function sortOrdersByPriority(orders: Order[]): Order[] {
 
 export const OrderCard: React.FC<OrderCardProps> = ({ order, onAdvanceStatus, onCancel, onPrint, onWhatsApp, onOpenDetail, themeColor, kitchenMode, sequenceNumber }) => {
   const statusCfg = STATUS_CONFIG[order.status] || STATUS_CONFIG['Pendiente'];
-  const isFinal = order.status === 'Entregado' || order.status === 'Cancelado';
+  const isFinal = order.status === 'Entregado' || order.status === 'Cancelado' || order.status === 'completado' || order.status === 'cancelado';
   const elapsed = getElapsed(order.fecha);
-
-  const flow: Order['status'][] = ['Pendiente', 'En preparación', 'En camino', 'Entregado'];
-  const currentIdx = flow.indexOf(order.status);
-  const nextStatus = currentIdx >= 0 && currentIdx < flow.length - 1 ? flow[currentIdx + 1] : null;
 
   const nextLabel: Record<string, string> = {
     'Pendiente': 'En Preparación',
@@ -97,6 +93,22 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onAdvanceStatus, on
     'Listo': order.tipo_entrega === 'delivery' ? 'En Camino' : 'Entregado',
     'En camino': 'Entregado',
   };
+
+  function getNextStatus(status: Order['status'], tipoEntrega?: string): Order['status'] | null {
+    if (status === 'Entregado' || status === 'Cancelado' || status === 'completado' || status === 'cancelado') return null;
+    if (status === 'En camino') return 'Entregado';
+    if (status === 'En preparación' || status === 'En preparacion' || status === 'en_preparacion') {
+      return tipoEntrega === 'delivery' ? 'En camino' : 'Entregado';
+    }
+    if (status === 'Pendiente' || status === 'Procesando' || status === 'enviado_cocina' ||
+        status === 'pendiente_verificacion' || status === 'pago_enviado' || status === 'pendiente_pago' ||
+        status === 'pago_en_verificacion' || status === 'Listo') {
+      return 'En preparación';
+    }
+    return null;
+  }
+
+  const nextStatus = getNextStatus(order.status, order.tipo_entrega);
 
   const subtotal = order.subtotal_usd || order.total_usd;
   const shipping = order.costo_envio_usd || 0;

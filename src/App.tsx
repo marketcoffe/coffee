@@ -130,7 +130,9 @@ function AppContent() {
     if (config.theme_color) {
       const themeMeta = document.querySelector('meta[name="theme-color"]');
       if (themeMeta) themeMeta.setAttribute('content', config.theme_color);
-      document.body.style.backgroundColor = config.theme_color;
+      // Update preload background style to prevent FOUC
+      const preloadBg = document.getElementById('preload-bg');
+      if (preloadBg) preloadBg.textContent = 'body { background-color: ' + config.theme_color + '; }';
     }
 
     // Update apple-touch-icon
@@ -202,10 +204,11 @@ function AppContent() {
 
   // Admin: body background blanco para evitar espacio marrón al hacer scroll
   useEffect(() => {
+    const preloadBg = document.getElementById('preload-bg');
     if (tab === 'admin') {
-      document.body.style.backgroundColor = '#ffffff';
+      if (preloadBg) preloadBg.textContent = 'body { background-color: #ffffff; }';
     } else {
-      document.body.style.backgroundColor = config.theme_color || '#F8F6F0';
+      if (preloadBg) preloadBg.textContent = 'body { background-color: ' + (config.theme_color || '#F8F6F0') + '; }';
     }
   }, [tab, config.theme_color]);
 

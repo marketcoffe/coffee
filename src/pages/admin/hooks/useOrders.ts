@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useApp } from '../../../store/AppContext';
+import { useToast } from '../../../components/Toast';
 import { Order } from '../../../types/store';
 
 function getNextStatus(status: Order['status'], tipoEntrega?: string): Order['status'] | null {
@@ -29,6 +30,7 @@ function getNextStatus(status: Order['status'], tipoEntrega?: string): Order['st
 
 export function useOrders(sedeId?: string) {
   const { orders, config, updateOrderStatus } = useApp();
+  const { showToast } = useToast();
   const [advancingId, setAdvancingId] = useState<string | null>(null);
   const principalSedeId = (config.sedes || []).find(s => s.es_principal)?.id || (config.sedes || [])[0]?.id || '';
 
@@ -46,20 +48,26 @@ export function useOrders(sedeId?: string) {
     if (!nextStatus) return;
     setAdvancingId(order.id);
     try {
-      await updateOrderStatus(order.id, nextStatus);
+      const result = await updateOrderStatus(order.id, nextStatus);
+      if (result === false) {
+        showToast('error', 'Error al actualizar el estado. Verifica tus permisos.');
+      }
     } finally {
       setAdvancingId(null);
     }
-  }, [updateOrderStatus]);
+  }, [updateOrderStatus, showToast]);
 
   const cancelOrder = useCallback(async (order: Order, reason?: string) => {
     setAdvancingId(order.id);
     try {
-      await updateOrderStatus(order.id, 'Cancelado', undefined, reason || 'Cancelado por administrador');
+      const result = await updateOrderStatus(order.id, 'Cancelado', undefined, reason || 'Cancelado por administrador');
+      if (result === false) {
+        showToast('error', 'Error al cancelar el pedido. Verifica tus permisos.');
+      }
     } finally {
       setAdvancingId(null);
     }
-  }, [updateOrderStatus]);
+  }, [updateOrderStatus, showToast]);
 
   const bulkAdvance = useCallback(async (orderIds: string[]) => {
     for (const id of orderIds) {
