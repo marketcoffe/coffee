@@ -21,13 +21,13 @@ DECLARE
     pol RECORD;
 BEGIN
     FOR pol IN 
-        SELECT policyname 
+        SELECT polname 
         FROM pg_policy 
         WHERE polrelid = 'public.orders'::regclass 
         AND polcmd IN ('a', '*')  -- 'a' = INSERT, '*' = ALL
     LOOP
-        EXECUTE format('DROP POLICY IF EXISTS %I ON orders', pol.policyname);
-        RAISE NOTICE 'Dropped policy: %', pol.policyname;
+        EXECUTE format('DROP POLICY IF EXISTS %I ON orders', pol.polname);
+        RAISE NOTICE 'Dropped policy: %', pol.polname;
     END LOOP;
 END $$;
 
