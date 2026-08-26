@@ -1838,6 +1838,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setCurrentUser(newUser);
 
+    // 5. Vincular pedidos guest existentes al nuevo usuario registrado
+    if (authSucceeded && userId && !userId.startsWith('guest-')) {
+      try {
+        await supabase.rpc('link_guest_orders', { p_phone: cleanPhone });
+      } catch (e) {
+        console.warn('No se pudieron vincular pedidos guest:', e);
+      }
+    }
+
     if (authSucceeded) {
       addNotification(
         '¡Cuenta Creada! 🎉',
