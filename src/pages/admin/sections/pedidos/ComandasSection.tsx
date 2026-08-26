@@ -22,10 +22,12 @@ const COLUMN_CONFIG: Record<KanbanColumn, { label: string; color: string; bg: st
 };
 
 function getOrderColumn(order: Order): KanbanColumn {
-  if (order.status === 'Cancelado') return 'Cancelado';
-  if (order.status === 'Procesando') return 'Pendiente';
-  if (order.status === ('En preparacion' as Order['status']) || order.status === 'En preparación') return 'En preparacion';
-  return order.status as KanbanColumn;
+  if (order.status === 'Cancelado' || order.status === 'cancelado') return 'Cancelado';
+  if (order.status === 'Procesando' || order.status === 'pendiente_verificacion' || order.status === 'pago_enviado' || order.status === 'pendiente_pago' || order.status === 'pago_en_verificacion') return 'Pendiente';
+  if (order.status === 'En preparacion' || order.status === 'En preparación' || order.status === 'en_preparacion' || order.status === 'enviado_cocina') return 'En preparacion';
+  if (order.status === 'Entregado' || order.status === 'completado') return 'Entregado';
+  if (order.status === 'Listo' || order.status === 'En camino') return order.status as KanbanColumn;
+  return 'Pendiente';
 }
 
 function getUrgencyClass(fecha: string, status: Order['status']): string {
@@ -59,7 +61,7 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
   const effectiveSedeFilter = lockedSede || sedeFilter;
 
   const allDisplayOrders = useMemo(() => {
-    let result = [...orders];
+    let result = [...(orders || [])];
     if (effectiveSedeFilter) result = result.filter(o => o.sede_id === effectiveSedeFilter);
     return result;
   }, [orders, effectiveSedeFilter]);
@@ -120,7 +122,7 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
 
   const exportCSV = () => {
     const headers = ["ID", "Fecha", "Cliente", "Telefono", "Metodo Pago", "Total USD", "Status"];
-    const rows = allDisplayOrders.map(o => [o.id, o.fecha, o.cliente_nombre, o.cliente_telefono, o.metodo_pago, o.total_usd.toFixed(2), o.status]);
+    const rows = allDisplayOrders.map(o => [o.id, o.fecha, o.cliente_nombre, o.cliente_telefono, o.metodo_pago, (o.total_usd ?? 0).toFixed(2), o.status]);
     const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
