@@ -13,7 +13,7 @@ import { FloatingCartButton } from '../components/FloatingCartButton';
 import { SedesMap } from '../components/SedesMap';
 import { findNearestSede } from '../utils/geo';
 import { getWhatsAppPhone } from '../utils/phone';
-import { hasCategory, categoryIncludes, formatCategories } from '../utils/categoryUtils';
+import { hasCategory, hasAnyCategory, categoryIncludes, formatCategories } from '../utils/categoryUtils';
 import { formatVes } from '../utils/bcvRate';
 
 interface BeforeInstallPromptEvent {
@@ -74,7 +74,7 @@ export const Home: React.FC<HomeProps> = ({
 
   const activeItems = useMemo(() => foodItems.filter(p => p.activo !== false), [foodItems]);
   const promoItems = useMemo(() => activeItems.filter(p => p.es_promo), [activeItems]);
-  const activeCombos = useMemo(() => (config.combos || []).filter(c => c.active), [config.combos]);
+  const activeCombos = useMemo(() => (config.combos || []).filter(c => c?.active), [config.combos]);
   const faqItems = useMemo(() => config.faq_items && config.faq_items.length > 0 ? config.faq_items : DEFAULT_FAQ, [config.faq_items]);
   const activePromotions = useMemo(() => {
     const now = new Date().toISOString();
@@ -99,7 +99,7 @@ export const Home: React.FC<HomeProps> = ({
   const combosFamiliaresItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Combos Familiares')).slice(0, 8), [activeItems]);
 
   const masVendidosItems = useMemo(() => activeItems.filter(p => p.es_mas_vendido).slice(0, 8), [activeItems]);
-  const combosCategoriaItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Combos') || hasCategory(p, 'Combos') || (p.categoria ?? []).some(c => c.toLowerCase() === 'combos')).slice(0, 8), [activeItems]);
+  const combosCategoriaItems = useMemo(() => activeItems.filter(p => hasCategory(p, 'Combos') || hasAnyCategory(p, ['Combos', 'combos'])).slice(0, 8), [activeItems]);
 
   const coveredCategoryKeywords = useMemo(() => [
     'panaderia', 'panadería', 'comida rapida', 'comida rápida', 'repostería', 'reposteria',
@@ -913,7 +913,7 @@ export const Home: React.FC<HomeProps> = ({
           {/* Desktop: Grid */}
           <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-4">
             {activeCombos.map((combo) => {
-              const prods = combo.product_ids.map(id => activeItems.find(p => p.id === id)).filter(Boolean) as FoodItem[];
+              const prods = (combo.product_ids || []).map(id => activeItems.find(p => p.id === id)).filter(Boolean) as FoodItem[];
               const img = combo.imagen_url || prods[0]?.imagen_urls?.[0] || '';
               return (
                 <div key={combo.id} className="flex rounded-2xl border overflow-hidden h-36 transition-all hover:-translate-y-1 group cursor-pointer"
@@ -944,7 +944,7 @@ export const Home: React.FC<HomeProps> = ({
           {/* Mobile: Horizontal Carousel */}
           <div ref={comboRef} className="flex md:hidden gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
             {activeCombos.map((combo) => {
-              const prods = combo.product_ids.map(id => activeItems.find(p => p.id === id)).filter(Boolean) as FoodItem[];
+              const prods = (combo.product_ids || []).map(id => activeItems.find(p => p.id === id)).filter(Boolean) as FoodItem[];
               const img = combo.imagen_url || prods[0]?.imagen_urls?.[0] || '';
               return (
                 <div key={combo.id} className="flex w-[180px] rounded-xl border overflow-hidden h-[150px] shrink-0"
