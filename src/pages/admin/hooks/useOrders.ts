@@ -3,22 +3,28 @@ import { useApp } from '../../../store/AppContext';
 import { Order } from '../../../types/store';
 
 function getNextStatus(status: Order['status'], tipoEntrega?: string): Order['status'] | null {
-  const flow: Record<string, Order['status']> = {
-    'enviado_cocina': 'En preparación',
-    'pendiente_verificacion': 'Pendiente',
-    'pago_enviado': 'En preparación',
-    'pendiente_pago': 'En preparación',
-    'pago_en_verificacion': 'En preparación',
-    'Pendiente': 'Procesando',
-    'Procesando': 'En preparación',
-    'En preparación': 'Listo',
-    'En preparacion': 'Listo',
-    'en_preparacion': 'Listo',
-  };
-  // After "Listo": delivery goes to "En camino", mesa/pickup go to "Entregado"
-  if (status === 'Listo') return tipoEntrega === 'delivery' ? 'En camino' : 'Entregado';
+  if (status === 'Entregado' || status === 'Cancelado' || status === 'completado' || status === 'cancelado') return null;
+
   if (status === 'En camino') return 'Entregado';
-  return flow[status] ?? null;
+
+  if (status === 'En preparación' || status === 'En preparacion' || status === 'en_preparacion') {
+    return tipoEntrega === 'delivery' ? 'En camino' : 'Entregado';
+  }
+
+  if (
+    status === 'Pendiente' ||
+    status === 'Procesando' ||
+    status === 'enviado_cocina' ||
+    status === 'pendiente_verificacion' ||
+    status === 'pago_enviado' ||
+    status === 'pendiente_pago' ||
+    status === 'pago_en_verificacion' ||
+    status === 'Listo'
+  ) {
+    return 'En preparación';
+  }
+
+  return null;
 }
 
 export function useOrders(sedeId?: string) {

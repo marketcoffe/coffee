@@ -1297,3 +1297,78 @@ svg {
   border-top: none;
   border-radius: 0 0 var(--erp-card-radius) var(--erp-card-radius);
 }
+
+/* ============================================
+   ORDER SYSTEM - NEW STYLES
+   ============================================ */
+
+/* Tab flash animation for new orders */
+@keyframes tabFlash {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.1); }
+}
+
+.tab-flash {
+  animation: tabFlash 0.6s ease-in-out infinite;
+}
+
+/* Slide up animation for modals */
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Order urgency classes */
+.order-urgency-low {
+  border-left: 3px solid #22c55e;
+}
+
+.order-urgency-medium {
+  border-left: 3px solid #f59e0b;
+}
+
+.order-urgency-high {
+  border-left: 3px solid #ef4444;
+  animation: urgencyPulse 2s ease-in-out infinite;
+}
+
+@keyframes urgencyPulse {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(239, 68, 68, 0.05); }
+}
+
+/* No scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Panel slide animation */
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* Smooth transitions for order cards */
+.order-card-enter {
+  animation: slideUp 0.2s ease-out;
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 640px) {
+  .erp-kanban-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .erp-kanban-body {
+    max-height: calc(100vh - 280px);
+  }
+}

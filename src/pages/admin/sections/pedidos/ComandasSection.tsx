@@ -2,46 +2,46 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { useOrders } from '../../hooks/useOrders';
 import { Order } from '../../../../types/store';
-import { Download, LayoutGrid, List, XCircle, ArrowRight, Monitor, Smartphone } from 'lucide-react';
+import { Download, LayoutGrid, List, XCircle, ArrowRight, Monitor, Smartphone, ChevronRight } from 'lucide-react';
 import { OrderCard, sortOrdersByPriority } from '../../components/OrderCard';
-import { AdminTrackingMap } from '../../components/AdminTrackingMap';
+import { OrderDetailModal } from '../../components/OrderDetailModal';
 import { printOrderTicket } from '../../utils/printUtils';
 import { Tooltip } from '../../components/Tooltip';
 
-type KanbanColumn = 'Pendiente' | 'En preparacion' | 'Listo' | 'En camino' | 'Entregado' | 'Cancelado';
+type TabStatus = 'Pendiente' | 'En preparacion' | 'En camino' | 'Entregado' | 'Cancelado' | 'Todos';
 
-const KANBAN_COLUMNS: KanbanColumn[] = ['Pendiente', 'En preparacion', 'Listo', 'En camino', 'Entregado', 'Cancelado'];
-
-const COLUMN_CONFIG: Record<KanbanColumn, { label: string; color: string; bg: string; borderColor: string; countBg: string }> = {
-  'Pendiente':       { label: 'Pendiente',        color: 'text-amber-700',  bg: 'bg-amber-50',  borderColor: 'border-amber-300',  countBg: 'bg-amber-500' },
-  'En preparacion':  { label: 'En Preparacion',   color: 'text-violet-700', bg: 'bg-violet-50', borderColor: 'border-violet-300', countBg: 'bg-violet-500' },
-  'Listo':           { label: 'Listo',             color: 'text-blue-700',   bg: 'bg-blue-50',   borderColor: 'border-blue-300',   countBg: 'bg-blue-500' },
-  'En camino':       { label: 'En Camino',         color: 'text-cyan-700',   bg: 'bg-cyan-50',   borderColor: 'border-cyan-300',   countBg: 'bg-cyan-500' },
-  'Entregado':       { label: 'Entregado',         color: 'text-emerald-700',bg: 'bg-emerald-50',borderColor: 'border-emerald-300',countBg: 'bg-emerald-500' },
-  'Cancelado':       { label: 'Cancelado',         color: 'text-red-700',    bg: 'bg-red-50',    borderColor: 'border-red-300',    countBg: 'bg-red-500' },
+const TAB_CONFIG: Record<TabStatus, { label: string; color: string; bg: string; borderColor: string; countBg: string }> = {
+  'Todos':          { label: 'Todos',          color: 'text-slate-700',   bg: 'bg-slate-50',   borderColor: 'border-slate-300',   countBg: 'bg-slate-500' },
+  'Pendiente':      { label: 'Pendiente',      color: 'text-amber-700',  bg: 'bg-amber-50',   borderColor: 'border-amber-300',   countBg: 'bg-amber-500' },
+  'En preparacion': { label: 'En Preparacion', color: 'text-violet-700', bg: 'bg-violet-50',  borderColor: 'border-violet-300',  countBg: 'bg-violet-500' },
+  'En camino':      { label: 'En Camino',      color: 'text-cyan-700',   bg: 'bg-cyan-50',    borderColor: 'border-cyan-300',    countBg: 'bg-cyan-500' },
+  'Entregado':      { label: 'Entregado',      color: 'text-emerald-700',bg: 'bg-emerald-50', borderColor: 'border-emerald-300', countBg: 'bg-emerald-500' },
+  'Cancelado':      { label: 'Cancelado',      color: 'text-red-700',    bg: 'bg-red-50',     borderColor: 'border-red-300',     countBg: 'bg-red-500' },
 };
 
-function getOrderColumn(order: Order): KanbanColumn {
-  if (order.status === 'Cancelado' || order.status === 'cancelado') return 'Cancelado';
-  if (order.status === 'Procesando' || order.status === 'pendiente_verificacion' || order.status === 'pago_enviado' || order.status === 'pendiente_pago' || order.status === 'pago_en_verificacion') return 'Pendiente';
-  if (order.status === 'En preparacion' || order.status === 'En preparación' || order.status === 'en_preparacion' || order.status === 'enviado_cocina') return 'En preparacion';
-  if (order.status === 'Entregado' || order.status === 'completado') return 'Entregado';
-  if (order.status === 'Listo' || order.status === 'En camino') return order.status as KanbanColumn;
+const STATUS_ORDER: Record<string, number> = {
+  'Pendiente': 0, 'Procesando': 1, 'enviado_cocina': 2,
+  'En preparación': 3, 'En preparacion': 3, 'en_preparacion': 3,
+  'En camino': 4, 'Entregado': 5, 'Cancelado': 6,
+  'pendiente_verificacion': 0, 'pago_enviado': 0, 'pendiente_pago': 0, 'pago_en_verificacion': 0,
+  'completado': 5, 'cancelado': 6, 'Listo': 4,
+};
+
+function getOrderTab(order: Order): TabStatus {
+  const s = order.status;
+  if (s === 'Cancelado' || s === 'cancelado') return 'Cancelado';
+  if (s === 'Entregado' || s === 'completado') return 'Entregado';
+  if (s === 'En camino' || s === 'Listo') return 'En camino';
+  if (s === 'En preparación' || s === 'En preparacion' || s === 'en_preparacion' || s === 'enviado_cocina') return 'En preparacion';
   return 'Pendiente';
 }
 
 function getUrgencyClass(fecha: string, status: Order['status']): string {
-  if (status === 'Cancelado' || status === 'Entregado') return '';
+  if (status === 'Cancelado' || status === 'cancelado' || status === 'Entregado' || status === 'completado') return '';
   const mins = Math.floor((Date.now() - new Date(fecha).getTime()) / 60000);
-  if (mins > 30) return 'erp-urgency-high';
-  if (mins > 15) return 'erp-urgency-medium';
-  return 'erp-urgency-low';
-}
-
-function waLink(order: Order): string {
-  const phone = order.cliente_telefono?.replace(/\D/g, '');
-  if (!phone) return '';
-  return `https://wa.me/58${phone}?text=Tu pedido #${order.id.slice(-4)} esta ${order.status}`;
+  if (mins > 30) return 'order-urgency-high';
+  if (mins > 15) return 'order-urgency-medium';
+  return 'order-urgency-low';
 }
 
 interface ComandasSectionProps { scopeSedeId?: string; }
@@ -51,49 +51,56 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
   const { advanceStatus, cancelOrder, bulkAdvance } = useOrders();
   const themeColor = config.theme_color || '#A4D045';
 
-  const [viewMode, setViewMode] = useState<'kanban' | 'lista' | 'mapa'>('kanban');
+  const [activeTab, setActiveTab] = useState<TabStatus>('Pendiente');
   const [kitchenMode, setKitchenMode] = useState(false);
   const [sedeFilter, setSedeFilter] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [detailOrder, setDetailOrder] = useState<Order | null>(null);
 
   const activeSedes = config.sedes?.filter(s => s.activa) || [];
   const lockedSede = scopeSedeId || '';
   const effectiveSedeFilter = lockedSede || sedeFilter;
 
-  const allDisplayOrders = useMemo(() => {
+  const deliveryPickupOrders = useMemo(() => {
     let result = [...(orders || [])];
+    result = result.filter(o => o.tipo_pedido !== 'mesa' && o.tipo_entrega !== 'mesa');
     if (effectiveSedeFilter) result = result.filter(o => o.sede_id === effectiveSedeFilter);
     return result;
   }, [orders, effectiveSedeFilter]);
 
-  const activeOrders = useMemo(() =>
-    allDisplayOrders.filter(o => o.status !== 'Entregado' && o.status !== 'Cancelado'),
-    [allDisplayOrders]
-  );
-
-  const ordersByColumn = useMemo(() => {
-    const groups: Record<KanbanColumn, Order[]> = {
-      'Pendiente': [], 'En preparacion': [], 'Listo': [],
-      'En camino': [], 'Entregado': [], 'Cancelado': [],
+  const tabCounts = useMemo(() => {
+    const counts: Record<TabStatus, number> = {
+      'Todos': 0, 'Pendiente': 0, 'En preparacion': 0,
+      'En camino': 0, 'Entregado': 0, 'Cancelado': 0,
     };
-    allDisplayOrders.forEach(order => { groups[getOrderColumn(order)].push(order); });
-    return groups;
-  }, [allDisplayOrders]);
+    deliveryPickupOrders.forEach(order => {
+      const tab = getOrderTab(order);
+      counts[tab]++;
+      counts['Todos']++;
+    });
+    return counts;
+  }, [deliveryPickupOrders]);
+
+  const filteredOrders = useMemo(() => {
+    let result = deliveryPickupOrders;
+    if (activeTab !== 'Todos') {
+      result = result.filter(o => getOrderTab(o) === activeTab);
+    }
+    return result.sort((a, b) => {
+      const pa = STATUS_ORDER[a.status] ?? 0;
+      const pb = STATUS_ORDER[b.status] ?? 0;
+      if (pa !== pb) return pa - pb;
+      return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+    });
+  }, [deliveryPickupOrders, activeTab]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
-  const selectAllInColumn = (columnOrders: Order[]) => {
-    const ids = columnOrders.map(o => o.id);
-    const allSelected = ids.every(id => selectedIds.includes(id));
-    if (allSelected) setSelectedIds(prev => prev.filter(id => !ids.includes(id)));
-    else setSelectedIds(prev => [...new Set([...prev, ...ids])]);
-  };
-
   const handleBulkAdvance = async () => {
     const advanceable = selectedIds.filter(id => {
-      const order = allDisplayOrders.find(o => o.id === id);
+      const order = deliveryPickupOrders.find(o => o.id === id);
       return order && order.status !== 'Entregado' && order.status !== 'Cancelado';
     });
     await bulkAdvance(advanceable);
@@ -102,11 +109,11 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
 
   const handleBulkCancel = async () => {
     const cancellable = selectedIds.filter(id => {
-      const order = allDisplayOrders.find(o => o.id === id);
+      const order = deliveryPickupOrders.find(o => o.id === id);
       return order && order.status !== 'Entregado' && order.status !== 'Cancelado';
     });
     for (const id of cancellable) {
-      const order = allDisplayOrders.find(o => o.id === id);
+      const order = deliveryPickupOrders.find(o => o.id === id);
       if (order) await cancelOrder(order);
     }
     setSelectedIds([]);
@@ -116,13 +123,17 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
   const handleCancel = useCallback((order: Order) => { cancelOrder(order); }, [cancelOrder]);
 
   const handleWhatsApp = useCallback((order: Order) => {
-    const url = waLink(order);
-    if (url) window.open(url, '_blank');
+    const phone = order.cliente_telefono?.replace(/\D/g, '');
+    if (!phone) return;
+    window.open(`https://wa.me/58${phone}?text=Tu pedido #${order.id.slice(-4)} esta ${order.status}`, '_blank');
   }, []);
 
   const exportCSV = () => {
-    const headers = ["ID", "Fecha", "Cliente", "Telefono", "Metodo Pago", "Total USD", "Status"];
-    const rows = allDisplayOrders.map(o => [o.id, o.fecha, o.cliente_nombre, o.cliente_telefono, o.metodo_pago, (o.total_usd ?? 0).toFixed(2), o.status]);
+    const headers = ["#", "ID", "Fecha", "Cliente", "Telefono", "Tipo", "Metodo Pago", "Total USD", "Status"];
+    const rows = filteredOrders.map((o, i) => [
+      String(i + 1), o.id, o.fecha, o.cliente_nombre, o.cliente_telefono,
+      o.tipo_entrega, o.metodo_pago, (o.total_usd ?? 0).toFixed(2), o.status
+    ]);
     const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -136,41 +147,22 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
           <h4 className="text-xs uppercase font-mono font-bold text-[#a1a1aa] tracking-wider">Cola de Pedidos</h4>
-          <p className="text-[10px] text-slate-400 mt-0.5">{activeOrders.length} pedidos activos</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">{tabCounts.Todos} pedidos activos</p>
         </div>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full lg:w-auto">
-          <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
-            <Tooltip content="Vista Kanban: columnas por estado del pedido">
-              <button onClick={() => setViewMode('kanban')} className={`flex items-center gap-1 px-2 py-1.5 rounded-md text-[10px] font-bold cursor-pointer transition-all ${viewMode === 'kanban' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500'}`}>
-                <LayoutGrid size={12} />
-                <span className="hidden sm:inline">Kanban</span>
-              </button>
-            </Tooltip>
-            <Tooltip content="Vista Lista: pedidos en fila vertical">
-              <button onClick={() => setViewMode('lista')} className={`flex items-center gap-1 px-2 py-1.5 rounded-md text-[10px] font-bold cursor-pointer transition-all ${viewMode === 'lista' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500'}`}>
-                <List size={12} />
-                <span className="hidden sm:inline">Lista</span>
-              </button>
-            </Tooltip>
-            <Tooltip content="Vista Mapa: ubicacion de clientes en tiempo real">
-              <button onClick={() => setViewMode('mapa')} className={`flex items-center gap-1 px-2 py-1.5 rounded-md text-[10px] font-bold cursor-pointer transition-all ${viewMode === 'mapa' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500'}`}>
-                <LayoutGrid size={12} />
-                <span className="hidden sm:inline">Mapa</span>
-              </button>
-            </Tooltip>
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
           <Tooltip content="Exportar pedidos a archivo CSV">
             <button onClick={exportCSV} className="flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all shadow-sm cursor-pointer">
-              <Download size={12} /> <span className="hidden sm:inline">CSV</span>
+              <Download size={12} /> CSV
             </button>
           </Tooltip>
           <Tooltip content={kitchenMode ? 'Vista normal' : 'Modo Cocina: tarjetas grandes para pantalla de cocina'}>
             <button onClick={() => setKitchenMode(!kitchenMode)} className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all shadow-sm cursor-pointer ${kitchenMode ? 'bg-amber-500 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>
               {kitchenMode ? <Smartphone size={12} /> : <Monitor size={12} />}
-              <span className="hidden sm:inline">{kitchenMode ? 'Normal' : 'Cocina'}</span>
+              {kitchenMode ? 'Normal' : 'Cocina'}
             </button>
           </Tooltip>
           {activeSedes.length > 1 && !lockedSede && (
@@ -184,9 +176,10 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
         </div>
       </div>
 
+      {/* Bulk actions bar */}
       {selectedIds.length > 0 && (
-        <div className="erp-bulk-bar flex items-center gap-3">
-          <span className="text-xs font-bold" style={{ color: themeColor }}>{selectedIds.length} seleccionados</span>
+        <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl border border-blue-200">
+          <span className="text-xs font-bold text-blue-700">{selectedIds.length} seleccionados</span>
           <Tooltip content="Avanzar todos los seleccionados al siguiente estado">
             <button onClick={handleBulkAdvance} className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-white rounded-lg cursor-pointer transition-all active:scale-95" style={{ background: themeColor }}>
               <ArrowRight size={12} /> Avanzar todos
@@ -201,76 +194,81 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
         </div>
       )}
 
-      {viewMode === 'kanban' && (
-        <div className={kitchenMode ? 'erp-kanban-grid kitchen-display-grid' : 'erp-kanban-grid'}>
-          {KANBAN_COLUMNS.map(col => {
-            const cfg = COLUMN_CONFIG[col];
-            const columnOrders = ordersByColumn[col];
-            return (
-              <div key={col} className="erp-kanban-col">
-                <div className={`erp-kanban-header ${cfg.borderColor} ${cfg.bg}`}>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs font-black uppercase tracking-wider ${cfg.color}`}>{cfg.label}</span>
-                    <span className={`text-[9px] font-black text-white px-1.5 py-0.5 rounded-full ${cfg.countBg}`}>{columnOrders.length}</span>
-                  </div>
-                  {columnOrders.length > 0 && (
-                    <button onClick={() => selectAllInColumn(columnOrders)} className="text-[9px] font-bold text-slate-400 hover:text-slate-600 cursor-pointer">Seleccionar</button>
-                  )}
-                </div>
-                <div className={`erp-kanban-body ${cfg.bg}`}>
-                  {columnOrders.length === 0 ? (
-                    <div className="flex items-center justify-center h-20 text-[10px] text-slate-400 italic">Sin pedidos</div>
-                  ) : columnOrders.map(order => (
-                    <div key={order.id} className={`relative ${getUrgencyClass(order.fecha, order.status)}`}>
-                      <div className="absolute top-2 left-0 z-10">
-                        <input
-                          type="checkbox"
-                          checked={selectedIds.includes(order.id)}
-                          onChange={() => toggleSelect(order.id)}
-                          className="w-4 h-4 rounded border-slate-300 cursor-pointer accent-blue-600"
-                        />
-                      </div>
-                      <div className="pl-5">
-                        <OrderCard
-                          order={order}
-                          onAdvanceStatus={handleAdvance}
-                          onCancel={handleCancel}
-                          onPrint={printOrder}
-                          onWhatsApp={handleWhatsApp}
-                          themeColor={themeColor}
-                          kitchenMode={kitchenMode}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {/* Status tabs */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar shrink-0">
+        {(['Pendiente', 'En preparacion', 'En camino', 'Entregado', 'Cancelado'] as TabStatus[]).map(status => {
+          const cfg = TAB_CONFIG[status];
+          const count = tabCounts[status];
+          const isActive = activeTab === status;
+          return (
+            <button
+              key={status}
+              onClick={() => setActiveTab(status)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer border shrink-0 ${
+                isActive
+                  ? `${cfg.bg} ${cfg.borderColor} ${cfg.color} shadow-sm`
+                  : 'bg-white/50 border-transparent text-slate-500 hover:bg-white hover:border-slate-200'
+              }`}
+            >
+              {cfg.label}
+              <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${
+                isActive ? `${cfg.countBg} text-white` : 'bg-slate-200 text-slate-600'
+              }`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
-      {viewMode === 'lista' && (
-        <div className="flex flex-col gap-2">
-          {activeOrders.length === 0 ? (
-            <div className="p-10 border border-dashed border-slate-300 rounded-xl text-center text-xs text-slate-400">No hay pedidos activos.</div>
-          ) : activeOrders.map(order => (
+      {/* Orders list */}
+      <div className="flex flex-col gap-2">
+        {filteredOrders.length === 0 ? (
+          <div className="p-10 border border-dashed border-slate-300 rounded-xl text-center">
+            <p className="text-sm font-bold text-slate-400">Sin pedidos</p>
+            <p className="text-[10px] text-slate-400 mt-1">
+              No hay pedidos {activeTab !== 'Todos' ? `con estado: ${TAB_CONFIG[activeTab].label}` : 'en esta seccion'}
+            </p>
+          </div>
+        ) : (
+          filteredOrders.map((order, index) => (
             <div key={order.id} className={`relative ${getUrgencyClass(order.fecha, order.status)}`}>
-              <div className="absolute top-2 left-2 z-10">
-                <input type="checkbox" checked={selectedIds.includes(order.id)} onChange={() => toggleSelect(order.id)} className="w-4 h-4 rounded border-slate-300 cursor-pointer accent-blue-600" />
+              <div className="absolute top-3 left-0 z-10">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.includes(order.id)}
+                  onChange={() => toggleSelect(order.id)}
+                  className="w-4 h-4 rounded border-slate-300 cursor-pointer accent-blue-600"
+                />
               </div>
-              <div className="pl-7">
-                <OrderCard order={order} onAdvanceStatus={handleAdvance} onCancel={handleCancel} onPrint={printOrder} onWhatsApp={handleWhatsApp} themeColor={themeColor} />
+              <div className="pl-5">
+                <OrderCard
+                  order={order}
+                  onAdvanceStatus={handleAdvance}
+                  onCancel={handleCancel}
+                  onPrint={printOrder}
+                  onWhatsApp={handleWhatsApp}
+                  onOpenDetail={setDetailOrder}
+                  themeColor={themeColor}
+                  kitchenMode={kitchenMode}
+                  sequenceNumber={index + 1}
+                />
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
 
-      {viewMode === 'mapa' && (
-        <div className="h-[calc(100vh-280px)] min-h-[400px] rounded-xl overflow-hidden border border-slate-200">
-          <AdminTrackingMap orders={allDisplayOrders} shopCoords={config.coordenadas_tienda} selectedOrderId={null} onSelectOrder={() => {}} themeColor={themeColor} />
-        </div>
+      {/* Detail modal */}
+      {detailOrder && (
+        <OrderDetailModal
+          order={detailOrder}
+          onClose={() => setDetailOrder(null)}
+          onAdvance={handleAdvance}
+          onCancel={handleCancel}
+          onPrint={printOrder}
+          sequenceNumber={filteredOrders.indexOf(detailOrder) + 1}
+        />
       )}
     </div>
   );

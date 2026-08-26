@@ -9,8 +9,10 @@ interface OrderCardProps {
   onCancel?: (order: Order) => void;
   onPrint: (order: Order) => void;
   onWhatsApp: (order: Order) => void;
+  onOpenDetail?: (order: Order) => void;
   themeColor: string;
   kitchenMode?: boolean;
+  sequenceNumber?: number;
 }
 
 const DEFAULT_STATUS_STYLE = { color: 'text-gray-700', bg: 'bg-gray-100', border: 'border-l-gray-400', label: 'Otro' };
@@ -60,8 +62,9 @@ function getDeliveryLabel(tipo: string, mesa?: number) {
 
 export function sortOrdersByPriority(orders: Order[]): Order[] {
   const priority: Record<string, number> = {
-    'Pendiente': 0, 'Procesando': 1, 'En preparación': 2,
-    'Listo': 3, 'En camino': 4, 'Entregado': 5, 'Cancelado': 6,
+    'Pendiente': 0, 'Procesando': 1, 'enviado_cocina': 2,
+    'En preparación': 3, 'En preparacion': 3, 'en_preparacion': 3,
+    'En camino': 4, 'Entregado': 5, 'Cancelado': 6,
   };
   return [...orders].sort((a, b) => {
     const pa = priority[a.status] ?? 0;
@@ -71,21 +74,28 @@ export function sortOrdersByPriority(orders: Order[]): Order[] {
   });
 }
 
-export const OrderCard: React.FC<OrderCardProps> = ({ order, onAdvanceStatus, onCancel, onPrint, onWhatsApp, themeColor, kitchenMode }) => {
+export const OrderCard: React.FC<OrderCardProps> = ({ order, onAdvanceStatus, onCancel, onPrint, onWhatsApp, onOpenDetail, themeColor, kitchenMode, sequenceNumber }) => {
   const statusCfg = STATUS_CONFIG[order.status] || STATUS_CONFIG['Pendiente'];
   const isFinal = order.status === 'Entregado' || order.status === 'Cancelado';
   const elapsed = getElapsed(order.fecha);
 
-  const flow: Order['status'][] = ['Pendiente', 'Procesando', 'En preparación', 'Listo', 'En camino', 'Entregado'];
+  const flow: Order['status'][] = ['Pendiente', 'En preparación', 'En camino', 'Entregado'];
   const currentIdx = flow.indexOf(order.status);
   const nextStatus = currentIdx >= 0 && currentIdx < flow.length - 1 ? flow[currentIdx + 1] : null;
 
   const nextLabel: Record<string, string> = {
-    'Pendiente': 'Preparar',
+    'Pendiente': 'En Preparación',
     'Procesando': 'En Preparación',
-    'En preparación': 'Marcar Listo',
-    'Listo': 'Enviar',
-    'En camino': 'Marcar Entregado',
+    'enviado_cocina': 'En Preparación',
+    'pendiente_verificacion': 'En Preparación',
+    'pago_enviado': 'En Preparación',
+    'pendiente_pago': 'En Preparación',
+    'pago_en_verificacion': 'En Preparación',
+    'En preparación': order.tipo_entrega === 'delivery' ? 'En Camino' : 'Entregado',
+    'En preparacion': order.tipo_entrega === 'delivery' ? 'En Camino' : 'Entregado',
+    'en_preparacion': order.tipo_entrega === 'delivery' ? 'En Camino' : 'Entregado',
+    'Listo': order.tipo_entrega === 'delivery' ? 'En Camino' : 'Entregado',
+    'En camino': 'Entregado',
   };
 
   const subtotal = order.subtotal_usd || order.total_usd;
@@ -94,7 +104,10 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onAdvanceStatus, on
   const iva = subtotal * 0.16;
 
   return (
-    <div className={`bg-white rounded-xl border-l-4 ${statusCfg.border} border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden ${kitchenMode ? 'order-card-kitchen' : ''}`}>
+    <div
+      onClick={() => onOpenDetail?.(order)}
+      className={`bg-white rounded-xl border-l-4 ${statusCfg.border} border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer ${kitchenMode ? 'order-card-kitchen' : ''}`}
+    >
       <div className={kitchenMode ? 'p-4' : 'p-3'}>
         {/* Header: Order number + status + timer */}
         <div className="flex items-center gap-2">

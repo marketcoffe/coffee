@@ -1,12 +1,11 @@
-import React, { Suspense, lazy, useState, useCallback, useMemo } from 'react';
+import React, { Suspense, lazy, useState, useCallback, useMemo, useEffect } from 'react';
 import { useApp } from '../../store/AppContext';
 import { useAdminStore } from '../../store/stores/adminStore';
-import { useOrders } from './hooks/useOrders';
 import { Order, FoodItem } from '../../types/store';
 import { log } from '../../utils/logger';
 import {
   BarChart3, ShoppingBag, X, MessageSquare, Megaphone, Package, Award,
-  LayoutGrid, ChevronLeft, ChevronRight, MapPin, Shield, Store,
+  LayoutGrid, ChevronLeft, ChevronRight, Shield, Store,
   TrendingUp, Smartphone, Activity, Clock, Users, Zap, Tag,
   Truck, CreditCard, Image, Grid, Search, Building2, HelpCircle,
   Sliders, Palette, Ticket, Settings, Menu, Armchair, UtensilsCrossed
@@ -28,7 +27,6 @@ const EstadisticasSection = lazy(() => import('./sections/reports/EstadisticasSe
 // Lazy Imports: Pedidos
 const ComandasSection = lazy(() => import('./sections/pedidos/ComandasSection'));
 const HistorialPedidosSection = lazy(() => import('./sections/pedidos/HistorialPedidosSection'));
-const MapaDeliverySection = lazy(() => import('./sections/pedidos/MapaDeliverySection'));
 const PedidosMesaSection = lazy(() => import('./sections/pedidos/PedidosMesaSection'));
 const GridComanderaMesas = lazy(() => import('./sections/pedidos/GridComanderaMesas'));
 
@@ -87,7 +85,6 @@ const ALL_SECTIONS = [
   { id: 'orders',          label: 'Comandas',          icon: ShoppingBag,     group: 'pedidos', groupLabel: 'Pedidos' },
   { id: 'mesa-orders',     label: 'Pedidos Mesa',      icon: UtensilsCrossed, group: 'pedidos' },
   { id: 'order-history',   label: 'Historial',         icon: Clock,           group: 'pedidos' },
-  { id: 'delivery-map',    label: 'Mapa Delivery',     icon: MapPin,          group: 'pedidos' },
 
   { id: 'customers',       label: 'Clientes',          icon: Users,           group: 'marketing', groupLabel: 'Marketing' },
   { id: 'messages',        label: 'Mensajes',          icon: MessageSquare,   group: 'marketing' },
@@ -137,6 +134,19 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openEditor, setOpenEditor] = useState<FoodItem | null>(null);
   const [showProductForm, setShowProductForm] = useState(false);
+  const [newOrderFlash, setNewOrderFlash] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.flash) {
+        setNewOrderFlash(true);
+        setTimeout(() => setNewOrderFlash(false), 2000);
+      }
+    };
+    window.addEventListener('newOrderAlert', handler);
+    return () => window.removeEventListener('newOrderAlert', handler);
+  }, []);
 
   const visibleSections = ALL_SECTIONS.filter(s => isAdmin || !s.adminOnly);
   const currentSection = visibleSections.find(s => s.id === activeSection);
@@ -145,7 +155,12 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   const SectionIcon = currentSection?.icon;
 
   const pendingOrdersCount = useMemo(() =>
-    orders.filter(o => o.status === 'Pendiente' || o.status === 'Procesando').length,
+    orders.filter(o =>
+      o.status === 'Pendiente' || o.status === 'Procesando' ||
+      o.status === 'enviado_cocina' || o.status === 'pendiente_verificacion' ||
+      o.status === 'pago_enviado' || o.status === 'pendiente_pago' ||
+      o.status === 'pago_en_verificacion'
+    ).length,
     [orders]
   );
 
@@ -184,7 +199,6 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
       case 'orders':          return <ComandasSection scopeSedeId={scopeSedeId} />;
       case 'mesa-orders':     return <GridComanderaMesas scopeSedeId={scopeSedeId} />;
       case 'order-history':   return <HistorialPedidosSection scopeSedeId={scopeSedeId} />;
-      case 'delivery-map':    return <MapaDeliverySection scopeSedeId={scopeSedeId} />;
 
       case 'customers':       return <ClientesSection />;
       case 'messages':        return <MensajesSection />;
@@ -265,9 +279,9 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
             {pendingOrdersCount > 0 && (
               <Tooltip content={`${pendingOrdersCount} pedidos esperando ser procesados`} position="bottom">
                 <div
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold cursor-pointer"
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold cursor-pointer ${newOrderFlash ? 'tab-flash' : ''}`}
                   style={{ background: `${themeColor}15`, color: themeColor }}
-                  onClick={() => handleSectionChange('orders')}
+                  onClick={() => { handleSectionChange('orders'); setNewOrderFlash(false); }}
                 >
                   <ShoppingBag size={13} />
                   <span>{pendingOrdersCount}</span>
@@ -292,8 +306,8 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
           {pendingOrdersCount > 0 && (
             <Tooltip content={`${pendingOrdersCount} pedidos pendientes`} position="bottom">
               <button
-                onClick={() => handleSectionChange('orders')}
-                className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer active:scale-95 transition-transform"
+                onClick={() => { handleSectionChange('orders'); setNewOrderFlash(false); }}
+                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer active:scale-95 transition-transform ${newOrderFlash ? 'tab-flash' : ''}`}
                 style={{ background: `${themeColor}15`, color: themeColor, minHeight: 40 }}
               >
                 <ShoppingBag size={14} />
@@ -330,8 +344,9 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
                   onClick={() => {
                     if (isMore) setShowMoreSheet(true);
                     else handleSectionChange(tab.id);
+                    if (tab.id === 'orders') setNewOrderFlash(false);
                   }}
-                  className="relative flex flex-col items-center justify-center gap-0.5 flex-1 cursor-pointer active:scale-95 transition-all"
+                  className={`relative flex flex-col items-center justify-center gap-0.5 flex-1 cursor-pointer active:scale-95 transition-all ${tab.id === 'orders' && newOrderFlash ? 'tab-flash' : ''}`}
                   style={{ color: isActive ? themeColor : 'var(--ios-text-secondary)', WebkitTapHighlightColor: 'transparent' }}
                 >
                   <div className="relative" style={{ marginTop: 4 }}>
