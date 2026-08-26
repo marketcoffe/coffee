@@ -4,6 +4,7 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, L
 import { Download } from 'lucide-react';
 
 type DateRange = 'today' | '7days' | '30days' | 'custom';
+type OrderType = 'all' | 'delivery' | 'pickup' | 'mesa';
 
 const VentasReportSection: React.FC = () => {
   const { orders, config } = useApp();
@@ -11,6 +12,8 @@ const VentasReportSection: React.FC = () => {
   const [dateRange, setDateRange] = useState<DateRange>('30days');
   const [customStart, setCustomStart] = useState('');
   const [customEnd, setCustomEnd] = useState('');
+  const [orderTypeFilter, setOrderTypeFilter] = useState<OrderType>('all');
+  const [mesaFilter, setMesaFilter] = useState<string>('');
 
   const activeSedes = config.sedes?.filter(s => s.activa) || [];
   const principalSedeId = activeSedes.find(s => s.es_principal)?.id || activeSedes[0]?.id || '';
@@ -19,6 +22,16 @@ const VentasReportSection: React.FC = () => {
     let result = sedeFilter
       ? orders.filter(o => (o.sede_id || principalSedeId) === sedeFilter)
       : [...orders];
+
+    // Filter by order type
+    if (orderTypeFilter !== 'all') {
+      result = result.filter(o => o.tipo_entrega === orderTypeFilter || o.tipo_pedido === orderTypeFilter);
+    }
+
+    // Filter by mesa number
+    if (mesaFilter) {
+      result = result.filter(o => String(o.numero_mesa) === mesaFilter);
+    }
 
     const now = new Date();
     const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
@@ -38,7 +51,7 @@ const VentasReportSection: React.FC = () => {
     }
 
     return result;
-  }, [orders, sedeFilter, principalSedeId, dateRange, customStart, customEnd]);
+  }, [orders, sedeFilter, principalSedeId, dateRange, customStart, customEnd, orderTypeFilter, mesaFilter]);
 
   const dailySalesData = useMemo(() => {
     const map: { [key: string]: number } = {};
@@ -93,10 +106,47 @@ const VentasReportSection: React.FC = () => {
 
   const totalRevenue = useMemo(() => filteredOrders.reduce((s, o) => s + (Number(o.total_usd) || 0), 0), [filteredOrders]);
 
+  // Sales breakdown by order type
+  const salesByType = useMemo(() => {
+    const map: { [key: string]: { count: number; total: number } } = { delivery: { count: 0, total: 0 }, pickup: { count: 0, total: 0 }, mesa: { count: 0, total: 0 }, other: { count: 0, total: 0 } };
+    filteredOrders.forEach(o => {
+      const type = o.tipo_entrega || o.tipo_pedido || 'other';
+      const key = type === 'mesa' ? 'mesa' : type === 'pickup' ? 'pickup' : type === 'delivery' ? 'delivery' : 'other';
+      map[key].count += 1;
+      map[key].total += Number(o.total_usd) || 0;
+    });
+    return map;
+  }, [filteredOrders]);
+
+  // Top mesas
+  const topMesas = useMemo(() => {
+    const map: { [key: number]: { count: number; total: number } } = {};
+    filteredOrders.forEach(o => {
+      if (o.numero_mesa) {
+        if (!map[o.numero_mesa]) map[o.numero_mesa] = { count: 0, total: 0 };
+        map[o.numero_mesa].count += 1;
+        map[o.numero_mesa].total += Number(o.total_usd) || 0;
+      }
+    });
+    return Object.entries(map)
+      .map(([num, data]) => ({ mesa: `Mesa ${num}`, ...data }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 10);
+  }, [filteredOrders]);
+
+  // Unique mesa numbers for filter
+  const availableMesas = useMemo(() => {
+    const nums = new Set<number>();
+    orders.forEach(o => { if (o.numero_mesa) nums.add(o.numero_mesa); });
+    return Array.from(nums).sort((a, b) => a - b);
+  }, [orders]);
+
   const exportCSV = () => {
     const header = 'Día,Pedidos,Total USD\n';
     const rows = ordersByDay.map(r => `${r.dia},${r.count},${r.total.toFixed(2)}`).join('\n');
-    const blob = new Blob([header + rows], { type: 'text/csv' });
+    const typeSummary = `\n\nResumen por Tipo:\nTipo,Pedidos,Total USD\nDelivery,${salesByType.delivery.count},${salesByType.delivery.total.toFixed(2)}\nPickup,${salesByType.pickup.count},${salesByType.pickup.total.toFixed(2)}\nMesa,${salesByType.mesa.count},${salesByType.mesa.total.toFixed(2)}`;
+    const mesaSummary = topMesas.length > 0 ? `\n\nTop Mesas:\nMesa,Pedidos,Total USD\n${topMesas.map(m => `${m.mesa},${m.count},${m.total.toFixed(2)}`).join('\n')}` : '';
+    const blob = new Blob([header + rows + typeSummary + mesaSummary], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -140,10 +190,55 @@ const VentasReportSection: React.FC = () => {
         </button>
       </div>
 
-      <div className="p-4 border border-slate-200 rounded-xl bg-white shadow-sm">
-        <p className="text-[10px] text-slate-500 uppercase tracking-wide font-medium">Total Período</p>
-        <p className="text-2xl font-black font-mono text-slate-900">${totalRevenue.toFixed(2)}</p>
-        <p className="text-[10px] text-slate-400 mt-1">{filteredOrders.length} pedidos</p>
+      {/* Order type & mesa filters */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex gap-1">
+          {(['all', 'delivery', 'pickup', 'mesa'] as OrderType[]).map(t => (
+            <button
+              key={t}
+              onClick={() => setOrderTypeFilter(t)}
+              className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors ${
+                orderTypeFilter === t ? 'bg-orange-500 text-white' : 'bg-white border border-slate-200 text-slate-600'
+              }`}
+            >
+              {t === 'all' ? 'Todos' : t === 'delivery' ? 'Delivery' : t === 'pickup' ? 'Pickup' : 'Mesa'}
+            </button>
+          ))}
+        </div>
+        {availableMesas.length > 0 && (
+          <select
+            value={mesaFilter}
+            onChange={(e) => setMesaFilter(e.target.value)}
+            className="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-white border border-slate-200 text-slate-700"
+          >
+            <option value="">Todas las mesas</option>
+            {availableMesas.map(n => <option key={n} value={n}>Mesa {n}</option>)}
+          </select>
+        )}
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="p-4 border border-slate-200 rounded-xl bg-white shadow-sm">
+          <p className="text-[10px] text-slate-500 uppercase tracking-wide font-medium">Total Período</p>
+          <p className="text-2xl font-black font-mono text-slate-900">${totalRevenue.toFixed(2)}</p>
+          <p className="text-[10px] text-slate-400 mt-1">{filteredOrders.length} pedidos</p>
+        </div>
+        <div className="p-4 border border-blue-200 rounded-xl bg-blue-50 shadow-sm">
+          <p className="text-[10px] text-blue-600 uppercase tracking-wide font-medium">Delivery</p>
+          <p className="text-xl font-black font-mono text-blue-900">${salesByType.delivery.total.toFixed(2)}</p>
+          <p className="text-[10px] text-blue-500 mt-1">{salesByType.delivery.count} pedidos</p>
+        </div>
+        <div className="p-4 border border-purple-200 rounded-xl bg-purple-50 shadow-sm">
+          <p className="text-[10px] text-purple-600 uppercase tracking-wide font-medium">Pickup</p>
+          <p className="text-xl font-black font-mono text-purple-900">${salesByType.pickup.total.toFixed(2)}</p>
+          <p className="text-[10px] text-purple-500 mt-1">{salesByType.pickup.count} pedidos</p>
+        </div>
+        <div className="p-4 border border-orange-200 rounded-xl bg-orange-50 shadow-sm">
+          <p className="text-[10px] text-orange-600 uppercase tracking-wide font-medium">Mesa</p>
+          <p className="text-xl font-black font-mono text-orange-900">${salesByType.mesa.total.toFixed(2)}</p>
+          <p className="text-[10px] text-orange-500 mt-1">{salesByType.mesa.count} pedidos</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -189,6 +284,35 @@ const VentasReportSection: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Top Mesas */}
+      {topMesas.length > 0 && (
+        <div className="p-4 border border-slate-200 rounded-lg bg-white shadow-sm">
+          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">Top Mesas (por ventas)</h4>
+          <div className="overflow-x-auto">
+            <table className="w-full text-[11px]">
+              <thead className="bg-slate-50">
+                <tr>
+                  <th className="px-4 py-2 text-left font-bold text-slate-600">#</th>
+                  <th className="px-4 py-2 text-left font-bold text-slate-600">Mesa</th>
+                  <th className="px-4 py-2 text-right font-bold text-slate-600">Pedidos</th>
+                  <th className="px-4 py-2 text-right font-bold text-slate-600">Total (USD)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topMesas.map((m, i) => (
+                  <tr key={m.mesa} className="border-b border-slate-50 hover:bg-slate-50">
+                    <td className="px-4 py-2 text-slate-400 font-bold">{i + 1}</td>
+                    <td className="px-4 py-2 font-medium text-orange-600">{m.mesa}</td>
+                    <td className="px-4 py-2 text-right text-slate-600">{m.count}</td>
+                    <td className="px-4 py-2 text-right font-mono font-bold text-slate-900">${m.total.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       <div className="border border-slate-200 rounded-lg bg-white shadow-sm overflow-hidden">
         <div className="p-4 border-b border-slate-100">

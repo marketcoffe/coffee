@@ -1862,16 +1862,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const targetPhone = prevOrder?.cliente_telefono;
     const clientName = prevOrder?.cliente_nombre || 'Cliente';
+    const isMesa = prevOrder?.tipo_entrega === 'mesa' || prevOrder?.tipo_pedido === 'mesa';
+    const mesaNum = prevOrder?.numero_mesa;
 
     let statusMsg = `Tu pedido ${orderId} ahora se encuentra en estado: ${status}.`;
-    if (status === 'En preparación') {
-      statusMsg = `🥬 ¡Buenas noticias, ${clientName}! Tu pedido ${orderId} ya está en preparación en nuestros almacenes de Las Acacias.`;
-    } else if (status === 'En camino') {
-      statusMsg = `🛵 ¡Tu pedido ${orderId} va en camino! Nuestro motorizado se dirige a tu ubicación en Valencia con cadena de frío.`;
-    } else if (status === 'Entregado') {
-      statusMsg = `✅ Pedido ${orderId} entregado con éxito. ¡Gracias por preferir a ${config.site_nombre || 'nuestra tienda'}!`;
+    if (isMesa) {
+      if (status === 'En preparación') {
+        statusMsg = `🍳 ¡${clientName}! Tu pedido de Mesa ${mesaNum} está en preparación.`;
+      } else if (status === 'Listo') {
+        statusMsg = `✅ ¡${clientName}! Tu pedido de Mesa ${mesaNum} está listo. ¡Puedes pasar a recogerlo!`;
+      } else if (status === 'Entregado') {
+        statusMsg = `✅ Pedido de Mesa ${mesaNum} completado. ¡Gracias por preferirnos!`;
+      }
+    } else {
+      if (status === 'En preparación') {
+        statusMsg = `🥬 ¡Buenas noticias, ${clientName}! Tu pedido ${orderId} ya está en preparación.`;
+      } else if (status === 'En camino') {
+        statusMsg = `🛵 ¡Tu pedido ${orderId} va en camino!`;
+      } else if (status === 'Entregado') {
+        statusMsg = `✅ Pedido ${orderId} entregado con éxito. ¡Gracias por preferir a ${config.site_nombre || 'nuestra tienda'}!`;
+      }
     }
-    if (estimatedTime) statusMsg += ` Tiempo estimado de entrega: ${estimatedTime}.`;
+    if (estimatedTime) statusMsg += ` Tiempo estimado: ${estimatedTime}.`;
 
     // Enviar notificación (await para garantizar que se inserta antes del update)
     if (targetPhone) {
@@ -2547,49 +2559,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!('PushManager' in window)) {
       return { success: false, error: 'PushManager no disponible en este navegador' };
     }
-    if (!currentUser) {
-      console.error('❌ Marketo Sync Error: Intento de sincronizar push sin usuario logueado');
-      return { success: false, error: 'No hay usuario logueado. Inicia sesión para activar notificaciones.' };
-    }
 
     try {
       const registration = await navigator.serviceWorker.ready;
       const existingSub = await registration.pushManager.getSubscription();
 
       if (!existingSub) {
-        console.warn('⚠️ Marketo Sync: No se encontró suscripción push activa en este navegador.');
-        return { success: false, error: 'No existe suscripción push activa. Activa las notificaciones desde tu Perfil.' };
+        return { success: false, error: 'No existe suscripción push activa.' };
       }
 
       const subJSON = existingSub.toJSON();
 
-      // Validar que tenemos las keys necesarias
       if (!subJSON.endpoint || !subJSON.keys?.p256dh || !subJSON.keys?.auth) {
-        return { success: false, error: 'Suscripción push corrupta. Renuncia y activa las notificaciones de nuevo.' };
+        return { success: false, error: 'Suscripción push corrupta.' };
       }
 
-      // Actualizamos la suscripción en la tabla push_subscriptions.
-      // El upsert usa 'endpoint' como unique constraint (creado en schema_definitivo.sql).
+      // For guest users, use anonymous_id from localStorage
+      const guestPhone = localStorage.getItem('trv_guest_phone') || '';
+      const userId = currentUser?.id || `guest-${Date.now()}`;
+
       const { error } = await supabase.from('push_subscriptions').upsert({
-        user_id: currentUser.id,
+        user_id: userId,
         endpoint: subJSON.endpoint,
         p256dh: subJSON.keys?.p256dh,
         auth_secret: subJSON.keys?.auth,
-        destinatario_telefono: currentUser.telefono.trim()
+        destinatario_telefono: currentUser?.telefono?.trim() || guestPhone || null,
       }, { onConflict: 'endpoint' });
 
       if (error) {
-        const msg = 'Error sincronizando suscripción push: ' + error.message;
-        console.error('❌ Marketo:', msg);
-        return { success: false, error: msg };
-      } else {
-        console.warn('✅ Marketo: Suscripción Push sincronizada con el teléfono:', currentUser.telefono);
-        return { success: true };
+        return { success: false, error: error.message };
       }
+      return { success: true };
     } catch (err: any) {
-      const msg = 'Fallo crítico en syncPushSubscription: ' + (err?.message || String(err));
-      console.error('❌ Marketo:', msg);
-      return { success: false, error: msg };
+      return { success: false, error: err?.message || String(err) };
     }
   };
 

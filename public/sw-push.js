@@ -12,20 +12,24 @@ self.addEventListener('activate', (event) => {
 });
 
 // ─── SPA Navigation Handler ───
+// Let browser handle popstate (back/forward) natively; only intercept regular navigations
 self.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate' && event.request.method === 'GET') {
     const url = new URL(event.request.url);
     if (url.pathname.startsWith('/api/')) return;
-    event.respondWith(
-      caches.open('workbox-precache-v2').then((cache) => {
-        return cache.match('/index.html').then((cached) => {
-          if (cached) return cached;
-          return fetch(event.request, { redirect: 'follow' }).catch(() => {
-            return new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/html' } });
+    // For same-origin navigations triggered by back/forward, let the browser handle it
+    if (event.request.destination === 'document') {
+      event.respondWith(
+        caches.open('workbox-precache-v2').then((cache) => {
+          return cache.match('/index.html').then((cached) => {
+            if (cached) return cached;
+            return fetch(event.request, { redirect: 'follow' }).catch(() => {
+              return new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/html' } });
+            });
           });
-        });
-      })
-    );
+        })
+      );
+    }
   }
 });
 

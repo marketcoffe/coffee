@@ -13,14 +13,25 @@ interface OrderTrackerProps {
   onStatusUpdate?: (newStatus: string) => void;
 }
 
-const STATUS_STEPS = [
-  { key: 'Pendiente', label: 'Aceptado', icon: CheckCircle, description: 'Tu pedido fue recibido' },
-  { key: 'Procesando', label: 'En Preparación', icon: ChefHat, description: 'Estamos preparando tu comida' },
-  { key: 'En preparación', label: 'Se asignó motorizado', icon: Package, description: 'Un repartidor va por tu pedido' },
-  { key: 'Listo', label: 'Listo para entregar', icon: Package, description: 'Tu pedido está empacado' },
-  { key: 'En camino', label: 'En Camino', icon: Truck, description: 'Tu pedido está en camino' },
-  { key: 'Entregado', label: 'Entregado', icon: MapPin, description: '¡Pedido entregado!' },
-];
+function getStatusSteps(orderType?: string) {
+  if (orderType === 'mesa' || orderType === 'pickup') {
+    return [
+      { key: 'Pendiente', label: 'Recibido', icon: CheckCircle, description: 'Tu pedido fue recibido' },
+      { key: 'enviado_cocina', label: 'En Cocina', icon: ChefHat, description: 'Estamos preparando tu comida' },
+      { key: 'En preparación', label: 'En Preparación', icon: ChefHat, description: 'Tu pedido se está preparando' },
+      { key: 'Listo', label: 'Listo', icon: Package, description: '¡Tu pedido está listo para recoger!' },
+      { key: 'Entregado', label: 'Entregado', icon: CheckCircle, description: '¡Pedido completado!' },
+    ];
+  }
+  return [
+    { key: 'Pendiente', label: 'Aceptado', icon: CheckCircle, description: 'Tu pedido fue recibido' },
+    { key: 'Procesando', label: 'En Preparación', icon: ChefHat, description: 'Estamos preparando tu comida' },
+    { key: 'En preparación', label: 'Se asignó motorizado', icon: Package, description: 'Un repartidor va por tu pedido' },
+    { key: 'Listo', label: 'Listo para entregar', icon: Package, description: 'Tu pedido está empacado' },
+    { key: 'En camino', label: 'En Camino', icon: Truck, description: 'Tu pedido está en camino' },
+    { key: 'Entregado', label: 'Entregado', icon: MapPin, description: '¡Pedido entregado!' },
+  ];
+}
 
 const MOTIVATIONAL_MESSAGES = [
   '¡Tu comida está siendo preparada con amor! 🍳',
@@ -44,8 +55,10 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
-  const statusOrder = ['Pendiente', 'Procesando', 'En preparación', 'Listo', 'En camino', 'Entregado'];
-  const currentStepIdx = statusOrder.indexOf(liveStatus);
+  const orderType = order.tipo_entrega || order.tipo_pedido || 'delivery';
+  const STATUS_STEPS = useMemo(() => getStatusSteps(orderType), [orderType]);
+  const statusOrder = STATUS_STEPS.map(s => s.key);
+  const currentStepIdx = Math.max(0, statusOrder.indexOf(liveStatus));
 
   const adProducts = useMemo(() => {
     return foodItems
@@ -305,7 +318,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
                       className="shrink-0 w-[130px] bg-zinc-50 rounded-xl overflow-hidden border border-zinc-100 hover:border-zinc-200 transition-all cursor-pointer"
                     >
                       <div className="aspect-[4/3] overflow-hidden">
-                        <img src={p.imagen_urls[0]} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        <img src={p.imagen_urls?.[0] || ''} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       </div>
                       <div className="p-2">
                         <p className="text-[10px] font-bold text-zinc-900 truncate">{p.nombre}</p>

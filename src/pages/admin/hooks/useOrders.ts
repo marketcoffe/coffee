@@ -2,6 +2,25 @@ import { useCallback, useMemo, useState } from 'react';
 import { useApp } from '../../../store/AppContext';
 import { Order } from '../../../types/store';
 
+function getNextStatus(status: Order['status'], tipoEntrega?: string): Order['status'] | null {
+  const flow: Record<string, Order['status']> = {
+    'enviado_cocina': 'En preparación',
+    'pendiente_verificacion': 'Pendiente',
+    'pago_enviado': 'En preparación',
+    'pendiente_pago': 'En preparación',
+    'pago_en_verificacion': 'En preparación',
+    'Pendiente': 'Procesando',
+    'Procesando': 'En preparación',
+    'En preparación': 'Listo',
+    'En preparacion': 'Listo',
+    'en_preparacion': 'Listo',
+  };
+  // After "Listo": delivery goes to "En camino", mesa/pickup go to "Entregado"
+  if (status === 'Listo') return tipoEntrega === 'delivery' ? 'En camino' : 'Entregado';
+  if (status === 'En camino') return 'Entregado';
+  return flow[status] ?? null;
+}
+
 export function useOrders(sedeId?: string) {
   const { orders, config, updateOrderStatus } = useApp();
   const [advancingId, setAdvancingId] = useState<string | null>(null);
@@ -17,15 +36,13 @@ export function useOrders(sedeId?: string) {
   const cancelledOrders = useMemo(() => filteredBySede.filter(o => o.status === 'Cancelado'), [filteredBySede]);
 
   const advanceStatus = useCallback(async (order: Order) => {
-    const statusFlow: Order['status'][] = ['Pendiente', 'Procesando', 'En preparación', 'Listo', 'En camino', 'Entregado'];
-    const currentIdx = statusFlow.indexOf(order.status);
-    if (currentIdx >= 0 && currentIdx < statusFlow.length - 1) {
-      setAdvancingId(order.id);
-      try {
-        await updateOrderStatus(order.id, statusFlow[currentIdx + 1]);
-      } finally {
-        setAdvancingId(null);
-      }
+    const nextStatus = getNextStatus(order.status, order.tipo_entrega);
+    if (!nextStatus) return;
+    setAdvancingId(order.id);
+    try {
+      await updateOrderStatus(order.id, nextStatus);
+    } finally {
+      setAdvancingId(null);
     }
   }, [updateOrderStatus]);
 
@@ -42,10 +59,9 @@ export function useOrders(sedeId?: string) {
     for (const id of orderIds) {
       const order = filteredBySede.find(o => o.id === id);
       if (!order) continue;
-      const statusFlow: Order['status'][] = ['Pendiente', 'Procesando', 'En preparación', 'Listo', 'En camino', 'Entregado'];
-      const currentIdx = statusFlow.indexOf(order.status);
-      if (currentIdx >= 0 && currentIdx < statusFlow.length - 1) {
-        await updateOrderStatus(id, statusFlow[currentIdx + 1]);
+      const nextStatus = getNextStatus(order.status, order.tipo_entrega);
+      if (nextStatus) {
+        await updateOrderStatus(id, nextStatus);
       }
     }
   }, [filteredBySede, updateOrderStatus]);

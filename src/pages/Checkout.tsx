@@ -6,6 +6,7 @@ import { LeafletMap } from '../components/LeafletMap';
 import { SEOHead } from '../components/SEOHead';
 import { CartUpsell } from '../components/CartUpsell';
 import { OrderTracker } from '../components/OrderTracker';
+import { OrderSuccessStep } from '../components/mesa/OrderSuccessStep';
 import { OrderTypeModal } from '../components/OrderTypeModal';
 import { FoodItem, Coupon, Order, StoreConfig, DeliveryZone } from '../types/store';
 import { haversineKm, findNearestSede } from '../utils/geo';
@@ -900,6 +901,30 @@ ${productosDetailText}
             )}
           </div>
         </div>
+      );
+    }
+
+    // For mesa/pickup orders, show OrderSuccessStep instead of OrderTracker
+    const isMesaOrPickup = displayOrder.tipo_entrega === 'mesa' || displayOrder.tipo_entrega === 'pickup' || displayOrder.tipo_pedido === 'mesa';
+    if (isMesaOrPickup) {
+      return (
+        <OrderSuccessStep
+          order={displayOrder}
+          onContinueShopping={() => {
+            localStorage.removeItem('trv_active_order_id');
+            localStorage.removeItem('trv_waiting_for_admin');
+            localStorage.removeItem('trv_checkout_order_type');
+            setProcessedOrder(null);
+            setTab('catalog');
+          }}
+          onClose={() => {
+            localStorage.removeItem('trv_active_order_id');
+            localStorage.removeItem('trv_waiting_for_admin');
+            localStorage.removeItem('trv_checkout_order_type');
+            setProcessedOrder(null);
+            if (onClose) onClose(); else setTab('home');
+          }}
+        />
       );
     }
 

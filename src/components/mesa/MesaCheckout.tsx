@@ -24,7 +24,14 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
   const mesaColor = '#e67e22';
 
   const [currentStep, setCurrentStep] = useState<1 | 2>(1);
-  const [clientName, setClientName] = useState(currentUser?.nombre || '');
+  const [clientName, setClientName] = useState(() => {
+    if (currentUser?.nombre) return currentUser.nombre;
+    try { return localStorage.getItem('trv_guest_name') || ''; } catch { return ''; }
+  });
+  const [clientPhone, setClientPhone] = useState(() => {
+    if (currentUser?.telefono) return currentUser.telefono;
+    try { return localStorage.getItem('trv_guest_phone') || ''; } catch { return ''; }
+  });
   const [selectedMesa, setSelectedMesa] = useState<number | null>(null);
   const [orderNotes, setOrderNotes] = useState('');
   const [couponInput, setCouponInput] = useState('');
@@ -33,6 +40,7 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
   const [isProcessing, setIsProcessing] = useState(false);
   const [validationError, setValidationError] = useState('');
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   useEffect(() => {
     if (mesas.length === 0) fetchMesas();
@@ -41,6 +49,30 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
   useEffect(() => {
     if (currentUser) setClientName(currentUser.nombre);
   }, [currentUser]);
+
+  // Save guest name/phone to localStorage
+  useEffect(() => {
+    if (clientName.trim()) {
+      try { localStorage.setItem('trv_guest_name', clientName.trim()); } catch {}
+    }
+  }, [clientName]);
+  useEffect(() => {
+    if (clientPhone.trim()) {
+      try { localStorage.setItem('trv_guest_phone', clientPhone.trim()); } catch {}
+    }
+  }, [clientPhone]);
+
+  // beforeunload confirmation
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (cart.length > 0 && !isProcessing) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [cart.length, isProcessing]);
 
   const availableMesas = useMemo(() =>
     mesas.filter(m => m.estado !== 'Inactiva').sort((a, b) => a.numero_mesa - b.numero_mesa),
@@ -143,7 +175,7 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
         p_notas_admin: orderNotes,
         p_sede_id: '',
         p_usuario_id: currentUser?.id || '',
-        p_cliente_telefono: currentUser?.telefono || '',
+        p_cliente_telefono: clientPhone.trim() || currentUser?.telefono || '',
         p_cliente_email: currentUser?.email || '',
         p_lat: config.coordenadas_tienda.lat,
         p_lng: config.coordenadas_tienda.lng,
@@ -163,7 +195,7 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
       const newOrder: Order = {
         id: orderData.id,
         cliente_nombre: clientName.trim(),
-        cliente_telefono: currentUser?.telefono || '',
+        cliente_telefono: clientPhone.trim() || currentUser?.telefono || '',
         cliente_email: currentUser?.email || '',
         usuario_id: currentUser?.id,
         items,
@@ -236,7 +268,15 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
 
       {/* Header */}
       <div className="border-b px-4 py-3 flex items-center gap-3 sticky top-0 z-20" style={{ backgroundColor: 'rgba(249,249,251,0.8)', backdropFilter: 'blur(20px)', borderColor: '#e4beb1/10' }}>
-        <button onClick={() => currentStep === 2 ? setCurrentStep(1) : setTab('cart')} className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#eeeef0] transition-colors cursor-pointer" style={{ backgroundColor: '#eeeef0' }}>
+        <button onClick={() => {
+          if (cart.length > 0 && !isProcessing) {
+            setShowExitModal(true);
+          } else if (currentStep === 2) {
+            setCurrentStep(1);
+          } else {
+            setTab('cart');
+          }
+        }} className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#eeeef0] transition-colors cursor-pointer" style={{ backgroundColor: '#eeeef0' }}>
           <ArrowLeft size={18} className="text-[#1a1c1d]" />
         </button>
         <div className="flex-1">
@@ -293,6 +333,19 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
                 />
               </div>
 
+              {/* Teléfono (opcional, para notificaciones) */}
+              <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
+                <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-1">Teléfono (opcional)</h3>
+                <p className="text-[10px] text-[#8f7065] mb-3">Te notificaremos cuando tu pedido esté listo</p>
+                <input
+                  type="tel"
+                  value={clientPhone}
+                  onChange={(e) => setClientPhone(e.target.value)}
+                  placeholder="0412-1234567"
+                  className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[var(--theme-color,#FF6B35)] transition-colors"
+                />
+              </div>
+
               {/* Selección de Mesa */}
               <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
                 <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Selecciona tu Mesa</h3>
@@ -343,7 +396,7 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
                   {cart.map(item => (
                     <div key={item.item.id} className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#eeeef0] border border-[#e4beb1]/10 shrink-0">
-                        <img src={item.item.imagen_urls[0]} alt={item.item.nombre} className="w-full h-full object-cover" />
+                        <img src={item.item.imagen_urls?.[0] || ''} alt={item.item.nombre} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="text-xs font-bold text-[#1a1c1d] truncate">{item.item.nombre}</h4>
@@ -470,6 +523,24 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
               {isProcessing ? 'Enviando...' : '✓ Confirmar y Enviar a Cocina'}
             </button>
           )}
+        </div>
+      )}
+
+      {/* Exit confirmation modal */}
+      {showExitModal && (
+        <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black/40 backdrop-blur-sm p-6">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-base font-bold text-[#1a1c1d] mb-2">¿Salir del pedido?</h3>
+            <p className="text-sm text-[#8f7065] mb-5">Si sales ahora, se perderá el contenido de tu carrito para este pedido en mesa.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowExitModal(false)} className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-[#eeeef0] text-[#5b4137] transition-all active:scale-[0.98] cursor-pointer">
+                Quedarme
+              </button>
+              <button onClick={() => { setShowExitModal(false); setTab('cart'); }} className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: '#ef4444' }}>
+                Salir
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

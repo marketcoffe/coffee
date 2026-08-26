@@ -235,26 +235,43 @@ function AppContent() {
   // Sync URL with tab state
   useEffect(() => {
     const currentPath = window.location.pathname;
-    const targetPath = tab === 'admin' ? '/admin' : '/';
+    let targetPath = '/';
+    if (tab === 'admin') targetPath = '/admin';
+    else if (tab === 'cart') targetPath = '/cart';
+    else if (tab === 'checkout') targetPath = '/checkout';
+    else if (tab === 'profile') targetPath = '/profile';
+    else if (tab === 'catalog') targetPath = '/catalog';
+    else if (tab === 'mesa_checkout') targetPath = '/mesa';
+    else targetPath = '/';
     if (currentPath !== targetPath) {
-      window.history.pushState({}, '', targetPath);
+      window.history.pushState({ tab }, '', targetPath);
     }
   }, [tab]);
 
   // Handle browser back/forward
   useEffect(() => {
-    const handlePopState = () => {
+    const handlePopState = (e: PopStateEvent) => {
       const path = window.location.pathname;
-      const isNowAdmin = path.startsWith('/admin') || path.startsWith('/admin');
-      const isNowHome = path === '/' || path === '/coffe' || path === '/' || path === '';
-      if (isNowAdmin) {
+      // Check if PWA standalone and at root → close app
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      if (isStandalone && (path === '/' || path === '')) {
+        // Try to close the PWA
+        try { (window as any).close?.(); } catch {}
+      }
+      if (path.startsWith('/admin')) {
         setTab('admin');
-        setIs404(false);
-      } else if (!isNowHome) {
-        setIs404(true);
+      } else if (path === '/cart') {
+        setTab('cart');
+      } else if (path === '/checkout') {
+        setTab('checkout');
+      } else if (path === '/profile') {
+        setTab('profile');
+      } else if (path === '/catalog') {
+        setTab('catalog');
+      } else if (path === '/mesa') {
+        setTab('mesa_checkout');
       } else {
         setTab('home');
-        setIs404(false);
       }
     };
     window.addEventListener('popstate', handlePopState);
