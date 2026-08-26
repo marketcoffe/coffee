@@ -1,10 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { useToast } from '../../../../components/Toast';
+import { supabase } from '../../../../store/supabaseClient';
 import { FoodItem } from '../../../../types/store';
 import {
   Search, Plus, Eye, Edit3, Trash2, ToggleLeft, ToggleRight,
-  Tag, Package, Download, Upload, Mic, MicOff, Grid, List, X, Check
+  Tag, Package, Download, Upload, Mic, MicOff, Grid, List, X, Check,
+  Wifi, WifiOff, AlertTriangle, CheckCircle
 } from 'lucide-react';
 import { getCategories, hasCategory, formatCategories } from '../../../../utils/categoryUtils';
 
@@ -21,6 +23,20 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
   const { foodItems, addFoodItem, updateFoodItem, deleteFoodItem, searchItems } = useApp();
   const { showToast } = useToast();
   const themeColor = config.theme_color || '#A4D045';
+
+  const [dbStatus, setDbStatus] = useState<'checking' | 'connected' | 'mock' | 'error'>('checking');
+
+  const checkDbConnection = useCallback(async () => {
+    setDbStatus('checking');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { setDbStatus('mock'); return; }
+      const { error } = await supabase.from('store_config').select('id').limit(1);
+      setDbStatus(error ? 'error' : 'connected');
+    } catch { setDbStatus('mock'); }
+  }, []);
+
+  useEffect(() => { checkDbConnection(); }, [checkDbConnection]);
 
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('todos');
@@ -189,9 +205,31 @@ const ProductosSection: React.FC<ProductosSectionProps> = ({ onEdit, onCreate, c
     <div className="flex flex-col gap-4">
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
-        <div>
-          <h2 className="text-lg font-bold" style={{ color: 'var(--ios-text)' }}>Gestión de Productos</h2>
-          <p className="text-xs text-slate-500">{stats.total} productos · {stats.activos} activos · {stats.bajoStock} bajo stock</p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h2 className="text-lg font-bold" style={{ color: 'var(--ios-text)' }}>Gestión de Productos</h2>
+            <p className="text-xs text-slate-500">{stats.total} productos · {stats.activos} activos · {stats.bajoStock} bajo stock</p>
+          </div>
+          {dbStatus === 'checking' && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">
+              <Wifi size={10} className="animate-pulse" /> Verificando DB...
+            </span>
+          )}
+          {dbStatus === 'connected' && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+              <CheckCircle size={10} /> DB Conectada
+            </span>
+          )}
+          {dbStatus === 'mock' && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-orange-100 text-orange-700 border border-orange-200">
+              <AlertTriangle size={10} /> Solo Local
+            </span>
+          )}
+          {dbStatus === 'error' && (
+            <button onClick={checkDbConnection} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-red-100 text-red-700 border border-red-200 cursor-pointer hover:bg-red-50">
+              <WifiOff size={10} /> Error DB — Reintentar
+            </button>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button onClick={exportCSV} className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer transition-colors">

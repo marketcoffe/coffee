@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { uploadImage } from '../../../store/supabaseClient';
+import { uploadImage } from '../../../store/storageService';
 import { useToast } from '../../../components/Toast';
 import { Image, Upload, Link, X } from 'lucide-react';
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { useToast } from '../../../../components/Toast';
 import { FoodItem, FoodOptionGroup, FoodOption, PizzaSize } from '../../../../types/store';
-import { uploadImage } from '../../../../store/supabaseClient';
+import { uploadImage } from '../../../../store/storageService';
 import {
   Save, X, Plus, Trash2, Image as ImageIcon, GripVertical, Package,
   Tag, Palette, List, Link2, Clock, AlertTriangle, ChevronDown, ChevronUp,

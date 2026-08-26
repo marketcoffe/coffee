@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useApp } from '../../../../store/AppContext';
-import { uploadImage } from '../../../../store/supabaseClient';
+import { uploadImage } from '../../../../store/storageService';
 import { Send, MessageSquare, MessageCircle, Trash2, User, Bell, Upload, Package, Search, ExternalLink } from 'lucide-react';
 
 const MensajesSection: React.FC = () => {
