@@ -193,6 +193,15 @@ function AppContent() {
     }
   }, [config.theme_color, config.pwa_icon_url, config.splash_logo_url, config.site_nombre, config.logo_url, config.favicon_url]);
 
+  // Admin: body background blanco para evitar espacio marrón al hacer scroll
+  useEffect(() => {
+    if (tab === 'admin') {
+      document.body.style.backgroundColor = '#ffffff';
+    } else {
+      document.body.style.backgroundColor = config.theme_color || '#F8F6F0';
+    }
+  }, [tab, config.theme_color]);
+
   const handleInstallClick = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
@@ -349,7 +358,7 @@ function AppContent() {
         )}
 
         {/* ═══ MAIN CONTENT AREA ═══ */}
-        <main className={`flex-1 overflow-y-auto w-full${tab !== 'admin' ? ' pb-14 lg:pb-0' : ' max-h-screen'} `}>
+        <main className={`flex-1 overflow-y-auto w-full${tab !== 'admin' ? ' pb-14 lg:pb-0' : ' h-full max-h-screen'} `}>
           {tab === 'home' && (
             <ErrorBoundary moduleName="Home">
               <Home
