@@ -193,6 +193,13 @@ function AppContent() {
     }
   }, [config.theme_color, config.pwa_icon_url, config.splash_logo_url, config.site_nombre, config.logo_url, config.favicon_url]);
 
+  // Route/Tab controllers - si es admin/operador autenticado O si la URL es /admin, abrir directo en su panel
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const isAdminUrl = pathname.startsWith('/admin') || pathname.startsWith('/admin');
+  const isHome = pathname === '/' || pathname === '/coffe' || pathname === '/' || pathname === '';
+  const is404Url = !isHome && !isAdminUrl;
+  const [tab, setTab] = useState<'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout'>((isAdminAuthenticated || isAdminUrl) ? 'admin' : 'home');
+
   // Admin: body background blanco para evitar espacio marrón al hacer scroll
   useEffect(() => {
     if (tab === 'admin') {
@@ -211,13 +218,6 @@ function AppContent() {
       }
     }
   };
-
-  // Route/Tab controllers - si es admin/operador autenticado O si la URL es /admin, abrir directo en su panel
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
-  const isAdminUrl = pathname.startsWith('/admin') || pathname.startsWith('/admin');
-  const isHome = pathname === '/' || pathname === '/coffe' || pathname === '/' || pathname === '';
-  const is404Url = !isHome && !isAdminUrl;
-  const [tab, setTab] = useState<'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout'>((isAdminAuthenticated || isAdminUrl) ? 'admin' : 'home');
   const [mesaOrderCreated, setMesaOrderCreated] = useState<any>(null);
   const [mesaPaymentSent, setMesaPaymentSent] = useState(false);
   const [mesaPayAtRegister, setMesaPayAtRegister] = useState(false);
