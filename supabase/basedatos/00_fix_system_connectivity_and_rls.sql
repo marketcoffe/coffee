@@ -369,17 +369,24 @@ USING (public.is_admin_or_operator())
 WITH CHECK (public.is_admin_or_operator());
 
 -- ============================================================================
--- PASO 14: Verificación final
+-- PASO 13b: Drop FK constraint on push_subscriptions.user_id
+-- The FK references usuarios_clientes(id) but guests have no row there,
+-- causing "insert or update violates foreign key constraint" error.
+-- ============================================================================
+DO $$ BEGIN
+    ALTER TABLE push_subscriptions DROP CONSTRAINT IF EXISTS push_subscriptions_user_id_fkey;
+EXCEPTION WHEN undefined_object THEN NULL;
+END $$;
+
+-- ============================================================================
+-- PASO 14: Verificacion final
 -- ============================================================================
 DO $$
 BEGIN
-    RAISE NOTICE '═══════════════════════════════════════════════════════════';
-    RAISE NOTICE '✅ REPARACIÓN COMPLETADA';
-    RAISE NOTICE '═══════════════════════════════════════════════════════════';
-    RAISE NOTICE '🔑 Admin: kecho8a@gmail.com / admin123';
-    RAISE NOTICE '📦 Buckets: settings, productos, banners, categories, usuarios';
-    RAISE NOTICE '📡 Realtime: 8 tablas en publication supabase_realtime';
-    RAISE NOTICE '🔒 RLS: policies recreadas para orders, products, notifications';
-    RAISE NOTICE '👤 Auth: admin_users sincronizado con auth.users';
-    RAISE NOTICE '═══════════════════════════════════════════════════════════';
+    RAISE NOTICE 'REPARACION COMPLETADA';
+    RAISE NOTICE 'Admin: kecho8a@gmail.com / admin123';
+    RAISE NOTICE 'Buckets: settings, productos, banners, categories, usuarios';
+    RAISE NOTICE 'Realtime: 8 tablas en publication supabase_realtime';
+    RAISE NOTICE 'RLS: policies recreadas para orders, products, notifications';
+    RAISE NOTICE 'Auth: admin_users sincronizado con auth.users';
 END $$;
