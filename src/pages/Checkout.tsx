@@ -35,7 +35,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const [clientPhone, setClientPhone] = useState(currentUser?.telefono || '');
   const [clientEmail, setClientEmail] = useState(currentUser?.email || '');
   const [orderNotes, setOrderNotes] = useState('');
-  const [selectedPayment, setSelectedPayment] = useState<'Pago Móvil' | 'Zelle' | 'Efectivo' | 'Transferencia' | 'Otro'>('Pago Móvil');
+  const [selectedPayment, setSelectedPayment] = useState<'Pago Móvil' | 'Efectivo' | 'Punto'>('Pago Móvil');
   const [validationError, setValidationError] = useState('');
   const [customPaymentNote, setCustomPaymentNote] = useState('');
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -373,11 +373,41 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
       setShippingDistance(0);
       setShippingZone('Retiro en Tienda');
     } else if (method === 'zonas') {
+      // Auto-detect GPS for zone-based delivery
       setShippingLat(sedeCoords.lat);
       setShippingLng(sedeCoords.lng);
       setShippingCost(0);
       setShippingDistance(0);
-      setShippingZone('Selecciona una zona');
+      setShippingZone('Detectando ubicación...');
+      // Request GPS automatically
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setShippingLat(latitude);
+            setShippingLng(longitude);
+            localStorage.setItem('trv_user_location', JSON.stringify({ lat: latitude, lng: longitude }));
+            const dist = haversineKm(latitude, longitude, sedeCoords.lat, sedeCoords.lng);
+            setShippingDistance(Math.round(dist * 10) / 10);
+            const zones = sede?.delivery_zonas || config.delivery_zonas || [];
+            const matchedZone = zones.find(z => dist >= z.minKm && dist <= z.maxKm);
+            if (matchedZone) {
+              const idx = zones.indexOf(matchedZone);
+              setSelectedZoneIndex(idx);
+              setShippingZone(matchedZone.name);
+              setShippingCost((sede?.delivery_gratis ?? config.delivery_gratis) ? 0 : matchedZone.cost);
+            } else {
+              setShippingZone('Zona no cubierta');
+              setShippingCost(dist * (sede?.costo_delivery_km || config.costo_delivery_km || 1.5));
+            }
+          },
+          () => {
+            // GPS denied - show zones without location
+            setShippingZone('Selecciona una zona');
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+        );
+      }
     } else if (method === 'mapa') {
       const savedLocation = localStorage.getItem('trv_user_location');
       if (savedLocation) {
@@ -421,6 +451,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const validateStep1 = (): boolean => {
     if (shippingMethod === 'zonas' && selectedZoneIndex === null) {
       setValidationError('Selecciona una zona de entrega.');
+      return false;
+    }
+    if (shippingMethod === 'zonas' && shippingLat === config.coordenadas_tienda.lat && shippingLng === config.coordenadas_tienda.lng) {
+      setValidationError('Se requiere tu ubicación GPS para el delivery. Permite el acceso a tu ubicación.');
       return false;
     }
     if (shippingMethod === 'mapa' && shippingLat === config.coordenadas_tienda.lat && shippingLng === config.coordenadas_tienda.lng) {
@@ -603,14 +637,14 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
 *Pedido ID:* ${created.id}
 *Cliente:* ${finalClientName || 'Cliente sin nombre'}
 *Telefono:* ${cleanedPhone}
-${clientEmail ? `*Correo:* ${clientEmail}\n` : ''}*Direccion de Entrega:* ${shippingZone}
+*Direccion de Entrega:* ${shippingZone}
 *Ubicacion Mapa:* https://www.google.com/maps?q=${shippingLat},${shippingLng}
 *Metodo Despacho:* ${deliveryLabel} - Costo: $${effectiveShippingAfterCoupon.toFixed(2)}
 
 *Detalle del Carrito:*
 ${productosDetailText}
 *Total Neto a Pagar:* $${totalUsd.toFixed(2)} / ${totalBs.toFixed(2)} Bs.
-*Metodo de Pago:* ${selectedPayment}${selectedPayment === 'Otro' && customPaymentNote ? `\n*Detalle Pago:* ${customPaymentNote}` : ''}${selectedPayment === 'Efectivo' && cashBills ? `\n*Billetes:* ${cashBills}` : ''}
+*Metodo de Pago:* ${selectedPayment}${selectedPayment === 'Efectivo' && cashBills ? `\n*Billetes:* ${cashBills}` : ''}
 ----------------------------------`;
 
         let cleanPhone = checkoutWhatsAppPhone().replace(/\D/g, '');
@@ -1572,15 +1606,13 @@ ${productosDetailText}
               {orderType !== 'mesa' && (
               <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
                 <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Método de Pago</h3>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {[
-                    { key: 'Pago Móvil', label: 'Pago Móvil Bs', icon: 'Bs', enabled: config.pagomovil_enabled },
-                    { key: 'Zelle', label: 'Zelle USD', icon: 'USD', enabled: config.zelle_enabled },
-                    { key: 'Efectivo', label: 'Efectivo', icon: '$', enabled: config.efectivo_enabled },
-                    { key: 'Transferencia', label: 'Transferencia', icon: 'Bco', enabled: config.transferencia_enabled },
-                    { key: 'Otro', label: 'Otro', icon: '?', enabled: true }
-                  ].filter(pm => pm.enabled).map(pm => (
-                    <button key={pm.key} onClick={() => setSelectedPayment(pm.key as 'Pago Móvil' | 'Zelle' | 'Efectivo' | 'Transferencia' | 'Otro')} className={`p-3 rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer border-2 text-xs ${
+                    { key: 'Pago Móvil', label: 'Pago Móvil', icon: 'Bs' },
+                    { key: 'Efectivo', label: 'Efectivo', icon: '$' },
+                    { key: 'Punto', label: 'Punto de Venta', icon: 'Pt' },
+                  ].map(pm => (
+                    <button key={pm.key} onClick={() => setSelectedPayment(pm.key as typeof selectedPayment)} className={`p-3 rounded-xl text-left flex items-center gap-2 transition-all cursor-pointer border-2 text-xs ${
                       selectedPayment === pm.key ? 'text-white shadow-md' : 'bg-[#f9f9fb] border-[#e4beb1]/10 text-[#5b4137] hover:bg-[#eeeef0]'
                     }`} style={selectedPayment === pm.key ? { backgroundColor: orderTypeColor, borderColor: orderTypeColor } : {}}>
                       <span className="text-[9px] uppercase font-mono font-bold px-1.5 py-0.5 rounded bg-white/20 shrink-0">{pm.icon}</span>
@@ -1592,74 +1624,64 @@ ${productosDetailText}
                 <div className="mt-3 p-3 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl text-[11px] text-[#5b4137] leading-relaxed font-mono">
                   {selectedPayment === 'Pago Móvil' && (
                     <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                        <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Banco / Titular</span>
-                          <span className="text-[#1a1c1d] font-bold">{(config.pagomovil_data || 'Banesco (0134)').split('-')[0]?.trim()}</span>
+                      {/* Datos hardcoded Banesco */}
+                      <div className="p-2 rounded-lg border border-[#e67e22]/30 bg-[#e67e22]/5">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[9px] font-bold uppercase" style={{ color: orderTypeColor }}>Banesco (0134)</span>
+                          <span className="text-[8px] px-1 py-0.5 rounded-full text-white font-bold" style={{ backgroundColor: orderTypeColor }}>Principal</span>
                         </div>
-                        <CopyButton text={config.pagomovil_data || 'Banesco (0134)'} fieldId="pm-data" />
-                      </div>
-                      <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                        <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Teléfono</span>
-                          <span className="text-[#1a1c1d] font-bold">{(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'}</span>
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] text-[#8f7065]">Teléfono</span>
+                            <div className="flex items-center gap-1">
+                              <span className="text-[#1a1c1d] font-bold text-[11px]">04123758879</span>
+                              <CopyButton text="04123758879" fieldId="pm-phone-delivery" />
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] text-[#8f7065]">Cédula/RIF</span>
+                            <div className="flex items-center gap-1">
+                              <span className="text-[#1a1c1d] font-bold text-[11px]">V-33112679</span>
+                              <CopyButton text="V-33112679" fieldId="pm-ci-delivery" />
+                            </div>
+                          </div>
                         </div>
-                        <CopyButton text={(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'} fieldId="pm-phone" />
-                      </div>
-                      <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                        <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Cédula / RIF</span>
-                          <span className="text-[#1a1c1d] font-bold">{(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'}</span>
-                        </div>
-                        <CopyButton text={(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'} fieldId="pm-ci" />
                       </div>
                       <p className="text-center font-black py-1 rounded" style={{ color: themeColor }}>Calcular: {totalBs.toFixed(2)} Bs.</p>
-                    </div>
-                  )}
-                  {selectedPayment === 'Zelle' && (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
+                      <div className="space-y-2 mt-2 pt-2 border-t border-[#e4beb1]/10">
                         <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Correo Zelle</span>
-                          <span className="text-[#1a1c1d] font-bold">{config.zelle_data || 'pagos@email.com'}</span>
+                          <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Tu Banco Emisor *</label>
+                          <select value={paymentBank} onChange={(e) => setPaymentBank(e.target.value)} className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer">
+                            <option value="Banesco">Banesco (0134)</option>
+                            <option value="Mercantil">Mercantil (0102)</option>
+                            <option value="Venezuela">Banco de Venezuela (0102)</option>
+                            <option value="Provincial">Provincial (0108)</option>
+                            <option value="Bancaribe">Bancaribe (0114)</option>
+                            <option value="Exterior">Banco Exterior (0115)</option>
+                            <option value="Nacional">Nacional de Crédito (0191)</option>
+                            <option value="BOD">BOD (0128)</option>
+                            <option value="Plaza">Banco Plaza (0138)</option>
+                            <option value="Otros">Otros</option>
+                          </select>
                         </div>
-                        <CopyButton text={config.zelle_data || 'pagos@email.com'} fieldId="zelle-email" />
-                      </div>
-                      <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
                         <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Monto a enviar</span>
-                          <span className="font-black" style={{ color: themeColor }}>${totalUsd.toFixed(2)} USD</span>
+                          <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia de Pago *</label>
+                          <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
                         </div>
-                        <CopyButton text={`$${totalUsd.toFixed(2)}`} fieldId="zelle-amount" />
                       </div>
                     </div>
                   )}
                   {selectedPayment === 'Efectivo' && (
                     <div className="flex flex-col gap-2">
-                      <p className="text-[#1a1c1d] font-bold text-center">{config.efectivo_data || 'Paga al motorizado en efectivo al recibir'}</p>
-                      <p className="text-center font-black py-1 rounded" style={{ color: themeColor }}>Total: ${totalUsd.toFixed(2)}</p>
+                      <p className="text-[#1a1c1d] font-bold text-center">{config.efectivo_data || 'Paga al motorizado en efectivo (USD/Bs) al recibir tu delivery'}</p>
+                      <p className="text-center font-black py-1 rounded" style={{ color: themeColor }}>Total: ${totalUsd.toFixed(2)} / {totalBs.toFixed(2)} Bs.</p>
                     </div>
                   )}
-                  {selectedPayment === 'Transferencia' && (
+                  {selectedPayment === 'Punto' && (
                     <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                        <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Datos Bancarios</span>
-                          <span className="text-[#1a1c1d] font-bold">{config.transferencia_data || `Banesco - ${config.site_nombre}`}</span>
-                        </div>
-                        <CopyButton text={config.transferencia_data || `Banesco - ${config.site_nombre}`} fieldId="transfer-data" />
-                      </div>
-                      <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                        <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
-                          <span className="font-black" style={{ color: themeColor }}>${totalUsd.toFixed(2)} USD</span>
-                        </div>
-                        <CopyButton text={`$${totalUsd.toFixed(2)}`} fieldId="transfer-amount" />
-                      </div>
+                      <p className="text-[#1a1c1d] font-bold text-center">Paga con tu punto de venta en tienda al recoger</p>
+                      <p className="text-center font-black py-1 rounded" style={{ color: themeColor }}>Total: ${totalUsd.toFixed(2)} / {totalBs.toFixed(2)} Bs.</p>
                     </div>
-                  )}
-                  {selectedPayment === 'Otro' && (
-                    <textarea value={customPaymentNote} onChange={(e) => setCustomPaymentNote(e.target.value)} placeholder="Describe cómo vas a pagar..." className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none focus:border-[var(--theme-color,#FF6B35)] resize-none" rows={3} />
                   )}
                 </div>
               </div>
@@ -1667,7 +1689,7 @@ ${productosDetailText}
 
               {orderType !== 'mesa' && (
               <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
-                {(selectedPayment === 'Pago Móvil' || selectedPayment === 'Zelle' || selectedPayment === 'Transferencia') && (
+                {selectedPayment === 'Pago Móvil' && (
                   <div className="mb-3 p-3 rounded-xl border" style={{ backgroundColor: `${themeColor}08`, borderColor: `${themeColor}20` }}>
                     <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: themeColor }}>Importante</p>
                     <p className="text-xs text-[#5b4137] leading-relaxed">
@@ -1910,43 +1932,44 @@ ${productosDetailText}
                   <div className="p-3 rounded-xl mb-3" style={{ backgroundColor: `${themeColor}10` }}>
                     <p className="text-sm font-bold text-[#1a1c1d]">{(processedOrder as Order).metodo_pago}</p>
                   </div>
-                  {(processedOrder as Order).metodo_pago === 'Pago Móvil' && (
+               {(processedOrder as Order).metodo_pago === 'Pago Móvil' && (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                        <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Banco / Titular</span>
-                          <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || 'Banesco (0134)').split('-')[0]?.trim()}</span>
+                      {/* Datos hardcoded Banesco */}
+                      <div className="p-2 rounded-lg border border-[#e67e22]/30 bg-[#e67e22]/5">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[9px] font-bold uppercase" style={{ color: themeColor }}>Banesco (0134)</span>
+                          <span className="text-[8px] px-1 py-0.5 rounded-full text-white font-bold" style={{ backgroundColor: themeColor }}>Principal</span>
                         </div>
-                        <CopyButton text={config.pagomovil_data || 'Banesco (0134)'} fieldId="pm-bank-final" />
-                      </div>
-                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                        <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Teléfono</span>
-                          <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'}</span>
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] text-[#8f7065]">Teléfono</span>
+                            <div className="flex items-center gap-1">
+                              <span className="text-[#1a1c1d] font-bold text-[11px]">04123758879</span>
+                              <CopyButton text="04123758879" fieldId="pm-phone-final" />
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] text-[#8f7065]">Cédula/RIF</span>
+                            <div className="flex items-center gap-1">
+                              <span className="text-[#1a1c1d] font-bold text-[11px]">V-33112679</span>
+                              <CopyButton text="V-33112679" fieldId="pm-ci-final" />
+                            </div>
+                          </div>
                         </div>
-                        <CopyButton text={(config.pagomovil_data || '').match(/\d{4,}/)?.[0] || '04121234567'} fieldId="pm-phone-final" />
-                      </div>
-                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                        <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Cédula / RIF</span>
-                          <span className="text-[#1a1c1d] font-bold text-xs">{(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'}</span>
-                        </div>
-                        <CopyButton text={(config.pagomovil_data || '').match(/V-\d+[.-]?\d+[.-]?\d+|J-\d+[.-]?\d+[.-]?\d+/)?.[0] || 'V-12345678'} fieldId="pm-ci-final" />
                       </div>
                        <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {(processedOrder as Order).total_bs?.toFixed(2)} Bs.</p>
 
                       <div className="space-y-2 mt-3 pt-3 border-t border-[#e4beb1]/10">
                         <div>
-                          <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Banco Emisor *</label>
+                          <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Tu Banco Emisor *</label>
                           <select value={paymentBank} onChange={(e) => setPaymentBank(e.target.value)} className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer">
-                            <option value="">Seleccionar banco</option>
                             <option value="Banesco">Banesco (0134)</option>
                             <option value="Mercantil">Mercantil (0102)</option>
                             <option value="Venezuela">Banco de Venezuela (0102)</option>
                             <option value="Provincial">Provincial (0108)</option>
                             <option value="Bancaribe">Bancaribe (0114)</option>
                             <option value="Exterior">Banco Exterior (0115)</option>
-                            <option value="Nacional">Banco Nacional de Crédito (0191)</option>
+                            <option value="Nacional">Nacional de Crédito (0191)</option>
                             <option value="BOD">BOD (0128)</option>
                             <option value="Plaza">Banco Plaza (0138)</option>
                             <option value="Otros">Otros</option>
@@ -1956,50 +1979,6 @@ ${productosDetailText}
                           <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia de Pago *</label>
                           <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
                         </div>
-                      </div>
-                    </div>
-                  )}
-                   {(processedOrder as Order).metodo_pago === 'Zelle' && (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                        <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Correo Zelle</span>
-                          <span className="text-[#1a1c1d] font-bold text-xs">{config.zelle_data || 'pagos@email.com'}</span>
-                        </div>
-                        <CopyButton text={config.zelle_data || 'pagos@email.com'} fieldId="zelle-email-final" />
-                      </div>
-                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                        <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
-                          <span className="font-black text-sm" style={{ color: themeColor }}>${(processedOrder as Order).total_usd?.toFixed(2)} USD</span>
-                        </div>
-                        <CopyButton text={`$${(processedOrder as Order).total_usd?.toFixed(2)}`} fieldId="zelle-amount-final" />
-                      </div>
-                      <div className="mt-2 pt-2 border-t border-[#e4beb1]/10">
-                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia / Nota Zelle</label>
-                        <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: Confirmación Zelle" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
-                      </div>
-                    </div>
-                  )}
-                   {(processedOrder as Order).metodo_pago === 'Transferencia' && (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                        <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Datos Bancarios</span>
-                          <span className="text-[#1a1c1d] font-bold text-xs">{config.transferencia_data || `Banesco - ${config.site_nombre}`}</span>
-                        </div>
-                        <CopyButton text={config.transferencia_data || `Banesco - ${config.site_nombre}`} fieldId="transfer-data-final" />
-                      </div>
-                      <div className="flex items-center justify-between bg-[#f9f9fb] rounded-lg px-3 py-2 border border-[#e4beb1]/10">
-                        <div>
-                          <span className="text-[9px] text-[#8f7065] uppercase block">Monto</span>
-                          <span className="font-black text-sm" style={{ color: themeColor }}>${(processedOrder as Order).total_usd?.toFixed(2)} USD</span>
-                        </div>
-                        <CopyButton text={`$${(processedOrder as Order).total_usd?.toFixed(2)}`} fieldId="transfer-amount-final" />
-                      </div>
-                      <div className="mt-2 pt-2 border-t border-[#e4beb1]/10">
-                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia</label>
-                        <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
                       </div>
                     </div>
                   )}

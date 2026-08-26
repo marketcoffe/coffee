@@ -43,10 +43,10 @@ interface LeafletMapProps {
 
 // Zonas de Valencia predefinidas (fallback si no hay zonas configuradas)
 const VALENCIA_ZONES = [
-  { name: 'Cercano (Trigaleña, Guaparo, Las Chimeneas, El Viñedo)', minKm: 0, maxKm: 3, cost: 2.00 },
-  { name: 'Medio (Prebo, Mañongo, Prebo II, San Diego)', minKm: 3, maxKm: 8, cost: 4.50 },
-  { name: 'Lejano (Guacara, Los Guayos, Tocuyito, Flor Amarillo)', minKm: 8, maxKm: 18, cost: 7.00 },
-  { name: 'Fuera de Valencia (Envíos por encomienda Zoom/Tealka)', minKm: 18, maxKm: 100, cost: 0.00 }
+  { name: 'Trigal / Prebo / Chimeneas', minKm: 0, maxKm: 3, cost: 1.00 },
+  { name: 'Mañongo / Trigaleña / Naguanagua / Av Bolívar', minKm: 3, maxKm: 7, cost: 2.00 },
+  { name: 'San Diego / Otras zonas', minKm: 7, maxKm: 18, cost: 3.00 },
+  { name: 'Fuera de Valencia (Envíos por encomienda)', minKm: 18, maxKm: 100, cost: 0.00 }
 ];
 
 // Haversine formula

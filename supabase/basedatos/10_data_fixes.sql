@@ -84,7 +84,7 @@ UPDATE store_config SET
     categories = ARRAY['Bebidas', 'Carnicería', 'Charcutería', 'Charcutería y Embutidos', 'Combos Familiares', 'Comida Rapida', 'Frutas y Verduras', 'Higiene Personal', 'Hogar', 'Lácteos', 'Licores', 'Limpieza', 'Mascotas', 'Panaderia', 'Dulces y Postres', 'Salsas y Condimentos', 'Snacks y Frituras', 'Viveres'],
     entrega_por_zonas = TRUE,
     costo_delivery_km = 1.50,
-    delivery_zonas = '[{"id": "z1", "name": "El Trigal (0-3 km)", "cost": 2.00, "minKm": 0, "maxKm": 3}, {"id": "z2", "name": "La Trigaleña / Prebo (3-8 km)", "cost": 4.50, "minKm": 3, "maxKm": 8}, {"id": "z3", "name": "La Viña / Mañongo / Naguanagua / San Diego (8-18 km)", "cost": 7.00, "minKm": 8, "maxKm": 18}]',
+    delivery_zonas = '[{"id": "z1", "name": "Trigal / Prebo / Chimeneas", "cost": 1.00, "minKm": 0, "maxKm": 3}, {"id": "z2", "name": "Mañongo / Trigaleña / Naguanagua / Av Bolívar", "cost": 2.00, "minKm": 3, "maxKm": 7}, {"id": "z3", "name": "San Diego / Otras zonas", "cost": 3.00, "minKm": 7, "maxKm": 18}]',
     mensaje_bienvenida = 'Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado.',
     hero_cta_text = 'Descargar la app',
     hero_cta_url = '#download-app',

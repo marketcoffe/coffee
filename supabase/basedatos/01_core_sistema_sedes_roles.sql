@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS store_config (
     envio_nacional BOOLEAN NOT NULL DEFAULT FALSE,
     costo_envio_nacional NUMERIC(10,2) DEFAULT 0,
     stock_alert_threshold INTEGER DEFAULT 5,
-    delivery_zonas JSONB DEFAULT '[{"id": "z1", "name": "El Trigal (0-3 km)", "cost": 2.00, "minKm": 0, "maxKm": 3}, {"id": "z2", "name": "La Trigaleña / Prebo (3-8 km)", "cost": 4.50, "minKm": 3, "maxKm": 8}, {"id": "z3", "name": "La Viña / Mañongo / Naguanagua / San Diego (8-18 km)", "cost": 7.00, "minKm": 8, "maxKm": 18}]'::JSONB,
+    delivery_zonas JSONB DEFAULT '[{"id": "z1", "name": "Trigal / Prebo / Chimeneas", "cost": 1.00, "minKm": 0, "maxKm": 3}, {"id": "z2", "name": "Mañongo / Trigaleña / Naguanagua / Av Bolívar", "cost": 2.00, "minKm": 3, "maxKm": 7}, {"id": "z3", "name": "San Diego / Otras zonas", "cost": 3.00, "minKm": 7, "maxKm": 18}]'::JSONB,
 
     -- Textos / Hero
     mensaje_bienvenida TEXT DEFAULT 'Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado.',
