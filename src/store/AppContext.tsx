@@ -57,6 +57,7 @@ interface AppContextProps {
   
   // Checkout & Order Actions
   createOrder: (orderData: Omit<Order, 'id' | 'subtotal_usd' | 'total_usd' | 'total_bs' | 'fecha' | 'status'> & { descuento_cupon_usd?: number; cupon_codigo?: string }, preGeneratedId?: string) => Promise<Order | null>;
+  registerGuestUser: (orderData: { cliente_nombre: string; cliente_telefono: string; cliente_email?: string }) => Promise<void>;
   updateOrderStatus: (orderId: string, status: Order['status'], estimatedTime?: string, notas?: string) => Promise<boolean>;
   confirmMesaPayment: (orderId: string) => Promise<boolean>;
   updateOrderItems: (orderId: string, newItems: OrderItem[]) => Promise<void>;
@@ -1567,6 +1568,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const clearCart = useCallback(() => {
     setCart([]);
+    try { localStorage.removeItem('trv_cart'); } catch {}
   }, []);
 
   // Mesas Management
@@ -1735,70 +1737,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setOrders(prev => [newOrder, ...prev]);
 
-    // Auto-register guest after successful order (sin checkbox, con email o telefono)
-    if (!currentUser && (orderData.cliente_email || orderData.cliente_telefono)) {
-      const cleanPhone = orderData.cliente_telefono.replace(/[\s\-()]/g, '');
-      const email = (orderData.cliente_email || '').trim().toLowerCase() || `${cleanPhone}@guest.foodapp.local`;
-      let userId = '';
-      let authSucceeded = false;
-
-      // 1. Primero intentar signIn (si ya tiene cuenta por email o telefono)
-      try {
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password: cleanPhone
-        });
-        if (!signInError && signInData?.user) {
-          userId = signInData.user.id;
-          authSucceeded = true;
-        }
-      } catch { /* signIn falló, intentar signUp */ }
-
-      // 2. Si signIn falla, intentar signUp
-      if (!authSucceeded) {
-        try {
-          const { data: authData, error: authError } = await supabase.auth.signUp({
-            email,
-            password: cleanPhone,
-            options: {
-              data: {
-                nombre: orderData.cliente_nombre,
-                telefono: cleanPhone
-              }
-            }
-          });
-          if (!authError && authData?.user) {
-            userId = authData.user.id;
-            authSucceeded = true;
-          }
-        } catch { /* signUp falló, usar ID local */ }
-      }
-
-      // 3. Si auth falló, usar ID local para que el usuario quede logueado
-      if (!userId) {
-        userId = `guest-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-      }
-
-      // 4. SIEMPRE hacer setCurrentUser para que el cliente quede logueado
-      const newUser: AppUser = {
-        id: userId,
-        nombre: orderData.cliente_nombre,
-        email,
-        telefono: cleanPhone,
-        contrasena: 'auth_managed',
-        createdAt: new Date().toISOString()
-      };
-      setCurrentUser(newUser);
-
-      if (authSucceeded) {
-        addNotification(
-          '¡Cuenta Creada! 🎉',
-          `Hola ${newUser.nombre}. Tu cuenta fue creada automáticamente. Tu contraseña es tu número de teléfono (${cleanPhone}).`,
-          'personal',
-          newUser.telefono
-        );
-      }
-    }
+    // NOTA: La auto-registro de invitados se ejecuta DESPUÉS del checkout
+    // para evitar que setCurrentUser dispare initData y desmonte el componente
+    // mientras el usuario está en el flujo de pago. Se llama desde Checkout.tsx
+    // después de setProcessedOrder().
 
     // BROADCAST: Enviar señal inmediata al Admin sin esperar a la DB
     try {
@@ -1832,6 +1774,76 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     return newOrder;
+  };
+
+  // Auto-registro de invitados: se llama DESPUÉS de que el checkout ya procesó
+  // el pedido, para evitar que setCurrentUser dispare initData y desmonte el
+  // componente durante el flujo de pago.
+  const registerGuestUser = async (orderData: { cliente_nombre: string; cliente_telefono: string; cliente_email?: string }) => {
+    if (currentUser) return;
+    if (!orderData.cliente_email && !orderData.cliente_telefono) return;
+
+    const cleanPhone = orderData.cliente_telefono.replace(/[\s\-()]/g, '');
+    const email = (orderData.cliente_email || '').trim().toLowerCase() || `${cleanPhone}@guest.foodapp.local`;
+    let userId = '';
+    let authSucceeded = false;
+
+    // 1. Primero intentar signIn (si ya tiene cuenta por email o telefono)
+    try {
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password: cleanPhone
+      });
+      if (!signInError && signInData?.user) {
+        userId = signInData.user.id;
+        authSucceeded = true;
+      }
+    } catch { /* signIn falló, intentar signUp */ }
+
+    // 2. Si signIn falla, intentar signUp
+    if (!authSucceeded) {
+      try {
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email,
+          password: cleanPhone,
+          options: {
+            data: {
+              nombre: orderData.cliente_nombre,
+              telefono: cleanPhone
+            }
+          }
+        });
+        if (!authError && authData?.user) {
+          userId = authData.user.id;
+          authSucceeded = true;
+        }
+      } catch { /* signUp falló, usar ID local */ }
+    }
+
+    // 3. Si auth falló, usar ID local para que el usuario quede logueado
+    if (!userId) {
+      userId = `guest-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    }
+
+    // 4. SIEMPRE hacer setCurrentUser para que el cliente quede logueado
+    const newUser: AppUser = {
+      id: userId,
+      nombre: orderData.cliente_nombre,
+      email,
+      telefono: cleanPhone,
+      contrasena: 'auth_managed',
+      createdAt: new Date().toISOString()
+    };
+    setCurrentUser(newUser);
+
+    if (authSucceeded) {
+      addNotification(
+        '¡Cuenta Creada! 🎉',
+        `Hola ${newUser.nombre}. Tu cuenta fue creada automáticamente. Tu contraseña es tu número de teléfono (${cleanPhone}).`,
+        'personal',
+        newUser.telefono
+      );
+    }
   };
 
   const updateOrderStatus = async (orderId: string, status: Order['status'], estimatedTime?: string, notas?: string) => {
@@ -3062,6 +3074,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateCartQuantity,
       clearCart,
       createOrder,
+      registerGuestUser,
       updateOrderStatus,
       confirmMesaPayment,
       updateOrderItems,

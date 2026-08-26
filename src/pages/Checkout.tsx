@@ -18,7 +18,7 @@ interface CheckoutProps {
 }
 
 export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
-  const { cart, config, addToCart, updateCartQuantity, removeFromCart, createOrder, currentUser, coupons, updateCoupon, orders, earnLoyaltyPoints, clearCart, mesas, fetchMesas } = useApp();
+  const { cart, config, addToCart, updateCartQuantity, removeFromCart, createOrder, registerGuestUser, currentUser, coupons, updateCoupon, orders, earnLoyaltyPoints, clearCart, mesas, fetchMesas } = useApp();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
@@ -58,6 +58,15 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const [recoveredOrderId] = useState<string | null>(() =>
     typeof window !== 'undefined' ? localStorage.getItem('trv_active_order_id') : null
   );
+  // Estados del flujo de checkout también se guardan/restauran para sobrevivir remounts
+  const [recoveredWaitingForAdmin] = useState<boolean>(() =>
+    typeof window !== 'undefined' && localStorage.getItem('trv_waiting_for_admin') === 'true'
+  );
+  const [recoveredOrderType] = useState<'delivery' | 'pickup' | 'mesa' | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const v = localStorage.getItem('trv_checkout_order_type');
+    return v === 'delivery' || v === 'pickup' || v === 'mesa' ? v : null;
+  });
 
   const activeSedes = useMemo(() => (config.sedes || []).filter(s => s.activa), [config.sedes]);
   // Multi-sucursal: se activa automáticamente con 2+ sedes activas (el flag
@@ -83,7 +92,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const [showLocationModal, setShowLocationModal] = useState(false);
 
   // Estado para pedidos en mesa
-  const [orderType, setOrderType] = useState<'delivery' | 'pickup' | 'mesa'>('delivery');
+  const [orderType, setOrderType] = useState<'delivery' | 'pickup' | 'mesa'>(() => recoveredOrderType || 'delivery');
   const [mesaNumber, setMesaNumber] = useState<number>(() => {
     // Intentar obtener la primera mesa disponible
     const availableMesas = mesas.filter(m => m.estado === 'Disponible');
@@ -94,7 +103,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const [paymentBank, setPaymentBank] = useState('');
   const [mesaOrderConfirmed, setMesaOrderConfirmed] = useState(false);
   const [showTypeModal, setShowTypeModal] = useState(false);
-  const [waitingForAdmin, setWaitingForAdmin] = useState(false);
+  const [waitingForAdmin, setWaitingForAdmin] = useState<boolean>(() =>
+    !!recoveredOrderId && recoveredWaitingForAdmin
+  );
   const [adminAccepted, setAdminAccepted] = useState(false);
   const [paymentConfirmedByAdmin, setPaymentConfirmedByAdmin] = useState(false);
   // Fase de pago para pedidos de mesa
@@ -130,6 +141,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
           setWaitingForAdmin(false);
           setProcessedOrder(null);
           localStorage.removeItem('trv_active_order_id');
+          localStorage.removeItem('trv_waiting_for_admin');
+          localStorage.removeItem('trv_checkout_order_type');
           setValidationError('Tu pedido fue rechazado. Intenta de nuevo.');
         }
       })
@@ -154,6 +167,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
           setMesaPaymentPhase(false);
           setProcessedOrder(null);
           localStorage.removeItem('trv_active_order_id');
+          localStorage.removeItem('trv_waiting_for_admin');
+          localStorage.removeItem('trv_checkout_order_type');
           setValidationError('Tu pedido fue cancelado.');
         }
       })
@@ -489,56 +504,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
 
     const preOrderId = `PED-${Math.floor(1000 + Math.random() * 9000)}-VAL-${new Date().getFullYear()}`;
 
-    // Para pedidos en mesa, NO se envía a WhatsApp
-    if (orderType !== 'mesa') {
-      const deliveryLabel = shippingMethod === 'recogida'
-        ? 'Recogida en Tienda'
-        : shippingMethod === 'zonas'
-          ? `Entrega por Zonas (${shippingZone})`
-          : effectiveShippingCost === 0
-            ? 'Retiro en Tienda'
-            : `Delivery por Mapa (${shippingDistance} KM)`;
-
-      let productosDetailText = '';
-      cart.forEach(ci => {
-        const extrasTotal = ci.selected_options?.reduce((e, opt) => e + opt.precio_usd, 0) || 0;
-        const itemTotal = (ci.item.precio_usd + extrasTotal) * ci.quantity;
-        productosDetailText += `- ${ci.quantity}x ${ci.item.nombre} - $${itemTotal.toFixed(2)}\n`;
-        if (ci.selected_options && ci.selected_options.length > 0) {
-          ci.selected_options.forEach(opt => {
-            productosDetailText += opt.precio_usd > 0
-              ? `   + ${opt.option_name} (+$${opt.precio_usd.toFixed(2)})\n`
-              : `   + ${opt.option_name}\n`;
-          });
-        }
-      });
-
-      const sedeInfo = hasMultipleSedes && selectedSedeId
-        ? `\n*Sede Destino:* ${activeSedes.find(s => s.id === selectedSedeId)?.nombre || 'N/A'}`
-        : '';
-
-      const whatsappMessage =
-`*Nuevo Pedido en ${config.site_nombre || 'Market Coffee Sweet'}*${sedeInfo}
-----------------------------------
-*Pedido ID:* ${preOrderId}
-*Cliente:* ${finalClientName || 'Cliente sin nombre'}
-*Telefono:* ${cleanedPhone}
-${clientEmail ? `*Correo:* ${clientEmail}\n` : ''}*Direccion de Entrega:* ${shippingZone}
-*Ubicacion Mapa:* https://www.google.com/maps?q=${shippingLat},${shippingLng}
-*Metodo Despacho:* ${deliveryLabel} - Costo: $${effectiveShippingAfterCoupon.toFixed(2)}
-
-*Detalle del Carrito:*
-${productosDetailText}
-*Total Neto a Pagar:* $${totalUsd.toFixed(2)} / ${totalBs.toFixed(2)} Bs.
-*Metodo de Pago:* ${selectedPayment}${selectedPayment === 'Otro' && customPaymentNote ? `\n*Detalle Pago:* ${customPaymentNote}` : ''}${selectedPayment === 'Efectivo' && cashBills ? `\n*Billetes:* ${cashBills}` : ''}
-----------------------------------`;
-
-      let cleanPhone = checkoutWhatsAppPhone().replace(/\D/g, '');
-      if (cleanPhone.startsWith('0')) cleanPhone = '58' + cleanPhone.substring(1);
-      const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMessage)}`;
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    }
-
     const created = await createOrder({
       cliente_nombre: finalClientName || 'Cliente sin nombre',
       cliente_telefono: cleanedPhone || '00000000',
@@ -581,7 +546,9 @@ ${productosDetailText}
       setProcessedOrder(created);
       if (orderType !== 'mesa') {
         setWaitingForAdmin(true);
+        localStorage.setItem('trv_waiting_for_admin', 'true');
       }
+      localStorage.setItem('trv_checkout_order_type', orderType);
       if (appliedCoupon) {
         updateCoupon(appliedCoupon.id, { usage_count: (appliedCoupon.usage_count || 0) + 1 });
       }
@@ -599,6 +566,66 @@ ${productosDetailText}
           zoneIndex: selectedZoneIndex,
           sedeId: selectedSedeId
         }));
+      }
+
+      // WhatsApp: se abre DESPUÉS de confirmar que el pedido se creó
+      if (orderType !== 'mesa') {
+        const deliveryLabel = shippingMethod === 'recogida'
+          ? 'Recogida en Tienda'
+          : shippingMethod === 'zonas'
+            ? `Entrega por Zonas (${shippingZone})`
+            : effectiveShippingCost === 0
+              ? 'Retiro en Tienda'
+              : `Delivery por Mapa (${shippingDistance} KM)`;
+
+        let productosDetailText = '';
+        cart.forEach(ci => {
+          const extrasTotal = ci.selected_options?.reduce((e, opt) => e + opt.precio_usd, 0) || 0;
+          const itemTotal = (ci.item.precio_usd + extrasTotal) * ci.quantity;
+          productosDetailText += `- ${ci.quantity}x ${ci.item.nombre} - $${itemTotal.toFixed(2)}\n`;
+          if (ci.selected_options && ci.selected_options.length > 0) {
+            ci.selected_options.forEach(opt => {
+              productosDetailText += opt.precio_usd > 0
+                ? `   + ${opt.option_name} (+$${opt.precio_usd.toFixed(2)})\n`
+                : `   + ${opt.option_name}\n`;
+            });
+          }
+        });
+
+        const sedeInfo = hasMultipleSedes && selectedSedeId
+          ? `\n*Sede Destino:* ${activeSedes.find(s => s.id === selectedSedeId)?.nombre || 'N/A'}`
+          : '';
+
+        const whatsappMessage =
+`*Nuevo Pedido en ${config.site_nombre || 'Market Coffee Sweet'}*${sedeInfo}
+----------------------------------
+*Pedido ID:* ${created.id}
+*Cliente:* ${finalClientName || 'Cliente sin nombre'}
+*Telefono:* ${cleanedPhone}
+${clientEmail ? `*Correo:* ${clientEmail}\n` : ''}*Direccion de Entrega:* ${shippingZone}
+*Ubicacion Mapa:* https://www.google.com/maps?q=${shippingLat},${shippingLng}
+*Metodo Despacho:* ${deliveryLabel} - Costo: $${effectiveShippingAfterCoupon.toFixed(2)}
+
+*Detalle del Carrito:*
+${productosDetailText}
+*Total Neto a Pagar:* $${totalUsd.toFixed(2)} / ${totalBs.toFixed(2)} Bs.
+*Metodo de Pago:* ${selectedPayment}${selectedPayment === 'Otro' && customPaymentNote ? `\n*Detalle Pago:* ${customPaymentNote}` : ''}${selectedPayment === 'Efectivo' && cashBills ? `\n*Billetes:* ${cashBills}` : ''}
+----------------------------------`;
+
+        let cleanPhone = checkoutWhatsAppPhone().replace(/\D/g, '');
+        if (cleanPhone.startsWith('0')) cleanPhone = '58' + cleanPhone.substring(1);
+        const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMessage)}`;
+        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      }
+
+      // Auto-registro de invitado DESPUÉS de confirmar el pedido (fuera de createOrder
+      // para evitar que dispare initData y desmonte el componente durante el checkout)
+      if (!currentUser && (clientEmail || cleanedPhone)) {
+        registerGuestUser({
+          cliente_nombre: finalClientName || 'Cliente sin nombre',
+          cliente_telefono: cleanedPhone || '00000000',
+          cliente_email: clientEmail || ''
+        }).catch(err => console.warn('[Checkout] Guest registration failed:', err));
       }
     } else {
       setValidationError('Error: No se pudo registrar el pedido. Verifique su conexión.');
@@ -654,7 +681,7 @@ ${productosDetailText}
     setMesaPaymentSent(true);
   };
 
-  const displayOrder = processedOrder || (cart.length === 0 && recoveredOrderId ? orders.find(o => o.id === recoveredOrderId) : undefined);
+  const displayOrder = processedOrder || (recoveredOrderId ? orders.find(o => o.id === recoveredOrderId) : undefined);
 
   // Derived colors — must be before early returns that reference them
   const themeColor = config.theme_color || '#A4D045';
@@ -670,7 +697,7 @@ ${productosDetailText}
           <SEOHead title="Pedido en Mesa" />
           <div className="border-b px-4 py-3 sticky top-0 z-20" style={{ backgroundColor: 'rgba(249,249,251,0.8)', backdropFilter: 'blur(20px)', borderColor: '#e4beb1/10' }}>
             <div className="flex items-center gap-3">
-              <button onClick={() => { setMesaOrderConfirmed(false); setMesaPaymentSent(false); setProcessedOrder(null); localStorage.removeItem('trv_active_order_id'); if (onClose) onClose(); else setTab('home'); }} className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#eeeef0] transition-colors cursor-pointer" style={{ backgroundColor: '#eeeef0' }}>
+              <button onClick={() => { setMesaOrderConfirmed(false); setMesaPaymentSent(false); setProcessedOrder(null); localStorage.removeItem('trv_active_order_id'); localStorage.removeItem('trv_waiting_for_admin'); localStorage.removeItem('trv_checkout_order_type'); if (onClose) onClose(); else setTab('home'); }} className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#eeeef0] transition-colors cursor-pointer" style={{ backgroundColor: '#eeeef0' }}>
                 <X size={18} className="text-[#1a1c1d]" />
               </button>
               <div>
@@ -881,11 +908,15 @@ ${productosDetailText}
         order={displayOrder}
         onClose={() => {
           if (displayOrder.status === 'Entregado') localStorage.removeItem('trv_active_order_id');
+          localStorage.removeItem('trv_waiting_for_admin');
+          localStorage.removeItem('trv_checkout_order_type');
           setProcessedOrder(null);
           if (onClose) onClose(); else setTab('home');
         }}
         onContinueShopping={() => {
           if (displayOrder.status === 'Entregado') localStorage.removeItem('trv_active_order_id');
+          localStorage.removeItem('trv_waiting_for_admin');
+          localStorage.removeItem('trv_checkout_order_type');
           setProcessedOrder(null);
           setTab('catalog');
         }}
@@ -2056,7 +2087,7 @@ ${productosDetailText}
             {(processedOrder as Order).tipo_pedido !== 'mesa' && (
               <p className="text-xs text-[#8f7065] text-center mb-6">{(processedOrder as Order).id}</p>
             )}
-            <button onClick={() => { setPaymentConfirmedByAdmin(false); setProcessedOrder(null); setMesaOrderConfirmed(false); setMesaPaymentPhase(false); setMesaPaymentSent(false); setWaitingForAdmin(false); setAdminAccepted(false); localStorage.removeItem('trv_active_order_id'); if (onClose) onClose(); else setTab('home'); }} className="w-full max-w-sm py-3.5 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: '#10b981' }}>
+              <button onClick={() => { setPaymentConfirmedByAdmin(false); setProcessedOrder(null); setMesaOrderConfirmed(false); setMesaPaymentPhase(false); setMesaPaymentSent(false); setWaitingForAdmin(false); setAdminAccepted(false); localStorage.removeItem('trv_active_order_id'); localStorage.removeItem('trv_waiting_for_admin'); localStorage.removeItem('trv_checkout_order_type'); if (onClose) onClose(); else setTab('home'); }} className="w-full max-w-sm py-3.5 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98] cursor-pointer" style={{ backgroundColor: '#10b981' }}>
               Entendido
             </button>
           </motion.div>
