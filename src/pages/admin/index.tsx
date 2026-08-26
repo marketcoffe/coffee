@@ -219,7 +219,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   };
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col" style={{ background: 'var(--erp-content-bg)' }}>
+    <div className="h-full overflow-hidden flex flex-col" style={{ background: 'var(--erp-content-bg)' }}>
       <SEOHead title={`Admin - ${config.site_nombre || 'Panel'}`} type="admin" />
       <AdminOrderAlert />
 
