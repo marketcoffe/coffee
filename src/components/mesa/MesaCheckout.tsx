@@ -221,19 +221,24 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
         ticket_code: orderData.ticket_code
       };
 
-      // Broadcast the new order
+      // Broadcast the new order (con timeout para no colgar el UI)
       try {
         const broadcastChannel = supabase.channel('marketo_realtime_system');
-        await new Promise<void>((resolve) => {
-          broadcastChannel.subscribe((status) => {
-            if (status === 'SUBSCRIBED') resolve();
+        const subscribed = await Promise.race([
+          new Promise<boolean>((resolve) => {
+            broadcastChannel.subscribe((status) => {
+              if (status === 'SUBSCRIBED') resolve(true);
+            });
+          }),
+          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000))
+        ]);
+        if (subscribed) {
+          await broadcastChannel.send({
+            type: 'broadcast',
+            event: 'new_order_broadcast',
+            payload: newOrder
           });
-        });
-        await broadcastChannel.send({
-          type: 'broadcast',
-          event: 'new_order_broadcast',
-          payload: newOrder
-        });
+        }
         supabase.removeChannel(broadcastChannel);
       } catch (e) {
         console.warn('Broadcast failed:', e);

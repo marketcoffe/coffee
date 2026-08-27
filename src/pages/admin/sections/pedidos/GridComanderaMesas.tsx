@@ -93,30 +93,42 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
     prevOrderCountRef.current = mesaOrders.length;
   }, [orders, soundEnabled]);
 
-  // Realtime subscription — escucha en canal global marketo_realtime_system
+  // Realtime: escuchar custom events del AppContext + refresh al volver a la pestaña
   useEffect(() => {
-    const channel = supabase.channel('marketo_realtime_system')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders', filter: 'tipo_pedido=eq.mesa' }, () => refreshOrders())
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: 'tipo_pedido=eq.mesa' }, () => refreshOrders())
-      .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
-        const o = payload.payload;
-        if (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') {
-          refreshOrders();
-          // Flash animation for new order
-          setNewOrderIds(prev => new Set([...prev, o.id]));
-          setTimeout(() => setNewOrderIds(prev => {
-            const next = new Set(prev);
-            next.delete(o.id);
-            return next;
-          }), 3000);
-        }
-      })
-      .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
-        const o = payload.payload;
-        if (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') refreshOrders();
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const handleNewOrder = (e: Event) => {
+      const order = (e as CustomEvent).detail as Order;
+      if (order && (order.tipo_pedido === 'mesa' || order.tipo_entrega === 'mesa')) {
+        refreshOrders();
+        setNewOrderIds(prev => new Set([...prev, order.id]));
+        setTimeout(() => setNewOrderIds(prev => {
+          const next = new Set(prev);
+          next.delete(order.id);
+          return next;
+        }), 3000);
+      }
+    };
+
+    const handleOrderUpdate = (e: Event) => {
+      const order = (e as CustomEvent).detail as Order;
+      if (order && (order.tipo_pedido === 'mesa' || order.tipo_entrega === 'mesa')) {
+        refreshOrders();
+      }
+    };
+
+    const onFocus = () => refreshOrders();
+    const onVisibility = () => { if (document.visibilityState === 'visible') refreshOrders(); };
+
+    window.addEventListener('new_order_received', handleNewOrder);
+    window.addEventListener('order_status_changed', handleOrderUpdate);
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      window.removeEventListener('new_order_received', handleNewOrder);
+      window.removeEventListener('order_status_changed', handleOrderUpdate);
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, [refreshOrders]);
 
   const mesaOrders = useMemo(() => {

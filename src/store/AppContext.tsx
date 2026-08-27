@@ -729,6 +729,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             )
           );
 
+          window.dispatchEvent(new CustomEvent('order_status_changed', { detail: updatedOrder }));
+
           playNotificationSound('update', updatedOrder.status);
 
           const cu = currentUserRef.current;

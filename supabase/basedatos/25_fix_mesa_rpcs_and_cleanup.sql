@@ -85,48 +85,74 @@
     $$;
 
     -- ============================================================================
-    -- 4. RPC: Crear pedido de mesa (si no existe)
+    -- 4. RPC: Crear pedido de mesa (versión actualizada con todos los parámetros del frontend)
     -- ============================================================================
     CREATE OR REPLACE FUNCTION public.crear_pedido_mesa(
         p_cliente_nombre TEXT,
+        p_numero_mesa INTEGER,
+        p_items JSONB,
+        p_subtotal_usd NUMERIC,
+        p_total_usd NUMERIC,
+        p_total_bs NUMERIC,
+        p_notas_admin TEXT DEFAULT '',
+        p_sede_id TEXT DEFAULT '',
+        p_usuario_id TEXT DEFAULT '',
         p_cliente_telefono TEXT DEFAULT '',
         p_cliente_email TEXT DEFAULT '',
-        p_numero_mesa INTEGER DEFAULT 0,
-        p_items JSONB DEFAULT '[]'::jsonb,
-        p_subtotal_usd NUMERIC DEFAULT 0,
-        p_total_usd NUMERIC DEFAULT 0,
-        p_total_bs NUMERIC DEFAULT 0,
-        p_metodo_pago TEXT DEFAULT 'Pago Móvil',
-        p_notas_admin TEXT DEFAULT ''
+        p_lat NUMERIC DEFAULT 0,
+        p_lng NUMERIC DEFAULT 0,
+        p_descuento_cupon_usd NUMERIC DEFAULT 0,
+        p_cupon_codigo TEXT DEFAULT ''
     )
-    RETURNS TABLE (
-        id TEXT,
-        ticket_code TEXT
-    )
+    RETURNS JSONB
     LANGUAGE plpgsql
     SECURITY DEFINER
     SET search_path = public
     AS $$
     DECLARE
         v_order_id TEXT;
-        v_ticket TEXT;
+        v_ticket_code TEXT;
+        v_new_order JSONB;
     BEGIN
-        v_order_id := 'PED-' || LPAD(FLOOR(RANDOM() * 9999)::TEXT, 4, '0') || '-' || UPPER(SUBSTRING(MD5(RANDOM()::TEXT) FROM 1 FOR 3)) || '-' || EXTRACT(YEAR FROM NOW())::TEXT;
-        v_ticket := UPPER(SUBSTRING(MD5(RANDOM()::TEXT) FROM 1 FOR 6));
+        IF NOT public.is_mesa_valida(p_numero_mesa) THEN
+            RAISE EXCEPTION 'La mesa % no es valida o esta inactiva.', p_numero_mesa;
+        END IF;
+
+        v_order_id := 'PED-' || floor(random() * 9000 + 1000)::text || '-VAL-' || EXTRACT(YEAR FROM NOW())::text;
+        v_ticket_code := public.generate_ticket_code(p_numero_mesa);
 
         INSERT INTO public.orders (
             id, cliente_nombre, cliente_telefono, cliente_email,
-            numero_mesa, items, subtotal_usd, total_usd, total_bs,
-            metodo_pago, tipo_pedido, tipo_entrega, status,
-            notas_admin, fecha, ticket_code
+            items, subtotal_usd, total_usd, total_bs,
+            costo_envio_usd, descuento_cupon_usd, cupon_codigo,
+            metodo_pago, tipo_pedido, tipo_entrega,
+            numero_mesa, nombre_cliente,
+            lat, lng, direccion_envio, distancia_km,
+            status, notas_admin, sede_id,
+            ticket_code, fecha, created_at
         ) VALUES (
             v_order_id, p_cliente_nombre, p_cliente_telefono, p_cliente_email,
-            p_numero_mesa, p_items, p_subtotal_usd, p_total_usd, p_total_bs,
-            p_metodo_pago, 'mesa', 'mesa', 'enviado_cocina',
-            p_notas_admin, NOW(), v_ticket
+            p_items, p_subtotal_usd, p_total_usd, p_total_bs,
+            0, p_descuento_cupon_usd, NULLIF(p_cupon_codigo, ''),
+            'Pendiente', 'mesa', 'mesa',
+            p_numero_mesa, p_cliente_nombre,
+            p_lat, p_lng, 'Mesa #' || p_numero_mesa::text, 0,
+            'enviado_cocina', p_notas_admin, NULLIF(p_sede_id, ''),
+            v_ticket_code, NOW(), NOW()
         );
 
-        RETURN QUERY SELECT v_order_id, v_ticket;
+        v_new_order := jsonb_build_object(
+            'id', v_order_id,
+            'ticket_code', v_ticket_code,
+            'numero_mesa', p_numero_mesa,
+            'cliente_nombre', p_cliente_nombre,
+            'total_usd', p_total_usd,
+            'total_bs', p_total_bs,
+            'status', 'enviado_cocina',
+            'fecha', NOW()::text
+        );
+
+        RETURN v_new_order;
     END;
     $$;
 
@@ -211,7 +237,10 @@
     GRANT EXECUTE ON FUNCTION public.aceptar_pedido_mesa TO anon;
     GRANT EXECUTE ON FUNCTION public.rechazar_pedido_mesa TO anon;
     GRANT EXECUTE ON FUNCTION public.aprobar_pago_mesa TO anon;
-    GRANT EXECUTE ON FUNCTION public.crear_pedido_mesa TO anon;
+    GRANT EXECUTE ON FUNCTION public.crear_pedido_mesa(
+        TEXT, INTEGER, JSONB, NUMERIC, NUMERIC, NUMERIC,
+        TEXT, TEXT, TEXT, TEXT, TEXT, NUMERIC, NUMERIC, NUMERIC, TEXT
+    ) TO anon;
     GRANT EXECUTE ON FUNCTION public.limpiar_pedidos_atascados TO anon;
     GRANT EXECUTE ON FUNCTION public.eliminar_pedidos_antiguos TO anon;
     GRANT EXECUTE ON FUNCTION public.cerrar_mesa TO anon;

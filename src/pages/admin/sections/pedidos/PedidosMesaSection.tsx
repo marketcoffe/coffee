@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../../../store/AppContext';
-import { supabase } from '../../../../store/supabaseClient';
 import { Order } from '../../../../types/store';
 import { UtensilsCrossed, Printer, CheckCircle, Clock, CreditCard, Banknote } from 'lucide-react';
 import { printMesaTicket } from '../../../../utils/printMesaTicket';
@@ -51,42 +50,31 @@ const PedidosMesaSection: React.FC<PedidosMesaSectionProps> = ({ scopeSedeId }) 
 
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
 
-  // Refuerzo: escuchar broadcast global para pedidos de mesa (bypasea RLS/cache)
+  // Realtime: escuchar custom events del AppContext + refresh al volver a la pestaña
   useEffect(() => {
-    const channel = supabase.channel('marketo_realtime_system')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'orders',
-        filter: 'tipo_pedido=eq.mesa'
-      }, () => { refreshOrders(); })
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'orders',
-        filter: 'tipo_pedido=eq.mesa'
-      }, () => { refreshOrders(); })
-      .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
-        const o = payload.payload;
-        if (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') {
-          refreshOrders();
-        }
-      })
-      .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
-        const o = payload.payload;
-        if (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') {
-          refreshOrders();
-        }
-      })
-      .subscribe();
-
+    const handleNewOrder = (e: Event) => {
+      const order = (e as CustomEvent).detail as Order;
+      if (order && (order.tipo_pedido === 'mesa' || order.tipo_entrega === 'mesa')) {
+        refreshOrders();
+      }
+    };
+    const handleOrderUpdate = (e: Event) => {
+      const order = (e as CustomEvent).detail as Order;
+      if (order && (order.tipo_pedido === 'mesa' || order.tipo_entrega === 'mesa')) {
+        refreshOrders();
+      }
+    };
     const onFocus = () => refreshOrders();
     const onVisibility = () => { if (document.visibilityState === 'visible') refreshOrders(); };
+
+    window.addEventListener('new_order_received', handleNewOrder);
+    window.addEventListener('order_status_changed', handleOrderUpdate);
     window.addEventListener('focus', onFocus);
     document.addEventListener('visibilitychange', onVisibility);
 
     return () => {
-      supabase.removeChannel(channel);
+      window.removeEventListener('new_order_received', handleNewOrder);
+      window.removeEventListener('order_status_changed', handleOrderUpdate);
       window.removeEventListener('focus', onFocus);
       document.removeEventListener('visibilitychange', onVisibility);
     };
