@@ -125,7 +125,7 @@ export function showLocalNotification(title: string, body: string, tag?: string)
  */
 export function playMesaNotificationSound() {
   try {
-    const audio = new Audio('/sounds/notification.mp3');
+    const audio = new Audio('/sounds/notification.wav');
     audio.volume = 0.8;
     audio.play().catch(() => {});
   } catch {}

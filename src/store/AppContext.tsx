@@ -571,26 +571,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  // ✅ FIX: Escuchar mensajes del Service Worker para reproducir sonido desde el cliente
-  // (Audio API no está disponible en SW — el SW hace postMessage y el cliente reproduce)
-  useEffect(() => {
-    if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
-
-    const handleSWMessage = (event: MessageEvent) => {
-      if (event.data?.type === 'PLAY_NOTIFICATION_SOUND') {
-        const url = event.data.soundUrl || '/sounds/notification.mp3';
-        const audio = new Audio(url);
-        audio.volume = 0.8;
-        audio.play().catch(err =>
-          console.warn('[SW→Client] No se pudo reproducir sonido:', err.message)
-        );
-      }
-    };
-
-    navigator.serviceWorker.addEventListener('message', handleSWMessage);
-    return () => navigator.serviceWorker.removeEventListener('message', handleSWMessage);
-  }, []);
-
   // ✅ FIX: Sincronizar suscripción push automáticamente cuando el usuario inicia sesión
   // Si el usuario ya tiene permisos de notificación granted, sincronizar su suscripción con la DB
   useEffect(() => {
@@ -668,7 +648,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setOrders(prev =>
             prev.map(o =>
               o.id === updated.id
-                ? { ...o, status: updated.status, tiempo_estimado_entrega: updated.tiempo_estimado_entrega }
+                ? { ...o, ...updated }
                 : o
             )
           );
@@ -744,7 +724,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setOrders(prev =>
             prev.map(o =>
               o.id === updatedOrder.id
-                ? { ...o, status: updatedOrder.status, tiempo_estimado_entrega: updatedOrder.tiempo_estimado_entrega }
+                ? { ...o, ...updatedOrder }
                 : o
             )
           );
@@ -854,7 +834,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => {
       if (mainChannel) supabase.removeChannel(mainChannel);
     };
-  }, [currentUser, config.site_nombre]);
+  }, [currentUser]);
   useEffect(() => {
     localStorage.setItem('trv_orders', JSON.stringify(orders));
   }, [orders]);
@@ -1748,6 +1728,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // BROADCAST: Enviar señal inmediata al Admin sin esperar a la DB
     try {
       const broadcastChannel = supabase.channel('marketo_realtime_system');
+      await new Promise<void>((resolve) => {
+        broadcastChannel.subscribe((status) => {
+          if (status === 'SUBSCRIBED') resolve();
+        });
+      });
       const sendResult = await broadcastChannel.send({
         type: 'broadcast',
         event: 'new_order_broadcast',
@@ -1758,6 +1743,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       } else {
         console.warn('[Broadcast] new_order_broadcast resultado inesperado:', sendResult);
       }
+      supabase.removeChannel(broadcastChannel);
     } catch (broadcastErr) {
       console.error('[Broadcast] Error enviando new_order_broadcast:', broadcastErr);
     }
@@ -1929,11 +1915,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // Broadcast instantáneo para que el cliente reciba el cambio en <100ms
       try {
         const updatedOrder = { ...prevOrder, ...updatePayload } as Order;
-        supabase.channel('marketo_realtime_system').send({
+        const statusChannel = supabase.channel('marketo_realtime_system');
+        await new Promise<void>((resolve) => {
+          statusChannel.subscribe((st) => { if (st === 'SUBSCRIBED') resolve(); });
+        });
+        await statusChannel.send({
           type: 'broadcast',
           event: 'order_status_broadcast',
           payload: updatedOrder
         });
+        supabase.removeChannel(statusChannel);
       } catch (e) {
         console.warn('Broadcast status update failed:', e);
       }
@@ -1961,11 +1952,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     try {
       const updatedOrder = { ...prevOrder, status: 'completado' } as Order;
-      supabase.channel('marketo_realtime_system').send({
+      const paymentChannel = supabase.channel('marketo_realtime_system');
+      await new Promise<void>((resolve) => {
+        paymentChannel.subscribe((st) => { if (st === 'SUBSCRIBED') resolve(); });
+      });
+      await paymentChannel.send({
         type: 'broadcast',
         event: 'order_status_broadcast',
         payload: updatedOrder
       });
+      supabase.removeChannel(paymentChannel);
     } catch (e) {
       console.warn('Broadcast confirm payment failed:', e);
     }

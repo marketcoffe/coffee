@@ -67,7 +67,7 @@ self.addEventListener('push', (event) => {
   const image     = payload.imagen_url || payload.image || undefined;
   const urlToOpen = payload.link_url || payload.url || '/';
   const tag       = payload.tag || ('marketcoffee-' + (payload.id || Date.now()));
-  const soundUrl  = payload.sound_url || payload.sound || '/sounds/notification.mp3';
+  const soundUrl  = payload.sound_url || payload.sound || '/sounds/notification.wav';
   const priority  = payload.priority || 'normal';
 
   // Deduplicación: ignorar notificaciones duplicadas en ventana de 60s

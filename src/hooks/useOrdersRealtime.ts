@@ -16,7 +16,7 @@ interface UseOrdersRealtimeReturn {
   reconnect: () => void;
 }
 
-const NOTIFICATION_SOUND_URL = '/sounds/notification.mp3';
+const NOTIFICATION_SOUND_URL = '/sounds/notification.wav';
 
 /**
  * Hook responsivo para la Comandera Admin que escucha pedidos

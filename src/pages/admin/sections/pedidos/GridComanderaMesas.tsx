@@ -2,9 +2,10 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { supabase } from '../../../../store/supabaseClient';
 import { Order } from '../../../../types/store';
+import { useToast } from '../../../../components/Toast';
 import {
   UtensilsCrossed, Printer, CheckCircle, Clock, CreditCard, X, Volume2, VolumeX,
-  Search, Filter, AlertTriangle, Banknote, Eye, Check, Ban
+  Search, Filter, AlertTriangle, Banknote, Eye, Check, Ban, Trash2, RotateCcw
 } from 'lucide-react';
 import { printMesaTicket } from '../../../../utils/printMesaTicket';
 
@@ -51,6 +52,7 @@ interface GridComanderaMesasProps {
 
 const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) => {
   const { orders, config, confirmMesaPayment, updateOrderStatus, refreshOrders } = useApp();
+  const { showToast } = useToast();
   const themeColor = config.theme_color || '#A4D045';
 
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
@@ -73,7 +75,7 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
     );
     if (mesaOrders.length > prevOrderCountRef.current && soundEnabled) {
       try {
-        const audio = new Audio('/sounds/notification.mp3');
+        const audio = new Audio('/sounds/notification.wav');
         audio.volume = 0.8;
         audio.play().catch(() => {});
       } catch {}
@@ -155,27 +157,116 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
   }, [mesaOrders]);
 
   const handleAccept = async (orderId: string) => {
-    await supabase.rpc('aceptar_pedido_mesa', { p_order_id: orderId, p_tiempo_estimado: '15 min' });
+    const { error } = await supabase.rpc('aceptar_pedido_mesa', { p_order_id: orderId, p_tiempo_estimado: '15 min' });
+    if (error) {
+      console.error('aceptar_pedido_mesa error:', error);
+      showToast('error', 'Error al aceptar pedido: ' + (error.message || 'Error desconocido'));
+      return;
+    }
+    showToast('success', 'Pedido aceptado correctamente');
     refreshOrders();
   };
 
   const handleApprovePayment = async (orderId: string) => {
-    await supabase.rpc('aprobar_pago_mesa', { p_order_id: orderId, p_aprobar: true });
+    const { error } = await supabase.rpc('aprobar_pago_mesa', { p_order_id: orderId, p_aprobar: true });
+    if (error) {
+      console.error('aprobar_pago_mesa error:', error);
+      showToast('error', 'Error al aprobar pago: ' + (error.message || 'Error desconocido'));
+      return;
+    }
+    showToast('success', 'Pago aprobado');
     setShowPaymentModal(null);
     refreshOrders();
   };
 
   const handleRejectPayment = async (orderId: string) => {
-    await supabase.rpc('aprobar_pago_mesa', { p_order_id: orderId, p_aprobar: false });
+    const { error } = await supabase.rpc('aprobar_pago_mesa', { p_order_id: orderId, p_aprobar: false });
+    if (error) {
+      console.error('aprobar_pago_mesa reject error:', error);
+      showToast('error', 'Error al rechazar pago: ' + (error.message || 'Error desconocido'));
+      return;
+    }
+    showToast('info', 'Pago rechazado');
     setShowPaymentModal(null);
     refreshOrders();
   };
 
   const handleReject = async (orderId: string) => {
     const motivo = rejectReason || 'Pedido rechazado por el personal';
-    await supabase.rpc('rechazar_pedido_mesa', { p_order_id: orderId, p_motivo: motivo });
+    const { error } = await supabase.rpc('rechazar_pedido_mesa', { p_order_id: orderId, p_motivo: motivo });
+    if (error) {
+      console.error('rechazar_pedido_mesa error:', error);
+      showToast('error', 'Error al rechazar pedido: ' + (error.message || 'Error desconocido'));
+      return;
+    }
+    showToast('info', 'Pedido rechazado');
     setRejectModal(null);
     setRejectReason('');
+    refreshOrders();
+  };
+
+  const [closeMesaModal, setCloseMesaModal] = useState<string | null>(null);
+  const [cleanModal, setCleanModal] = useState<'stuck' | 'all' | null>(null);
+
+  const handleCloseMesa = async (numeroMesa: number) => {
+    const mesaOrdersToClose = orders.filter(o =>
+      (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') &&
+      o.numero_mesa === numeroMesa &&
+      !['Cancelado', 'cancelado', 'completado', 'Entregado'].includes(o.status)
+    );
+    if (mesaOrdersToClose.length === 0) {
+      showToast('info', 'No hay pedidos activos en esta mesa');
+      setCloseMesaModal(null);
+      return;
+    }
+    let closed = 0;
+    for (const order of mesaOrdersToClose) {
+      const { error } = await supabase.from('orders').update({ status: 'completado' }).eq('id', order.id);
+      if (!error) closed++;
+    }
+    showToast('success', `Mesa #${numeroMesa} cerrada. ${closed} pedidos completados.`);
+    setCloseMesaModal(null);
+    refreshOrders();
+  };
+
+  const handleCleanStuck = async () => {
+    const stuckOrders = orders.filter(o =>
+      o.status === 'enviado_cocina' &&
+      (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa')
+    );
+    if (stuckOrders.length === 0) {
+      showToast('info', 'No hay pedidos atascados en cocina');
+      setCleanModal(null);
+      return;
+    }
+    let cleaned = 0;
+    for (const order of stuckOrders) {
+      const { error } = await supabase.from('orders').update({ status: 'Cancelado', notas_admin: (order.notas_admin || '') + ' | Auto-cancelado: Pedido atascado' }).eq('id', order.id);
+      if (!error) cleaned++;
+    }
+    showToast('success', `${cleaned} pedidos atascados cancelados`);
+    setCleanModal(null);
+    refreshOrders();
+  };
+
+  const handleCleanAll = async () => {
+    const oldOrders = orders.filter(o =>
+      (o.status === 'Cancelado' || o.status === 'cancelado' || o.status === 'completado' || o.status === 'Entregado') &&
+      (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa')
+    );
+    if (oldOrders.length === 0) {
+      showToast('info', 'No hay pedidos antiguos para limpiar');
+      setCleanModal(null);
+      return;
+    }
+    const ids = oldOrders.map(o => o.id);
+    const { error, count } = await supabase.from('orders').delete().in('id', ids);
+    if (error) {
+      showToast('error', 'Error al limpiar pedidos: ' + error.message);
+      return;
+    }
+    showToast('success', `${ids.length} pedidos antiguos eliminados`);
+    setCleanModal(null);
     refreshOrders();
   };
 
@@ -301,6 +392,10 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
                 <CheckCircle size={12} /> Verificar Pago
               </button>
             )}
+            <button onClick={(e) => { e.stopPropagation(); setCloseMesaModal(order.numero_mesa?.toString() || null); }}
+              className="w-full py-2.5 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1.5 border-2 border-amber-400 text-amber-600 transition-all cursor-pointer hover:bg-amber-50 active:scale-95">
+              <RotateCcw size={12} /> Cerrar Mesa #{order.numero_mesa}
+            </button>
           </div>
         )}
 
@@ -330,6 +425,16 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
           <button onClick={() => setSoundEnabled(!soundEnabled)}
             className="p-2 rounded-xl bg-white border border-[#e4beb1]/10 cursor-pointer hover:bg-[#f9f9fb] transition-colors">
             {soundEnabled ? <Volume2 size={14} className="text-[#1a1c1d]" /> : <VolumeX size={14} className="text-[#8f7065]" />}
+          </button>
+          <button onClick={() => setCleanModal('stuck')}
+            className="p-2 rounded-xl bg-white border border-amber-200 text-amber-600 cursor-pointer hover:bg-amber-50 transition-colors"
+            title="Limpiar pedidos atascados">
+            <AlertTriangle size={14} />
+          </button>
+          <button onClick={() => setCleanModal('all')}
+            className="p-2 rounded-xl bg-white border border-red-200 text-red-500 cursor-pointer hover:bg-red-50 transition-colors"
+            title="Limpiar pedidos antiguos">
+            <Trash2 size={14} />
           </button>
         </div>
       </div>
@@ -443,6 +548,48 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
                 className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-[#eeeef0] text-[#5b4137] cursor-pointer">Cancelar</button>
               <button onClick={() => handleReject(rejectModal)}
                 className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-red-500 text-white cursor-pointer">Rechazar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Close Mesa modal */}
+      {closeMesaModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}>
+          <div className="bg-white rounded-2xl w-full max-w-sm p-5">
+            <h3 className="text-sm font-bold text-[#1a1c1d] mb-2">Cerrar Mesa #{closeMesaModal}</h3>
+            <p className="text-xs text-[#8f7065] mb-4">Se marcarán como completados todos los pedidos activos de esta mesa.</p>
+            <div className="flex gap-2">
+              <button onClick={() => setCloseMesaModal(null)}
+                className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-[#eeeef0] text-[#5b4137] cursor-pointer">Cancelar</button>
+              <button onClick={() => handleCloseMesa(Number(closeMesaModal))}
+                className="flex-1 py-2.5 rounded-xl font-bold text-xs text-white cursor-pointer" style={{ backgroundColor: '#f59e0b' }}>
+                <RotateCcw size={12} className="inline mr-1" /> Cerrar Mesa
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clean modal */}
+      {cleanModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}>
+          <div className="bg-white rounded-2xl w-full max-w-sm p-5">
+            <h3 className="text-sm font-bold text-[#1a1c1d] mb-2">
+              {cleanModal === 'stuck' ? 'Limpiar Pedidos Atascados' : 'Limpiar Pedidos Antiguos'}
+            </h3>
+            <p className="text-xs text-[#8f7065] mb-4">
+              {cleanModal === 'stuck'
+                ? 'Se cancelarán todos los pedidos en estado "En Cocina" que estén atascados.'
+                : 'Se eliminarán permanentemente todos los pedidos completados y cancelados de mesa.'}
+            </p>
+            <div className="flex gap-2">
+              <button onClick={() => setCleanModal(null)}
+                className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-[#eeeef0] text-[#5b4137] cursor-pointer">Cancelar</button>
+              <button onClick={() => cleanModal === 'stuck' ? handleCleanStuck() : handleCleanAll()}
+                className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-red-500 text-white cursor-pointer">
+                <Trash2 size={12} className="inline mr-1" /> Limpiar
+              </button>
             </div>
           </div>
         </div>

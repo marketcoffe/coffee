@@ -76,7 +76,7 @@ if ('serviceWorker' in navigator) {
 
   navigator.serviceWorker.addEventListener('message', (event) => {
     if (event.data?.type === 'PLAY_NOTIFICATION_SOUND') {
-      const url = event.data.soundUrl || '/sounds/notification.mp3';
+      const url = event.data.soundUrl || '/sounds/notification.wav';
       try {
         const audio = new Audio(url);
         audio.volume = 0.8;

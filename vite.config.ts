@@ -16,7 +16,7 @@ export default defineConfig(({mode}) => {
       //   registerType: 'autoUpdate',
       //   strategies: 'generateSW',
       //   selfDestroying: true,
-      //   includeAssets: ['icon.png', 'logo.png', 'sounds/notification.mp3', 'manifest-admin.json'],
+      //   includeAssets: ['icon.png', 'logo.png', 'sounds/notification.wav', 'manifest-admin.json'],
       //   manifest: false,
       //   workbox: {
       //     importScripts: ['/sw-push.js'],

@@ -10,7 +10,7 @@ export default function AdminOrderAlert() {
   const { config, updateOrderStatus, mesas } = useApp();
   const themeColor = config.theme_color || '#A4D045';
   const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
-  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+  const dismissedIdsRef = useRef<Set<string>>(new Set());
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [panelOpen, setPanelOpen] = useState(true);
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
@@ -36,7 +36,7 @@ export default function AdminOrderAlert() {
     channel
       .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
         const order = payload.payload;
-        if (order && !dismissedIds.has(order.id)) {
+        if (order && !dismissedIdsRef.current.has(order.id)) {
           if (order.tipo_pedido === 'mesa' || order.tipo_entrega === 'mesa') return;
           setPendingOrders(prev => {
             if (prev.some(o => o.id === order.id)) return prev;
@@ -49,7 +49,7 @@ export default function AdminOrderAlert() {
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload: Record<string, unknown>) => {
         const order = payload.new as Order;
-        if (order && !dismissedIds.has(order.id)) {
+        if (order && !dismissedIdsRef.current.has(order.id)) {
           if (order.tipo_pedido === 'mesa' || order.tipo_entrega === 'mesa') return;
           setPendingOrders(prev => {
             if (prev.some(o => o.id === order.id)) return prev;
@@ -65,13 +65,13 @@ export default function AdminOrderAlert() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [dismissedIds, playAlertSound]);
+  }, [playAlertSound]);
 
   const handleApprove = async (orderId: string) => {
     const result = await updateOrderStatus(orderId, 'En preparación' as Order['status']);
     if (result === false) return;
     setPendingOrders(prev => prev.filter(o => o.id !== orderId));
-    setDismissedIds(prev => new Set([...prev, orderId]));
+    dismissedIdsRef.current = new Set([...dismissedIdsRef.current, orderId]);
   };
 
   const handleReject = async (orderId: string) => {
@@ -81,12 +81,12 @@ export default function AdminOrderAlert() {
       return;
     }
     setPendingOrders(prev => prev.filter(o => o.id !== orderId));
-    setDismissedIds(prev => new Set([...prev, orderId]));
+    dismissedIdsRef.current = new Set([...dismissedIdsRef.current, orderId]);
   };
 
   const handleDismiss = (orderId: string) => {
     setPendingOrders(prev => prev.filter(o => o.id !== orderId));
-    setDismissedIds(prev => new Set([...prev, orderId]));
+    dismissedIdsRef.current = new Set([...dismissedIdsRef.current, orderId]);
   };
 
   const handleAcceptAll = async () => {
@@ -94,7 +94,7 @@ export default function AdminOrderAlert() {
       await updateOrderStatus(order.id, 'En preparación' as Order['status']);
     }
     const ids = pendingOrders.map(o => o.id);
-    setDismissedIds(prev => new Set([...prev, ...ids]));
+    dismissedIdsRef.current = new Set([...dismissedIdsRef.current, ...ids]);
     setPendingOrders([]);
   };
 
