@@ -743,9 +743,16 @@ BEGIN
             RETURN NEW;
     END CASE;
 
-    -- Insertar notificación (el trigger de push se encarga de enviar la push)
-    INSERT INTO public.notifications (titulo, mensaje, tipo, destinatario_telefono, fecha, leida)
-    VALUES (v_titulo, v_mensaje, v_tipo, v_target_phone, NOW(), false);
+    INSERT INTO public.notifications (id, titulo, mensaje, tipo, destinatario_telefono, fecha, leida)
+    VALUES (
+        'mesa-' || NEW.id || '-' || LOWER(REPLACE(COALESCE(NEW.status, ''), ' ', '_')) || '-' || EXTRACT(EPOCH FROM NOW())::BIGINT,
+        v_titulo,
+        v_mensaje,
+        v_tipo,
+        v_target_phone,
+        NOW()::TEXT,
+        false
+    );
 
     RETURN NEW;
 END;
