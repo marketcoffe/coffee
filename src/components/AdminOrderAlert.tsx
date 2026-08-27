@@ -31,21 +31,9 @@ export default function AdminOrderAlert() {
   }, [soundEnabled]);
 
   useEffect(() => {
+    // CDC listener en canal persistente
     const channel = supabase.channel('marketo_realtime_system');
-
     channel
-      .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
-        const order = payload.payload;
-        if (order && !dismissedIdsRef.current.has(order.id)) {
-          setPendingOrders(prev => {
-            if (prev.some(o => o.id === order.id)) return prev;
-            return [order, ...prev];
-          });
-          playAlertSound();
-          setNewOrderFlash(true);
-          setTimeout(() => setNewOrderFlash(false), 2000);
-        }
-      })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload: Record<string, unknown>) => {
         const order = payload.new as Order;
         if (order && !dismissedIdsRef.current.has(order.id)) {
@@ -60,8 +48,25 @@ export default function AdminOrderAlert() {
       })
       .subscribe();
 
+    // Broadcast listener en canal separado (recibe envíos de createOrder/updateOrderStatus)
+    const broadcastChan = supabase.channel('marketo_broadcast_send')
+      .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
+        const order = payload.payload;
+        if (order && !dismissedIdsRef.current.has(order.id)) {
+          setPendingOrders(prev => {
+            if (prev.some(o => o.id === order.id)) return prev;
+            return [order, ...prev];
+          });
+          playAlertSound();
+          setNewOrderFlash(true);
+          setTimeout(() => setNewOrderFlash(false), 2000);
+        }
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(broadcastChan);
     };
   }, [playAlertSound]);
 

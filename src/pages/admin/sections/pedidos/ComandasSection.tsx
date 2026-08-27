@@ -61,14 +61,13 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
 
   // Escuchar broadcasts para updates instantáneos (<100ms)
   useEffect(() => {
-    const channel = supabase
-      .channel('marketo_realtime_system')
+    // Canal separado para broadcasts (enviados desde createOrder/updateOrderStatus)
+    const broadcastChan = supabase
+      .channel('marketo_broadcast_send')
       .on('broadcast', { event: 'new_order_broadcast' }, () => {
-        // Cuando llega un pedido nuevo, forzar refresh
         refreshOrders();
       })
       .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
-        // Cuando cambia un estado, forzar refresh
         const updated = payload.payload;
         if (updated?.id) {
           refreshOrders();
@@ -76,7 +75,7 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
       })
       .subscribe();
 
-    channelRef.current = channel;
+    channelRef.current = broadcastChan;
 
     return () => {
       if (channelRef.current) {

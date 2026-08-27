@@ -529,7 +529,7 @@ BEGIN
     END IF;
 
     -- Generar ID y código de ticket
-    v_order_id := 'PED-' || floor(random() * 9000 + 1000)::text || '-VAL-' || EXTRACT(YEAR FROM NOW())::text;
+    v_order_id := 'ORD-' || lpad(floor(random() * 90000 + 10000)::text, 6, '0');
     v_ticket_code := public.generate_ticket_code(p_numero_mesa);
 
     -- Insertar el pedido

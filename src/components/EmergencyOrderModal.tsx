@@ -4,7 +4,7 @@ import { Order } from '../types/store';
 import { supabase } from '../store/supabaseClient';
 import {
   CheckCircle, XCircle, Printer, Volume2, VolumeX, UtensilsCrossed,
-  Truck, Store, Clock, AlertTriangle, ChefHat, Wifi, WifiOff
+  Truck, Store, Clock, AlertTriangle, ChefHat, Wifi, WifiOff, MapPin, ExternalLink
 } from 'lucide-react';
 import { printMesaTicket } from '../utils/printMesaTicket';
 
@@ -148,6 +148,7 @@ export default function EmergencyOrderModal() {
   const [audioUnlocked, setAudioUnlocked] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const broadcastRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const retriesRef = useRef(0);
   const dismissedIdsRef = useRef<Set<string>>(new Set());
@@ -205,21 +206,18 @@ export default function EmergencyOrderModal() {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
     }
+    if (broadcastRef.current) {
+      supabase.removeChannel(broadcastRef.current);
+      broadcastRef.current = null;
+    }
     if (reconnectTimerRef.current) {
       clearTimeout(reconnectTimerRef.current);
       reconnectTimerRef.current = null;
     }
 
+    // CDC listener en canal persistente
     const channel = supabase.channel('marketo_emergency_orders');
-
     channel
-      .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
-        const order = payload.payload;
-        if (order && !dismissedIdsRef.current.has(order.id)) {
-          addOrdersBatch([order]);
-          playNewOrderBeep();
-        }
-      })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload: Record<string, unknown>) => {
         const order = payload.new as Order;
         if (order && !dismissedIdsRef.current.has(order.id)) {
@@ -239,7 +237,19 @@ export default function EmergencyOrderModal() {
         }
       });
 
+    // Broadcast listener en canal separado
+    const broadcastChan = supabase.channel('marketo_broadcast_send')
+      .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
+        const order = payload.payload;
+        if (order && !dismissedIdsRef.current.has(order.id)) {
+          addOrdersBatch([order]);
+          playNewOrderBeep();
+        }
+      })
+      .subscribe();
+
     channelRef.current = channel;
+    broadcastRef.current = broadcastChan;
   }, [addOrdersBatch]);
 
   useEffect(() => {
@@ -248,6 +258,10 @@ export default function EmergencyOrderModal() {
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
+      }
+      if (broadcastRef.current) {
+        supabase.removeChannel(broadcastRef.current);
+        broadcastRef.current = null;
       }
       if (reconnectTimerRef.current) {
         clearTimeout(reconnectTimerRef.current);
@@ -444,7 +458,7 @@ export default function EmergencyOrderModal() {
 
                 {/* Items */}
                 <div className="space-y-1 mb-2">
-                  {order.items?.slice(0, 4).map((item, idx) => (
+                  {order.items?.map((item, idx) => (
                     <div key={idx} className="flex justify-between items-center">
                       <span className="text-[11px] text-slate-600 truncate">
                         {item.cantidad}x {item.nombre}
@@ -454,12 +468,34 @@ export default function EmergencyOrderModal() {
                       </span>
                     </div>
                   ))}
-                  {(order.items?.length || 0) > 4 && (
-                    <p className="text-[9px] text-slate-400">
-                      +{(order.items?.length || 0) - 4} producto{(order.items?.length || 0) - 4 > 1 ? 's' : ''} mas
-                    </p>
-                  )}
                 </div>
+
+                {/* Delivery address & location */}
+                {order.direccion_envio && (
+                  <div className="p-2 bg-blue-50 rounded-lg border border-blue-200 mb-2">
+                    <div className="flex items-start gap-2">
+                      <MapPin size={12} className="text-blue-500 mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] text-blue-700 font-semibold">Direccion de entrega</p>
+                        <p className="text-[11px] text-blue-900 truncate">{order.direccion_envio}</p>
+                        {order.distancia_km && (
+                          <p className="text-[9px] text-blue-500 mt-0.5">{order.distancia_km.toFixed(1)} km de distancia</p>
+                        )}
+                      </div>
+                      {order.lat && order.lng && (
+                        <a
+                          href={`https://www.google.com/maps?q=${order.lat},${order.lng}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 rounded-lg bg-blue-100 hover:bg-blue-200 transition-colors shrink-0"
+                          title="Ver en Google Maps"
+                        >
+                          <ExternalLink size={12} className="text-blue-600" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Payment info */}
                 <div className="flex items-center gap-2 text-[9px] text-slate-400 mb-2">

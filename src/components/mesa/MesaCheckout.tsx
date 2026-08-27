@@ -223,7 +223,7 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
 
       // Broadcast the new order (con timeout para no colgar el UI)
       try {
-        const broadcastChannel = supabase.channel('marketo_realtime_system');
+        const broadcastChannel = supabase.channel('marketo_broadcast_send');
         const subscribed = await Promise.race([
           new Promise<boolean>((resolve) => {
             broadcastChannel.subscribe((status) => {

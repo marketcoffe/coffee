@@ -84,23 +84,23 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
     }
   }, [deferredPrompt]);
 
-  // ── Deep linking desde notificaciones push ───────────────────────────────
-  useEffect(() => {
-    if (!deepLinkAction) return;
-    if (deepLinkAction === 'track_order' && deepLinkOrderId) {
-      setActiveSubTab('orders');
-      setActiveOrderModalId(deepLinkOrderId);
-      setShowOrderTimelineModal(true);
-    } else if (deepLinkAction === 'loyalty') {
-      setActiveSubTab('rewards');
-    } else if (deepLinkAction === 'coupons') {
-      setActiveSubTab('coupons');
-    }
-  }, [deepLinkAction, deepLinkOrderId]);
-
   // ── Delivery Timeline Modal (disparado al finalizar el checkout) ─────────────────
   const [activeOrderModalId, setActiveOrderModalId] = useState<string | null>(null);
   const [showOrderTimelineModal, setShowOrderTimelineModal] = useState(false);
+
+  // ── Deep linking desde notificaciones push ───────────────────────────────
+  useEffect(() => {
+    if (!deepLinkAction) return;
+    if (deepLinkAction === 'OPEN_ORDER_TRACKER' && deepLinkOrderId) {
+      setActiveSubTab('orders');
+      setActiveOrderModalId(deepLinkOrderId);
+      setShowOrderTimelineModal(true);
+    } else if (deepLinkAction === 'OPEN_REWARDS' || deepLinkAction === 'loyalty') {
+      setActiveSubTab('rewards');
+    } else if (deepLinkAction === 'OPEN_COUPONS' || deepLinkAction === 'coupons') {
+      setActiveSubTab('coupons');
+    }
+  }, [deepLinkAction, deepLinkOrderId]);
 
   const [notificationPermission, setNotificationPermission] = useState<'default' | 'granted' | 'denied' | 'unsupported'>(() => {
     if (typeof window === 'undefined' || !('Notification' in window)) {
@@ -399,10 +399,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
     ? userOrders.find(o => o.id === activeOrderModalId) || null
     : null;
 
-  // Filter notifications (Global + personal targeted)
+  // Filter notifications (Solo personales y requests dirigidos al usuario — broadcasts ocultos)
   const userNotifications = currentUser
     ? notifications.filter(n =>
-        n.tipo === 'todos' ||
         (n.tipo === 'personal' && n.destinatario_telefono?.trim() === currentUser.telefono.trim()) ||
         (n.tipo === 'request' && n.destinatario_telefono?.trim() === currentUser.telefono.trim())
       )

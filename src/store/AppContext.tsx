@@ -625,6 +625,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     let mainChannel: ReturnType<typeof supabase.channel> | null = null;
+    let broadcastChan: ReturnType<typeof supabase.channel> | null = null;
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
     let reconnectRetries = 0;
     const MAX_DELAY = 30000;
@@ -794,10 +795,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (payload: Record<string, unknown>) => {
           const newNotif = payload.new as InAppNotification;
           
-          // Validar si es para todos o específicamente para el usuario actual
+          // Validar si es específicamente para el usuario actual (broadcasts ocultos)
           const cu = currentUserRef.current;
-          const isForMe = (newNotif.tipo === 'todos') || 
-                         (cu && newNotif.tipo === 'personal' && newNotif.destinatario_telefono === cu.telefono) ||
+          const isForMe = (cu && newNotif.tipo === 'personal' && newNotif.destinatario_telefono === cu.telefono) ||
                          (isAdminAuthenticatedRef.current && (newNotif.tipo === 'request' || newNotif.tipo === 'admin'));
 
           if (isForMe) {
@@ -872,6 +872,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         });
 
+    // Canal separado para broadcasts (enviados desde createOrder/updateOrderStatus sin destruir listeners)
+    broadcastChan = supabase.channel('marketo_broadcast_send')
+      .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
+        const newOrder = payload.payload;
+        if (!newOrder?.id) return;
+        setOrders(prev => {
+          if (prev.some(o => o.id === newOrder.id)) return prev;
+          return [newOrder, ...prev];
+        });
+        window.dispatchEvent(new CustomEvent('new_order_received', { detail: newOrder }));
+        playNotificationSound('new');
+        if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.showNotification('¡NUEVO PEDIDO! 🛒', {
+              body: `Cliente: ${newOrder.cliente_nombre} — Total: $${newOrder.total_usd?.toFixed(2)}`,
+              icon: '/icon.png',
+              badge: '/icon.png',
+              tag: `new-order-${newOrder.id}`,
+              renotify: true,
+              vibrate: [200, 100, 200],
+              requireInteraction: true,
+              data: { url: '/admin' }
+            } as NotificationOptions);
+          });
+        }
+      })
+      .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
+        const updatedOrder = payload.payload;
+        if (!updatedOrder?.id) return;
+        setOrders(prev => prev.map(o => o.id === updatedOrder.id ? { ...o, ...updatedOrder } : o));
+      })
+      .subscribe();
+
     } catch (e) {
       console.error('Realtime channels failed:', e);
     }
@@ -881,6 +914,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     return () => {
       if (mainChannel) supabase.removeChannel(mainChannel);
+      if (broadcastChan) supabase.removeChannel(broadcastChan);
       if (reconnectTimer) clearTimeout(reconnectTimer);
     };
   }, [currentUser]);
@@ -1223,10 +1257,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           .order('fecha', { ascending: false });
         if (dbOrders) setOrders(dbOrders as Order[]);
 
-        // Cargar Notificaciones (Solo globales, personales o request del usuario)
+        // Cargar Notificaciones (Solo personales y requests del usuario — broadcasts ocultos)
         const { data: dbNotifs } = await supabase.from('notifications')
           .select('*')
-          .or(`tipo.eq.todos,and(tipo.eq.personal,destinatario_telefono.eq.${currentUser.telefono}),and(tipo.eq.request,destinatario_telefono.eq.${currentUser.telefono})`)
+          .or(`and(tipo.eq.personal,destinatario_telefono.eq.${currentUser.telefono}),and(tipo.eq.request,destinatario_telefono.eq.${currentUser.telefono})`)
           .order('id', { ascending: false });
         if (dbNotifs) setNotifications(dbNotifs as InAppNotification[]);
 
@@ -1702,7 +1736,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const newOrder: Order = {
       ...orderData,
-      id: preGeneratedId || `PED-${Math.floor(1000 + Math.random() * 9000)}-VAL-${new Date().getFullYear()}`,
+      id: preGeneratedId || `ORD-${String(Math.floor(10000 + Math.random() * 90000)).padStart(6, '0')}`,
       usuario_id: orderData.usuario_id || (currentUser ? currentUser.id : undefined),
       items,
       subtotal_usd: subtotal,
@@ -1776,7 +1810,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // BROADCAST: Enviar señal inmediata al Admin sin esperar a la DB
     try {
-      const broadcastChannel = supabase.channel('marketo_realtime_system');
+      const broadcastChannel = supabase.channel('marketo_broadcast_send');
       await new Promise<void>((resolve) => {
         broadcastChannel.subscribe((status) => {
           if (status === 'SUBSCRIBED') resolve();
@@ -1966,7 +2000,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // Broadcast instantáneo para que el cliente reciba el cambio en <100ms
       try {
         const updatedOrder = { ...prevOrder, ...updatePayload } as Order;
-        const statusChannel = supabase.channel('marketo_realtime_system');
+        const statusChannel = supabase.channel('marketo_broadcast_send');
         await new Promise<void>((resolve) => {
           statusChannel.subscribe((st) => { if (st === 'SUBSCRIBED') resolve(); });
         });
@@ -2003,7 +2037,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     try {
       const updatedOrder = { ...prevOrder, status: 'completado' } as Order;
-      const paymentChannel = supabase.channel('marketo_realtime_system');
+      const paymentChannel = supabase.channel('marketo_broadcast_send');
       await new Promise<void>((resolve) => {
         paymentChannel.subscribe((st) => { if (st === 'SUBSCRIBED') resolve(); });
       });
@@ -2869,11 +2903,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (txErr && txErr.code !== '23505') { // 23505 = duplicate key (ya ganó puntos por esta orden)
         console.error('[Loyalty] Error guardando transaccion:', txErr.message);
       }
-      // Actualizar puntos en Supabase
+      // Actualizar puntos en Supabase (ambos campos para compatibilidad)
       const { error: ptsErr } = await supabase.from('usuarios_clientes')
         .update({
           puntos_fidelidad: (user.puntos_fidelidad || user.loyalty_points || 0) + pointsEarned,
           puntos_historicos: (user.puntos_historicos || user.loyalty_lifetime_points || 0) + pointsEarned,
+          loyalty_points: (user.loyalty_points || user.puntos_fidelidad || 0) + pointsEarned,
+          loyalty_lifetime_points: (user.loyalty_lifetime_points || user.puntos_historicos || 0) + pointsEarned,
         })
         .eq('id', userId);
       if (ptsErr) console.error('[Loyalty] Error actualizando puntos:', ptsErr.message);
@@ -2902,6 +2938,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         loyalty_lifetime_points: (prev.loyalty_lifetime_points || 0) + pointsEarned,
       } : prev);
     }
+
+    // Notificar al usuario que ganó puntos
+    addNotification(
+      '¡Puntos Ganados!',
+      `Ganaste ${pointsEarned} puntos por tu pedido #${orderId.slice(-8)}. ${user.is_pwa_installed ? '(Bonus App x1.5)' : ''}¡Sigue comprando para subir de nivel!`,
+      'personal',
+      user.telefono || undefined,
+      undefined,
+      '/profile'
+    );
   };
 
   // --- PWA INSTALL DETECTION ---

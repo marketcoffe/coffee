@@ -579,6 +579,12 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
         setMesaPaymentPhase(true);
       }
       setProcessedOrder(created);
+
+      // Otorgar puntos de fidelidad al usuario
+      if (currentUser?.id && created.total_usd) {
+        earnLoyaltyPoints(currentUser.id, created.id, created.total_usd, selectedSedeId || undefined);
+      }
+
       if (orderType !== 'mesa') {
         setWaitingForAdmin(true);
         localStorage.setItem('trv_waiting_for_admin', 'true');
