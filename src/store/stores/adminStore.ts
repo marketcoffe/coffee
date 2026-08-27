@@ -6,7 +6,7 @@ type AdminSection =
   // Pedidos
   | 'orders' | 'mesa-orders' | 'order-history' | 'delivery-map'
   // Marketing
-  | 'customers' | 'messages' | 'promos' | 'coupons' | 'loyalty' | 'segments' | 'automations' | 'push-analytics'
+  | 'customers' | 'messages' | 'promos' | 'coupons' | 'loyalty' | 'segments' | 'automations' | 'push-analytics' | 'push-center'
   // Tienda
   | 'store-general' | 'products' | 'store-promos' | 'store-combos' | 'delivery' | 'payments' | 'banners' | 'categories' | 'tables'
   // Configuración

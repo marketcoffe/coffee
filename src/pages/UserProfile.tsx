@@ -4,15 +4,15 @@ import { motion } from 'motion/react';
 import { supabase } from '../store/supabaseClient';
 import {
   User, Lock, Phone, UserPlus, LogIn, LogOut, Bell, Package, Mail,
-  CheckCircle, Clock, Truck, MapPin, Edit2, AlertCircle, Eye, EyeOff, Tag,
-  Copy, Check, X, Smartphone, MessageSquare, Send, ExternalLink, Trash2, Star, Award, Gift
+  CheckCircle, Edit2, AlertCircle, Eye, EyeOff, Tag,
+  Copy, Check, X, Smartphone, MessageSquare, Send, ExternalLink, Trash2, Star, Gift
 } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
 import { useToast } from '../components/Toast';
 import { OrderTracker } from '../components/OrderTracker';
 import { LoyaltyWidget } from '../components/LoyaltyWidget';
-import { getWhatsAppPhone } from '../utils/phone';
 import { InAppNotification } from '../types/store';
+import ClientePanelPedidos from '../components/ClientePanelPedidos';
 
 interface BeforeInstallPromptEvent {
   prompt: () => void;
@@ -28,12 +28,14 @@ interface CredentialsReminder {
 }
 
 interface UserProfileProps {
-  setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout') => void;
+  setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout') => void;
   deferredPrompt?: BeforeInstallPromptEvent | null;
   onInstallClick?: () => void;
+  deepLinkOrderId?: string | null;
+  deepLinkAction?: string | null;
 }
 
-export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt, onInstallClick }) => {
+export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt, onInstallClick, deepLinkOrderId, deepLinkAction }) => {
   const { showToast } = useToast();
   const { 
     currentUser, 
@@ -53,12 +55,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
     deleteNotification,
     clearAllNotifications,
     getUserLoyaltyPoints,
-    getUserLoyaltyTier,
-    getLoyaltyTransactions,
     promotions,
     coupons: allCoupons,
-    rewardCatalog,
-    redeemRewardItem,
   } = useApp();
 
   const themeColor = config.theme_color || '#A4D045';
@@ -85,6 +83,20 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
       return () => clearTimeout(timer);
     }
   }, [deferredPrompt]);
+
+  // ── Deep linking desde notificaciones push ───────────────────────────────
+  useEffect(() => {
+    if (!deepLinkAction) return;
+    if (deepLinkAction === 'track_order' && deepLinkOrderId) {
+      setActiveSubTab('orders');
+      setActiveOrderModalId(deepLinkOrderId);
+      setShowOrderTimelineModal(true);
+    } else if (deepLinkAction === 'loyalty') {
+      setActiveSubTab('rewards');
+    } else if (deepLinkAction === 'coupons') {
+      setActiveSubTab('coupons');
+    }
+  }, [deepLinkAction, deepLinkOrderId]);
 
   // ── Delivery Timeline Modal (disparado al finalizar el checkout) ─────────────────
   const [activeOrderModalId, setActiveOrderModalId] = useState<string | null>(null);
@@ -123,7 +135,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
   };
 
   const requestNotificationPermission = async () => {
+    console.log('[UserProfile] requestNotificationPermission llamado');
     if (typeof window === 'undefined' || !('Notification' in window)) {
+      console.warn('[UserProfile] Notification API no soportada');
       addNotification('Error', 'Tu navegador no soporta notificaciones push.', 'admin');
       return;
     }
@@ -131,27 +145,35 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
     // Validar que la VAPID key esté configurada
     const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
     if (!vapidKey) {
+      console.error('[UserProfile] VITE_VAPID_PUBLIC_KEY no configurada');
       addNotification('⚠️ Error de Configuración', 'VITE_VAPID_PUBLIC_KEY no está configurada. Contacta al administrador.', 'admin');
       return;
     }
+    console.log('[UserProfile] VAPID key presente:', vapidKey.substring(0, 10) + '...');
 
     try {
+      console.log('[UserProfile] Solicitando permiso de notificación...');
       const res = await Notification.requestPermission();
+      console.log('[UserProfile] Permiso resultado:', res);
       setNotificationPermission(res);
       if (res === 'granted') {
+        console.log('[UserProfile] Permiso concedido — suscribiendo a push...');
         // Re-suscripción con llaves VAPID
         const registration = await navigator.serviceWorker.ready;
-        await registration.pushManager.subscribe({
+        const subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(vapidKey)
         });
+        console.log('[UserProfile] Push subscription creada:', subscription.endpoint.substring(0, 50));
 
         const syncResult = await syncPushSubscription();
+        console.log('[UserProfile] syncPushSubscription resultado:', syncResult);
         if (!syncResult.success) {
           addNotification('⚠️ Error Sincronizando Push', syncResult.error!, 'admin');
         }
 
         navigator.serviceWorker.ready.then(reg => {
+          console.log('[UserProfile] Mostrando notificación de bienvenida');
           reg.showNotification('¡Notificaciones Habilitadas! 🔔', {
             body: '¡Excelente! Ahora recibirás actualizaciones rápidas de tus pedidos y promociones de ' + (config.site_nombre || 'nuestra tienda') + '.',
             icon: config.logo_url || '/icon.png',
@@ -161,10 +183,11 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
           } as NotificationOptions);
         });
       } else if (res === 'denied') {
+        console.warn('[UserProfile] Permiso de notificación denegado por el usuario');
         addNotification('Notificaciones Bloqueadas', `${currentUser?.nombre || 'Usuario'} ha bloqueado las notificaciones.`, 'admin');
       }
     } catch (error) {
-      console.error('Error requesting notification permission:', error);
+      console.error('[UserProfile] Error requestNotificationPermission:', error);
       addNotification('Error Activando Notificaciones', (error as Error).message || String(error), 'admin');
     }
   };
@@ -847,163 +870,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
 
           {/* ACTIVE TAB CONTENT Area: ORDERS */}
           {activeSubTab === 'orders' && (
-            <div className="flex flex-col gap-4 px-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-sm font-bold font-display text-[#1a1c1d]">Mis Pedidos</h3>
-                <span className="text-[11px] text-[#8f7065] font-mono">{userOrders.length} pedido{userOrders.length !== 1 ? 's' : ''}</span>
-              </div>
-
-              {userOrders.length === 0 ? (
-                <div className="text-center py-12 bg-white border border-[#e4beb1]/10 rounded-2xl flex flex-col items-center gap-2">
-                  <Package size={32} className="text-zinc-300" />
-                  <h4 className="font-semibold text-[#1a1c1d] text-sm">Sin pedidos aún</h4>
-                  <p className="text-[12px] text-[#8f7065] max-w-[240px] leading-relaxed">
-                    Tus pedidos aparecerán aquí. ¡Empieza a pedir!
-                  </p>
-                  <button onClick={() => setTab('catalog')} className="mt-2 px-5 py-2.5 rounded-xl font-bold text-[12px] cursor-pointer active:scale-95 transition-all" style={{ backgroundColor: themeColor, color: '#fff' }}>
-                    Ver Menú
-                  </button>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  {userOrders.map(order => (
-                    <div key={order.id} className="border border-[#e4beb1]/10 bg-white rounded-xl overflow-hidden shadow-sm flex flex-col divide-y divide-zinc-100">
-                      {/* Order top bar info */}
-                      <div className="p-3 bg-[#f9f9fb]/50 flex justify-between items-center">
-                        <div>
-                          <p className="font-mono text-[#1a1c1d] font-bold tracking-tight text-xs">{order.id}</p>
-                          <p className="text-[9px] text-[#8f7065] font-mono">{order.fecha}</p>
-                        </div>
-                        {/* Status badges */}
-                        <div className="flex items-center gap-1.5">
-                          <button 
-                            onClick={() => { setActiveOrderModalId(order.id); setShowOrderTimelineModal(true); }}
-                            className="text-[9px] bg-violet-600 text-white px-2 py-0.5 rounded font-bold uppercase animate-pulse cursor-pointer"
-                          >
-                            Rastrear 🛵
-                          </button>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md uppercase font-mono ${
-                            order.status === 'Pendiente' ? 'bg-amber-100 text-amber-800 border-amber-300 border' :
-                            order.status === 'Procesando' ? 'bg-blue-100 text-blue-800 border-blue-300 border' :
-                            order.status === 'En preparación' ? 'bg-indigo-100 text-indigo-800 border-indigo-300 border' :
-                            order.status === 'En camino' ? 'bg-violet-100 text-violet-800 border-violet-400 border animate-pulse' :
-                            'bg-[#eeeef0] text-zinc-850 border border-zinc-300' // 'Entregado'
-                          }`}>
-                            {order.status === 'En camino' ? 'En camino / Despachado' : order.status}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Items details nested list */}
-                      <div className="p-3 bg-white flex flex-col gap-2">
-                        <span className="text-[9px] font-bold uppercase tracking-wider text-[#8f7065]">Productos del Pedido:</span>
-                        <div className="flex flex-col gap-1.5">
-                          {order.items.map((it, idx) => (
-                            <div key={idx} className="flex justify-between items-center text-[11px] text-[#5b4137] bg-[#f9f9fb]/40 p-1.5 rounded border border-[#e4beb1]/10/60 font-mono">
-                              <span className="line-clamp-1 flex-1 font-sans font-medium text-[#1a1c1d]">{it.cantidad}x {it.nombre}</span>
-                              <span className="font-bold text-[#1a1c1d] shrink-0 ml-2">${(it.precio_usd * it.cantidad).toFixed(2)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* DELIVERY / COURIER METRICS */}
-                      <div className="p-3 bg-[#f9f9fb]/30 flex flex-col gap-2.5">
-                        <div className="flex justify-between text-[11px] text-[#5b4137]">
-                          <span className="flex items-center gap-1"><MapPin size={12} className="text-red-500" /> Direccion recogida / delivery:</span>
-                          <span className="font-mono text-zinc-950 font-bold text-right">{order.direccion_envio}</span>
-                        </div>
-
-                        {/* ESTIMATIVE PROGRESS BAR */}
-                        <div className="flex flex-col gap-1.5 mt-1 border-t border-[#e4beb1]/10 pt-2 bg-transparent">
-                          <div className="flex justify-between items-baseline">
-                            <span className="text-[9px] font-bold text-[#8f7065] uppercase tracking-widest flex items-center gap-1">
-                              <Clock size={11} className="text-violet-500" /> Estado de Envio
-                            </span>
-                          </div>
-
-                          {/* Graphical Visualizer */}
-                          <div className="grid grid-cols-4 gap-1 mt-1 font-mono text-[9px]">
-                            {[
-                              { label: 'Pendiente', target: ['Pendiente'] },
-                              { label: 'Preparación', target: ['En preparación', 'Procesando'] },
-                              { label: 'En Camino', target: ['En camino'] },
-                              { label: 'Entregado', target: ['Entregado'] },
-                            ].map((stepObj, idx, _arr) => {
-                              // evaluate if this step has been completed in order status sequence
-                              const statusOrder = ['Pendiente', 'Procesando', 'En preparación', 'En camino', 'Entregado'];
-                              const currentPower = statusOrder.indexOf(order.status);
-                              
-                              let isStepPassed = false;
-                              if (stepObj.label === 'Pendiente') isStepPassed = currentPower >= 0;
-                              if (stepObj.label === 'Preparación') isStepPassed = currentPower >= 1; // Procesando = preparacion index wise
-                              if (stepObj.label === 'En Camino') isStepPassed = currentPower >= 3; // En camino / Enviado
-                              if (stepObj.label === 'Entregado') isStepPassed = currentPower >= 4;
-
-                              const isCurrent = stepObj.target.includes(order.status);
-
-                              return (
-                                <div key={idx} className="flex flex-col gap-1 items-center relative">
-                                  {order.status === 'En camino' && stepObj.label === 'En Camino' && (
-                                    <motion.div
-                                      initial={{ x: "-40%" }}
-                                      animate={{ x: "40%" }}
-                                      transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
-                                      className="absolute -top-5 text-violet-600 drop-shadow-sm"
-                                    >
-                                      <Truck size={16} />
-                                    </motion.div>
-                                  )}
-                                  <div className={`h-[4px] w-full rounded-full transition-all ${
-                                    isCurrent ? 'bg-violet-600 ring-2 ring-violet-400/30 animate-pulse' :
-                                    isStepPassed ? 'bg-zinc-800' : 'bg-[#e2e2e4]'
-                                  }`} />
-                                  <span className={`text-[8px] font-medium transition-colors ${
-                                    isCurrent ? 'text-violet-600 font-bold' :
-                                    isStepPassed ? 'text-[#1a1c1d] font-semibold' : 'text-[#8f7065]'
-                                  }`}>{stepObj.label}</span>
-                                </div>
-                              );
-                            })}
-                          </div>
-
-                          {/* DELIVERY ESTIMATED TIME (Requested) */}
-                          {order.status !== 'Entregado' && (
-                            <div className="mt-1.5 p-2 bg-violet-50/50 border border-violet-100 rounded-lg text-violet-850 text-[11px] leading-relaxed flex items-center justify-between font-medium">
-                              <div className="flex items-center gap-1.5">
-                                <span>Tiempo de entrega estimado:</span>
-                              </div>
-                              <span className="font-bold underline text-violet-700">
-                                {order.tiempo_estimado_entrega || "En asignación por tienda"}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Invoice and Support action bottom bar of order cards */}
-                      <div className="p-3 bg-[#f9f9fb] flex justify-between items-center text-xs font-mono">
-                        <div>
-                          <span className="text-[#8f7065]">Total pagado:</span>
-                          <p className="font-bold text-[#1a1c1d] scale-105 ml-1 mt-0.5">${(order.total_usd || 0).toFixed(2)} • <span className="text-green-600 font-semibold">{(order.total_bs || 0).toFixed(2)} Bs</span></p>
-                        </div>
-                        
-                        <a
-                          href={`https://wa.me/${getWhatsAppPhone(config).replace(/\D/g, '').replace(/^0/, '58')}?text=${encodeURIComponent(`Hola, quisiera soporte e información de mi Pedido en Valencia con Código: *${order.id}*. El estatus actual es *${order.status}*.`)}`}
-                          target="_blank"
-                          referrerPolicy="no-referrer"
-                          className="bg-zinc-950 hover:bg-zinc-800 text-white font-sans text-[10px] font-bold py-1.5 px-3 rounded-lg flex items-center gap-1 transition-colors hover:scale-[1.02]"
-                        >
-                          Soporte Pedido
-                        </a>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <ClientePanelPedidos />
           )}
-
           {/* ═══ NOTIFICACIONES / MENSAJES ═══ */}
           {activeSubTab === 'notifications' && (
             <div className="flex flex-col gap-4 text-sm px-0">

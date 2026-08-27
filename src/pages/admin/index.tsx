@@ -10,7 +10,7 @@ import {
   LayoutGrid, ChevronLeft, ChevronRight, Shield, Store,
   TrendingUp, Smartphone, Activity, Clock, Users, Zap, Tag,
   Truck, CreditCard, Image, Grid, Search, Building2, HelpCircle,
-  Sliders, Palette, Ticket, Settings, Menu, Armchair, UtensilsCrossed
+  Sliders, Palette, Ticket, Settings, Menu, Armchair, UtensilsCrossed, Bell
 } from 'lucide-react';
 import { SEOHead } from '../../components/SEOHead';
 import AdminOrderAlert from '../../components/AdminOrderAlert';
@@ -41,6 +41,7 @@ const FidelizacionSection = lazyWithRetry(() => import('./sections/marketing/Fid
 const SegmentacionSection = lazyWithRetry(() => import('./sections/marketing/SegmentacionSection'));
 const AutomatizacionSection = lazyWithRetry(() => import('./sections/marketing/AutomatizacionSection'));
 const AnalyticsPushSection = lazyWithRetry(() => import('./sections/marketing/AnalyticsPushSection'));
+const AdminPushManager = lazyWithRetry(() => import('./sections/marketing/AdminPushManager'));
 
 // Lazy Imports: Tienda
 const StoreGeneralSection = lazyWithRetry(() => import('./sections/tienda/StoreGeneralSection'));
@@ -133,6 +134,7 @@ const ALL_SECTIONS = [
   { id: 'segments',        label: 'Segmentacion',      icon: Users,           group: 'marketing' },
   { id: 'automations',     label: 'Automatizacion',    icon: Zap,             group: 'marketing' },
   { id: 'push-analytics',  label: 'Analytics Push',    icon: BarChart3,       group: 'marketing' },
+  { id: 'push-center',    label: 'Centro Push',       icon: Bell,           group: 'marketing' },
 
   { id: 'store-general',   label: 'General',           icon: Store,           group: 'tienda', groupLabel: 'Tienda' },
   { id: 'products',        label: 'Productos',         icon: Package,         group: 'tienda' },
@@ -247,6 +249,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
       case 'segments':        return <SegmentacionSection />;
       case 'automations':     return <AutomatizacionSection />;
       case 'push-analytics':  return <AnalyticsPushSection />;
+      case 'push-center':    return <AdminPushManager />;
 
       case 'store-general':   return <StoreGeneralSection />;
       case 'products':        return <ProductosSection onEdit={(p) => setOpenEditor(p)} onCreate={() => setShowProductForm(true)} config={config} />;

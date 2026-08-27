@@ -71,22 +71,46 @@ console.error = (...args: unknown[]) => {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    console.log('[Main] Registrando Service Worker...');
     navigator.serviceWorker.register('/sw-push.js', { scope: '/' })
       .then((reg) => {
+        console.log('[Main] SW registrado correctamente:', reg.scope);
         log.info('SW', `Registrado correctamente: ${reg.scope}`);
         setInterval(() => reg.update(), 60 * 60 * 1000);
       })
-      .catch((err) => log.error('SW', 'Error al registrar', err));
+      .catch((err) => {
+        console.error('[Main] Error al registrar SW:', err);
+        log.error('SW', 'Error al registrar', err);
+      });
   });
 
   navigator.serviceWorker.addEventListener('message', (event) => {
+    console.log('[SW Message] Received:', event.data?.type, event.data);
     if (event.data?.type === 'PLAY_NOTIFICATION_SOUND') {
       const url = event.data.soundUrl || '/sounds/notification.wav';
+      console.log('[SW Message] Playing notification sound:', url);
       try {
         const audio = new Audio(url);
         audio.volume = 0.8;
-        audio.play().catch(() => {});
-      } catch { /* ignore */ }
+        audio.play().catch((err) => console.warn('[SW Message] Sound play failed:', err));
+      } catch (err) { console.warn('[SW Message] Sound error:', err); }
+    }
+
+    // Deep linking desde notificaciones push
+    if (event.data?.type === 'NOTIFICATION_CLICKED') {
+      const { deepLink, targetUrl, notificationId } = event.data;
+      console.log('[SW Message] NOTIFICATION_CLICKED:', { deepLink, targetUrl, notificationId });
+      window.dispatchEvent(new CustomEvent('push_notification_deep_link', {
+        detail: { deepLink, targetUrl, notificationId }
+      }));
+    }
+
+    // Suscripción push cambió — el frontend debe re-registrar
+    if (event.data?.type === 'PUSH_SUBSCRIPTION_CHANGED') {
+      console.log('[SW Message] PUSH_SUBSCRIPTION_CHANGED:', event.data.newEndpoint);
+      window.dispatchEvent(new CustomEvent('push_subscription_changed', {
+        detail: { newEndpoint: event.data.newEndpoint }
+      }));
     }
   });
 }

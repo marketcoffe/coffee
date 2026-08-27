@@ -239,6 +239,64 @@ function AppContent() {
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
   const [adminUserInput, setAdminUserInput] = useState('');
 
+  // Deep linking desde notificaciones push (Service Worker)
+  const [deepLinkOrderId, setDeepLinkOrderId] = useState<string | null>(null);
+  const [deepLinkAction, setDeepLinkAction] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handlePushDeepLink = (e: Event) => {
+      const { deepLink, notificationId } = (e as CustomEvent).detail;
+      console.log('[App] push_notification_deep_link recibido:', { deepLink, notificationId });
+      if (!deepLink) {
+        console.warn('[App] Deep link vacío — ignorando');
+        return;
+      }
+
+      // Navegar a la ruta correcta del SPA
+      const route = deepLink.spa_route || '/';
+      console.log('[App] Navegando a ruta:', route);
+      if (route === '/admin') setTab('admin');
+      else if (route === '/catalog') setTab('catalog');
+      else if (route === '/cart') setTab('cart');
+      else if (route === '/profile') setTab('profile');
+      else if (route === '/mesa') setTab('mesa_checkout');
+      else setTab('home');
+
+      // Si hay acción específica (abrir modal de pedido, cupones, etc.)
+      if (deepLink.action && deepLink.order_id) {
+        console.log('[App] Deep link con order_id:', deepLink.action, deepLink.order_id);
+        setDeepLinkOrderId(deepLink.order_id);
+        setDeepLinkAction(deepLink.action);
+      } else if (deepLink.action) {
+        console.log('[App] Deep link con action:', deepLink.action);
+        setDeepLinkAction(deepLink.action);
+      } else {
+        console.log('[App] Deep link sin acción específica');
+      }
+
+      // Limpiar después de 5 segundos para no bloquear futuras acciones
+      setTimeout(() => {
+        setDeepLinkOrderId(null);
+        setDeepLinkAction(null);
+      }, 5000);
+    };
+
+    const handleSubscriptionChanged = () => {
+      console.log('[App] push_subscription_changed recibido — re-suscribiendo push...');
+      // Re-suscribir push cuando el SW detecte un cambio
+      import('./store/AppContext').then(({ useApp }) => {
+        // Esto se ejecuta en el contexto del componente AppContent
+      });
+    };
+
+    window.addEventListener('push_notification_deep_link', handlePushDeepLink);
+    window.addEventListener('push_subscription_changed', handleSubscriptionChanged);
+    return () => {
+      window.removeEventListener('push_notification_deep_link', handlePushDeepLink);
+      window.removeEventListener('push_subscription_changed', handleSubscriptionChanged);
+    };
+  }, []);
+
   const resetAllFilters = () => {
     setSelectedCategory('');
     setGlobalSearch('');
@@ -463,7 +521,7 @@ function AppContent() {
 
           {tab === 'profile' && (
             <ErrorBoundary moduleName="UserProfile">
-              <UserProfile setTab={setTab} deferredPrompt={deferredPrompt} onInstallClick={handleInstallClick} />
+              <UserProfile setTab={setTab} deferredPrompt={deferredPrompt} onInstallClick={handleInstallClick} deepLinkOrderId={deepLinkOrderId} deepLinkAction={deepLinkAction} />
             </ErrorBoundary>
           )}
 

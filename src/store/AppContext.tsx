@@ -2642,47 +2642,61 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
    * Se debe llamar siempre que el teléfono cambie.
    */
   const syncPushSubscription = async (): Promise<{ success: boolean; error?: string }> => {
+    console.log('[PushSync] Iniciando syncPushSubscription...');
     if (typeof window === 'undefined') {
+      console.warn('[PushSync] window no disponible (SSR)');
       return { success: false, error: 'window no disponible (SSR?)' };
     }
     if (!('serviceWorker' in navigator)) {
+      console.warn('[PushSync] Service Worker no soportado');
       return { success: false, error: 'Service Worker no soportado en este navegador' };
     }
     if (!('PushManager' in window)) {
+      console.warn('[PushSync] PushManager no disponible');
       return { success: false, error: 'PushManager no disponible en este navegador' };
     }
 
     try {
       const registration = await navigator.serviceWorker.ready;
+      console.log('[PushSync] SW registration lista:', registration.scope);
       const existingSub = await registration.pushManager.getSubscription();
+      console.log('[PushSync] Suscripción existente:', existingSub ? existingSub.endpoint.substring(0, 50) : 'NINGUNA');
 
       if (!existingSub) {
+        console.warn('[PushSync] No existe suscripción push activa — el usuario debe habilitar notificaciones');
         return { success: false, error: 'No existe suscripción push activa.' };
       }
 
       const subJSON = existingSub.toJSON();
+      console.log('[PushSync] Sub keys:', { hasEndpoint: !!subJSON.endpoint, hasP256dh: !!subJSON.keys?.p256dh, hasAuth: !!subJSON.keys?.auth });
 
       if (!subJSON.endpoint || !subJSON.keys?.p256dh || !subJSON.keys?.auth) {
+        console.warn('[PushSync] Suscripción push corrupta — faltan campos');
         return { success: false, error: 'Suscripción push corrupta.' };
       }
 
       // For guest users, use anonymous_id from localStorage
       const guestPhone = localStorage.getItem('trv_guest_phone') || '';
       const userId = currentUser?.id || `guest-${Date.now()}`;
+      const phone = currentUser?.telefono?.trim() || guestPhone || null;
+      console.log('[PushSync] Guardando suscripción:', { userId, phone, endpoint: subJSON.endpoint.substring(0, 50) });
 
       const { error } = await supabase.from('push_subscriptions').upsert({
         user_id: userId,
         endpoint: subJSON.endpoint,
         p256dh: subJSON.keys?.p256dh,
         auth_secret: subJSON.keys?.auth,
-        destinatario_telefono: currentUser?.telefono?.trim() || guestPhone || null,
+        destinatario_telefono: phone,
       }, { onConflict: 'endpoint' });
 
       if (error) {
+        console.error('[PushSync] Error guardando suscripción en BD:', error.message, error);
         return { success: false, error: error.message };
       }
+      console.log('[PushSync] Suscripción guardada exitosamente');
       return { success: true };
     } catch (err: any) {
+      console.error('[PushSync] Excepción en syncPushSubscription:', err);
       return { success: false, error: err?.message || String(err) };
     }
   };

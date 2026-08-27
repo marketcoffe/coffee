@@ -10,6 +10,7 @@ export async function sendMesaPushNotification(
   body: string,
   data?: Record<string, unknown>
 ): Promise<boolean> {
+  console.log('[Push] sendMesaPushNotification:', { targetPhone, title, body: body.substring(0, 60) });
   try {
     // Get the push subscription for this phone
     const { data: subscriptions, error: fetchError } = await supabase
@@ -19,20 +20,26 @@ export async function sendMesaPushNotification(
       .eq('is_active', true)
       .limit(1);
 
-    if (fetchError || !subscriptions || subscriptions.length === 0) {
+    if (fetchError) {
+      console.error('[Push] Error consultando push_subscriptions:', fetchError.message);
+      return false;
+    }
+    if (!subscriptions || subscriptions.length === 0) {
       console.warn('[Push] No active subscription for phone:', targetPhone);
       return false;
     }
 
     const sub = subscriptions[0];
+    console.log('[Push] Suscripción encontrada:', sub.endpoint.substring(0, 50));
 
     // Send via the webhook endpoint
     const webhookUrl = import.meta.env.VITE_PUSH_WEBHOOK_URL;
     if (!webhookUrl) {
-      console.warn('[Push] No webhook URL configured');
+      console.error('[Push] VITE_PUSH_WEBHOOK_URL no configurada');
       return false;
     }
 
+    console.log('[Push] Enviando a webhook:', webhookUrl);
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -56,6 +63,11 @@ export async function sendMesaPushNotification(
       })
     });
 
+    console.log('[Push] Webhook response:', response.status, response.statusText);
+    if (!response.ok) {
+      const text = await response.text().catch(() => 'no body');
+      console.error('[Push] Webhook error body:', text);
+    }
     return response.ok;
   } catch (err) {
     console.error('[Push] Error sending notification:', err);
@@ -71,9 +83,13 @@ export async function sendMesaBroadcastPush(
   body: string,
   data?: Record<string, unknown>
 ): Promise<boolean> {
+  console.log('[Push] sendMesaBroadcastPush:', { title, body: body.substring(0, 60) });
   try {
     const webhookUrl = import.meta.env.VITE_PUSH_WEBHOOK_URL;
-    if (!webhookUrl) return false;
+    if (!webhookUrl) {
+      console.error('[Push] VITE_PUSH_WEBHOOK_URL no configurada para broadcast');
+      return false;
+    }
 
     const response = await fetch(webhookUrl, {
       method: 'POST',
@@ -91,6 +107,7 @@ export async function sendMesaBroadcastPush(
       })
     });
 
+    console.log('[Push] Broadcast response:', response.status, response.statusText);
     return response.ok;
   } catch (err) {
     console.error('[Push] Error broadcasting:', err);

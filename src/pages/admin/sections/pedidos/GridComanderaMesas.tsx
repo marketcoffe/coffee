@@ -9,10 +9,11 @@ import {
 } from 'lucide-react';
 import { printMesaTicket } from '../../../../utils/printMesaTicket';
 
-type MesaColumn = 'en_cocina' | 'esperando_pago' | 'pagado';
+type MesaColumn = 'en_cocina' | 'en_preparacion' | 'esperando_pago' | 'pagado';
 
 const COLUMN_CONFIG: Record<MesaColumn, { label: string; color: string; bg: string; borderColor: string; countBg: string }> = {
   'en_cocina':      { label: 'En Cocina',       color: 'text-blue-700',    bg: 'bg-blue-50',    borderColor: 'border-blue-300',    countBg: 'bg-blue-500' },
+  'en_preparacion': { label: 'En Preparación',  color: 'text-violet-700',  bg: 'bg-violet-50',  borderColor: 'border-violet-300',  countBg: 'bg-violet-500' },
   'esperando_pago': { label: 'Esperando Pago',   color: 'text-amber-700',   bg: 'bg-amber-50',   borderColor: 'border-amber-300',   countBg: 'bg-amber-500' },
   'pagado':         { label: 'Pagado',           color: 'text-emerald-700', bg: 'bg-emerald-50', borderColor: 'border-emerald-300', countBg: 'bg-emerald-500' },
 };
@@ -21,6 +22,7 @@ function getMesaColumn(order: Order): MesaColumn {
   const s = order.status;
   if (s === 'pago_enviado' || s === 'pendiente_pago') return 'esperando_pago';
   if (s === 'completado' || s === 'Entregado') return 'pagado';
+  if (s === 'En preparacion' || s === 'En preparación' || s === 'en_preparacion') return 'en_preparacion';
   return 'en_cocina';
 }
 
@@ -66,23 +68,28 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
   const prevOrderCountRef = useRef(0);
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set());
 
-  // Sound alert for new orders
+  // Sound alert for new orders + repeating alert every 10s while pending
   useEffect(() => {
-    const mesaOrders = orders.filter(o =>
-      (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') &&
-      o.status === 'enviado_cocina' &&
-      !['Cancelado', 'cancelado', 'completado', 'Entregado'].includes(o.status)
-    );
-    if (mesaOrders.length > prevOrderCountRef.current && soundEnabled) {
+    const playAlert = () => {
       try {
         const audio = new Audio('/sounds/notification.wav');
         audio.volume = 0.8;
         audio.play().catch(() => {});
       } catch {}
+    };
+
+    const pendingKitchenOrders = orders.filter(o =>
+      (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') &&
+      o.status === 'enviado_cocina' &&
+      !['Cancelado', 'cancelado', 'completado', 'Entregado'].includes(o.status)
+    );
+
+    if (pendingKitchenOrders.length > prevOrderCountRef.current && soundEnabled) {
+      playAlert();
     }
     // Mark new orders for flash animation
-    if (mesaOrders.length > prevOrderCountRef.current) {
-      const newIds = mesaOrders.filter(o => !prevOrderCountRef.current || true).slice(0, 3).map(o => o.id);
+    if (pendingKitchenOrders.length > prevOrderCountRef.current) {
+      const newIds = pendingKitchenOrders.slice(0, 3).map(o => o.id);
       setNewOrderIds(prev => new Set([...prev, ...newIds]));
       setTimeout(() => setNewOrderIds(prev => {
         const next = new Set(prev);
@@ -90,7 +97,27 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
         return next;
       }), 3000);
     }
-    prevOrderCountRef.current = mesaOrders.length;
+    prevOrderCountRef.current = pendingKitchenOrders.length;
+  }, [orders, soundEnabled]);
+
+  // Repeating sound alert every 10 seconds while there are pending kitchen orders
+  useEffect(() => {
+    const pendingCount = orders.filter(o =>
+      (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') &&
+      o.status === 'enviado_cocina'
+    ).length;
+
+    if (pendingCount === 0 || !soundEnabled) return;
+
+    const interval = setInterval(() => {
+      try {
+        const audio = new Audio('/sounds/notification.wav');
+        audio.volume = 0.6;
+        audio.play().catch(() => {});
+      } catch {}
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, [orders, soundEnabled]);
 
   // Realtime: escuchar custom events del AppContext + refresh al volver a la pestaña
@@ -158,7 +185,7 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
   }, [activeMesaOrders, filterMesa, searchTicket]);
 
   const ordersByColumn = useMemo(() => {
-    const groups: Record<MesaColumn, Order[]> = { 'en_cocina': [], 'esperando_pago': [], 'pagado': [] };
+    const groups: Record<MesaColumn, Order[]> = { 'en_cocina': [], 'en_preparacion': [], 'esperando_pago': [], 'pagado': [] };
     filteredOrders.forEach(order => { groups[getMesaColumn(order)].push(order); });
     return groups;
   }, [filteredOrders]);
@@ -221,22 +248,15 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
   const [cleanModal, setCleanModal] = useState<'stuck' | 'all' | null>(null);
 
   const handleCloseMesa = async (numeroMesa: number) => {
-    const mesaOrdersToClose = orders.filter(o =>
-      (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') &&
-      o.numero_mesa === numeroMesa &&
-      !['Cancelado', 'cancelado', 'completado', 'Entregado'].includes(o.status)
-    );
-    if (mesaOrdersToClose.length === 0) {
-      showToast('info', 'No hay pedidos activos en esta mesa');
+    const { data, error } = await supabase.rpc('close_mesa_orders', { p_numero_mesa: numeroMesa });
+    if (error) {
+      console.error('close_mesa_orders error:', error);
+      showToast('error', 'Error al cerrar mesa: ' + (error.message || 'Error desconocido'));
       setCloseMesaModal(null);
       return;
     }
-    let closed = 0;
-    for (const order of mesaOrdersToClose) {
-      const { error } = await supabase.from('orders').update({ status: 'completado' }).eq('id', order.id);
-      if (!error) closed++;
-    }
-    showToast('success', `Mesa #${numeroMesa} cerrada. ${closed} pedidos completados.`);
+    const result = data as any;
+    showToast('success', `Mesa #${numeroMesa} cerrada. ${result?.closed_count || 0} pedidos completados.`);
     setCloseMesaModal(null);
     refreshOrders();
   };
@@ -467,9 +487,10 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: 'En Cocina', value: ordersByColumn.en_cocina.length, color: '#3b82f6' },
+          { label: 'En Preparación', value: ordersByColumn.en_preparacion.length, color: '#8b5cf6' },
           { label: 'Esperando Pago', value: ordersByColumn.esperando_pago.length, color: '#f59e0b' },
           { label: 'Pagado', value: ordersByColumn.pagado.length, color: '#10b981' },
         ].map(s => (
@@ -481,7 +502,7 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
       </div>
 
       {/* Kanban columns */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {(Object.keys(COLUMN_CONFIG) as MesaColumn[]).map(col => {
           const cfg = COLUMN_CONFIG[col];
           const columnOrders = ordersByColumn[col];

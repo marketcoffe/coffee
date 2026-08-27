@@ -1,8 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../../store/AppContext';
 import { supabase } from '../../store/supabaseClient';
-import { CheckCircle, Copy, Check, X } from 'lucide-react';
+import { CheckCircle, Copy, Check, X, Building2 } from 'lucide-react';
 import { Order } from '../../types/store';
+
+interface BankAccount {
+  id: string;
+  banco_nombre: string;
+  titular_cuenta: string;
+  numero_cuenta: string;
+  cedula_rif: string;
+  telefono: string;
+  tipo_cuenta: string;
+  es_principal: boolean;
+  notas: string;
+}
 
 interface PantallaPagoMesaProps {
   order: Order;
@@ -10,6 +22,18 @@ interface PantallaPagoMesaProps {
   onPayAtRegister: () => void;
   onBack: () => void;
 }
+
+const FALLBACK_BANK: BankAccount = {
+  id: 'fallback',
+  banco_nombre: 'Banesco',
+  titular_cuenta: 'Market Coffee Sweet',
+  numero_cuenta: '0134-0000-00-0000000000',
+  cedula_rif: 'V-33112679',
+  telefono: '04123758879',
+  tipo_cuenta: 'Corriente',
+  es_principal: true,
+  notas: ''
+};
 
 export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
   order, onPaymentSent, onPayAtRegister, onBack
@@ -19,12 +43,52 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
   const mesaColor = '#e67e22';
 
   const [paymentMethod, setPaymentMethod] = useState<'Pago Móvil' | 'Efectivo' | 'Punto'>('Pago Móvil');
+  const [selectedBankId, setSelectedBankId] = useState<string>('');
   const [paymentBank, setPaymentBank] = useState('Banesco');
   const [paymentReference, setPaymentReference] = useState('');
   const [paymentPhone, setPaymentPhone] = useState(currentUser?.telefono || '');
   const [isProcessing, setIsProcessing] = useState(false);
   const [validationError, setValidationError] = useState('');
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
+  const [loadingBanks, setLoadingBanks] = useState(true);
+
+  // Fetch bank accounts from BD
+  useEffect(() => {
+    const fetchBankAccounts = async () => {
+      console.log('[PantallaPago] Fetching bank accounts from BD...');
+      try {
+        const { data, error } = await supabase.rpc('get_configuracion_pagos_activos');
+        if (error) {
+          console.error('[PantallaPago] Error RPC get_configuracion_pagos_activos:', error.message);
+        }
+        if (!error && data && data.length > 0) {
+          console.log('[PantallaPago] Bank accounts from BD:', data.length, 'cuentas');
+          setBankAccounts(data);
+          const principal = data.find((b: BankAccount) => b.es_principal) || data[0];
+          setSelectedBankId(principal.id);
+          setPaymentBank(principal.banco_nombre);
+        } else {
+          console.warn('[PantallaPago] No bank accounts in BD — using fallback');
+          // Fallback a datos hardcodeados si la BD no tiene datos
+          setBankAccounts([FALLBACK_BANK]);
+          setSelectedBankId(FALLBACK_BANK.id);
+          setPaymentBank(FALLBACK_BANK.banco_nombre);
+        }
+      } catch (err) {
+        console.error('[PantallaPago] Exception fetching bank accounts:', err);
+        setBankAccounts([FALLBACK_BANK]);
+        setSelectedBankId(FALLBACK_BANK.id);
+        setPaymentBank(FALLBACK_BANK.banco_nombre);
+      }
+      setLoadingBanks(false);
+    };
+    fetchBankAccounts();
+  }, []);
+
+  const selectedBank = useMemo(() => {
+    return bankAccounts.find(b => b.id === selectedBankId) || bankAccounts[0] || FALLBACK_BANK;
+  }, [bankAccounts, selectedBankId]);
 
   const handleCopy = async (text: string, fieldId: string) => {
     try { await navigator.clipboard.writeText(text); } catch {
@@ -46,6 +110,12 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
     </button>
   );
 
+  const formatBankLabel = (bank: BankAccount) => {
+    const codeMatch = bank.numero_cuenta.match(/^(\d{4})/);
+    const code = codeMatch ? codeMatch[1] : '';
+    return code ? `${bank.banco_nombre} (${code})` : bank.banco_nombre;
+  };
+
   const handleSendPayment = async () => {
     if (paymentMethod === 'Pago Móvil' && !paymentReference.trim()) {
       setValidationError('Ingresa la referencia de pago.');
@@ -55,9 +125,10 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
     setIsProcessing(true);
 
     try {
+      const bankLabel = formatBankLabel(selectedBank);
       const { error } = await supabase.rpc('reportar_pago_movil', {
         p_order_id: order.id,
-        p_banco_origen: 'Banesco (0134)',
+        p_banco_origen: bankLabel,
         p_referencia: paymentReference,
         p_telefono_emisor: paymentPhone || order.cliente_telefono,
         p_monto: order.total_usd
@@ -160,51 +231,102 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
           <div className="mt-3 p-3 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl">
             {paymentMethod === 'Pago Móvil' && (
               <div className="flex flex-col gap-2">
-                {/* Datos hardcoded Banesco */}
-                <div className="p-2 rounded-lg border border-[#e67e22]/30 bg-[#e67e22]/5">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[9px] font-bold uppercase" style={{ color: mesaColor }}>Banesco (0134)</span>
-                    <span className="text-[8px] px-1 py-0.5 rounded-full text-white font-bold" style={{ backgroundColor: mesaColor }}>Principal</span>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[9px] text-[#8f7065]">Teléfono</span>
-                      <div className="flex items-center gap-1">
-                        <span className="text-[#1a1c1d] font-bold text-[11px]">04123758879</span>
-                        <CopyBtn text="04123758879" id="pm-phone" />
+                {/* Datos de la cuenta bancaria seleccionada */}
+                {loadingBanks ? (
+                  <div className="p-3 text-center text-[10px] text-[#8f7065]">Cargando datos bancarios...</div>
+                ) : (
+                  <>
+                    <div className="p-2 rounded-lg border border-[#e67e22]/30 bg-[#e67e22]/5">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[9px] font-bold uppercase flex items-center gap-1" style={{ color: mesaColor }}>
+                          <Building2 size={10} />
+                          {formatBankLabel(selectedBank)}
+                        </span>
+                        {selectedBank.es_principal && (
+                          <span className="text-[8px] px-1 py-0.5 rounded-full text-white font-bold" style={{ backgroundColor: mesaColor }}>Principal</span>
+                        )}
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] text-[#8f7065]">Titular</span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-[#1a1c1d] font-bold text-[10px]">{selectedBank.titular_cuenta}</span>
+                            <CopyBtn text={selectedBank.titular_cuenta} id="pm-titular" />
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] text-[#8f7065]">Teléfono</span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-[#1a1c1d] font-bold text-[11px]">{selectedBank.telefono}</span>
+                            <CopyBtn text={selectedBank.telefono} id="pm-phone" />
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] text-[#8f7065]">Cédula/RIF</span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-[#1a1c1d] font-bold text-[11px]">{selectedBank.cedula_rif}</span>
+                            <CopyBtn text={selectedBank.cedula_rif} id="pm-ci" />
+                          </div>
+                        </div>
+                        {selectedBank.numero_cuenta && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] text-[#8f7065]">Cuenta</span>
+                            <div className="flex items-center gap-1">
+                              <span className="text-[#1a1c1d] font-bold text-[10px]">{selectedBank.numero_cuenta}</span>
+                              <CopyBtn text={selectedBank.numero_cuenta} id="pm-cuenta" />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[9px] text-[#8f7065]">Cédula/RIF</span>
-                      <div className="flex items-center gap-1">
-                        <span className="text-[#1a1c1d] font-bold text-[11px]">V-33112679</span>
-                        <CopyBtn text="V-33112679" id="pm-ci" />
+
+                    {/* Selector de cuenta bancaria si hay múltiples */}
+                    {bankAccounts.length > 1 && (
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[9px] text-[#8f7065] uppercase">Otra cuenta disponible</label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {bankAccounts.map(bank => (
+                            <button
+                              key={bank.id}
+                              onClick={() => { setSelectedBankId(bank.id); setPaymentBank(bank.banco_nombre); }}
+                              className={`text-[9px] px-2 py-1 rounded-lg font-bold transition-all cursor-pointer border ${
+                                selectedBankId === bank.id
+                                  ? 'text-white border-transparent'
+                                  : 'bg-white text-[#5b4137] border-[#e4beb1]/20 hover:bg-[#eeeef0]'
+                              }`}
+                              style={selectedBankId === bank.id ? { backgroundColor: mesaColor } : {}}
+                            >
+                              {formatBankLabel(bank)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {order.total_bs?.toFixed(2)} Bs.</p>
+                    <div className="space-y-2 mt-2 pt-2 border border-[#e4beb1]/10 rounded-xl p-3">
+                      <div>
+                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Tu Banco Emisor *</label>
+                        <select value={paymentBank} onChange={(e) => setPaymentBank(e.target.value)} className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer">
+                          <option value="Banesco">Banesco (0134)</option>
+                          <option value="Mercantil">Mercantil (0102)</option>
+                          <option value="Venezuela">Banco de Venezuela (0102)</option>
+                          <option value="Provincial">Provincial (0108)</option>
+                          <option value="Bancaribe">Bancaribe (0114)</option>
+                          <option value="Exterior">Banco Exterior (0115)</option>
+                          <option value="Nacional">Nacional de Crédito (0191)</option>
+                          <option value="BOD">BOD (0128)</option>
+                          <option value="Plaza">Banco Plaza (0138)</option>
+                          <option value="Otros">Otros</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia de Pago *</label>
+                        <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
                       </div>
                     </div>
-                  </div>
-                </div>
-                <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {order.total_bs?.toFixed(2)} Bs.</p>
-                <div className="space-y-2 mt-2 pt-2 border border-[#e4beb1]/10 rounded-xl p-3">
-                  <div>
-                    <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Tu Banco Emisor *</label>
-                    <select value={paymentBank} onChange={(e) => setPaymentBank(e.target.value)} className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer">
-                      <option value="Banesco">Banesco (0134)</option>
-                      <option value="Mercantil">Mercantil (0102)</option>
-                      <option value="Venezuela">Banco de Venezuela (0102)</option>
-                      <option value="Provincial">Provincial (0108)</option>
-                      <option value="Bancaribe">Bancaribe (0114)</option>
-                      <option value="Exterior">Banco Exterior (0115)</option>
-                      <option value="Nacional">Nacional de Crédito (0191)</option>
-                      <option value="BOD">BOD (0128)</option>
-                      <option value="Plaza">Banco Plaza (0138)</option>
-                      <option value="Otros">Otros</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia de Pago *</label>
-                    <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
             )}
             {paymentMethod === 'Efectivo' && (
