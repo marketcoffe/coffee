@@ -27,7 +27,7 @@ CREATE POLICY "orders_select_v4" ON orders FOR SELECT USING (
         cliente_telefono IS NOT NULL
         AND cliente_telefono != ''
         AND cliente_telefono IN (
-            SELECT telefono FROM public.users
+            SELECT telefono FROM public.usuarios_clientes
             WHERE id::text = auth.uid()::text
             AND telefono IS NOT NULL
             AND telefono != ''
@@ -79,7 +79,7 @@ CREATE POLICY "notifications_select_own_and_broadcast_v2" ON notifications
         AND destinatario_telefono IS NOT NULL
         AND destinatario_telefono != ''
         AND destinatario_telefono IN (
-            SELECT telefono FROM public.users
+            SELECT telefono FROM public.usuarios_clientes
             WHERE id::text = auth.uid()::text
             AND telefono IS NOT NULL
         )
@@ -90,7 +90,7 @@ CREATE POLICY "notifications_select_own_and_broadcast_v2" ON notifications
         AND destinatario_telefono IS NOT NULL
         AND destinatario_telefono != ''
         AND destinatario_telefono IN (
-            SELECT telefono FROM public.users
+            SELECT telefono FROM public.usuarios_clientes
             WHERE id::text = auth.uid()::text
             AND telefono IS NOT NULL
         )

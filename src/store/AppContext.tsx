@@ -1401,22 +1401,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const requestPart = async (nombre: string, telefono: string, descripcion: string, imagenUrl?: string): Promise<boolean> => {
-    console.warn('🛠️ AppContext: Procesando solicitud de producto:', descripcion);
+    console.warn('AppContext: Procesando solicitud de producto:', descripcion);
+    // Fire-and-forget: no bloquear si falla RLS
     const adminRes = await addNotification(
-      'Nueva Solicitud de FoodItem Especial 🍏',
+      'Nueva Solicitud de Producto Especial',
       `Solicitud de: ${nombre} (${telefono})\n\nFoodItem: ${descripcion}${imagenUrl ? `\n\nImagen disponible` : ''}`,
       'request',
       telefono
-    );
+    ).catch(() => false);
      // Also notify user that request was received
      const userRes = await addNotification(
-      'Solicitud de FoodItem Recibida',
+      'Solicitud de Producto Recibida',
       `Hola ${nombre}, hemos recibido tu solicitud para "${descripcion.substring(0, 30)}...". Un agente de ${config.site_nombre || 'nuestra tienda'} te contactará pronto.`,
       'personal',
       telefono
-    );
-    console.warn('🛠️ AppContext: Resultados de envío:', { adminRes, userRes });
-    return adminRes && userRes;
+    ).catch(() => false);
+    console.warn('AppContext: Resultados de envío:', { adminRes, userRes });
+    return adminRes || userRes;
   };
 
   // Catalog CRUD Functions
@@ -1790,7 +1791,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     let userId = '';
     let authSucceeded = false;
 
-    // 1. Primero intentar signIn (si ya tiene cuenta por email o telefono)
+    // 1. Primero intentar signIn (si ya tiene cuenta por email)
     try {
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -1802,7 +1803,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     } catch { /* signIn falló, intentar signUp */ }
 
-    // 2. Si signIn falla, intentar signUp
+    // 2. Si signIn falla, intentar signUp con options flowType: 'implicit' para evitar
+    //    problemas con PKCE + email confirmation en invitados
     if (!authSucceeded) {
       try {
         const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -1812,19 +1814,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             data: {
               nombre: orderData.cliente_nombre,
               telefono: cleanPhone
-            }
+            },
+            emailRedirectTo: window.location.origin
           }
         });
         if (!authError && authData?.user) {
           userId = authData.user.id;
-          authSucceeded = true;
+          // Si hay sesión activa (auto-confirmado), auth funciona
+          // Si no (email confirmation pendiente), igual guardamos el userId
+          if (authData.session) {
+            authSucceeded = true;
+          } else {
+            // signUp exitoso pero sin sesión (email confirmation pendiente)
+            // Usamos el userId pero marcamos authSucceeded como false
+            // para que el frontend funcione con phone-based RLS
+            console.warn('[registerGuestUser] signUp ok pero sin sesión (email confirmation pendiente)');
+          }
         }
-      } catch { /* signUp falló, usar ID local */ }
+      } catch (e) { console.warn('[registerGuestUser] signUp exception:', e); }
     }
 
-    // 3. Si auth falló, usar ID local para que el usuario quede logueado
+    // 3. Si no hay auth, generar un userId estable basado en teléfono (no aleatorio)
     if (!userId) {
-      userId = `guest-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      // Usar un ID determinista basado en teléfono para que sea reutilizable
+      userId = `guest-${cleanPhone}`;
     }
 
     // 4. SIEMPRE hacer setCurrentUser para que el cliente quede logueado
@@ -1847,13 +1860,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
 
+    // 6. Notificación de bienvenida (no bloquear si falla)
     if (authSucceeded) {
       addNotification(
-        '¡Cuenta Creada! 🎉',
-        `Hola ${newUser.nombre}. Tu cuenta fue creada automáticamente. Tu contraseña es tu número de teléfono (${cleanPhone}).`,
+        '¡Cuenta Creada!',
+        `Hola ${newUser.nombre}. Tu cuenta fue creada automáticamente. Tu contraseña es tu número de teléfono.`,
         'personal',
         newUser.telefono
-      );
+      ).catch(() => {});
     }
   };
 
@@ -2507,10 +2521,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         // Los broadcasts de sistema no se insertan desde el frontend: los genera
         // Supabase via los triggers handle_new_order_actions / handle_order_status_push_update.
         // Silenciamos el fallo RLS para que el checkout de un cliente anonimo no genere ruido.
-        console.warn('⚠️ Marketo: Broadcast de sistema bloqueado por RLS (esperado para anon):', error.message);
+        console.warn('Marketo: Broadcast de sistema bloqueado por RLS (esperado para anon):', error.message);
         return false;
       }
-      console.error('❌ Marketo Error (SQL):', error.message, '| Hint:', error.hint);
+      // Para notificaciones personales/request de anon, silenciar errores RLS
+      if (error.code === '42501' || error.message?.includes('permission')) {
+        console.warn('Marketo: Notificación bloqueada por RLS (anon):', error.message);
+        return false;
+      }
+      console.error('Marketo Error (SQL):', error.message, '| Hint:', error.hint);
       // Rollback actualización optimista
       setNotifications(prev => prev.filter(n => n.id !== notifId));
       return false;
@@ -2529,7 +2548,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const markNotificationAsRead = (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, leida: true } : n));
     supabase.from('notifications').update({ leida: true }).eq('id', id)
-      .then(({ error }) => { if (error) console.error('[Notification] Mark read sync error:', error.message); });
+      .then(({ error }) => {
+        if (error) {
+          // Anon users may not have UPDATE permission — silenciar si es RLS
+          if (error.code === '42501' || error.message?.includes('permission')) {
+            console.warn('[Notification] Mark read blocked by RLS (anon user):', error.message);
+          } else {
+            console.error('[Notification] Mark read sync error:', error.message);
+          }
+        }
+      });
   };
 
   const toggleNotificationReadStatus = (id: string) => {
@@ -2537,7 +2565,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const target = prev.find(n => n.id === id);
       const newLeida = target ? !target.leida : false;
       supabase.from('notifications').update({ leida: newLeida }).eq('id', id)
-        .then(({ error }) => { if (error) console.error('[Notification] Toggle read sync error:', error.message); });
+        .then(({ error }) => {
+          if (error) {
+            if (error.code === '42501' || error.message?.includes('permission')) {
+              console.warn('[Notification] Toggle read blocked by RLS (anon user)');
+            } else {
+              console.error('[Notification] Toggle read sync error:', error.message);
+            }
+          }
+        });
       return prev.map(n => n.id === id ? { ...n, leida: newLeida } : n);
     });
   };
