@@ -349,20 +349,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const [orders, setOrders] = useState<Order[]>(() => {
-    const saved = localStorage.getItem('trv_orders');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('trv_orders');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
   });
   const ordersRef = useRef(orders);
   useEffect(() => { ordersRef.current = orders; }, [orders]);
 
   const [coupons, setCoupons] = useState<Coupon[]>(() => {
-    const saved = localStorage.getItem('trv_coupons');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('trv_coupons');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
   });
 
   const [mesas, setMesas] = useState<Mesa[]>(() => {
-    const saved = localStorage.getItem('trv_mesas');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('trv_mesas');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
   });
 
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -388,8 +394,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const [notifications, setNotifications] = useState<InAppNotification[]>(() => {
-    const saved = localStorage.getItem('trv_notifications');
-    return saved ? JSON.parse(saved) : [
+    try {
+      const saved = localStorage.getItem('trv_notifications');
+      if (saved) return JSON.parse(saved);
+    } catch { /* use default */ }
+    return [
       {
         id: 'init-notif',
         titulo: 'Bienvenidos a Market Coffee',
@@ -405,8 +414,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isGlobalLoading, setIsGlobalLoading] = useState(true);
 
   const [cart, setCart] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem('trv_cart');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('trv_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
   });
 
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
@@ -469,38 +480,52 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const [users, setUsers] = useState<AppUser[]>(() => {
-    const saved = localStorage.getItem('trv_users');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('trv_users');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
   });
 
   const [currentUser, setCurrentUser] = useState<AppUser | null>(() => {
-    const saved = localStorage.getItem('trv_current_user');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem('trv_current_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
   });
 
   const [favorites, setFavorites] = useState<string[]>(() => {
-    const saved = localStorage.getItem('trv_favorites');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('trv_favorites');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
   });
 
   const [reviews, setReviews] = useState<ProductReview[]>(() => {
-    const saved = localStorage.getItem('trv_reviews');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('trv_reviews');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
   });
 
   const [flashSales, setFlashSales] = useState<FlashSale[]>(() => {
-    const saved = localStorage.getItem('trv_flash_sales');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('trv_flash_sales');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
   });
 
   const [loyaltyTransactions, setLoyaltyTransactions] = useState<LoyaltyTransaction[]>(() => {
-    const saved = localStorage.getItem('trv_loyalty_transactions');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('trv_loyalty_transactions');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
   });
 
   const [rewardCatalog, setRewardCatalog] = useState<RewardItem[]>(() => {
-    const saved = localStorage.getItem('trv_reward_catalog');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('trv_reward_catalog');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
   });
 
   // --- MOTOR DE TIEMPO REAL (SUPABASE CHANNELS) ---
@@ -854,7 +879,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     connectRealtime();
 
-    setIsGlobalLoading(false);
     return () => {
       if (mainChannel) supabase.removeChannel(mainChannel);
       if (reconnectTimer) clearTimeout(reconnectTimer);

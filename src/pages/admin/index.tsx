@@ -1,4 +1,6 @@
-import React, { Suspense, lazy, useState, useCallback, useMemo, useEffect } from 'react';
+import React, { Suspense, useState, useCallback, useMemo, useEffect } from 'react';
+import { ErrorBoundary } from '../../components/ErrorBoundary';
+import { lazyWithRetry } from './utils/lazyWithRetry';
 import { useApp } from '../../store/AppContext';
 import { useAdminStore } from '../../store/stores/adminStore';
 import { Order, FoodItem } from '../../types/store';
@@ -19,49 +21,47 @@ import BottomSheet from './components/BottomSheet';
 import { Tooltip } from './components/Tooltip';
 
 // Lazy Imports: Reportes
-const ResumenGeneralSection = lazy(() => import('./sections/reports/ResumenGeneralSection'));
-const VentasReportSection = lazy(() => import('./sections/reports/VentasReportSection'));
-const ProductosReportSection = lazy(() => import('./sections/reports/ProductosReportSection'));
-const AppReportSection = lazy(() => import('./sections/reports/AppReportSection'));
-const EstadisticasSection = lazy(() => import('./sections/reports/EstadisticasSection'));
+const ResumenGeneralSection = lazyWithRetry(() => import('./sections/reports/ResumenGeneralSection'));
+const VentasReportSection = lazyWithRetry(() => import('./sections/reports/VentasReportSection'));
+const ProductosReportSection = lazyWithRetry(() => import('./sections/reports/ProductosReportSection'));
+const AppReportSection = lazyWithRetry(() => import('./sections/reports/AppReportSection'));
+const EstadisticasSection = lazyWithRetry(() => import('./sections/reports/EstadisticasSection'));
 
 // Lazy Imports: Pedidos
-const ComandasSection = lazy(() => import('./sections/pedidos/ComandasSection'));
-const HistorialPedidosSection = lazy(() => import('./sections/pedidos/HistorialPedidosSection'));
-const PedidosMesaSection = lazy(() => import('./sections/pedidos/PedidosMesaSection'));
-const GridComanderaMesas = lazy(() => import('./sections/pedidos/GridComanderaMesas'));
+const ComandasSection = lazyWithRetry(() => import('./sections/pedidos/ComandasSection'));
+const HistorialPedidosSection = lazyWithRetry(() => import('./sections/pedidos/HistorialPedidosSection'));
+const GridComanderaMesas = lazyWithRetry(() => import('./sections/pedidos/GridComanderaMesas'));
 
 // Lazy Imports: Marketing
-const ClientesSection = lazy(() => import('./sections/marketing/ClientesSection'));
-const MensajesSection = lazy(() => import('./sections/marketing/MensajesSection'));
-const PromocionesSection = lazy(() => import('./sections/marketing/PromocionesSection'));
-const CuponesSection = lazy(() => import('./sections/marketing/CuponesSection'));
-const FidelizacionSection = lazy(() => import('./sections/marketing/FidelizacionSection'));
-const SegmentacionSection = lazy(() => import('./sections/marketing/SegmentacionSection'));
-const AutomatizacionSection = lazy(() => import('./sections/marketing/AutomatizacionSection'));
-const AnalyticsPushSection = lazy(() => import('./sections/marketing/AnalyticsPushSection'));
+const ClientesSection = lazyWithRetry(() => import('./sections/marketing/ClientesSection'));
+const MensajesSection = lazyWithRetry(() => import('./sections/marketing/MensajesSection'));
+const PromocionesSection = lazyWithRetry(() => import('./sections/marketing/PromocionesSection'));
+const CuponesSection = lazyWithRetry(() => import('./sections/marketing/CuponesSection'));
+const FidelizacionSection = lazyWithRetry(() => import('./sections/marketing/FidelizacionSection'));
+const SegmentacionSection = lazyWithRetry(() => import('./sections/marketing/SegmentacionSection'));
+const AutomatizacionSection = lazyWithRetry(() => import('./sections/marketing/AutomatizacionSection'));
+const AnalyticsPushSection = lazyWithRetry(() => import('./sections/marketing/AnalyticsPushSection'));
 
 // Lazy Imports: Tienda
-const StoreGeneralSection = lazy(() => import('./sections/tienda/StoreGeneralSection'));
-const ProductosSection = lazy(() => import('./sections/tienda/ProductosSection'));
-const OfertasSection = lazy(() => import('./sections/tienda/OfertasSection'));
-const TiendaCombosSection = lazy(() => import('./sections/tienda/CombosSection'));
-const DeliverySection = lazy(() => import('./sections/tienda/DeliverySection'));
-const PaymentsSection = lazy(() => import('./sections/tienda/PaymentsSection'));
-const BannersSection = lazy(() => import('./sections/tienda/BannersSection'));
-const CategoriasSection = lazy(() => import('./sections/tienda/CategoriasSection'));
-const MesasSection = lazy(() => import('./sections/tienda/MesasSection'));
-const GestionMesasConfig = lazy(() => import('./sections/tienda/GestionMesasConfig'));
+const StoreGeneralSection = lazyWithRetry(() => import('./sections/tienda/StoreGeneralSection'));
+const ProductosSection = lazyWithRetry(() => import('./sections/tienda/ProductosSection'));
+const OfertasSection = lazyWithRetry(() => import('./sections/tienda/OfertasSection'));
+const TiendaCombosSection = lazyWithRetry(() => import('./sections/tienda/CombosSection'));
+const DeliverySection = lazyWithRetry(() => import('./sections/tienda/DeliverySection'));
+const PaymentsSection = lazyWithRetry(() => import('./sections/tienda/PaymentsSection'));
+const BannersSection = lazyWithRetry(() => import('./sections/tienda/BannersSection'));
+const CategoriasSection = lazyWithRetry(() => import('./sections/tienda/CategoriasSection'));
+const GestionMesasConfig = lazyWithRetry(() => import('./sections/tienda/GestionMesasConfig'));
 
 // Lazy Imports: Configuracion
-const PersonalizacionSection = lazy(() => import('./sections/config/PersonalizacionSection'));
-const PWASection = lazy(() => import('./sections/config/PWASection'));
-const SEOSection = lazy(() => import('./sections/config/SEOSection'));
-const SucursalesSection = lazy(() => import('./sections/config/SucursalesSection'));
-const RolesSection = lazy(() => import('./sections/config/RolesSection'));
-const SistemaSection = lazy(() => import('./sections/config/SistemaSection'));
-const ExtrasGlobalesSection = lazy(() => import('./sections/config/ExtrasGlobalesSection'));
-const FAQSection = lazy(() => import('./sections/config/FAQSection'));
+const PersonalizacionSection = lazyWithRetry(() => import('./sections/config/PersonalizacionSection'));
+const PWASection = lazyWithRetry(() => import('./sections/config/PWASection'));
+const SEOSection = lazyWithRetry(() => import('./sections/config/SEOSection'));
+const SucursalesSection = lazyWithRetry(() => import('./sections/config/SucursalesSection'));
+const RolesSection = lazyWithRetry(() => import('./sections/config/RolesSection'));
+const SistemaSection = lazyWithRetry(() => import('./sections/config/SistemaSection'));
+const ExtrasGlobalesSection = lazyWithRetry(() => import('./sections/config/ExtrasGlobalesSection'));
+const FAQSection = lazyWithRetry(() => import('./sections/config/FAQSection'));
 
 const SectionLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -71,6 +71,44 @@ const SectionLoader = () => (
     </div>
   </div>
 );
+
+class LazyBoundaryInner extends React.Component<
+  { children: React.ReactNode; onError: (error: Error) => void },
+  Record<string, never>
+> {
+  static getDerivedStateFromError() { return {}; }
+  componentDidCatch(error: Error) { this.props.onError(error); }
+  render() { return this.props.children; }
+}
+
+function LazyErrorBoundary({ children, sectionName }: { children: React.ReactNode; sectionName: string }) {
+  const [hasError, setHasError] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  if (hasError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[200px] p-6 rounded-xl border border-amber-200 bg-amber-50 text-center">
+        <span className="text-3xl mb-3">⚠️</span>
+        <h3 className="text-sm font-bold text-amber-800 mb-1">Error en {sectionName}</h3>
+        <p className="text-xs text-amber-600 mb-3 max-w-md">
+          {error?.message || 'Error al cargar la seccion'}
+        </p>
+        <button
+          onClick={() => { setHasError(false); setError(null); }}
+          className="px-4 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-lg cursor-pointer"
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <LazyBoundaryInner onError={(err) => { setHasError(true); setError(err); }}>
+      {children}
+    </LazyBoundaryInner>
+  );
+}
 
 interface AdminIndexProps {
   setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout') => void;
@@ -319,11 +357,13 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
           )}
         </header>
 
-        <main className="erp-content" style={{ padding: 16 }}>
+        <div className="erp-content" style={{ padding: 16 }}>
           <Suspense fallback={<SectionLoader />}>
-            {renderSection()}
+            <LazyErrorBoundary sectionName={sectionLabel}>
+              {renderSection()}
+            </LazyErrorBoundary>
           </Suspense>
-        </main>
+        </div>
       </div>
 
       {/* Mobile Bottom Nav - Native App Style - OUTSIDE flex container */}
