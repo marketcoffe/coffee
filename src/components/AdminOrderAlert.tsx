@@ -37,7 +37,6 @@ export default function AdminOrderAlert() {
       .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
         const order = payload.payload;
         if (order && !dismissedIdsRef.current.has(order.id)) {
-          if (order.tipo_pedido === 'mesa' || order.tipo_entrega === 'mesa') return;
           setPendingOrders(prev => {
             if (prev.some(o => o.id === order.id)) return prev;
             return [order, ...prev];
@@ -50,7 +49,6 @@ export default function AdminOrderAlert() {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload: Record<string, unknown>) => {
         const order = payload.new as Order;
         if (order && !dismissedIdsRef.current.has(order.id)) {
-          if (order.tipo_pedido === 'mesa' || order.tipo_entrega === 'mesa') return;
           setPendingOrders(prev => {
             if (prev.some(o => o.id === order.id)) return prev;
             return [order, ...prev];

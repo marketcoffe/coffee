@@ -600,12 +600,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     let mainChannel: ReturnType<typeof supabase.channel> | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let reconnectRetries = 0;
+    const MAX_DELAY = 30000;
+    const BASE_DELAY = 2000;
 
-    try {
-      // CANAL UNIFICADO PARA BROADCAST Y POSTGRES CHANGES
-      mainChannel = supabase.channel('marketo_realtime_system');
+    const connectRealtime = () => {
+      if (mainChannel) {
+        supabase.removeChannel(mainChannel);
+        mainChannel = null;
+      }
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
 
-      mainChannel
+      try {
+        mainChannel = supabase.channel('marketo_realtime_system');
+
+        mainChannel
         // Escuchar cambios en Configuración
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'store_config' }, (payload: Record<string, unknown>) => {
           const newRow = (payload as { new?: Record<string, unknown> })?.new;
@@ -672,7 +685,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                   renotify: true,
                   vibrate: [200, 100, 200],
                   requireInteraction: true,
-                  data: { url: '/' }
+                  data: { url: '/profile' }
                 } as NotificationOptions);
               });
             }
@@ -746,7 +759,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                   renotify: true,
                   vibrate: [200, 100, 200],
                   requireInteraction: true,
-                  data: { url: '/' }
+                  data: { url: '/profile' }
                 } as NotificationOptions);
               });
             }
@@ -825,16 +838,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         .subscribe((status: string) => {
           if (status === 'SUBSCRIBED') {
             console.warn('✅ Conectado al sistema Realtime de Marketo');
+            reconnectRetries = 0;
+          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            console.warn(`[Realtime] Canal desconectado (${status}), reconectando...`);
+            const delay = Math.min(BASE_DELAY * Math.pow(2, reconnectRetries), MAX_DELAY);
+            reconnectRetries += 1;
+            reconnectTimer = setTimeout(() => connectRealtime(), delay);
           }
         });
 
     } catch (e) {
       console.error('Realtime channels failed:', e);
     }
+    };
+
+    connectRealtime();
 
     setIsGlobalLoading(false);
     return () => {
       if (mainChannel) supabase.removeChannel(mainChannel);
+      if (reconnectTimer) clearTimeout(reconnectTimer);
     };
   }, [currentUser]);
   useEffect(() => {
@@ -1760,7 +1783,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         'Pedido Recibido con Exito 📦',
         `Hola ${newOrder.cliente_nombre}! Tu pedido con ID ${newOrder.id} por un monto de $${newOrder.total_usd.toFixed(2)} (${newOrder.total_bs.toFixed(2)} Bs) ha sido ingresado en estado: Pendiente. Estamos listos para atenderte.`,
         'personal',
-        newOrder.cliente_telefono
+        newOrder.cliente_telefono,
+        undefined,
+        '/profile'
       );
     }
 
@@ -1909,9 +1934,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } else {
       // Enviar notificación DESPUÉS del UPDATE exitoso (fire-and-forget, no bloquea)
       if (targetPhone) {
-        addNotification('Estado de Pedido Actualizado', statusMsg, 'personal', targetPhone);
+        addNotification('Estado de Pedido Actualizado', statusMsg, 'personal', targetPhone, undefined, '/profile');
       } else {
-        addNotification('Estado de Pedido Actualizado', statusMsg, 'todos');
+        addNotification('Estado de Pedido Actualizado', statusMsg, 'todos', undefined, undefined, '/admin');
       }
 
       // Broadcast instantáneo para que el cliente reciba el cambio en <100ms

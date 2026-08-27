@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { SEOHead } from '../../components/SEOHead';
 import AdminOrderAlert from '../../components/AdminOrderAlert';
+import EmergencyOrderModal from '../../components/EmergencyOrderModal';
 import ProductoFormSection from './sections/tienda/ProductoFormSection';
 import SidebarNav from './components/SidebarNav';
 import BottomSheet from './components/BottomSheet';
@@ -236,6 +237,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
     <div className="h-full overflow-hidden flex flex-col" style={{ background: 'var(--erp-content-bg)' }}>
       <SEOHead title={`Admin - ${config.site_nombre || 'Panel'}`} type="admin" />
       <AdminOrderAlert />
+      <EmergencyOrderModal />
 
       {/* Desktop sidebar - only visible lg+ */}
       <aside className={`erp-sidebar hidden lg:flex fixed inset-y-0 left-0 z-30 ${sidebarCollapsed ? 'collapsed' : ''}`} style={{ width: sidebarCollapsed ? 'var(--erp-sidebar-collapsed)' : 'var(--erp-sidebar-width)' }}>
