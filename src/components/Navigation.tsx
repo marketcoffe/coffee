@@ -1,27 +1,11 @@
 ﻿import React, { useState } from 'react';
 import {
   Home, ShoppingCart, Menu, X, MapPin, User, MessageCircle,
-  LogOut, ChevronRight, UtensilsCrossed, Pizza, Sandwich,
-  Coffee, IceCream, Beef, Salad, Beer, Cake, Sun, Moon,
+  LogOut, ChevronRight, UtensilsCrossed, Sun, Moon,
 } from 'lucide-react';
 import { useApp } from '../store/AppContext';
 import { getWhatsAppPhone, waLink } from '../utils/phone';
-
-const CATEGORY_ICON_MAP: Record<string, React.ElementType> = {
-  'mercado': Salad,
-  'panaderia': Cake,
-  'comida rapida': Sandwich,
-  'combos': UtensilsCrossed,
-  'hamburguesas': Sandwich,
-  'pizzas': Pizza,
-  'pollo': Beef,
-  'bebidas': Coffee,
-  'postres': Cake,
-  'papas & sides': Salad,
-  'entradas': Salad,
-  'cervezas': Beer,
-  'helados': IceCream,
-};
+import { CATEGORY_ICON_MAP, DEFAULT_CATEGORY_ICON } from '../utils/categoryIcons';
 
 interface NavigationProps {
   currentTab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout';
@@ -257,7 +241,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               <p className="text-[10px] font-bold uppercase tracking-widest px-2 mb-3" style={{ color: isDarkMode ? '#a0a0b8' : '#5b4137' }}>Categorías del Menú</p>
               <div className="flex flex-col gap-1">
                 {categories.map((cat) => {
-                  const IconComponent = CATEGORY_ICON_MAP[cat.toLowerCase()] || UtensilsCrossed;
+                  const IconComponent = CATEGORY_ICON_MAP[cat.toLowerCase()] || DEFAULT_CATEGORY_ICON;
                   return (
                     <div key={cat}>
                       <button
@@ -455,6 +439,34 @@ export const Navigation: React.FC<NavigationProps> = ({
                   <item.icon size={18} /> {item.label}
                 </button>
               ))}
+            </div>
+
+            {/* Categorías */}
+            <div className="mt-3 pt-3 border-t" style={{ borderColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(228,190,177,0.2)' }}>
+              <p className="text-[10px] font-bold uppercase tracking-widest px-3 mb-2" style={{ color: isDarkMode ? '#a0a0b8' : '#5b4137' }}>Categorías</p>
+              <div className="flex flex-col gap-0.5">
+                {categories.map((cat) => {
+                  const IconComponent = CATEGORY_ICON_MAP[cat.toLowerCase()] || DEFAULT_CATEGORY_ICON;
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => handleCategoryClick(cat)}
+                      className="flex items-center gap-3 w-full px-3 py-2.5 text-sm rounded-xl font-medium hover:opacity-80 transition-all cursor-pointer group"
+                      style={{ color: isDarkMode ? '#a0a0b8' : '#5b4137' }}
+                    >
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors group-hover:scale-105"
+                        style={{ backgroundColor: `${themeColor}12`, color: themeColor }}
+                      >
+                        <IconComponent size={16} strokeWidth={2} />
+                      </div>
+                      <span className="flex-1 text-left">{cat}</span>
+                      <ChevronRight size={14} className="text-[#e4beb1] group-hover:text-[#5b4137] transition-colors" />
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Quick actions */}

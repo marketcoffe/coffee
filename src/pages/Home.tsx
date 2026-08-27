@@ -6,6 +6,7 @@ import {
   Zap, Star, Plus, ShoppingCart, Clock, MapPin, X, LocateFixed, Check,
   Smartphone, Instagram, Twitter, Facebook,
   MessageCircle, Download, Award, Sparkles, TrendingUp, BadgeCheck, Flame,
+  UtensilsCrossed,
 } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
 import { useToast } from '../components/Toast';
@@ -15,6 +16,7 @@ import { findNearestSede } from '../utils/geo';
 import { getWhatsAppPhone } from '../utils/phone';
 import { hasCategory, hasAnyCategory, categoryIncludes, formatCategories } from '../utils/categoryUtils';
 import { formatVes } from '../utils/bcvRate';
+import { CATEGORY_ICON_MAP, DEFAULT_CATEGORY_ICON } from '../utils/categoryIcons';
 
 interface BeforeInstallPromptEvent {
   prompt: () => void;
@@ -70,6 +72,7 @@ export const Home: React.FC<HomeProps> = ({
   const { foodItems, config, cart, addToCart, getProductAverageRating, isDarkMode, promotions } = useApp();
   const { showToast } = useToast();
   const tc = config.theme_color || '#A4D045';
+  const categories = config.categories || [];
   const vesRate = config.tasa_cambio && config.tasa_cambio > 10 ? config.tasa_cambio : null;
   const safeImg = (urls?: string[]) => urls?.[0] || '';
 
@@ -299,8 +302,62 @@ export const Home: React.FC<HomeProps> = ({
   };
 
   return (
-    <div className="flex flex-col min-h-screen" style={{ backgroundColor: bg }}>
+    <div className="flex min-h-screen" style={{ backgroundColor: bg }}>
       <SEOHead title={`${config.site_nombre || 'Market Coffee Sweet'} - Mercado, Panaderia & Comida Rapida`} type="home" />
+
+      {/* ═══ SIDEBAR FIJO — Desktop ═══ */}
+      <aside
+        className="hidden lg:flex flex-col fixed top-16 left-0 w-[260px] h-[calc(100vh-4rem)] z-40 overflow-y-auto no-scrollbar border-r"
+        style={{
+          backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff',
+          borderColor: isDarkMode ? 'rgba(42,42,42,0.6)' : 'rgba(228,190,177,0.15)',
+        }}
+      >
+        <div className="p-4 pb-6">
+          <p
+            className="text-[10px] font-bold uppercase tracking-widest px-3 mb-3"
+            style={{ color: isDarkMode ? '#a0a0b8' : '#5b4137' }}
+          >
+            Categorias
+          </p>
+          <div className="flex flex-col gap-0.5">
+            {categories.map((cat) => {
+              const IconComponent = CATEGORY_ICON_MAP[cat.toLowerCase()] || DEFAULT_CATEGORY_ICON;
+              const isActive = activeCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => {
+                    setActiveCategory(cat);
+                    setSelectedCategory(cat);
+                    setTab('catalog');
+                  }}
+                  className="flex items-center gap-3 w-full px-3 py-2.5 text-sm rounded-xl font-medium transition-all cursor-pointer group"
+                  style={{
+                    backgroundColor: isActive ? `${tc}12` : 'transparent',
+                    color: isActive ? tc : isDarkMode ? '#a0a0b8' : '#5b4137',
+                  }}
+                >
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all group-hover:scale-105"
+                    style={{
+                      backgroundColor: isActive ? `${tc}20` : `${tc}08`,
+                      color: tc,
+                    }}
+                  >
+                    <IconComponent size={18} strokeWidth={2} />
+                  </div>
+                  <span className="flex-1 text-left">{cat}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </aside>
+
+      {/* ═══ CONTENIDO PRINCIPAL ═══ */}
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-[260px]">
 
       {/* ═══ 1. HERO — Horizontal Swipe Carousel ═══ */}
       <section className="relative w-full overflow-hidden aspect-[3/4] md:aspect-[2/1]">
@@ -489,7 +546,7 @@ export const Home: React.FC<HomeProps> = ({
       )}
 
       {/* ═══ 2. CATEGORY PILLS ═══ */}
-      <section className="py-3 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
+      <section className="lg:hidden py-3 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-lg font-bold" style={{ color: text1 }}>Explorar por categorías</h3>
           <div className="hidden md:flex gap-1.5">
@@ -2300,6 +2357,7 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* ═══ 15. FLOATING CART ═══ */}
       <FloatingCartButton itemCount={cartCount} total={cartTotal} onClick={() => setTab('checkout')} themeColor={tc} />
+      </div>
     </div>
   );
 };
