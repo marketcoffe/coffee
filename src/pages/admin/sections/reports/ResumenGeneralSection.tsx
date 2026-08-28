@@ -2,8 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts';
 import {
-  Calendar, BarChart3, ShoppingBag, ShoppingCart, DollarSign, Landmark, Package, Ticket, RefreshCw
+  Calendar, BarChart3, ShoppingBag, ShoppingCart, DollarSign, Landmark, Package, Ticket, RefreshCw, Printer
 } from 'lucide-react';
+import { printReporte, ReporteData } from '../../utils/printReporte';
 
 const ResumenGeneralSection: React.FC = () => {
   const { orders, config, foodItems, fetchExchangeRate, rateDate } = useApp();
@@ -139,6 +140,25 @@ const ResumenGeneralSection: React.FC = () => {
     ? ((reportTotals.monthTotal - reportTotals.prevMonthTotal) / reportTotals.prevMonthTotal * 100).toFixed(1)
     : '+100';
 
+  const handlePrintReporte = () => {
+    const reportData: ReporteData = {
+      titulo: 'RESUMEN GENERAL',
+      totalPedidos: reportTotals.ordersCount,
+      totalIngresos: reportTotals.salesUSD,
+      totalEnvios: filteredOrders.reduce((acc, o) => acc + (Number(o.costo_envio_usd) || 0), 0),
+      totalDescuentos: reportTotals.couponSavingsUSD,
+      totalIVA: reportTotals.salesUSD * 0.16,
+      porDelivery: filteredOrders.filter(o => o.tipo_entrega === 'delivery').length,
+      porPickup: filteredOrders.filter(o => o.tipo_entrega === 'pickup').length,
+      porMesa: filteredOrders.filter(o => o.tipo_entrega === 'mesa').length,
+      efectivo: filteredOrders.filter(o => o.metodo_pago?.toLowerCase().includes('efectivo')).reduce((a, o) => a + (Number(o.total_usd) || 0), 0),
+      tdc: filteredOrders.filter(o => o.metodo_pago?.toLowerCase().includes('tarjeta') || o.metodo_pago?.toLowerCase().includes('tdc')).reduce((a, o) => a + (Number(o.total_usd) || 0), 0),
+      pagoMovil: filteredOrders.filter(o => o.metodo_pago?.toLowerCase().includes('pago movil')).reduce((a, o) => a + (Number(o.total_usd) || 0), 0),
+      otroPago: filteredOrders.filter(o => !o.metodo_pago?.toLowerCase().includes('efectivo') && !o.metodo_pago?.toLowerCase().includes('tarjeta') && !o.metodo_pago?.toLowerCase().includes('tdc') && !o.metodo_pago?.toLowerCase().includes('pago movil')).reduce((a, o) => a + (Number(o.total_usd) || 0), 0),
+    };
+    printReporte(reportData, config);
+  };
+
   return (
     <div className="flex flex-col gap-5">
       {activeSedes.length > 1 && (
@@ -173,18 +193,27 @@ const ResumenGeneralSection: React.FC = () => {
             )}
           </div>
         </div>
-        <button
-          onClick={handleRefreshRate}
-          disabled={isRefreshingRate}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold transition-all disabled:opacity-50"
-          style={{
-            backgroundColor: rateRefreshStatus === 'success' ? '#10b981' : rateRefreshStatus === 'error' ? '#ef4444' : '#3b82f6',
-            color: '#ffffff',
-          }}
-        >
-          <RefreshCw size={14} className={isRefreshingRate ? 'animate-spin' : ''} />
-          {isRefreshingRate ? 'Actualizando...' : rateRefreshStatus === 'success' ? '¡Actualizado!' : rateRefreshStatus === 'error' ? 'Error - Reintentar' : 'Actualizar ahora'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handlePrintReporte}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+          >
+            <Printer size={14} />
+            Imprimir
+          </button>
+          <button
+            onClick={handleRefreshRate}
+            disabled={isRefreshingRate}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold transition-all disabled:opacity-50"
+            style={{
+              backgroundColor: rateRefreshStatus === 'success' ? '#10b981' : rateRefreshStatus === 'error' ? '#ef4444' : '#3b82f6',
+              color: '#ffffff',
+            }}
+          >
+            <RefreshCw size={14} className={isRefreshingRate ? 'animate-spin' : ''} />
+            {isRefreshingRate ? 'Actualizando...' : rateRefreshStatus === 'success' ? '¡Actualizado!' : rateRefreshStatus === 'error' ? 'Error - Reintentar' : 'Actualizar ahora'}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

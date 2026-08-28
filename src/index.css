@@ -1098,10 +1098,10 @@ svg {
     position: absolute;
     left: 0;
     top: 0;
-    width: 80mm;
+    width: 48mm;
     font-family: 'Courier New', monospace;
-    font-size: 12px;
-    padding: 5mm;
+    font-size: 9px;
+    padding: 2mm;
     background: #fff;
     color: #000;
   }
@@ -1195,10 +1195,10 @@ svg {
     position: absolute;
     left: 0;
     top: 0;
-    width: 80mm;
+    width: 48mm;
     font-family: 'Courier New', monospace;
-    font-size: 12px;
-    padding: 5mm;
+    font-size: 9px;
+    padding: 2mm;
     background: #fff;
     color: #000;
   }

@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts';
-import { Download } from 'lucide-react';
+import { Download, Printer } from 'lucide-react';
+import { printReporte, ReporteData } from '../../utils/printReporte';
 
 type DateRange = 'today' | '7days' | '30days' | 'custom';
 type OrderType = 'all' | 'delivery' | 'pickup' | 'mesa';
@@ -155,6 +156,36 @@ const VentasReportSection: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handlePrintReporte = () => {
+    const now = new Date();
+    const rangeLabel = dateRange === 'today' ? 'Hoy' : dateRange === '7days' ? 'Ultimos 7 dias' : dateRange === '30days' ? 'Ultimos 30 dias' : 'Periodo personalizado';
+    const reportData: ReporteData = {
+      titulo: `REPORTE DE VENTAS - ${rangeLabel}`,
+      totalPedidos: filteredOrders.length,
+      totalIngresos: totalRevenue,
+      totalEnvios: filteredOrders.reduce((acc, o) => acc + (Number(o.costo_envio_usd) || 0), 0),
+      totalDescuentos: filteredOrders.reduce((acc, o) => acc + (Number(o.descuento_cupon_usd) || 0), 0),
+      totalIVA: totalRevenue * 0.16,
+      porDelivery: salesByType.delivery.count,
+      porPickup: salesByType.pickup.count,
+      porMesa: salesByType.mesa.count,
+      efectivo: filteredOrders.filter(o => o.metodo_pago?.toLowerCase().includes('efectivo')).reduce((a, o) => a + (Number(o.total_usd) || 0), 0),
+      tdc: filteredOrders.filter(o => o.metodo_pago?.toLowerCase().includes('tarjeta') || o.metodo_pago?.toLowerCase().includes('tdc')).reduce((a, o) => a + (Number(o.total_usd) || 0), 0),
+      pagoMovil: filteredOrders.filter(o => o.metodo_pago?.toLowerCase().includes('pago movil')).reduce((a, o) => a + (Number(o.total_usd) || 0), 0),
+      otroPago: filteredOrders.filter(o => !o.metodo_pago?.toLowerCase().includes('efectivo') && !o.metodo_pago?.toLowerCase().includes('tarjeta') && !o.metodo_pago?.toLowerCase().includes('tdc') && !o.metodo_pago?.toLowerCase().includes('pago movil')).reduce((a, o) => a + (Number(o.total_usd) || 0), 0),
+      pedidos: ordersByDay.slice(0, 20).map(r => ({
+        id: r.dia,
+        fecha: r.dia,
+        cliente: `${r.count} pedidos`,
+        tipo: '',
+        items: 0,
+        total: r.total,
+        metodoPago: '',
+      })),
+    };
+    printReporte(reportData, config);
+  };
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center gap-3">
@@ -187,6 +218,9 @@ const VentasReportSection: React.FC = () => {
         )}
         <button onClick={exportCSV} className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors">
           <Download size={13} /> Exportar CSV
+        </button>
+        <button onClick={handlePrintReporte} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-slate-600 text-white hover:bg-slate-700 transition-colors">
+          <Printer size={13} /> Imprimir
         </button>
       </div>
 

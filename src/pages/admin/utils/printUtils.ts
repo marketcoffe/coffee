@@ -25,21 +25,21 @@ export function printOrderTicket(order: Order, config: any) {
   let itemsHtml = '';
   order.items?.forEach(item => {
     const optStr = item.selected_options?.length
-      ? `<div style="font-size:9px;color:#666;margin-left:8px">${item.selected_options.map(o => o.option_name).join(', ')}</div>`
+      ? `<div style="font-size:8px;color:#666;margin-left:6px">${item.selected_options.map(o => o.option_name).join(', ')}</div>`
       : '';
     const removedStr = item.ingredientes_removidos?.length
-      ? `<div style="font-size:9px;color:#c00;margin-left:8px;text-decoration:line-through">Sin: ${item.ingredientes_removidos.join(', ')}</div>`
+      ? `<div style="font-size:8px;color:#c00;margin-left:6px;text-decoration:line-through">Sin: ${item.ingredientes_removidos.join(', ')}</div>`
       : '';
     const itemTotal = (item.precio_usd * item.cantidad).toFixed(2);
     itemsHtml += `
       <tr>
-        <td style="width:30px;text-align:center;font-weight:bold">${item.cantidad}x</td>
-        <td>
+        <td style="width:24px;text-align:center;font-weight:bold;font-size:9px">${item.cantidad}x</td>
+        <td style="font-size:9px">
           ${item.nombre}
           ${optStr}
           ${removedStr}
         </td>
-        <td style="text-align:right;width:60px;font-weight:bold">$${itemTotal}</td>
+        <td style="text-align:right;width:50px;font-weight:bold;font-size:9px">$${itemTotal}</td>
       </tr>`;
   });
 
@@ -48,37 +48,34 @@ export function printOrderTicket(order: Order, config: any) {
 <head>
   <title>Pedido #${orderId}</title>
   <style>
-    @page { margin: 0; size: 80mm auto; }
+    @page { margin: 0; size: 58mm auto; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Courier New', Courier, monospace;
-      font-size: 11px;
-      width: 72mm;
+      font-size: 10px;
+      width: 48mm;
       padding: 2mm;
       color: #000;
-      line-height: 1.4;
+      line-height: 1.3;
     }
     .center { text-align: center; }
-    .right { text-align: right; }
     .bold { font-weight: bold; }
-    .large { font-size: 16px; letter-spacing: 1px; }
-    .medium { font-size: 12px; }
+    .large { font-size: 13px; letter-spacing: 1px; }
+    .medium { font-size: 10px; }
     .small { font-size: 9px; }
-    .xsmall { font-size: 8px; }
-    .line { border-top: 1px dashed #000; margin: 4px 0; }
-    .double-line { border-top: 2px solid #000; margin: 6px 0; }
+    .xsmall { font-size: 7px; }
+    .line { border-top: 1px dashed #000; margin: 3px 0; }
+    .double-line { border-top: 2px solid #000; margin: 4px 0; }
     table { width: 100%; border-collapse: collapse; }
-    td { padding: 1px 0; vertical-align: top; font-size: 10px; }
-    .items-table td:first-child { width: 30px; text-align: center; }
-    .items-table td:last-child { text-align: right; width: 60px; }
-    .totals td { padding: 1px 0; font-size: 10px; }
+    td { padding: 1px 0; vertical-align: top; }
+    .totals td { padding: 1px 0; font-size: 9px; }
     .totals td:last-child { text-align: right; }
-    .totals .total-row td { font-size: 13px; font-weight: bold; border-top: 1px solid #000; padding-top: 3px; }
+    .totals .total-row td { font-size: 11px; font-weight: bold; border-top: 1px solid #000; padding-top: 2px; }
     .badge {
       display: inline-block;
       border: 1px solid #000;
-      padding: 2px 8px;
-      font-size: 10px;
+      padding: 2px 6px;
+      font-size: 8px;
       font-weight: bold;
       letter-spacing: 1px;
     }
@@ -87,8 +84,8 @@ export function printOrderTicket(order: Order, config: any) {
 <body>
   <!-- Business Header -->
   <div class="center bold large">${businessName}</div>
-  ${address ? `<div class="center small">${address}</div>` : ''}
-  ${phone ? `<div class="center small">Tel: ${phone}</div>` : ''}
+  ${address ? `<div class="center xsmall">${address}</div>` : ''}
+  ${phone ? `<div class="center xsmall">Tel: ${phone}</div>` : ''}
   <div class="double-line"></div>
 
   <!-- Order Info -->
@@ -96,14 +93,14 @@ export function printOrderTicket(order: Order, config: any) {
     <div class="medium bold">PEDIDO #${orderId}</div>
     <div class="badge">${deliveryLabel}</div>
   </div>
-  <div class="small" style="margin-top:2px">${date}</div>
+  <div class="xsmall" style="margin-top:2px">${date}</div>
   <div class="small bold">${order.cliente_nombre}</div>
-  <div class="small">${order.cliente_telefono}</div>
+  <div class="xsmall">${order.cliente_telefono}</div>
   <div class="line"></div>
 
   <!-- Items -->
-  <div class="small bold" style="margin-bottom:3px">ITEMS:</div>
-  <table class="items-table">
+  <div class="xsmall bold" style="margin-bottom:2px">ITEMS:</div>
+  <table>
     ${itemsHtml}
   </table>
   <div class="line"></div>
@@ -130,19 +127,16 @@ export function printOrderTicket(order: Order, config: any) {
     </div>
   </div>
   ${order.tipo_entrega === 'delivery' && order.direccion_envio ? `
-  <div style="margin-top:3px">
+  <div style="margin-top:2px">
     <div class="xsmall">DIRECCION:</div>
-    <div class="small">${order.direccion_envio}</div>
+    <div class="xsmall">${order.direccion_envio}</div>
     ${order.distancia_km ? `<div class="xsmall">Distancia: ${order.distancia_km.toFixed(1)} km</div>` : ''}
   </div>` : ''}
   <div class="double-line"></div>
 
   <!-- Footer -->
   <div class="center small bold">Gracias por su compra!</div>
-  <div class="center xsmall" style="margin-top:2px">Market Coffee Sweet</div>
-
-  <!-- QR Code Area -->
-  <!-- QR code would be generated here -->
+  <div class="center xsmall" style="margin-top:1px">Market Coffee Sweet</div>
 </body>
 </html>`;
 

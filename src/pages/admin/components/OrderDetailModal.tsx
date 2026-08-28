@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { useApp } from '../../../store/AppContext';
 import { Order } from '../../../types/store';
-import { X, MapPin, Clock, Truck, Store, CreditCard, Phone, MessageSquare, Printer, ArrowRight, Navigation } from 'lucide-react';
+import { X, MapPin, Clock, Truck, Store, CreditCard, Phone, MessageSquare, Printer, ArrowRight, Navigation, FileText } from 'lucide-react';
+import { printFactura } from '../../../utils/printFactura';
 
 interface OrderDetailModalProps {
   order: Order;
@@ -327,13 +328,23 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               </button>
             )}
             {onPrint && (
-              <button
-                onClick={() => onPrint(order)}
-                className="flex items-center justify-center py-3 px-4 rounded-xl font-bold text-sm border-2 transition-all cursor-pointer active:scale-[0.98]"
-                style={{ borderColor: statusCfg.color, color: statusCfg.color }}
-              >
-                <Printer size={16} />
-              </button>
+              <>
+                <button
+                  onClick={() => onPrint(order)}
+                  className="flex items-center justify-center py-3 px-4 rounded-xl font-bold text-sm border-2 transition-all cursor-pointer active:scale-[0.98]"
+                  style={{ borderColor: statusCfg.color, color: statusCfg.color }}
+                >
+                  <Printer size={16} />
+                </button>
+                <button
+                  onClick={() => printFactura(order, config)}
+                  className="flex items-center justify-center py-3 px-4 rounded-xl font-bold text-sm border-2 transition-all cursor-pointer active:scale-[0.98]"
+                  style={{ borderColor: '#059669', color: '#059669' }}
+                  title="Imprimir Factura"
+                >
+                  <FileText size={16} />
+                </button>
+              </>
             )}
             {!isFinal && onCancel && (
               <button
