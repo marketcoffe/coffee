@@ -78,10 +78,17 @@ async function createVapidJwt(
   const payloadB64 = base64UrlEncode(enc.encode(JSON.stringify(payload)));
   const signingInput = `${headerB64}.${payloadB64}`;
 
-  // Import ECDSA private key (P-256)
+  // Import ECDSA private key (P-256) via JWK (raw format not supported for private keys)
+  const privateKeyJwk = {
+    kty: 'EC' as const,
+    crv: 'P-256' as const,
+    d: base64UrlEncode(privateKeyRaw),
+    x: base64UrlEncode(publicKeyRaw.slice(1, 33)),
+    y: base64UrlEncode(publicKeyRaw.slice(33, 65)),
+  };
   const privateKey = await crypto.subtle.importKey(
-    'raw',
-    privateKeyRaw,
+    'jwk',
+    privateKeyJwk,
     { name: 'ECDSA', namedCurve: 'P-256' },
     false,
     ['sign']
