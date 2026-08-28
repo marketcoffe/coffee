@@ -61,14 +61,24 @@ function base64UrlDecode(str: string): Uint8Array {
 }
 
 // ─── VAPID JWT using Web Crypto ECDSA ────────────────────────────────
+function getVapidAudience(endpoint: string): string {
+  if (endpoint.includes('fcm.googleapis.com')) return 'https://fcm.googleapis.com';
+  if (endpoint.includes('push.services.mozilla.com')) return 'https://updates.push.services.mozilla.com';
+  if (endpoint.push) {
+    try { return new URL(endpoint).origin; } catch {}
+  }
+  return new URL(endpoint).origin;
+}
+
 async function createVapidJwt(
   privateKeyRaw: Uint8Array,
-  publicKeyRaw: Uint8Array
+  publicKeyRaw: Uint8Array,
+  audience: string
 ): Promise<string> {
   const header = { typ: 'JWT', alg: 'ES256' };
   const now = Math.floor(Date.now() / 1000);
   const payload = {
-    aud: 'https://fcm.googleapis.com',
+    aud: audience,
     exp: now + 43200, // 12 hours (safe for push)
     sub: 'mailto:admin@marketcoffesweet.com',
   };
@@ -274,8 +284,9 @@ async function sendPush(
       return { ok: false, endpoint: sub.endpoint, statusCode: 0, error: `encryptPayload: ${encErr?.message}` };
     }
 
-    // Create VAPID JWT
-    const jwt = await createVapidJwt(vapidPrivateRaw, vapidPublicRaw);
+    // Create VAPID JWT with correct audience for this push service
+    const audience = getVapidAudience(sub.endpoint);
+    const jwt = await createVapidJwt(vapidPrivateRaw, vapidPublicRaw, audience);
     const vapidPubB64 = base64UrlEncode(vapidPublicRaw);
 
     // Send request
