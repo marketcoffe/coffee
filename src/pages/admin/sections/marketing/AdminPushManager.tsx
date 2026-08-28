@@ -68,22 +68,29 @@ const AdminPushManager: React.FC = () => {
 
   const loadMetrics = async () => {
     setLoadingMetrics(true);
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    try {
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-    const [subsRes, sentRes, clickedRes] = await Promise.all([
-      supabase.from('push_subscriptions').select('id', { count: 'exact', head: true }),
-      supabase.from('push_events').select('id', { count: 'exact', head: true })
-        .eq('event_type', 'sent')
-        .gte('created_at', sevenDaysAgo),
-      supabase.from('push_events').select('id', { count: 'exact', head: true })
-        .eq('event_type', 'clicked')
-        .gte('created_at', sevenDaysAgo),
-    ]);
+      const [subsRes, sentRes, clickedRes] = await Promise.all([
+        supabase.from('push_subscriptions').select('id', { count: 'exact', head: true }),
+        supabase.from('push_events').select('id', { count: 'exact', head: true })
+          .eq('event_type', 'sent')
+          .gte('created_at', sevenDaysAgo),
+        supabase.from('push_events').select('id', { count: 'exact', head: true })
+          .eq('event_type', 'clicked')
+          .gte('created_at', sevenDaysAgo),
+      ]);
 
-    setActiveSubscriptions(subsRes.count || 0);
-    setSentCount(sentRes.count || 0);
-    setClickedCount(clickedRes.count || 0);
-    setLoadingMetrics(false);
+      setActiveSubscriptions(subsRes.count || 0);
+      setSentCount(sentRes.count || 0);
+      setClickedCount(clickedRes.count || 0);
+    } catch {
+      setActiveSubscriptions(0);
+      setSentCount(0);
+      setClickedCount(0);
+    } finally {
+      setLoadingMetrics(false);
+    }
   };
 
   const loadSegments = async () => {
@@ -101,12 +108,16 @@ const AdminPushManager: React.FC = () => {
   };
 
   const loadCampaigns = async () => {
-    const { data } = await supabase.from('notifications')
-      .select('id, titulo, mensaje, fecha, tipo, imagen_url, link_url')
-      .in('tipo', ['todos', 'personal'])
-      .order('fecha', { ascending: false })
-      .limit(10);
-    setCampaigns((data || []) as CampaignRecord[]);
+    try {
+      const { data } = await supabase.from('notifications')
+        .select('id, titulo, mensaje, fecha, tipo, imagen_url, link_url')
+        .in('tipo', ['todos', 'personal'])
+        .order('fecha', { ascending: false })
+        .limit(10);
+      setCampaigns((data || []) as CampaignRecord[]);
+    } catch {
+      setCampaigns([]);
+    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
