@@ -795,9 +795,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (payload: Record<string, unknown>) => {
           const newNotif = payload.new as InAppNotification;
           
-          // Validar si es específicamente para el usuario actual (broadcasts ocultos)
+          // Validar si es para el usuario actual (broadcasts visibles para todos)
           const cu = currentUserRef.current;
-          const isForMe = (cu && newNotif.tipo === 'personal' && newNotif.destinatario_telefono === cu.telefono) ||
+          const isForMe = newNotif.tipo === 'todos' ||
+                         (cu && newNotif.tipo === 'personal' && newNotif.destinatario_telefono === cu.telefono) ||
                          (isAdminAuthenticatedRef.current && (newNotif.tipo === 'request' || newNotif.tipo === 'admin'));
 
           if (isForMe) {
@@ -1257,10 +1258,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           .order('fecha', { ascending: false });
         if (dbOrders) setOrders(dbOrders as Order[]);
 
-        // Cargar Notificaciones (Solo personales y requests del usuario — broadcasts ocultos)
+        // Cargar Notificaciones (broadcasts + personales + requests del usuario)
         const { data: dbNotifs } = await supabase.from('notifications')
           .select('*')
-          .or(`and(tipo.eq.personal,destinatario_telefono.eq.${currentUser.telefono}),and(tipo.eq.request,destinatario_telefono.eq.${currentUser.telefono})`)
+          .or(`tipo.eq.todos,and(tipo.eq.personal,destinatario_telefono.eq.${currentUser.telefono}),and(tipo.eq.request,destinatario_telefono.eq.${currentUser.telefono})`)
           .order('id', { ascending: false });
         if (dbNotifs) setNotifications(dbNotifs as InAppNotification[]);
 

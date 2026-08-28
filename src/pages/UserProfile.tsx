@@ -399,9 +399,10 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
     ? userOrders.find(o => o.id === activeOrderModalId) || null
     : null;
 
-  // Filter notifications (Solo personales y requests dirigidos al usuario — broadcasts ocultos)
+  // Filter notifications (broadcasts + personales + requests del usuario)
   const userNotifications = currentUser
     ? notifications.filter(n =>
+        n.tipo === 'todos' ||
         (n.tipo === 'personal' && n.destinatario_telefono?.trim() === currentUser.telefono.trim()) ||
         (n.tipo === 'request' && n.destinatario_telefono?.trim() === currentUser.telefono.trim())
       )
