@@ -78,11 +78,47 @@ async function createVapidJwt(
   const payloadB64 = base64UrlEncode(enc.encode(JSON.stringify(payload)));
   const signingInput = `${headerB64}.${payloadB64}`;
 
-  // Import ECDSA private key (P-256) via JWK (raw format not supported for private keys)
+  // Import ECDSA private key (P-256) via JWK
+  // VAPID_PRIVATE_KEY may be raw (32 bytes) or PKCS8 DER (longer)
+  let dBytes: Uint8Array;
+  if (privateKeyRaw.length === 32) {
+    // Raw scalar — use directly
+    dBytes = privateKeyRaw;
+  } else if (privateKeyRaw[0] === 0x30) {
+    // PKCS8 DER — extract the private key scalar
+    // DER: 30 82 xx xx 30 13 ... 04 20 <32 bytes of private key>
+    let pos = 0;
+    if (privateKeyRaw[pos++] !== 0x30) throw new Error('Invalid PKCS8');
+    const totalLen = privateKeyRaw[pos++];
+    // Skip outer SEQUENCE
+    // Skip inner SEQUENCE (algorithm)
+    pos += 2; // inner SEQUENCE tag + len
+    const algLen = privateKeyRaw[pos++];
+    pos += algLen;
+    // OCTET STRING wrapper for private key
+    if (privateKeyRaw[pos++] !== 0x04) throw new Error('Invalid PKCS8: not OCTET STRING');
+    const pkOctLen = privateKeyRaw[pos++];
+    // Inner SEQUENCE
+    if (privateKeyRaw[pos++] !== 0x30) throw new Error('Invalid PKCS8: not inner SEQUENCE');
+    const innerLen = privateKeyRaw[pos++];
+    // INTEGER (version)
+    if (privateKeyRaw[pos++] !== 0x02) throw new Error('Invalid PKCS8: not INTEGER');
+    const verLen = privateKeyRaw[pos++];
+    pos += verLen;
+    // OCTET STRING (private key scalar, 32 bytes)
+    if (privateKeyRaw[pos++] !== 0x04) throw new Error('Invalid PKCS8: not OCTET STRING for key');
+    const scalarLen = privateKeyRaw[pos++];
+    dBytes = privateKeyRaw.slice(pos, pos + scalarLen);
+  } else {
+    const info = `Unknown VAPID_PRIVATE_KEY format: len=${privateKeyRaw.length} first=0x${privateKeyRaw[0].toString(16)} second=0x${privateKeyRaw[1]?.toString(16)}`;
+    console.error('[push-notify]', info);
+    throw new Error(info);
+  }
+
   const privateKeyJwk = {
     kty: 'EC' as const,
     crv: 'P-256' as const,
-    d: base64UrlEncode(privateKeyRaw),
+    d: base64UrlEncode(dBytes),
     x: base64UrlEncode(publicKeyRaw.slice(1, 33)),
     y: base64UrlEncode(publicKeyRaw.slice(33, 65)),
   };
