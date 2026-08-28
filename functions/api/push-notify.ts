@@ -562,6 +562,7 @@ export const onRequestPost: any = async (context: any) => {
       total: validSubscriptions.length,
       invalidSubscriptions: invalidCount,
       notif_id: notifId,
+      _version: 'v3-ieee-p1363',
       failedDetails: failed.map(f => ({ endpoint: f.endpoint?.substring(0, 80), statusCode: f.statusCode, error: f.error }))
     }), {
       headers: { 'Content-Type': 'application/json', ...buildCorsHeaders(request, env) }
