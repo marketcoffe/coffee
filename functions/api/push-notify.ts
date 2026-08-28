@@ -95,17 +95,22 @@ async function createVapidJwt(
 
   // Convert DER signature to raw r||s (64 bytes)
   const sigDer = new Uint8Array(signature);
-  // DER: 30 || len || 02 || len(r) || r || 02 || len(s) || s
-  let offset = 2; // skip SEQUENCE tag + length
-  const rLen = sigDer[offset + 1];
-  const r = sigDer.slice(offset + 2, offset + 2 + rLen);
-  offset += 2 + rLen + 2; // skip 02 + rLen + r + 02
-  const sLen = sigDer[offset + 1];
-  const s = sigDer.slice(offset + 2, offset + 2 + sLen);
+  // Parse DER: 30 || len || 02 || len(r) || r || 02 || len(s) || s
+  let pos = 0;
+  if (sigDer[pos++] !== 0x30) throw new Error('Invalid DER signature: not SEQUENCE');
+  const seqLen = sigDer[pos++];
+  if (sigDer[pos++] !== 0x02) throw new Error('Invalid DER signature: not INTEGER (r)');
+  const rLen = sigDer[pos++];
+  const r = sigDer.slice(pos, pos + rLen);
+  pos += rLen;
+  if (sigDer[pos++] !== 0x02) throw new Error('Invalid DER signature: not INTEGER (s)');
+  const sLen = sigDer[pos++];
+  const s = sigDer.slice(pos, pos + sLen);
 
+  // r and s are big-endian, pad/truncate to 32 bytes each
   const rawSig = new Uint8Array(64);
-  rawSig.set(r, 32 - Math.min(rLen, 32));
-  rawSig.set(s, 64 - Math.min(sLen, 32));
+  rawSig.set(r.subarray(rLen > 32 ? rLen - 32 : 0, rLen), 32 - Math.min(rLen, 32));
+  rawSig.set(s.subarray(sLen > 32 ? sLen - 32 : 0, sLen), 64 - Math.min(sLen, 32));
 
   return `${signingInput}.${base64UrlEncode(rawSig)}`;
 }
@@ -197,15 +202,14 @@ async function encryptPayload(
     new TextEncoder().encode(plaintext)
   );
 
-  // Construct aes128gcm header: version(1) || rs(4, big-endian=0x1000=4096) || idlen(1, 0x41=65) || keyid(65)
-  const rs = new Uint8Array([0x00, 0x00, 0x10, 0x00]); // 4096
-  const header = new Uint8Array(1 + 1 + 1 + 65);
+  // Construct aes128gcm header (RFC 8291):
+  // version(1) || rs(2, big-endian) || idlen(1) || keyid(65)
+  const header = new Uint8Array(1 + 2 + 1 + 65); // 69 bytes total
   header[0] = 0x01; // version
-  header[1] = 0x00; // reserved
-  header[2] = 0x10; // rs high byte
-  header[3] = 0x00; // rs low byte (rs = 4096)
-  header[4] = 0x41; // keyid length = 65
-  header.set(ephemeralPubRaw, 5);
+  header[1] = 0x10; // rs high byte (rs = 4096 = 0x1000)
+  header[2] = 0x00; // rs low byte
+  header[3] = 0x41; // keyid length = 65
+  header.set(ephemeralPubRaw, 4);
 
   // Full body: header || ciphertext
   const body = new Uint8Array(header.length + ciphertext.byteLength);
