@@ -137,14 +137,15 @@ async function encryptPayload(
   subscriptionP256dh: Uint8Array,
   subscriptionAuth: Uint8Array
 ): Promise<{ body: Uint8Array; ephemeralPublicKey: Uint8Array; salt: Uint8Array }> {
-  // Generate ephemeral ECDH key pair
-  const ephemeralKeyPair = await crypto.subtle.generateKey(
-    { name: 'ECDH', namedCurve: 'P-256' },
-    false,
-    ['deriveBits']
-  );
+  try {
+    // Generate ephemeral ECDH key pair
+    const ephemeralKeyPair = await crypto.subtle.generateKey(
+      { name: 'ECDH', namedCurve: 'P-256' },
+      false,
+      ['deriveBits']
+    );
 
-  const ephemeralPubRaw = new Uint8Array(await crypto.subtle.exportKey('raw', ephemeralKeyPair.publicKey));
+    const ephemeralPubRaw = new Uint8Array(await crypto.subtle.exportKey('raw', ephemeralKeyPair.publicKey));
 
   // Import subscription's public key for ECDH
   const subPubKey = await crypto.subtle.importKey(
@@ -217,6 +218,10 @@ async function encryptPayload(
   body.set(new Uint8Array(ciphertext), header.length);
 
   return { body, ephemeralPublicKey: ephemeralPubRaw, salt };
+  } catch (err: any) {
+    console.error(`[push-notify] encryptPayload EXCEPTION step: ${err?.message}`);
+    throw err;
+  }
 }
 
 // ─── Send push to a single subscription ───────────────────────────────
@@ -232,7 +237,14 @@ async function sendPush(
     const subscriptionAuth = base64UrlDecode(sub.auth);
 
     // Encrypt payload
-    const { body } = await encryptPayload(plaintext, subscriptionP256dh, subscriptionAuth);
+    let body: Uint8Array;
+    try {
+      const enc = await encryptPayload(plaintext, subscriptionP256dh, subscriptionAuth);
+      body = enc.body;
+    } catch (encErr: any) {
+      console.error(`[push-notify] encryptPayload FAILED: ${encErr?.message} p256dh_len=${subscriptionP256dh.length} auth_len=${subscriptionAuth.length}`);
+      return { ok: false, endpoint: sub.endpoint, statusCode: 0, error: `encryptPayload: ${encErr?.message}` };
+    }
 
     // Create VAPID JWT
     const jwt = await createVapidJwt(vapidPrivateRaw, vapidPublicRaw);
