@@ -10,7 +10,7 @@ type AdminSection =
   // Tienda
   | 'store-general' | 'products' | 'store-promos' | 'store-combos' | 'delivery' | 'payments' | 'banners' | 'categories' | 'tables'
   // Configuración
-  | 'branding' | 'pwa-config' | 'seo' | 'branches' | 'roles' | 'system' | 'extras' | 'faq';
+  | 'branding' | 'pwa-config' | 'seo' | 'branches' | 'roles' | 'system' | 'extras' | 'faq' | 'password-reset';
 
 interface AdminState {
   activeSection: AdminSection;

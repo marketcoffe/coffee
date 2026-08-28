@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { FoodItem, Order, StoreConfig, InAppNotification, OrderItem, AppUser, Coupon, CartItem, SelectedOption, ProductReview, FlashSale, LoyaltyTransaction, LoyaltyTier, Promotion, RewardItem, UserRole, Mesa } from '../types/store';
 import { supabase } from './supabaseClient';
+import { secureLogin, type LoginSeguroResult } from '../security/authService';
 import productsData from '../data/products.json';
 import panProductsData from '../data/productos-pan-imported.json';
 import { getCategories, hasCategory, toArray } from '../utils/categoryUtils';
@@ -127,7 +128,7 @@ interface AppContextProps {
   deleteMesa: (id: string) => Promise<void>;
 
   // Auth
-  authenticateAdmin: (email: string, pass: string) => Promise<boolean>;
+  authenticateAdmin: (email: string, pass: string) => Promise<boolean | import('../security/authService').LoginSeguroResult>;
   logoutAdmin: () => Promise<void>;
   updateAdminCredentials: (user: string, pass: string) => void;
   adminUser: string;
@@ -2768,40 +2769,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       .then(({ error }) => { if (error) console.error('[Notification] ClearAll sync error:', error.message); });
   };
 
-  // Admin/Operator Auth functions
-  const authenticateAdmin = async (identifier: string, pass: string): Promise<boolean> => {
+  // Admin/Operator Auth functions — blindado con RPC login_seguro
+  const authenticateAdmin = async (identifier: string, pass: string): Promise<boolean | LoginSeguroResult> => {
     try {
-      // Resolve username to email if needed
+      // 1. Validar credenciales via RPC seguro (rate limiting + lockout)
+      const rpcResult = await secureLogin(identifier, pass);
+
+      if (!rpcResult.success) {
+        // Retornar el resultado completo para que el frontend muestre mensajes de bloqueo
+        return rpcResult;
+      }
+
+      // 2. RPC validó — ahora establecer sesión Supabase Auth
       const isEmail = identifier.includes('@');
       let authEmail = identifier.trim();
-      if (!isEmail) {
-        // Usar RPC que bypasea RLS (SECURITY DEFINER en DB)
-        const { data: rpcEmail } = await supabase
-          .rpc('lookup_admin_email', { p_username: identifier.trim() });
-        if (rpcEmail) {
-          authEmail = rpcEmail;
-        } else {
-          // Fallback: intentar el identifier como email directamente
-          authEmail = identifier.trim();
-        }
+      if (!isEmail && rpcResult.email) {
+        authEmail = rpcResult.email;
       }
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email: authEmail,
         password: pass.trim()
       });
-      if (error) {
-        console.error('[Auth] signInWithPassword failed:', error.message, '| email:', authEmail);
-        return false;
-      }
-      if (data.session) {
-        const sessionEmail = data.session.user?.email || '';
-        const appRole = data.session.user?.app_metadata?.role || data.session.user?.user_metadata?.role;
-        const isAdminEmail = sessionEmail === 'kecho8a@gmail.com';
-        const isAdminRole = appRole === 'admin';
-        const isOperatorRole = appRole === 'operator';
 
-        if (isAdminEmail || isAdminRole) {
+      if (error) {
+        console.error('[Auth] signInWithPassword failed after RPC validation:', error.message);
+        return { ...rpcResult, success: false, error: 'Error al establecer sesión.' };
+      }
+
+      if (data.session) {
+        const role = rpcResult.role;
+        const sedeId = rpcResult.sede_id || '';
+
+        if (role === 'admin') {
           setIsAdminAuthenticated(true);
           localStorage.setItem('trv_admin_auth', 'true');
           setUserRole('admin');
@@ -2811,54 +2811,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           return true;
         }
 
-        if (isOperatorRole) {
-          // Verificar que el operador esté activo en la tabla admin_users y obtener su sede
-          const { data: opRecord } = await supabase
-            .from('admin_users')
-            .select('active, sede_id')
-            .eq('id', data.session.user.id)
-            .single();
-
-          if (opRecord && opRecord.active !== false) {
-            setIsAdminAuthenticated(true);
-            localStorage.setItem('trv_admin_auth', 'true');
-            setUserRole('operator');
-            localStorage.setItem('trv_user_role', 'operator');
-            const scopeSede = opRecord.sede_id || '';
-            setAdminScopeSedeId(scopeSede);
-            localStorage.setItem('trv_admin_scope_sede', scopeSede);
-            return true;
-          }
+        if (role === 'operator') {
+          setIsAdminAuthenticated(true);
+          localStorage.setItem('trv_admin_auth', 'true');
+          setUserRole('operator');
+          localStorage.setItem('trv_user_role', 'operator');
+          setAdminScopeSedeId(sedeId);
+          localStorage.setItem('trv_admin_scope_sede', sedeId);
+          return true;
         }
 
-        const isCustomerRole = appRole === 'customer';
-        if (isCustomerRole) {
-          const { data: custRecord } = await supabase
-            .from('admin_users')
-            .select('active, sede_id')
-            .eq('id', data.session.user.id)
-            .single();
-
-          if (custRecord && custRecord.active !== false) {
-            setIsAdminAuthenticated(true);
-            localStorage.setItem('trv_admin_auth', 'true');
-            setUserRole('customer');
-            localStorage.setItem('trv_user_role', 'customer');
-            const scopeSede = custRecord.sede_id || '';
-            setAdminScopeSedeId(scopeSede);
-            localStorage.setItem('trv_admin_scope_sede', scopeSede);
-            return true;
-          }
+        if (role === 'customer') {
+          setIsAdminAuthenticated(true);
+          localStorage.setItem('trv_admin_auth', 'true');
+          setUserRole('customer');
+          localStorage.setItem('trv_user_role', 'customer');
+          setAdminScopeSedeId(sedeId);
+          localStorage.setItem('trv_admin_scope_sede', sedeId);
+          return true;
         }
 
-        // No tiene rol de admin, operador ni customer
+        // Rol no reconocido
         console.error('User has no admin/operator/customer role');
         await supabase.auth.signOut();
-        return false;
+        return { ...rpcResult, success: false, error: 'Sin permisos de acceso al panel.' };
       }
-      return false;
-    } catch {
-      return false;
+      return { success: false, error: 'Error al establecer sesión.' };
+    } catch (err) {
+      console.error('[Auth] authenticateAdmin exception:', err);
+      return { success: false, error: 'Error inesperado.' };
     }
   };
 

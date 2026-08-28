@@ -248,6 +248,9 @@ function AppContent() {
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
   const [adminUserInput, setAdminUserInput] = useState('');
+  const [adminLoginError, setAdminLoginError] = useState('');
+  const [adminLoginLocked, setAdminLoginLocked] = useState(false);
+  const [adminLoginLockedUntil, setAdminLoginLockedUntil] = useState('');
 
   // Deep linking desde notificaciones push (Service Worker)
   const [deepLinkOrderId, setDeepLinkOrderId] = useState<string | null>(null);
@@ -367,17 +370,30 @@ function AppContent() {
     }
   };
 
-  // Authentication trigger helper - admin o operador
+  // Authentication trigger helper - admin o operador (con soporte rate limiting)
   const handleAdminVerifySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await authenticateAdmin(adminUserInput, adminPasswordInput);
-    if (success) {
+    setAdminLoginError('');
+    setAdminLoginLocked(false);
+    setAdminLoginLockedUntil('');
+
+    const result = await authenticateAdmin(adminUserInput, adminPasswordInput);
+
+    if (result === true) {
       setTab('admin');
       setIsAdminLoginOpen(false);
       setAdminPasswordInput('');
       setAdminUserInput('');
+      setAdminLoginError('');
+    } else if (result !== null && result !== false && typeof result === 'object' && 'success' in result) {
+      const loginResult = result as { success: boolean; error?: string; locked?: boolean; locked_until?: string };
+      setAdminLoginError(loginResult.error || 'Credenciales incorrectas.');
+      if (loginResult.locked) {
+        setAdminLoginLocked(true);
+        setAdminLoginLockedUntil(loginResult.locked_until || '');
+      }
     } else {
-      showToast('error', 'Credenciales incorrectas o sin permisos de administracion');
+      setAdminLoginError('Credenciales incorrectas o sin permisos de administracion.');
     }
   };
 
@@ -563,7 +579,7 @@ function AppContent() {
             <div className="w-full max-w-sm bg-white border border-zinc-200 rounded-lg p-5 relative shadow-2xl flex flex-col gap-4 text-zinc-900">
               <button
                 type="button"
-                onClick={() => setIsAdminLoginOpen(false)}
+                onClick={() => { setIsAdminLoginOpen(false); setAdminLoginError(''); setAdminLoginLocked(false); }}
                 className="absolute top-3.5 right-3.5 text-zinc-500 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 p-1 rounded-lg"
               >
                 <X size={14} />
@@ -575,6 +591,24 @@ function AppContent() {
                 <p className="text-[10px] text-zinc-500 mt-1 leading-normal max-w-[240px]">Ingresa las credenciales de administrador u operador para acceder al panel.</p>
               </div>
 
+              {adminLoginError && (
+                <div className={`p-3 rounded-lg text-xs font-semibold flex items-center gap-2 ${
+                  adminLoginLocked
+                    ? 'bg-red-50 border border-red-200 text-red-700'
+                    : 'bg-amber-50 border border-amber-200 text-amber-700'
+                }`}>
+                  <span className="text-base">{adminLoginLocked ? '🔒' : '⚠️'}</span>
+                  <div>
+                    <span>{adminLoginError}</span>
+                    {adminLoginLocked && adminLoginLockedUntil && (
+                      <span className="block text-[10px] mt-0.5 opacity-80">
+                        Desbloqueo automático: {new Date(adminLoginLockedUntil).toLocaleTimeString('es-VE')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <form onSubmit={handleAdminVerifySubmit} className="flex flex-col gap-3.5 text-xs text-zinc-900">
                 <div className="flex flex-col gap-1.5">
                   <span>Usuario *</span>
@@ -584,7 +618,8 @@ function AppContent() {
                     value={adminUserInput}
                     onChange={(e) => setAdminUserInput(e.target.value)}
                     placeholder="Ingrese su usuario..."
-                    className="bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 text-center text-sm tracking-wider font-mono text-blue-600 font-bold"
+                    disabled={adminLoginLocked}
+                    className="bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 text-center text-sm tracking-wider font-mono text-blue-600 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -595,23 +630,25 @@ function AppContent() {
                     value={adminPasswordInput}
                     onChange={(e) => setAdminPasswordInput(e.target.value)}
                     placeholder="Ingrese clave..."
-                    className="bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 text-center text-sm tracking-wider font-mono text-blue-600 font-bold"
+                    disabled={adminLoginLocked}
+                    className="bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 text-center text-sm tracking-wider font-mono text-blue-600 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mt-2">
                   <button
                     type="button"
-                    onClick={() => setIsAdminLoginOpen(false)}
+                    onClick={() => { setIsAdminLoginOpen(false); setAdminLoginError(''); setAdminLoginLocked(false); }}
                     className="bg-zinc-100 hover:bg-zinc-200 py-2 rounded-lg text-zinc-800 border border-zinc-200 font-semibold"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold font-display tracking-wide uppercase cursor-pointer"
+                    disabled={adminLoginLocked}
+                    className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold font-display tracking-wide uppercase cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    INGRESAR
+                    {adminLoginLocked ? 'BLOQUEADO' : 'INGRESAR'}
                   </button>
                 </div>
               </form>

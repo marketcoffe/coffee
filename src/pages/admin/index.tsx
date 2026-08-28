@@ -10,7 +10,7 @@ import {
   LayoutGrid, ChevronLeft, ChevronRight, Shield, Store,
   TrendingUp, Smartphone, Activity, Clock, Users, Zap, Tag,
   Truck, CreditCard, Image, Grid, Search, Building2, HelpCircle,
-  Sliders, Palette, Ticket, Settings, Menu, Armchair, UtensilsCrossed, Bell
+  Sliders, Palette, Ticket, Settings, Menu, Armchair, UtensilsCrossed, Bell, Key
 } from 'lucide-react';
 import { SEOHead } from '../../components/SEOHead';
 import AdminOrderAlert from '../../components/AdminOrderAlert';
@@ -63,6 +63,7 @@ const RolesSection = lazyWithRetry(() => import('./sections/config/RolesSection'
 const SistemaSection = lazyWithRetry(() => import('./sections/config/SistemaSection'));
 const ExtrasGlobalesSection = lazyWithRetry(() => import('./sections/config/ExtrasGlobalesSection'));
 const FAQSection = lazyWithRetry(() => import('./sections/config/FAQSection'));
+const UserPasswordResetPanel = lazyWithRetry(() => import('./sections/config/UserPasswordResetPanel'));
 
 const SectionLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -154,6 +155,7 @@ const ALL_SECTIONS = [
   { id: 'system',          label: 'Sistema',           icon: Settings,        group: 'config', adminOnly: true },
   { id: 'extras',          label: 'Extras Productos',  icon: Sliders,         group: 'config', adminOnly: true },
   { id: 'faq',             label: 'FAQ',               icon: HelpCircle,      group: 'config', adminOnly: true },
+  { id: 'password-reset',  label: 'Recuperar Clave',    icon: Key,             group: 'config' },
 ];
 
 const BOTTOM_TABS = [
@@ -269,6 +271,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
       case 'system':          return <SistemaSection />;
       case 'extras':          return <ExtrasGlobalesSection />;
       case 'faq':             return <FAQSection />;
+      case 'password-reset':  return <UserPasswordResetPanel />;
 
       default: return <ResumenGeneralSection />;
     }
@@ -515,6 +518,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
                             section.id === 'system' ? 'Configuracion del sistema' :
                             section.id === 'extras' ? 'Extras y complementos para productos' :
                             section.id === 'faq' ? 'Preguntas frecuentes de la tienda' :
+                            section.id === 'password-reset' ? 'Restablecer contraseñas de clientes' :
                             ''
                           } position="top">
                             <button
