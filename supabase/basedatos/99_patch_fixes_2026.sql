@@ -226,3 +226,37 @@ GRANT EXECUTE ON FUNCTION public.get_push_config TO authenticated;
 --   SELECT has_table_privilege('authenticated', 'customer_segments', 'SELECT');
 --   SELECT has_function_privilege('authenticated', 'evaluate_all_segments()', 'EXECUTE');
 -- ═══════════════════════════════════════════════════════════════════════════
+
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PATCH 5: Permitir clientes borrar broadcasts (tipo='todos')
+-- Ejecutar DESPUES del Patch 4
+-- ═══════════════════════════════════════════════════════════════════════════
+
+DROP POLICY IF EXISTS "notifications_delete_own" ON notifications;
+CREATE POLICY "notifications_delete_own" ON notifications
+  FOR DELETE TO anon, authenticated
+  USING (
+    public.is_admin_or_operator()
+    OR
+    tipo = 'todos'
+    OR
+    (
+      tipo = 'personal'
+      AND destinatario_telefono IN (
+        SELECT telefono FROM usuarios_clientes
+        WHERE id::text = auth.uid()::text
+      )
+    )
+    OR
+    (
+      tipo = 'request'
+      AND destinatario_telefono IN (
+        SELECT telefono FROM usuarios_clientes
+        WHERE id::text = auth.uid()::text
+      )
+    )
+  );
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- FIN PATCH 5

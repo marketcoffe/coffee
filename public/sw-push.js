@@ -153,18 +153,28 @@ self.addEventListener('push', (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification(title, options)
-      .then(() => {
-        console.log('[SW Push] Notificación mostrada exitosamente:', title);
-        return self.clients.matchAll({ type: 'window', includeUncontrolled: true })
-          .then((clients) => {
-            console.log('[SW Push] Enviando PLAY_NOTIFICATION_SOUND a', clients.length, 'clientes');
-            clients.forEach((client) => {
-              client.postMessage({ type: 'PLAY_NOTIFICATION_SOUND', soundUrl });
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clients) => {
+        const hasOpenClient = clients.some(c => c.visibilityState === 'visible');
+
+        if (hasOpenClient) {
+          console.log('[SW Push] App en foreground — notificación visual manejada por el SPA');
+          clients.forEach((client) => {
+            client.postMessage({ type: 'PLAY_NOTIFICATION_SOUND', soundUrl });
+            client.postMessage({
+              type: 'SHOW_IN_APP_NOTIFICATION',
+              title, body, icon, badge, image, tag: tag, url: urlToOpen,
+              priority, soundUrl,
             });
           });
+          return;
+        }
+
+        console.log('[SW Push] App en background — mostrando notificación del sistema');
+        return self.registration.showNotification(title, options)
+          .then(() => console.log('[SW Push] Notificación del sistema mostrada:', title))
+          .catch((err) => console.error('[SW Push] Error showNotification:', err));
       })
-      .catch((err) => console.error('[SW Push] Error showNotification:', err))
   );
 });
 

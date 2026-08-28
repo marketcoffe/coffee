@@ -96,6 +96,15 @@ if ('serviceWorker' in navigator) {
       } catch (err) { console.warn('[SW Message] Sound error:', err); }
     }
 
+    // Notificación push en foreground — mostrar toast visual
+    if (event.data?.type === 'SHOW_IN_APP_NOTIFICATION') {
+      const { title, body, url } = event.data;
+      console.log('[SW Message] SHOW_IN_APP_NOTIFICATION:', title);
+      window.dispatchEvent(new CustomEvent('push_notification_received', {
+        detail: { title, body, url }
+      }));
+    }
+
     // Deep linking desde notificaciones push
     if (event.data?.type === 'NOTIFICATION_CLICKED') {
       const { deepLink, targetUrl, notificationId } = event.data;

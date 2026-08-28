@@ -122,6 +122,16 @@ function AppContent() {
     }
   }, [config.theme_color, config.secondary_color, config.accent_color]);
 
+  // Notificación push en foreground — mostrar toast visual
+  useEffect(() => {
+    const handlePushReceived = (e: CustomEvent) => {
+      const { title, body } = e.detail || {};
+      showToast('info', `${title}: ${body}`);
+    };
+    window.addEventListener('push_notification_received', handlePushReceived as EventListener);
+    return () => window.removeEventListener('push_notification_received', handlePushReceived as EventListener);
+  }, [showToast]);
+
   // Actualizar manifest, meta tags e iconos dinamicamente cuando el admin cambia config
   useEffect(() => {
     if (!config.theme_color && !config.pwa_icon_url && !config.site_nombre) return;
