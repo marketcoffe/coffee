@@ -294,6 +294,7 @@ async function sendPush(
       method: 'POST',
       headers: {
         'Content-Type': 'application/octet-stream',
+        'Content-Encoding': 'aes128gcm',
         'Authorization': `vapid t=${jwt}, k=${vapidPubB64}`,
         'TTL': String(options.TTL),
         'Urgency': options.urgency,
@@ -573,7 +574,7 @@ export const onRequestPost: any = async (context: any) => {
       total: validSubscriptions.length,
       invalidSubscriptions: invalidCount,
       notif_id: notifId,
-      _version: 'v4-dynamic-audience',
+      _version: 'v5-content-encoding',
       failedDetails: failed.map(f => ({ endpoint: f.endpoint?.substring(0, 80), statusCode: f.statusCode, error: f.error }))
     }), {
       headers: { 'Content-Type': 'application/json', ...buildCorsHeaders(request, env) }
