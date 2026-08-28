@@ -295,8 +295,13 @@ export const onRequestPost: any = async (context: any) => {
 
           return { ok: true, endpoint: sub.endpoint };
         } catch (err: any) {
+          const statusCode = err?.statusCode || err?.status || 0;
+          const errMsg = err?.message || String(err);
+          console.error(`[push-notify] FAIL endpoint=${sub.endpoint.substring(0, 60)}... status=${statusCode} msg=${errMsg}`);
+
           // Remove invalid subscriptions (404 = subscription expired, 410 = gone)
-          if (err.statusCode === 404 || err.statusCode === 410) {
+          if (statusCode === 404 || statusCode === 410) {
+            console.log(`[push-notify] Deleting expired subscription: ${sub.endpoint.substring(0, 60)}...`);
             try {
               await supabase
                 .from('push_subscriptions')
@@ -309,7 +314,8 @@ export const onRequestPost: any = async (context: any) => {
           return {
             ok: false,
             endpoint: sub.endpoint,
-            statusCode: err?.statusCode
+            statusCode,
+            error: errMsg
           };
         }
       })
@@ -324,7 +330,8 @@ export const onRequestPost: any = async (context: any) => {
       failed: failed.length,
       total: validSubscriptions.length,
       invalidSubscriptions: invalidCount,
-      notif_id: notifId
+      notif_id: notifId,
+      failedDetails: failed.map(f => ({ endpoint: f.endpoint?.substring(0, 80), statusCode: f.statusCode, error: f.error }))
     }), {
       headers: { 'Content-Type': 'application/json', ...buildCorsHeaders(request, env) }
     });
