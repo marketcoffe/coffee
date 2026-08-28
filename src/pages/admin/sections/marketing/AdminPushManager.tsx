@@ -11,7 +11,7 @@ import {
 
 interface Segment {
   segment_key: string;
-  label?: string;
+  segment_label?: string;
 }
 
 interface CampaignRecord {
@@ -87,7 +87,12 @@ const AdminPushManager: React.FC = () => {
 
   const loadSegments = async () => {
     try {
-      const { data } = await supabase.from('customer_segments').select('segment_key, label');
+      const { data, error } = await supabase.from('customer_segments').select('segment_key, segment_label');
+      if (error) {
+        console.error('[PushManager] Error loading segments:', error.message);
+        setSegments([]);
+        return;
+      }
       setSegments((data || []) as Segment[]);
     } catch {
       setSegments([]);
@@ -364,7 +369,7 @@ const AdminPushManager: React.FC = () => {
                         <option value="">Seleccionar segmento...</option>
                         {segments.map(seg => (
                           <option key={seg.segment_key} value={seg.segment_key}>
-                            {seg.label || seg.segment_key}
+                            {seg.segment_label || seg.segment_key}
                           </option>
                         ))}
                       </select>

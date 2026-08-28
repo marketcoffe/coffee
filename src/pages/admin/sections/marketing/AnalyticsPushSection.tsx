@@ -1,21 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../../store/supabaseClient';
-import { BarChart3 } from 'lucide-react';
+import { useToast } from '../../../../components/Toast';
+import { BarChart3, Users } from 'lucide-react';
 
 const AnalyticsPushSection: React.FC = () => {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [funnel, setFunnel] = useState({ sent: 0, clicked: 0 });
   const [dailyStats, setDailyStats] = useState<{ date: string; sent: number; clicked: number }[]>([]);
+  const [subscriberCount, setSubscriberCount] = useState(0);
 
   useEffect(() => { loadAnalytics(); }, []);
 
   const loadAnalytics = async () => {
-    const { data } = await supabase.from('push_events')
-      .select('event_type, created_at')
-      .order('created_at', { ascending: false })
-      .limit(1000);
+    setLoading(true);
 
-    const allEvents = data || [];
+    const [eventsRes, subsRes] = await Promise.all([
+      supabase.from('push_events')
+        .select('event_type, created_at')
+        .order('created_at', { ascending: false })
+        .limit(1000),
+      supabase.from('push_subscriptions')
+        .select('id', { count: 'exact', head: true }),
+    ]);
+
+    if (eventsRes.error) {
+      console.error('[AnalyticsPush] Error loading events:', eventsRes.error.message);
+      showToast('error', 'Error cargando eventos push: ' + eventsRes.error.message);
+    }
+
+    if (subsRes.error) {
+      console.error('[AnalyticsPush] Error loading subscribers:', subsRes.error.message);
+    }
+
+    setSubscriberCount(subsRes.count || 0);
+
+    const allEvents = eventsRes.data || [];
     const sent = allEvents.filter(e => e.event_type === 'sent').length;
     const clicked = allEvents.filter(e => e.event_type === 'clicked').length;
     setFunnel({ sent, clicked });
@@ -49,13 +69,17 @@ const AnalyticsPushSection: React.FC = () => {
       </div>
 
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <h4 className="text-[10px] font-bold text-slate-500 uppercase mb-3">Funnel de Delivery</h4>
+        <h4 className="text-[10px] font-bold text-slate-500 uppercase mb-3">Resumen Push</h4>
         <div className="flex items-end gap-4">
+          <div className="flex-1">
+            <p className="text-[10px] text-slate-400 flex items-center gap-1"><Users size={10} /> Suscritos</p>
+            <p className="text-2xl font-black text-blue-600">{subscriberCount}</p>
+          </div>
           <div className="flex-1">
             <p className="text-[10px] text-slate-400">Enviados</p>
             <p className="text-2xl font-black text-blue-600">{funnel.sent}</p>
           </div>
-          <div className="text-2xl text-slate-300">r</div>
+          <div className="text-2xl text-slate-300">→</div>
           <div className="flex-1">
             <p className="text-[10px] text-slate-400">Clicks</p>
             <p className="text-2xl font-black text-emerald-600">{funnel.clicked}</p>

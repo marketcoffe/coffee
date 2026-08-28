@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { supabase } from '../../../../store/supabaseClient';
 import { Promotion } from '../../../../types/store';
+import { useToast } from '../../../../components/Toast';
 import { Megaphone, Plus, Trash2, Edit3, Send, Calendar, Eye, MousePointerClick, ShoppingCart, X, Check } from 'lucide-react';
 
 const PromocionesSection: React.FC = () => {
-  const { foodItems, updateFoodItem, addNotification, config, promotions, setPromotions } = useApp();
+  const { foodItems, updateFoodItem, config, promotions, setPromotions } = useApp();
+  const { showToast } = useToast();
   const themeColor = config.theme_color || '#A4D045';
 
   const [loading, setLoading] = useState(true);
@@ -69,9 +71,29 @@ const PromocionesSection: React.FC = () => {
   };
 
   const handleSend = async (promo: Promotion) => {
-    await supabase.from('promotions').update({ status: 'active', sent_at: new Date().toISOString() }).eq('id', promo.id);
-    setPromotions(prev => prev.map(p => p.id === promo.id ? { ...p, status: 'active' as const, sent_at: new Date().toISOString() } : p));
-    await addNotification(promo.title, promo.message, 'todos', undefined, promo.image_url || '', '');
+    try {
+      await supabase.from('promotions').update({ status: 'active', sent_at: new Date().toISOString() }).eq('id', promo.id);
+      setPromotions(prev => prev.map(p => p.id === promo.id ? { ...p, status: 'active' as const, sent_at: new Date().toISOString() } : p));
+
+      const { error } = await supabase.rpc('send_broadcast_promotion', {
+        p_title: promo.title,
+        p_message: promo.message,
+        p_audience: 'all',
+        p_target_value: '',
+        p_image_url: promo.image_url || null,
+        p_link_url: null,
+        p_priority: 'normal',
+      });
+
+      if (error) {
+        console.error('[Promos] RPC send_broadcast_promotion error:', error.message);
+        showToast('error', 'Promocion marcada pero push falló: ' + error.message);
+      } else {
+        showToast('success', 'Promocion enviada correctamente');
+      }
+    } catch (err: any) {
+      showToast('error', err.message || 'Error al enviar promocion');
+    }
   };
 
   const togglePromoProduct = (productId: string) => {

@@ -1,10 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { uploadImage } from '../../../../store/storageService';
+import { useToast } from '../../../../components/Toast';
 import { Send, MessageSquare, MessageCircle, Trash2, User, Bell, Upload, Package, Search, ExternalLink } from 'lucide-react';
 
 const MensajesSection: React.FC = () => {
   const { notifications, addNotification, deleteNotification, foodItems, config } = useApp();
+  const { showToast } = useToast();
   const themeColor = config.theme_color || '#A4D045';
 
   const [activeChatPhone, setActiveChatPhone] = useState<string | null>(null);
@@ -42,8 +44,12 @@ const MensajesSection: React.FC = () => {
 
   const handleSendReply = async () => {
     if (!activeChatPhone || !replyMessage.trim()) return;
-    await addNotification('Re: Tu mensaje', replyMessage.trim(), 'personal', activeChatPhone, '', '');
-    setReplyMessage('');
+    const ok = await addNotification('Re: Tu mensaje', replyMessage.trim(), 'personal', activeChatPhone, '', '');
+    if (ok) {
+      setReplyMessage('');
+    } else {
+      showToast('error', 'Error al enviar reply');
+    }
   };
 
   const handleDeleteConversation = () => {
@@ -59,11 +65,14 @@ const MensajesSection: React.FC = () => {
     const target = notifType === 'personal' ? personalPhone.trim() : undefined;
     const ok = await addNotification(broadcastTitle.trim(), broadcastMessage.trim(), notifType, target, broadcastImage, broadcastLink);
     if (ok) {
+      showToast('success', 'Notificacion enviada');
       setBroadcastTitle('');
       setBroadcastMessage('');
       setBroadcastImage('');
       setBroadcastLink('');
       setPersonalPhone('');
+    } else {
+      showToast('error', 'Error al enviar notificacion. Verifica permisos.');
     }
   };
 

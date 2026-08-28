@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../../store/supabaseClient';
 import { CustomerSegment } from '../../../../types/store';
+import { useToast } from '../../../../components/Toast';
 import { RefreshCw, ChevronDown, ChevronUp, Users } from 'lucide-react';
 
 const SEGMENT_META: Record<string, { label: string; description: string; color: string }> = {
@@ -14,6 +15,7 @@ const SEGMENT_META: Record<string, { label: string; description: string; color: 
 };
 
 const SegmentacionSection: React.FC = () => {
+  const { showToast } = useToast();
   const [segments, setSegments] = useState<Record<string, number>>({});
   const [expandedSegment, setExpandedSegment] = useState<string | null>(null);
   const [segmentUsers, setSegmentUsers] = useState<CustomerSegment[]>([]);
@@ -24,7 +26,13 @@ const SegmentacionSection: React.FC = () => {
 
   const loadSegments = async () => {
     setLoading(true);
-    const { data } = await supabase.from('customer_segments').select('segment_key');
+    const { data, error } = await supabase.from('customer_segments').select('segment_key');
+    if (error) {
+      console.error('[Segmentacion] Error loading segments:', error.message);
+      showToast('error', 'Error cargando segmentos: ' + error.message);
+      setLoading(false);
+      return;
+    }
     const counts: Record<string, number> = {};
     for (const row of data || []) {
       counts[row.segment_key] = (counts[row.segment_key] || 0) + 1;
@@ -50,10 +58,18 @@ const SegmentacionSection: React.FC = () => {
   const handleRecompute = async () => {
     setRecomputing(true);
     try {
-      await supabase.rpc('evaluate_all_segments');
+      const { error } = await supabase.rpc('evaluate_all_segments');
+      if (error) {
+        console.error('[Segmentacion] RPC evaluate_all_segments error:', error.message);
+        showToast('error', 'Error recalculando: ' + error.message);
+        setRecomputing(false);
+        return;
+      }
       await loadSegments();
-    } catch (e) {
-      console.warn('Recompute failed:', e);
+      showToast('success', 'Segmentos recalculados');
+    } catch (e: any) {
+      console.error('[Segmentacion] Recompute exception:', e);
+      showToast('error', e.message || 'Error inesperado al recalcular');
     }
     setRecomputing(false);
   };

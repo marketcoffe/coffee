@@ -172,3 +172,34 @@ CREATE POLICY "notifications_delete_own" ON notifications
 --   SELECT COUNT(*) FROM notifications WHERE tipo = 'todos';
 --   (deberia seguir existiendo en la tabla, pero el frontend no las muestra)
 -- ═══════════════════════════════════════════════════════════════════════════
+
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PATCH 3: Marketing section — GRANTs faltantes
+-- Ejecutar DESPUES del Patch 2
+-- Resuelve: analytics vacios, segmentacion vacia, recompute falla
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- 3a. SELECT en push_events para authenticated (admin push analytics)
+GRANT SELECT ON push_events TO authenticated;
+
+-- 3b. SELECT en push_subscriptions para authenticated (admin metrics)
+GRANT SELECT ON push_subscriptions TO authenticated;
+
+-- 3c. SELECT en customer_segments para authenticated (segmentacion)
+GRANT SELECT ON customer_segments TO authenticated;
+
+-- 3d. EXECUTE en evaluate_all_segments (boton Recalcular)
+GRANT EXECUTE ON FUNCTION public.evaluate_all_segments TO authenticated;
+
+-- 3e. Asegurar send_broadcast_promotion accesible por authenticated
+GRANT EXECUTE ON FUNCTION public.send_broadcast_promotion TO authenticated;
+
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- FIN PATCH 3 — Verificar con:
+--   SELECT has_table_privilege('authenticated', 'push_events', 'SELECT');
+--   SELECT has_table_privilege('authenticated', 'push_subscriptions', 'SELECT');
+--   SELECT has_table_privilege('authenticated', 'customer_segments', 'SELECT');
+--   SELECT has_function_privilege('authenticated', 'evaluate_all_segments()', 'EXECUTE');
+-- ═══════════════════════════════════════════════════════════════════════════
