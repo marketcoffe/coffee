@@ -25,7 +25,7 @@ DECLARE
     v_auth_user_id UUID;
     v_password_hash TEXT;
 BEGIN
-    v_password_hash := crypt(v_new_password, gen_salt('bf'));
+    v_password_hash := pgcrypto.crypt(v_new_password, pgcrypto.gen_salt('bf'));
 
     SELECT id INTO v_auth_user_id
     FROM auth.users
@@ -85,47 +85,56 @@ DECLARE
     v_op_email TEXT := 'marketcoffe.ve@gmail.com';
     v_op_password TEXT := 'market.2026';
     v_op_nombre TEXT := 'Market Coffee';
-    v_op_username TEXT := 'marketcoffe';
+    v_op_username TEXT := 'marketcoffee';
     v_auth_user_id UUID;
     v_password_hash TEXT;
+    v_existing_cliente_id TEXT;
 BEGIN
-    v_password_hash := crypt(v_op_password, gen_salt('bf'));
+    v_password_hash := pgcrypto.crypt(v_op_password, pgcrypto.gen_salt('bf'));
 
     SELECT id INTO v_auth_user_id
     FROM auth.users
     WHERE email = v_op_email
     LIMIT 1;
 
-    IF v_auth_user_id IS NULL THEN
-        v_auth_user_id := gen_random_uuid();
-        INSERT INTO auth.users (
-            id, instance_id, aud, role, email, encrypted_password,
-            email_confirmed_at, confirmation_sent_at, recovery_sent_at,
-            last_sign_in_at, raw_app_meta_data, raw_user_meta_data,
-            created_at, updated_at, confirmation_token
-        ) VALUES (
-            v_auth_user_id,
-            '00000000-0000-0000-0000-000000000000',
-            'authenticated', 'authenticated',
-            v_op_email, v_password_hash,
-            NOW(), NOW(), NULL, NULL,
-            '{"provider": "email", "providers": ["email"], "role": "operator"}'::jsonb,
-            json_build_object('nombre', v_op_nombre, 'username', v_op_username, 'role', 'operator')::jsonb,
-            NOW(), NOW(), ''
-        );
-        RAISE NOTICE 'Operador auth user CREADO: % (id: %)', v_op_email, v_auth_user_id;
-    ELSE
-        UPDATE auth.users
-        SET
-            encrypted_password = v_password_hash,
-            email_confirmed_at = COALESCE(email_confirmed_at, NOW()),
-            raw_app_meta_data = raw_app_meta_data || '{"role": "operator"}'::jsonb,
-            raw_user_meta_data = raw_user_meta_data ||
-                json_build_object('nombre', v_op_nombre, 'username', v_op_username, 'role', 'operator')::jsonb,
-            updated_at = NOW()
-        WHERE id = v_auth_user_id;
-        RAISE NOTICE 'Operador auth user ACTUALIZADO: %', v_op_email;
+    -- Si ya existe, eliminar para recrear limpio
+    IF v_auth_user_id IS NOT NULL THEN
+        DELETE FROM admin_users WHERE id = v_auth_user_id;
+        DELETE FROM auth.users WHERE id = v_auth_user_id;
+        RAISE NOTICE 'Auth user existente ELIMINADO para recreación: %', v_op_email;
     END IF;
+
+    -- CRÍTICO: Limpiar usuarios_clientes con este email (trigger hará INSERT)
+    SELECT id INTO v_existing_cliente_id
+    FROM usuarios_clientes
+    WHERE email = v_op_email
+    LIMIT 1;
+
+    IF v_existing_cliente_id IS NOT NULL THEN
+        DELETE FROM loyalty_history WHERE user_id = v_existing_cliente_id;
+        DELETE FROM loyalty_transactions WHERE user_id = v_existing_cliente_id;
+        DELETE FROM usuarios_clientes WHERE id = v_existing_cliente_id;
+        RAISE NOTICE 'usuarios_clientes ELIMINADO para recreación: %', v_op_email;
+    END IF;
+
+    -- Crear auth user limpio
+    v_auth_user_id := gen_random_uuid();
+    INSERT INTO auth.users (
+        id, instance_id, aud, role, email, encrypted_password,
+        email_confirmed_at, confirmation_sent_at, recovery_sent_at,
+        last_sign_in_at, raw_app_meta_data, raw_user_meta_data,
+        created_at, updated_at, confirmation_token, is_super_admin
+    ) VALUES (
+        v_auth_user_id,
+        '00000000-0000-0000-0000-000000000000',
+        'authenticated', 'authenticated',
+        v_op_email, v_password_hash,
+        NOW(), NOW(), NULL, NULL,
+        '{"provider": "email", "providers": ["email"], "role": "operator"}'::jsonb,
+        json_build_object('nombre', v_op_nombre, 'username', v_op_username, 'role', 'operator')::jsonb,
+        NOW(), NOW(), '', FALSE
+    );
+    RAISE NOTICE 'Operador auth user CREADO: % (id: %)', v_op_email, v_auth_user_id;
 
     -- Sincronizar admin_users
     INSERT INTO public.admin_users (id, email, username, nombre, role, active, created_at)
@@ -199,7 +208,7 @@ CREATE OR REPLACE FUNCTION public.login_seguro(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, auth, pgcrypto
 AS $$
 DECLARE
     v_user_record RECORD;
@@ -304,7 +313,7 @@ BEGIN
     END IF;
 
     -- Verificar contraseña
-    v_is_valid := (v_password_hash = crypt(p_password, v_password_hash));
+    v_is_valid := (v_password_hash = pgcrypto.crypt(p_password, v_password_hash));
 
     IF NOT v_is_valid THEN
         -- Registrar fallo
@@ -454,7 +463,7 @@ CREATE OR REPLACE FUNCTION public.reset_password_manual(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, auth, pgcrypto
 AS $$
 DECLARE
     v_is_authorized BOOLEAN;
@@ -492,7 +501,7 @@ BEGIN
     v_target_email := v_auth_user.email;
 
     -- Generar hash de la nueva contraseña
-    v_password_hash := crypt(p_new_password, gen_salt('bf'));
+    v_password_hash := pgcrypto.crypt(p_new_password, pgcrypto.gen_salt('bf'));
 
     -- Actualizar contraseña en auth.users
     UPDATE auth.users

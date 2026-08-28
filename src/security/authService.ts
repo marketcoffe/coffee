@@ -33,6 +33,32 @@ export interface LockoutStatus {
   retry_after_seconds: number;
 }
 
+export interface ClientLoginResult {
+  success: boolean;
+  user?: {
+    id: string;
+    email: string;
+    username: string;
+    nombre: string;
+    telefono: string;
+  };
+  session_token?: string;
+  locked?: boolean;
+  locked_until?: string;
+  attempts_remaining?: number;
+  error?: string;
+  retry_after_seconds?: number;
+}
+
+export interface ClientLockoutStatus {
+  locked: boolean;
+  locked_until?: string;
+  attempts_remaining: number;
+  retry_after_seconds: number;
+  ip_attempts_remaining?: number;
+  lockout_reason?: 'account' | 'ip';
+}
+
 function getClientIP(): string {
   try {
     const stored = sessionStorage.getItem('trv_client_ip');
@@ -177,4 +203,74 @@ export function buildWhatsAppRecoveryURL(
     `Hola, solicito recuperación de contraseña para la cuenta de *${userName}*.\n\nMi código de verificación es: *${token}*\n\nPor favor, generar mi nueva contraseña. Gracias.`
   );
   return `https://wa.me/${cleanPhone}?text=${message}`;
+}
+
+export async function secureClientLogin(
+  identifier: string,
+  password: string
+): Promise<ClientLoginResult> {
+  try {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+    const response = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier: identifier.trim(), password: password.trim() }),
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.error || 'Credenciales incorrectas.',
+        locked: result.locked || false,
+        locked_until: result.locked_until || null,
+        attempts_remaining: result.attempts_remaining || 0,
+        retry_after_seconds: result.retry_after_seconds || 0,
+      };
+    }
+
+    return {
+      success: true,
+      user: result.user,
+      session_token: result.session_token,
+      attempts_remaining: result.attempts_remaining,
+    };
+  } catch (err) {
+    console.error('[AuthService] secureClientLogin exception:', err);
+    return {
+      success: false,
+      error: 'Error inesperado. Intente de nuevo.',
+      locked: false,
+      attempts_remaining: 5,
+    };
+  }
+}
+
+export async function checkClientAccountLockout(identifier: string): Promise<ClientLockoutStatus> {
+  try {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+    const response = await fetch(`${baseUrl}/api/auth/check-lockout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier: identifier.trim() }),
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return { locked: false, attempts_remaining: 5, retry_after_seconds: 0 };
+    }
+
+    return {
+      locked: result.locked || false,
+      locked_until: result.locked_until || null,
+      attempts_remaining: result.attempts_remaining || 5,
+      retry_after_seconds: result.retry_after_seconds || 0,
+      ip_attempts_remaining: result.ip_attempts_remaining,
+      lockout_reason: result.lockout_reason,
+    };
+  } catch {
+    return { locked: false, attempts_remaining: 5, retry_after_seconds: 0 };
+  }
 }

@@ -2186,6 +2186,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     if (authError) {
+      // Auditar registro fallido
+      await supabase.rpc('register_client_audit', {
+        p_email: email.trim().toLowerCase(),
+        p_username: username.trim(),
+        p_success: false,
+        p_error: authError.message,
+      }).then(() => {}, () => {}); // No bloquear si falla auditoría
+      
       if (authError.status === 429) {
         throw new Error("Límite de intentos alcanzado. Por favor, espere un minuto antes de intentar de nuevo.");
       }
@@ -2198,7 +2206,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       username: username.trim(),
       email: email.trim().toLowerCase(),
       telefono: telefono.trim(),
-      contrasena: contrasena.trim(),
+      contrasena: 'auth_managed',
       createdAt: new Date().toISOString()
     };
 
@@ -2211,6 +2219,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return [...filtered, newUser];
     });
     setCurrentUser(newUser);
+
+    // Auditar registro exitoso
+    await supabase.rpc('register_client_audit', {
+      p_email: email.trim().toLowerCase(),
+      p_username: username.trim(),
+      p_success: true,
+    }).then(() => {}, () => {}); // No bloquear si falla auditoría
 
     // Aplicar welcome bonus de lealtad si esta habilitado
     const loyaltyConfig = config.loyalty;
@@ -2258,78 +2273,93 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const loginUser = async (identifier: string, contrasena: string): Promise<AppUser | null> => {
-    const cleanId = identifier.trim().toLowerCase();
-    
-    // Determine if identifier is email or username
-    const isEmail = cleanId.includes('@');
-    
-    // Use Supabase Auth for secure login
-    let authEmail = cleanId;
-    if (!isEmail) {
-      // If username, look up the email from usuarios_clientes
-      const { data: lookupData } = await supabase
-        .from('usuarios_clientes')
-        .select('email')
-        .eq('username', identifier.trim())
-        .single();
-      
-      if (lookupData?.email) {
-        authEmail = lookupData.email;
-      } else {
-        return null; // No account found for this username
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+      const response = await fetch(`${baseUrl}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: identifier.trim(), password: contrasena.trim() }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        console.error('Login error:', result.error);
+        return null;
       }
-    }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: authEmail,
-      password: contrasena.trim()
-    });
+      if (!result.user) {
+        console.error('Login success but no user data');
+        return null;
+      }
 
-    if (error || !data.user) {
-      console.error('Login error:', error?.message);
+      const user: AppUser = {
+        id: result.user.id,
+        nombre: result.user.nombre,
+        email: result.user.email,
+        username: result.user.username,
+        telefono: result.user.telefono,
+        contrasena: 'auth_managed',
+        createdAt: new Date().toISOString(),
+        puntos_fidelidad: 0,
+        puntos_historicos: 0,
+        codigo_referido: '',
+        referred_by: '',
+        referral_count: 0,
+        sede_preferida_id: '',
+        is_pwa_installed: false,
+        pwa_installed_at: undefined,
+        loyalty_points: 0,
+        loyalty_lifetime_points: 0,
+      };
+
+      // Cargar datos completos del cliente desde usuarios_clientes
+      const { data: dbUser } = await supabase
+        .from('usuarios_clientes')
+        .select('*')
+        .eq('id', result.user.id)
+        .single();
+
+      if (dbUser) {
+        user.puntos_fidelidad = dbUser.puntos_fidelidad || dbUser.loyalty_points || 0;
+        user.puntos_historicos = dbUser.puntos_historicos || dbUser.loyalty_lifetime_points || 0;
+        user.codigo_referido = dbUser.codigo_referido || '';
+        user.referred_by = dbUser.referred_by || '';
+        user.referral_count = dbUser.referral_count || 0;
+        user.sede_preferida_id = dbUser.sede_preferida_id || '';
+        user.is_pwa_installed = dbUser.is_pwa_installed || false;
+        user.pwa_installed_at = dbUser.pwa_installed_at || undefined;
+        user.loyalty_points = dbUser.loyalty_points || 0;
+        user.loyalty_lifetime_points = dbUser.loyalty_lifetime_points || 0;
+        user.createdAt = dbUser.created_at || user.createdAt;
+      }
+
+      // Establecer sesión en Supabase Auth si tenemos token
+      if (result.session_token) {
+        await supabase.auth.setSession({
+          access_token: result.session_token,
+          refresh_token: '',
+        });
+      }
+
+      setCurrentUser(user);
+      addNotification(
+        'Sesión Iniciada',
+        `Bienvenido de vuelta, ${user.nombre}. Accede a tus notificaciones y estatus de compras desde este panel.`,
+        'personal',
+        user.telefono
+      );
+
+      // Check PWA install status on login
+      if (!user.is_pwa_installed && detectPwaInstalled()) {
+        markUserAsPwaInstalled(user.id);
+      }
+
+      return user;
+    } catch (error) {
+      console.error('Login exception:', error);
       return null;
     }
-
-    // Load full user data from usuarios_clientes
-    const { data: dbUser } = await supabase
-      .from('usuarios_clientes')
-      .select('*')
-      .eq('id', data.user.id)
-      .single();
-
-    const user: AppUser = {
-      id: data.user.id,
-      nombre: dbUser?.nombre || data.user.user_metadata?.nombre || data.user.email?.split('@')[0] || 'Usuario',
-      email: dbUser?.email || data.user.email || '',
-      telefono: dbUser?.telefono || data.user.user_metadata?.telefono || '',
-      contrasena: 'auth_managed',
-      createdAt: dbUser?.created_at || data.user.created_at || new Date().toISOString(),
-      puntos_fidelidad: dbUser?.puntos_fidelidad || dbUser?.loyalty_points || 0,
-      puntos_historicos: dbUser?.puntos_historicos || dbUser?.loyalty_lifetime_points || 0,
-      codigo_referido: dbUser?.codigo_referido || '',
-      referred_by: dbUser?.referred_by || '',
-      referral_count: dbUser?.referral_count || 0,
-      sede_preferida_id: dbUser?.sede_preferida_id || '',
-      is_pwa_installed: dbUser?.is_pwa_installed || false,
-      pwa_installed_at: dbUser?.pwa_installed_at || undefined,
-      loyalty_points: dbUser?.loyalty_points || 0,
-      loyalty_lifetime_points: dbUser?.loyalty_lifetime_points || 0,
-    };
-
-    setCurrentUser(user);
-    addNotification(
-      'Sesión Iniciada',
-      `Bienvenido de vuelta, ${user.nombre}. Accede a tus notificaciones y estatus de compras desde este panel.`,
-      'personal',
-      user.telefono
-    );
-
-    // Check PWA install status on login
-    if (!user.is_pwa_installed && detectPwaInstalled()) {
-      markUserAsPwaInstalled(user.id);
-    }
-
-    return user;
   };
 
   const sendPasswordResetEmail = async (email: string): Promise<{ success: boolean; error?: string }> => {
@@ -2351,22 +2381,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentUser(updatedUser);
     setUsers(prev => prev.map(u => u.id === currentUser.id ? updatedUser : u));
 
-    // Update in Supabase in background
-    supabase.from('usuarios_clientes')
-      .update({
-        nombre: updatedUser.nombre,
-        telefono: updatedUser.telefono,
-        email: updatedUser.email,
-        contrasena: updatedUser.contrasena
-      })
-      .eq('id', currentUser.id)
-      .then(({ error }) => {
-        if (error) console.error('Error updating user in Supabase:', error);
-      });
+    // Update in Supabase in background (sin contraseña - manejada por Supabase Auth)
+    const updatePayload: any = {};
+    if (updated.nombre !== undefined) updatePayload.nombre = updated.nombre;
+    if (updated.telefono !== undefined) updatePayload.telefono = updated.telefono;
+    if (updated.email !== undefined) updatePayload.email = updated.email;
+
+    if (Object.keys(updatePayload).length > 0) {
+      supabase.from('usuarios_clientes')
+        .update(updatePayload)
+        .eq('id', currentUser.id)
+        .then(({ error }) => {
+          if (error) console.error('Error updating user in Supabase:', error);
+        });
+    }
 
     addNotification(
       'Datos Actualizados ⚙️',
-      `Tus datos han sido guardados. Nombre: ${updatedUser.nombre}, Teléfono: ${updatedUser.telefono}. Tus credenciales de acceso son tu correo, teléfono y contraseña guardada.`,
+      `Tus datos han sido guardados. Nombre: ${updatedUser.nombre}, Teléfono: ${updatedUser.telefono}.`,
       'personal',
       updatedUser.telefono
     );
@@ -2380,11 +2412,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setCurrentUser(prev => prev ? { ...prev, ...updated } : null);
     }
 
-    // Sync to Supabase in background
+    // Sync to Supabase in background (sin contraseña - manejada por Supabase Auth)
     const updatePayload: any = {};
     if (updated.nombre !== undefined) updatePayload.nombre = updated.nombre;
     if (updated.telefono !== undefined) updatePayload.telefono = updated.telefono;
-    if (updated.contrasena !== undefined) updatePayload.contrasena = updated.contrasena;
+    if (updated.email !== undefined) updatePayload.email = updated.email;
 
     if (Object.keys(updatePayload).length > 0) {
       supabase.from('usuarios_clientes')
@@ -2769,18 +2801,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       .then(({ error }) => { if (error) console.error('[Notification] ClearAll sync error:', error.message); });
   };
 
-  // Admin/Operator Auth functions — blindado con RPC login_seguro
+  // Admin/Operator Auth functions — blindado con RPC login_seguro + fallback sesión local
   const authenticateAdmin = async (identifier: string, pass: string): Promise<boolean | LoginSeguroResult> => {
     try {
       // 1. Validar credenciales via RPC seguro (rate limiting + lockout)
       const rpcResult = await secureLogin(identifier, pass);
 
       if (!rpcResult.success) {
-        // Retornar el resultado completo para que el frontend muestre mensajes de bloqueo
         return rpcResult;
       }
 
-      // 2. RPC validó — ahora establecer sesión Supabase Auth
+      // 2. RPC validó — intentar establecer sesión Supabase Auth
       const isEmail = identifier.includes('@');
       let authEmail = identifier.trim();
       if (!isEmail && rpcResult.email) {
@@ -2792,51 +2823,67 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         password: pass.trim()
       });
 
-      if (error) {
-        console.error('[Auth] signInWithPassword failed after RPC validation:', error.message);
-        return { ...rpcResult, success: false, error: 'Error al establecer sesión.' };
-      }
-
-      if (data.session) {
-        const role = rpcResult.role;
+      // 3. Si signInWithPassword falla, establecer sesión local (fallback)
+      if (error || !data?.session) {
+        console.warn('[Auth] signInWithPassword failed, using local session fallback:', error?.message || 'no session');
+        const role = rpcResult.role!;
         const sedeId = rpcResult.sede_id || '';
+        const userId = rpcResult.user_id || '';
+        const nombre = rpcResult.nombre || '';
+        const email = rpcResult.email || authEmail;
 
-        if (role === 'admin') {
-          setIsAdminAuthenticated(true);
-          localStorage.setItem('trv_admin_auth', 'true');
-          setUserRole('admin');
-          localStorage.setItem('trv_user_role', 'admin');
-          setAdminScopeSedeId('');
-          localStorage.setItem('trv_admin_scope_sede', '');
-          return true;
-        }
+        setIsAdminAuthenticated(true);
+        localStorage.setItem('trv_admin_auth', 'true');
+        setUserRole(role);
+        localStorage.setItem('trv_user_role', role);
+        setAdminScopeSedeId(sedeId);
+        localStorage.setItem('trv_admin_scope_sede', sedeId);
 
-        if (role === 'operator') {
-          setIsAdminAuthenticated(true);
-          localStorage.setItem('trv_admin_auth', 'true');
-          setUserRole('operator');
-          localStorage.setItem('trv_user_role', 'operator');
-          setAdminScopeSedeId(sedeId);
-          localStorage.setItem('trv_admin_scope_sede', sedeId);
-          return true;
-        }
+        // Guardar datos del usuario para uso del panel
+        localStorage.setItem('trv_admin_user', JSON.stringify({
+          id: userId, email, nombre, role, sede_id: sedeId
+        }));
 
-        if (role === 'customer') {
-          setIsAdminAuthenticated(true);
-          localStorage.setItem('trv_admin_auth', 'true');
-          setUserRole('customer');
-          localStorage.setItem('trv_user_role', 'customer');
-          setAdminScopeSedeId(sedeId);
-          localStorage.setItem('trv_admin_scope_sede', sedeId);
-          return true;
-        }
-
-        // Rol no reconocido
-        console.error('User has no admin/operator/customer role');
-        await supabase.auth.signOut();
-        return { ...rpcResult, success: false, error: 'Sin permisos de acceso al panel.' };
+        return true;
       }
-      return { success: false, error: 'Error al establecer sesión.' };
+
+      // 4. signInWithPassword exitoso
+      const role = rpcResult.role!;
+      const sedeId = rpcResult.sede_id || '';
+
+      if (role === 'admin') {
+        setIsAdminAuthenticated(true);
+        localStorage.setItem('trv_admin_auth', 'true');
+        setUserRole('admin');
+        localStorage.setItem('trv_user_role', 'admin');
+        setAdminScopeSedeId('');
+        localStorage.setItem('trv_admin_scope_sede', '');
+        return true;
+      }
+
+      if (role === 'operator') {
+        setIsAdminAuthenticated(true);
+        localStorage.setItem('trv_admin_auth', 'true');
+        setUserRole('operator');
+        localStorage.setItem('trv_user_role', 'operator');
+        setAdminScopeSedeId(sedeId);
+        localStorage.setItem('trv_admin_scope_sede', sedeId);
+        return true;
+      }
+
+      if (role === 'customer') {
+        setIsAdminAuthenticated(true);
+        localStorage.setItem('trv_admin_auth', 'true');
+        setUserRole('customer');
+        localStorage.setItem('trv_user_role', 'customer');
+        setAdminScopeSedeId(sedeId);
+        localStorage.setItem('trv_admin_scope_sede', sedeId);
+        return true;
+      }
+
+      console.error('User has no admin/operator/customer role');
+      await supabase.auth.signOut();
+      return { ...rpcResult, success: false, error: 'Sin permisos de acceso al panel.' };
     } catch (err) {
       console.error('[Auth] authenticateAdmin exception:', err);
       return { success: false, error: 'Error inesperado.' };

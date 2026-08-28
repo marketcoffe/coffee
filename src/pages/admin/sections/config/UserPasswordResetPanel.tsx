@@ -88,7 +88,20 @@ export default function UserPasswordResetPanel() {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedUser || !newPassword.trim() || !currentUser?.id) return;
+    if (!selectedUser || !newPassword.trim()) return;
+
+    // Obtener admin ID: del contexto o de localStorage (fallback sesión local)
+    const adminId = currentUser?.id || (() => {
+      try {
+        const stored = JSON.parse(localStorage.getItem('trv_admin_user') || '{}');
+        return stored.id || '';
+      } catch { return ''; }
+    })();
+
+    if (!adminId) {
+      setResultMessage({ type: 'error', text: 'No se pudo identificar al administrador. Inicie sesión nuevamente.' });
+      return;
+    }
 
     if (newPassword.trim().length < 6) {
       setResultMessage({ type: 'error', text: 'La contraseña debe tener al menos 6 caracteres.' });
@@ -102,7 +115,7 @@ export default function UserPasswordResetPanel() {
       const result = await resetPasswordViaPanel(
         selectedUser.id,
         newPassword.trim(),
-        currentUser.id
+        adminId
       );
 
       if (result.success) {

@@ -13,7 +13,6 @@ import { OrderTracker } from '../components/OrderTracker';
 import { LoyaltyWidget } from '../components/LoyaltyWidget';
 import { InAppNotification } from '../types/store';
 import ClientePanelPedidos from '../components/ClientePanelPedidos';
-import { ForgotPasswordModal } from '../components/ForgotPasswordModal';
 
 interface BeforeInstallPromptEvent {
   prompt: () => void;
@@ -64,7 +63,6 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
 
   const [activeSubTab, setActiveSubTab] = useState<'profile' | 'orders' | 'notifications' | 'rewards' | 'promos' | 'coupons'>('orders');
   const [authMode, setAuthMode] = useState<'login' | 'register' | 'forgot'>('login');
-  const [showForgotModal, setShowForgotModal] = useState(false);
 
   // Derived data for tabs
   const activePromos = promotions.filter(p => p.status === 'active' && new Date(p.end_date) > new Date());
@@ -615,7 +613,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
                 
                 <button
                   type="button"
-                  onClick={() => setShowForgotModal(true)}
+                  onClick={() => { setAuthMode('forgot'); setAuthError(''); setForgotEmail(''); }}
                   className="text-[11px] text-[#8f7065] hover:underline transition-colors font-medium mt-1 text-center"
                 >
                   ¿Olvidaste tu contraseña?
@@ -623,29 +621,40 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
               </form>
             )}
 
-            {/* FORGOT PASSWORD - Reemplazado por modal WhatsApp */}
+            {/* FORGOT PASSWORD - Recuperación por email nativo de Supabase */}
             {authMode === 'forgot' && !resetSent && (
-              <div className="flex flex-col gap-3 items-center py-4">
+              <form onSubmit={handleForgotSubmit} className="flex flex-col gap-3.5 text-sm">
                 <p className="text-xs text-[#5b4137] text-center leading-relaxed">
-                  Recupera tu contraseña de forma segura a través de WhatsApp. No necesitas acceso a tu correo electrónico.
+                  Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
                 </p>
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-bold text-[#5b4137] flex items-center gap-1.5 uppercase font-mono text-[10px] tracking-wider">
+                    <Mail size={11} style={{ color: themeColor }} /> Correo Electrónico
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder="tu@correo.com"
+                    className="bg-[#f9f9fb] px-3 py-2.5 border border-[#e4beb1]/10 rounded-xl outline-none focus:border-[var(--theme-color,#FF6B35)] text-sm"
+                  />
+                </div>
                 <button
-                  type="button"
-                  onClick={() => setShowForgotModal(true)}
-                  className="w-full hover:opacity-90 font-bold font-display uppercase tracking-wider py-3 rounded-xl text-sm transition-transform cursor-pointer flex items-center justify-center gap-2"
-                  style={{ backgroundColor: '#25D366', color: '#fff' }}
+                  type="submit"
+                  className="hover:opacity-90 font-bold font-display uppercase tracking-wider py-3 rounded-xl text-sm mt-2 transition-transform cursor-pointer"
+                  style={{ backgroundColor: themeColor, color: '#fff' }}
                 >
-                  <MessageSquare size={16} />
-                  Recuperar vía WhatsApp
+                  Enviar Enlace de Recuperación
                 </button>
                 <button
                   type="button"
-                  onClick={() => setAuthMode('login')}
+                  onClick={() => { setAuthMode('login'); setForgotEmail(''); }}
                   className="text-[11px] text-[#8f7065] hover:underline transition-colors font-medium mt-1 text-center"
                 >
                   Volver al Inicio de Sesión
                 </button>
-              </div>
+              </form>
             )}
 
             {/* REGISTER FORM */}
@@ -1384,14 +1393,6 @@ Contraseña/Clave: ${showReminderModal.contrasena}
           </div>
         </div>
       )}
-
-      {/* Forgot Password Modal (WhatsApp) */}
-      <ForgotPasswordModal
-        isOpen={showForgotModal}
-        onClose={() => setShowForgotModal(false)}
-        themeColor={themeColor}
-        supportPhone="+584123758879"
-      />
     </div>
   );
 };
