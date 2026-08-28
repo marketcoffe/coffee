@@ -157,8 +157,12 @@ self.addEventListener('push', (event) => {
       .then((clients) => {
         const hasOpenClient = clients.some(c => c.visibilityState === 'visible');
 
+        const notificationPromise = self.registration.showNotification(title, options)
+          .then(() => console.log('[SW Push] showNotification OK:', title))
+          .catch((err) => console.error('[SW Push] Error showNotification:', err));
+
         if (hasOpenClient) {
-          console.log('[SW Push] App en foreground — notificación visual manejada por el SPA');
+          console.log('[SW Push] App en foreground — notificación del sistema + toast SPA');
           clients.forEach((client) => {
             client.postMessage({ type: 'PLAY_NOTIFICATION_SOUND', soundUrl });
             client.postMessage({
@@ -167,13 +171,11 @@ self.addEventListener('push', (event) => {
               priority, soundUrl,
             });
           });
-          return;
+        } else {
+          console.log('[SW Push] App en background — notificación del sistema');
         }
 
-        console.log('[SW Push] App en background — mostrando notificación del sistema');
-        return self.registration.showNotification(title, options)
-          .then(() => console.log('[SW Push] Notificación del sistema mostrada:', title))
-          .catch((err) => console.error('[SW Push] Error showNotification:', err));
+        return notificationPromise;
       })
   );
 });
