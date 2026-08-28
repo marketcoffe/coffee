@@ -2723,25 +2723,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return { success: false, error: 'Suscripción push corrupta.' };
       }
 
-      // For guest users, use anonymous_id from localStorage
+      // Usar /api/register-subscription (service_role) para evitar problemas de RLS con UPDATE
       const guestPhone = localStorage.getItem('trv_guest_phone') || '';
-      const userId = currentUser?.id || `guest-${Date.now()}`;
-      const phone = currentUser?.telefono?.trim() || guestPhone || null;
-      console.log('[PushSync] Guardando suscripción:', { userId, phone, endpoint: subJSON.endpoint.substring(0, 50) });
+      const phone = currentUser?.telefono?.trim() || guestPhone || '';
 
-      const { error } = await supabase.from('push_subscriptions').upsert({
-        user_id: userId,
-        endpoint: subJSON.endpoint,
-        p256dh: subJSON.keys?.p256dh,
-        auth_secret: subJSON.keys?.auth,
-        destinatario_telefono: phone,
-      }, { onConflict: 'endpoint' });
+      const platform = /iPhone|iPad|iPod/.test(navigator.userAgent) ? 'ios'
+        : /Android/.test(navigator.userAgent) ? 'android' : 'desktop';
 
-      if (error) {
-        console.error('[PushSync] Error guardando suscripción en BD:', error.message, error);
-        return { success: false, error: error.message };
+      const resp = await fetch('/api/register-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subscription: subJSON,
+          anonymous_id: localStorage.getItem('trv_anonymous_id') || crypto.randomUUID(),
+          phone,
+          user_id: currentUser?.id || null,
+          platform,
+          user_agent: navigator.userAgent,
+        }),
+      });
+
+      const result = await resp.json().catch(() => ({}));
+      if (!resp.ok || result.error) {
+        console.error('[PushSync] Error guardando suscripción via API:', resp.status, result);
+        return { success: false, error: result.error || `HTTP ${resp.status}` };
       }
-      console.log('[PushSync] Suscripción guardada exitosamente');
+      console.log('[PushSync] Suscripción guardada exitosamente via /api/register-subscription');
       return { success: true };
     } catch (err: any) {
       console.error('[PushSync] Excepción en syncPushSubscription:', err);
