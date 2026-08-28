@@ -2618,10 +2618,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     
     console.warn('✅ Notificación guardada en Supabase:', notifId);
 
-    // El disparo del Webhook Push ya no se hace desde el frontend por seguridad y para evitar errores 401.
-    // Ahora lo gestiona exclusivamente el trigger "trigger_notify_push" en Supabase 
-    // (definido en schema_definitivo.sql) usando la extensión pg_net, garantizando que el 
-    // secreto de autenticación nunca viaje por el navegador del cliente.
+    // Disparar push notification via webhook (admin-only, sin pg_net)
+    if (tipo === 'todos' || tipo === 'personal' || tipo === 'admin' || tipo === 'request') {
+      import('../utils/pushTrigger').then(({ triggerBroadcastPush }) => {
+        triggerBroadcastPush({
+          id: notifId,
+          titulo: title,
+          mensaje: message,
+          tipo,
+          destinatario_telefono: targetPhone || '',
+          imagen_url: imageUrl || '',
+          link_url: linkUrl || '/',
+        }).then(ok => {
+          if (ok) console.warn('[Push] Push disparado OK para:', notifId);
+          else console.warn('[Push] Push no disparado (sin suscripciones o error)');
+        });
+      });
+    }
 
     return true;
   };

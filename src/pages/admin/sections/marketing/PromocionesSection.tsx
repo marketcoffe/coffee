@@ -3,6 +3,7 @@ import { useApp } from '../../../../store/AppContext';
 import { supabase } from '../../../../store/supabaseClient';
 import { Promotion } from '../../../../types/store';
 import { useToast } from '../../../../components/Toast';
+import { triggerBroadcastPush } from '../../../../utils/pushTrigger';
 import { Megaphone, Plus, Trash2, Edit3, Send, Calendar, Eye, MousePointerClick, ShoppingCart, X, Check } from 'lucide-react';
 
 const PromocionesSection: React.FC = () => {
@@ -90,6 +91,17 @@ const PromocionesSection: React.FC = () => {
         showToast('error', 'Promocion marcada pero push falló: ' + error.message);
       } else {
         showToast('success', 'Promocion enviada correctamente');
+
+        // Trigger push via webhook
+        const pushId = 'promo-push-' + Date.now();
+        triggerBroadcastPush({
+          id: pushId,
+          titulo: promo.title,
+          mensaje: promo.message,
+          tipo: 'todos',
+          imagen_url: promo.image_url || '',
+          link_url: '',
+        });
       }
     } catch (err: any) {
       showToast('error', err.message || 'Error al enviar promocion');

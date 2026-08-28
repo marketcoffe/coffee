@@ -197,7 +197,30 @@ GRANT EXECUTE ON FUNCTION public.send_broadcast_promotion TO authenticated;
 
 
 -- ═══════════════════════════════════════════════════════════════════════════
--- FIN PATCH 3 — Verificar con:
+-- PATCH 4: Frontend push trigger (sin pg_net)
+-- Devuelve webhook URL + secret para que el admin dispare push desde JS
+-- ═══════════════════════════════════════════════════════════════════════════
+
+CREATE OR REPLACE FUNCTION public.get_push_config()
+RETURNS JSONB
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT jsonb_build_object(
+    'webhook_url', COALESCE(sc.push_webhook_url, ''),
+    'webhook_secret', COALESCE(sec.push_webhook_secret, '')
+  )
+  FROM public.store_config sc, public.app_secrets sec
+  WHERE sc.id = 1 AND sec.id = 1;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_push_config TO authenticated;
+
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- FIN PATCH 4
 --   SELECT has_table_privilege('authenticated', 'push_events', 'SELECT');
 --   SELECT has_table_privilege('authenticated', 'push_subscriptions', 'SELECT');
 --   SELECT has_table_privilege('authenticated', 'customer_segments', 'SELECT');
