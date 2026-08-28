@@ -68,7 +68,11 @@ export async function triggerBroadcastPush(params: {
     console.log('[Push] Webhook response:', resp.status, result);
     if (result.failedDetails?.length) {
       for (const fd of result.failedDetails) {
-        console.error(`[Push] FAIL sub: status=${fd.statusCode} error=${fd.error} endpoint=${fd.endpoint}`);
+        if (fd.statusCode === 410 || fd.statusCode === 404) {
+          console.log(`[Push] Sub expirada/auto-borrada: endpoint=${fd.endpoint}`);
+        } else {
+          console.warn(`[Push] FAIL sub: status=${fd.statusCode} error=${fd.error} endpoint=${fd.endpoint}`);
+        }
       }
     }
     return resp.ok && result.success === true;
