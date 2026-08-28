@@ -136,24 +136,9 @@ async function createVapidJwt(
     enc.encode(signingInput)
   );
 
-  // Convert DER signature to raw r||s (64 bytes)
-  const sigDer = new Uint8Array(signature);
-  // Parse DER: 30 || len || 02 || len(r) || r || 02 || len(s) || s
-  let pos = 0;
-  if (sigDer[pos++] !== 0x30) throw new Error('Invalid DER signature: not SEQUENCE');
-  const seqLen = sigDer[pos++];
-  if (sigDer[pos++] !== 0x02) throw new Error('Invalid DER signature: not INTEGER (r)');
-  const rLen = sigDer[pos++];
-  const r = sigDer.slice(pos, pos + rLen);
-  pos += rLen;
-  if (sigDer[pos++] !== 0x02) throw new Error('Invalid DER signature: not INTEGER (s)');
-  const sLen = sigDer[pos++];
-  const s = sigDer.slice(pos, pos + sLen);
-
-  // r and s are big-endian, pad/truncate to 32 bytes each
-  const rawSig = new Uint8Array(64);
-  rawSig.set(r.subarray(rLen > 32 ? rLen - 32 : 0, rLen), 32 - Math.min(rLen, 32));
-  rawSig.set(s.subarray(sLen > 32 ? sLen - 32 : 0, sLen), 64 - Math.min(sLen, 32));
+  // Web Crypto ECDSA returns IEEE P1363 format (raw r||s, 64 bytes)
+  // JWT ES256 expects the same raw r||s format
+  const rawSig = new Uint8Array(signature);
 
   return `${signingInput}.${base64UrlEncode(rawSig)}`;
 }
