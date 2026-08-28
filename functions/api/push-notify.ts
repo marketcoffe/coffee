@@ -55,6 +55,7 @@ export const onRequestGet: any = async (context: any) => {
     status: 'ok',
     service: 'push-notify',
     vapidConfigured: !!(env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY),
+    vapidPublicKey: env.VAPID_PUBLIC_KEY || '',
     authConfigured: !!getPushSecret(env),
   }), {
     headers: { 'Content-Type': 'application/json', ...buildCorsHeaders(request, env) }
