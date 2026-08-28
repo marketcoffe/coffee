@@ -1506,7 +1506,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const { data, error } = await supabase.from('products').insert([insertPayload]).select().single();
     if (error) {
       console.error('Add product error:', error);
-      addNotification('Error al agregar producto', error.message || 'Error de base de datos');
+      addNotification('Error al agregar producto', error.message || 'Error de base de datos', 'admin');
       throw error;
     }
     if (data) setProducts(prev => [data as FoodItem, ...prev]);
@@ -1531,7 +1531,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           // Revert optimistic update on failure
           setProducts(prevSnapshot);
           console.error('Update product error:', error);
-          addNotification('Error al actualizar producto', error.message || 'Error de base de datos');
+          addNotification('Error al actualizar producto', error.message || 'Error de base de datos', 'admin');
           throw error;
         }
       }
@@ -1543,7 +1543,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (error) {
         console.error('Delete product error:', error);
-        addNotification('Error al eliminar producto', error.message || 'Error de base de datos');
+        addNotification('Error al eliminar producto', error.message || 'Error de base de datos', 'admin');
         throw error;
       }
     }
@@ -1995,7 +1995,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (targetPhone) {
         addNotification('Estado de Pedido Actualizado', statusMsg, 'personal', targetPhone, undefined, '/profile');
       } else {
-        addNotification('Estado de Pedido Actualizado', statusMsg, 'todos', undefined, undefined, '/admin');
+        addNotification('Estado de Pedido Actualizado', statusMsg, 'admin', undefined, undefined, '/admin');
       }
 
       // Broadcast instantáneo para que el cliente reciba el cambio en <100ms
