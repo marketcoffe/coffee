@@ -101,7 +101,7 @@ export default defineConfig(({mode}) => {
             if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/scheduler')) {
               return 'vendor-react';
             }
-            if (id.includes('node_modules/@supabase') || id.includes('node_modules/websocket') || id.includes('/store/supabaseClient')) {
+            if (id.includes('node_modules/@supabase') || id.includes('node_modules/websocket')) {
               return 'vendor-supabase';
             }
             if (id.includes('node_modules/recharts') || id.includes('node_modules/d3-') || id.includes('node_modules/victory-')) {

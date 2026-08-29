@@ -12,12 +12,16 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     Promise.all([
       self.clients.claim(),
-      // Limpiar caches obsoletos al activar nueva versión
       caches.keys().then((names) =>
         Promise.all(
-          names
-            .filter((n) => n.includes('workbox-precache') && !n.includes('v2'))
-            .map((n) => caches.delete(n))
+          names.map((n) => {
+            // Clean stale workbox caches (old versions) and any old asset caches
+            const isStaleWorkbox = n.includes('workbox-precache') && !n.includes('v2');
+            const isStaleAssets = n.startsWith('assets-') || n.startsWith('vendor-') || n.startsWith('pages-');
+            if (isStaleWorkbox || isStaleAssets) {
+              return caches.delete(n);
+            }
+          })
         )
       )
     ])
@@ -335,7 +339,9 @@ self.addEventListener('message', (event) => {
   if (event.data?.type === 'CLEAR_ASSETS_CACHE') {
     event.waitUntil(
       caches.keys().then((names) =>
-        Promise.all(names.filter((n) => n.includes('images') || n.includes('supabase')).map((n) => caches.delete(n)))
+        Promise.all(names.filter((n) =>
+          n.includes('images') || n.includes('supabase') || n.startsWith('assets-') || n.startsWith('vendor-') || n.startsWith('pages-')
+        ).map((n) => caches.delete(n)))
       ).then(() => {
         self.clients.matchAll({ type: 'window', includeUncontrolled: true })
           .then((clients) => clients.forEach((c) => c.postMessage({ type: 'ASSETS_CACHE_CLEARED' })));

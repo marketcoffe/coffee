@@ -197,17 +197,37 @@ const createMockClient = (): SupabaseClient => {
 // (TypeError: e is not a function). Sessions use localStorage, no cross-tab lock needed.
 const noopLock = async <R>(_name: string, _acquireTimeout: number, fn: () => Promise<R>): Promise<R> => fn();
 
-export const supabase = supabaseUrl && supabaseAnonKey
-  ? createClient(supabaseUrl, supabaseAnonKey, {
+// ═══ CLIENT INITIALIZATION (production-safe) ═══
+// Wrapped in try-catch so that if createClient throws during module evaluation,
+// the app falls back to mock client instead of crashing the entire vendor-supabase chunk.
+let supabase: SupabaseClient;
+let usingMockClient = false;
+
+try {
+  if (supabaseUrl && supabaseAnonKey) {
+    // Validate URL format before passing to createClient
+    new URL(supabaseUrl);
+    supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: true,
-        autoRefreshToken: true,
+        autoRefreshToken: false,
         detectSessionInUrl: true,
         flowType: 'pkce',
         lock: noopLock,
       }
-    })
-  : createMockClient();
+    });
+  } else {
+    console.warn('[Supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY — using mock client');
+    supabase = createMockClient();
+    usingMockClient = true;
+  }
+} catch (err) {
+  console.error('[Supabase] createClient failed, falling back to mock client:', err);
+  supabase = createMockClient();
+  usingMockClient = true;
+}
+
+export { supabase, usingMockClient };
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
 const MAX_INPUT_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
