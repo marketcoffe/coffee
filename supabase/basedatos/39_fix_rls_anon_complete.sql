@@ -12,6 +12,7 @@ RETURNS TEXT AS $$
 DECLARE
   v_user_id UUID;
   v_new_encrypted TEXT;
+  v_instance_id UUID;
 BEGIN
   SELECT id INTO v_user_id FROM auth.users WHERE email = p_email;
   
@@ -19,29 +20,46 @@ BEGIN
     RETURN 'Usuario no encontrado: ' || p_email;
   END IF;
   
+  -- Obtener instance_id de auth.instances (requerido por GoTrue)
+  SELECT id INTO v_instance_id FROM auth.instances LIMIT 1;
+  
+  -- Limpiar TODOS los datos de auth relacionados
+  DELETE FROM auth.refresh_tokens WHERE user_id = v_user_id;
+  DELETE FROM auth.instances WHERE id = v_user_id;
+  
+  -- Generar hash bcrypt
   v_new_encrypted := crypt(p_new_password, gen_salt('bf'));
   
+  -- Actualizar auth.users con TODOS los campos requeridos por GoTrue
   UPDATE auth.users 
   SET 
     encrypted_password = v_new_encrypted,
     email_confirmed_at = COALESCE(email_confirmed_at, NOW()),
+    last_sign_in_at = NOW(),
     raw_app_meta_data = '{"provider": "email", "providers": ["email"]}'::jsonb,
-    raw_user_meta_data = COALESCE(raw_user_meta_data, '{}'::jsonb),
-    updated_at = NOW()
+    raw_user_meta_data = '{}'::jsonb,
+    updated_at = NOW(),
+    confirmation_token = '',
+    recovery_token = '',
+    confirmation_sent_at = NULL,
+    recovery_sent_at = NULL,
+    is_super_admin = false,
+    instance_id = COALESCE(v_instance_id, '00000000-0000-0000-0000-000000000000'::uuid)
   WHERE id = v_user_id;
   
+  -- Asegurar admin_users
   INSERT INTO public.admin_users (id, email, nombre, role, active)
   VALUES (v_user_id, p_email, p_email, 'operator', true)
-  ON CONFLICT (id) DO UPDATE SET active = true, role = 'operator';
+  ON CONFLICT (id) DO UPDATE SET active = true;
   
-  RETURN 'OK: ' || p_email || ' (id: ' || v_user_id || ')';
+  RETURN 'OK: ' || p_email || ' id=' || v_user_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Resetear operador
 SELECT public.reset_user_password('marketcoffe.ve@gmail.com', 'market.2026');
--- Resetear admin
-SELECT public.reset_user_password('kecho8a@gmail.com', 'Market.2026');
+-- Resetear admin (usuario: maketo, clave: kecho.180)
+SELECT public.reset_user_password('kecho8a@gmail.com', 'kecho.180');
 
 -- ═══════════════════════════════════════════════════════════════
 -- PARTE 2: RLS ANON POLICIES (permite admin sin sesion auth)
