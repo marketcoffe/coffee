@@ -77,11 +77,11 @@ BEGIN
 
   -- Crear identidad para admin
   INSERT INTO auth.identities (
-    id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at
+    id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at
   ) VALUES (
     v_admin_id, v_admin_id,
     jsonb_build_object('sub', v_admin_id::text, 'email', 'kecho8a@gmail.com', 'email_verified', true),
-    'email', NOW(), NOW(), NOW()
+    'email', 'kecho8a@gmail.com', NOW(), NOW(), NOW()
   );
 
   -- Crear admin_users
@@ -106,11 +106,11 @@ BEGIN
 
   -- Crear identidad para operador
   INSERT INTO auth.identities (
-    id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at
+    id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at
   ) VALUES (
     v_op_id, v_op_id,
     jsonb_build_object('sub', v_op_id::text, 'email', 'marketcoffe.ve@gmail.com', 'email_verified', true),
-    'email', NOW(), NOW(), NOW()
+    'email', 'marketcoffe.ve@gmail.com', NOW(), NOW(), NOW()
   );
 
   -- Crear admin_users para operador
