@@ -74,7 +74,7 @@ ORDER BY policyname;
 -- 1g. Verificar si push_subscriptions tiene datos
 SELECT '=== PUSH_SUBSCRIPTIONS DATA ===' as section;
 SELECT COUNT(*) as total, 
-  COUNT(*) FILTER (WHERE endpoint IS NOT NULL AND p256dh IS NOT NULL AND "auth" IS NOT NULL) as valid
+  COUNT(*) FILTER (WHERE endpoint IS NOT NULL AND p256dh IS NOT NULL AND auth_secret IS NOT NULL) as valid
 FROM push_subscriptions;
 
 -- 1h. Verificar GRANTS en tablas críticas
