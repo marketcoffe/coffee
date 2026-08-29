@@ -1,12 +1,8 @@
 import { lazy, type ComponentType } from 'react';
 
-/**
- * Wrapper around React.lazy that retries loading a chunk on failure.
- * Handles transient network errors and stale chunk caching in production.
- */
 export function lazyWithRetry<T extends ComponentType<any>>(
   factory: () => Promise<{ default: T }>,
-  retries = 2,
+  retries = 3,
   delay = 1000
 ): React.LazyExoticComponent<T> {
   return lazy(() => {
@@ -15,8 +11,17 @@ export function lazyWithRetry<T extends ComponentType<any>>(
         factory()
           .then(resolve)
           .catch((error) => {
-            if (remaining > 0) {
-              setTimeout(() => attempt(remaining - 1), delay);
+            const isNetworkError = error instanceof TypeError && (
+              error.message.includes('loading dynamically imported module') ||
+              error.message.includes('Failed to fetch') ||
+              error.message.includes('NetworkError') ||
+              error.message.includes('corrupted')
+            );
+            const isCorruptedContent = error.name === 'NS_ERROR_CORRUPTED_CONTENT' ||
+              error.message.includes('NS_ERROR_CORRUPTED_CONTENT');
+            
+            if (remaining > 0 && (isNetworkError || isCorruptedContent)) {
+              setTimeout(() => attempt(remaining - 1), delay * (3 - remaining + 1));
             } else {
               reject(error);
             }

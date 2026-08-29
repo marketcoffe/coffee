@@ -2596,8 +2596,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Log notifications
   const addNotification = async (title: string, message: string, tipo: 'todos' | 'personal' | 'admin' | 'request' = 'todos', targetPhone?: string, imageUrl?: string, linkUrl?: string): Promise<boolean> => {
-    console.warn(`🔔 Marketo System: Registrando notificación [${tipo}]...`);
-    
     const notifId = `notif-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
     const newNotif: InAppNotification = {
       id: notifId,
@@ -2611,13 +2609,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       leida: false
     };
 
-    // Actualización optimista local para que el mensaje aparezca inmediatamente en el emisor
     setNotifications(prev => {
       if (prev.some(n => n.id === notifId)) return prev;
       return [newNotif, ...prev];
     });
 
-    // Sincronización con Supabase
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      if (tipo === 'todos' || tipo === 'admin') {
+        return true;
+      }
+    }
+
     const { error } = await supabase.from('notifications').insert({
       id: notifId,
       titulo: newNotif.titulo,
@@ -2631,28 +2634,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }).select();
 
     if (error) {
-      const isBroadcast = tipo === 'todos' || tipo === 'admin';
-      if (isBroadcast) {
-        // Los broadcasts de sistema no se insertan desde el frontend: los genera
-        // Supabase via los triggers handle_new_order_actions / handle_order_status_push_update.
-        // Silenciamos el fallo RLS para que el checkout de un cliente anonimo no genere ruido.
-        console.warn('Marketo: Broadcast de sistema bloqueado por RLS (esperado para anon):', error.message);
-        return false;
-      }
-      // Para notificaciones personales/request de anon, silenciar errores RLS
       if (error.code === '42501' || error.message?.includes('permission')) {
-        console.warn('Marketo: Notificación bloqueada por RLS (anon):', error.message);
         return false;
       }
-      console.error('Marketo Error (SQL):', error.message, '| Hint:', error.hint);
-      // Rollback actualización optimista
       setNotifications(prev => prev.filter(n => n.id !== notifId));
       return false;
     }
-    
-    console.warn('✅ Notificación guardada en Supabase:', notifId);
 
-    // Disparar push notification via webhook (admin-only, sin pg_net)
     if (tipo === 'todos' || tipo === 'personal' || tipo === 'admin' || tipo === 'request') {
       import('../utils/pushTrigger').then(({ triggerBroadcastPush }) => {
         triggerBroadcastPush({
@@ -2664,8 +2652,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           imagen_url: imageUrl || '',
           link_url: linkUrl || '/',
         }).then(ok => {
-          if (ok) console.warn('[Push] Push disparado OK para:', notifId);
-          else console.warn('[Push] Push no disparado (sin suscripciones o error)');
+          if (ok) console.log('[Push] Push disparado OK para:', notifId);
         });
       });
     }

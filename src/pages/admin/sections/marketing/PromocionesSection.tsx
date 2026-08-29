@@ -22,12 +22,27 @@ const PromocionesSection: React.FC = () => {
   const [formDiscountValue, setFormDiscountValue] = useState(0);
   const [formSchedule, setFormSchedule] = useState('');
 
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => { loadPromotions(); }, []);
 
   const loadPromotions = async () => {
-    const { data } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
-    setPromotions((data || []) as Promotion[]);
-    setLoading(false);
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
+      if (error) {
+        console.error('[Promos] Error loading promotions:', error.message);
+        setError(error.message);
+      } else {
+        setPromotions((data || []) as Promotion[]);
+      }
+    } catch (err: any) {
+      console.error('[Promos] Load exception:', err);
+      setError(err?.message || 'Error al cargar promociones');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const resetForm = () => {
@@ -138,6 +153,14 @@ const PromocionesSection: React.FC = () => {
 
       {loading ? (
         <p className="text-xs text-slate-400">Cargando...</p>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <span className="text-2xl mb-2">⚠️</span>
+          <p className="text-xs text-red-500 mb-2">{error}</p>
+          <button onClick={loadPromotions} className="px-3 py-1.5 text-[11px] font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg cursor-pointer">
+            Reintentar
+          </button>
+        </div>
       ) : promotions.length === 0 ? (
         <div className="text-center py-10 text-slate-400 text-xs">No hay promociones creadas</div>
       ) : (
