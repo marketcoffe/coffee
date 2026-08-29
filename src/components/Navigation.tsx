@@ -88,33 +88,6 @@ export const Navigation: React.FC<NavigationProps> = ({
             </button>
           </div>
 
-          {/* Center: Navigation Links */}
-          <nav className="flex items-center gap-1" role="navigation" aria-label="Menú principal">
-            {[
-              { label: 'INICIO', tab: 'home' as const },
-              { label: 'MENÚ', tab: 'catalog' as const },
-              { label: 'RECOMPENSAS', tab: 'profile' as const },
-            ].map((link) => {
-              const isActive = currentTab === link.tab;
-              return (
-                <button
-                  key={link.label}
-                  type="button"
-                  onClick={() => setTab(link.tab)}
-                  className={`px-5 py-2 text-[13px] font-semibold tracking-wide rounded-full transition-all cursor-pointer focus:outline-none ${
-                    isActive
-                      ? 'text-white shadow-md'
-                      : 'hover:opacity-80'
-                  }`}
-                  style={isActive ? { backgroundColor: 'rgba(255,255,255,0.2)', color: '#fff' } : { color: 'rgba(255,255,255,0.7)' }}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  {link.label}
-                </button>
-              );
-            })}
-          </nav>
-
           {/* Right: Dark Mode Toggle + Sign In + Cart */}
           <div className="flex items-center gap-3">
             <button
@@ -123,7 +96,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 transition-colors cursor-pointer"
               aria-label={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
             >
-              {isDarkMode ? <Sun size={20} className="text-amber-300" /> : <Moon size={20} className="text-white" />}
+              {isDarkMode ? <Sun size={20} className="text-amber-300" /> : <Moon size={20} className="text-white" style={{ color: '#ffffff' }} />}
             </button>
 
             {currentUser ? (
@@ -356,7 +329,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-black/10 transition-colors cursor-pointer"
             aria-label={isDarkMode ? 'Modo claro' : 'Modo oscuro'}
           >
-            {isDarkMode ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-white" />}
+            {isDarkMode ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-white" style={{ color: '#ffffff' }} />}
           </button>
           <button
             type="button"

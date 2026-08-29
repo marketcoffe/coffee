@@ -587,8 +587,8 @@ function AppContent() {
 
               <div className="text-center flex flex-col items-center">
                 <span className="text-2xl p-2 bg-yellow-500/10 text-yellow-600 border border-yellow-500/20 rounded-2xl mb-2">🔑</span>
-                <h4 className="text-sm font-bold font-display text-zinc-800 uppercase tracking-wider">Acceso al Panel</h4>
-                <p className="text-[10px] text-zinc-500 mt-1 leading-normal max-w-[240px]">Ingresa las credenciales de administrador u operador para acceder al panel.</p>
+                <h4 className="text-sm font-bold font-display text-zinc-800 uppercase tracking-wider">Seguridad</h4>
+                <p className="text-[10px] text-zinc-500 mt-1 leading-normal max-w-[240px]">Ingresa las credenciales.</p>
               </div>
 
               {adminLoginError && (

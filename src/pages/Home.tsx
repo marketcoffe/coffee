@@ -6,7 +6,7 @@ import {
   Zap, Star, Plus, ShoppingCart, Clock, MapPin, X, LocateFixed, Check,
   Smartphone, Instagram, Twitter, Facebook,
   MessageCircle, Download, Award, Sparkles, TrendingUp, BadgeCheck, Flame,
-  UtensilsCrossed,
+  UtensilsCrossed, Shield,
 } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
 import { useToast } from '../components/Toast';
@@ -305,59 +305,8 @@ export const Home: React.FC<HomeProps> = ({
     <div className="flex min-h-screen" style={{ backgroundColor: bg }}>
       <SEOHead title={`${config.site_nombre || 'Market Coffee Sweet'} - Mercado, Panaderia & Comida Rapida`} type="home" />
 
-      {/* ═══ SIDEBAR FIJO — Desktop ═══ */}
-      <aside
-        className="hidden lg:flex flex-col fixed top-16 left-0 w-[260px] h-[calc(100vh-4rem)] z-40 overflow-y-auto no-scrollbar border-r"
-        style={{
-          backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff',
-          borderColor: isDarkMode ? 'rgba(42,42,42,0.6)' : 'rgba(228,190,177,0.15)',
-        }}
-      >
-        <div className="p-4 pb-6">
-          <p
-            className="text-[10px] font-bold uppercase tracking-widest px-3 mb-3"
-            style={{ color: isDarkMode ? '#a0a0b8' : '#5b4137' }}
-          >
-            Categorias
-          </p>
-          <div className="flex flex-col gap-0.5">
-            {categories.map((cat) => {
-              const IconComponent = CATEGORY_ICON_MAP[cat.toLowerCase()] || DEFAULT_CATEGORY_ICON;
-              const isActive = activeCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => {
-                    setActiveCategory(cat);
-                    setSelectedCategory(cat);
-                    setTab('catalog');
-                  }}
-                  className="flex items-center gap-3 w-full px-3 py-2.5 text-sm rounded-xl font-medium transition-all cursor-pointer group"
-                  style={{
-                    backgroundColor: isActive ? `${tc}12` : 'transparent',
-                    color: isActive ? tc : isDarkMode ? '#a0a0b8' : '#5b4137',
-                  }}
-                >
-                  <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all group-hover:scale-105"
-                    style={{
-                      backgroundColor: isActive ? `${tc}20` : `${tc}08`,
-                      color: tc,
-                    }}
-                  >
-                    <IconComponent size={18} strokeWidth={2} />
-                  </div>
-                  <span className="flex-1 text-left">{cat}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </aside>
-
       {/* ═══ CONTENIDO PRINCIPAL ═══ */}
-      <div className="flex-1 flex flex-col min-w-0 lg:ml-[260px]">
+      <div className="flex-1 flex flex-col min-w-0">
 
       {/* ═══ 1. HERO — Horizontal Swipe Carousel ═══ */}
       <section className="relative w-full overflow-hidden aspect-[3/4] md:aspect-[2/1]">
@@ -2113,13 +2062,14 @@ export const Home: React.FC<HomeProps> = ({
               <li><a href={`https://wa.me/${getWhatsApp().replace(/[+ ]/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-colors flex items-center gap-1.5"><MessageCircle size={11} className="text-green-500" /> WhatsApp</a></li>
               <li><button onClick={() => setShowTermsModal(true)} className="hover:opacity-80 transition-colors">Terminos de Servicio</button></li>
               <li><button onClick={() => setShowPrivacyModal(true)} className="hover:opacity-80 transition-colors">Politica de Privacidad</button></li>
-              {onAdminClick && <li><button onClick={onAdminClick} className="hover:opacity-80 transition-colors">{isAdminAuthenticated ? 'Admin ✓' : 'Admin'}</button></li>}
+              {onAdminClick && <li><button onClick={onAdminClick} className="hover:opacity-80 transition-colors flex items-center gap-1" title="Admin"><Shield size={11} /></button></li>}
             </ul>
           </div>
         </div>
         <div className="max-w-[1440px] mx-auto pt-4 border-t flex flex-col md:flex-row justify-between items-center gap-2 text-[10px]"
           style={{ borderColor: cardBorder, color: isDarkMode ? '#5a5a7a' : '#8f7065' }}>
           <p>© {new Date().getFullYear()} {config.footer_copyright || config.site_nombre || 'Market Coffee Sweet'}. Todos los derechos reservados.</p>
+          <a href="https://maketo.site" target="_blank" rel="noopener noreferrer" className="opacity-40 hover:opacity-70 transition-opacity text-[8px]">Desarrollado por Maketo Web</a>
           <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-center">
             <span>Market Coffee Sweet C.A.</span>
             <span>RIF: J-500338260</span>
