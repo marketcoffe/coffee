@@ -134,6 +134,10 @@ END $$;
 -- 2c. RLS para push_subscriptions: permitir SELECT a anon (para Cloudflare Worker)
 DROP POLICY IF EXISTS "push_subscriptions_insert_anon" ON public.push_subscriptions;
 DROP POLICY IF EXISTS "push_subscriptions_service_role_all" ON public.push_subscriptions;
+DROP POLICY IF EXISTS "push_subscriptions_anon_select" ON public.push_subscriptions;
+DROP POLICY IF EXISTS "push_subscriptions_anon_insert" ON public.push_subscriptions;
+DROP POLICY IF EXISTS "push_subscriptions_auth_all" ON public.push_subscriptions;
+DROP POLICY IF EXISTS "push_subscriptions_service_all" ON public.push_subscriptions;
 
 CREATE POLICY "push_subscriptions_anon_select" ON public.push_subscriptions
   FOR SELECT TO anon USING (true);
@@ -166,6 +170,7 @@ GRANT ALL ON public.push_subscriptions TO service_role;
 SELECT 'GRANTS push_subscriptions actualizados' as fix;
 
 -- 2f. RLS en orders para anon SELECT (degraded mode)
+DROP POLICY IF EXISTS "orders_anon_select" ON public.orders;
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -181,6 +186,7 @@ BEGIN
 END $$;
 
 -- 2g. RLS en notifications para anon SELECT
+DROP POLICY IF EXISTS "notifications_anon_select" ON public.notifications;
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -196,6 +202,7 @@ BEGIN
 END $$;
 
 -- 2h. RLS orders UPDATE para authenticated
+DROP POLICY IF EXISTS "orders_auth_update" ON public.orders;
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -210,6 +217,7 @@ BEGIN
 END $$;
 
 -- 2i. RLS orders DELETE para authenticated
+DROP POLICY IF EXISTS "orders_auth_delete" ON public.orders;
 DO $$
 BEGIN
   IF NOT EXISTS (
