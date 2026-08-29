@@ -1030,56 +1030,76 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       // Sincronizar rol desde la sesión
       if (isAdmin || isOperator || isCustomer) {
+        // When session is null (fallback mode), get user ID from localStorage
+        const userId = session?.user?.id || (() => {
+          try { return JSON.parse(localStorage.getItem('trv_admin_user') || '{}').id; } catch { return ''; }
+        })();
+
         if (isAdmin) {
           setUserRole('admin');
           localStorage.setItem('trv_user_role', 'admin');
           setAdminScopeSedeId('');
           localStorage.setItem('trv_admin_scope_sede', '');
         } else if (isOperator) {
-          // Verificar que el operador esté activo y obtener su sede
-          const { data: opRecord } = await supabase
-            .from('admin_users')
-            .select('active, sede_id')
-            .eq('id', session!.user.id)
-            .single();
+          if (userId) {
+            // Verificar que el operador esté activo y obtener su sede
+            const { data: opRecord } = await supabase
+              .from('admin_users')
+              .select('active, sede_id')
+              .eq('id', userId)
+              .single();
 
-          if (opRecord && opRecord.active !== false) {
+            if (opRecord && opRecord.active !== false) {
+              setUserRole('operator');
+              localStorage.setItem('trv_user_role', 'operator');
+              const scopeSede = opRecord.sede_id || '';
+              setAdminScopeSedeId(scopeSede);
+              localStorage.setItem('trv_admin_scope_sede', scopeSede);
+            } else {
+              // Operador desactivado, cerrar sesión
+              setIsAdminAuthenticated(false);
+              setUserRole(null);
+              localStorage.removeItem('trv_admin_auth');
+              localStorage.removeItem('trv_user_role');
+              localStorage.removeItem('trv_admin_scope_sede');
+              setAdminScopeSedeId('');
+              await supabase.auth.signOut();
+            }
+          } else {
+            // Fallback mode: use sede from localStorage
             setUserRole('operator');
             localStorage.setItem('trv_user_role', 'operator');
-            const scopeSede = opRecord.sede_id || '';
-            setAdminScopeSedeId(scopeSede);
-            localStorage.setItem('trv_admin_scope_sede', scopeSede);
-          } else {
-            // Operador desactivado, cerrar sesión
-            setIsAdminAuthenticated(false);
-            setUserRole(null);
-            localStorage.removeItem('trv_admin_auth');
-            localStorage.removeItem('trv_user_role');
-            localStorage.removeItem('trv_admin_scope_sede');
-            setAdminScopeSedeId('');
-            await supabase.auth.signOut();
+            const storedScope = localStorage.getItem('trv_admin_scope_sede') || '';
+            setAdminScopeSedeId(storedScope);
           }
         } else if (isCustomer) {
-          const { data: custRecord } = await supabase
-            .from('admin_users')
-            .select('active, sede_id')
-            .eq('id', session!.user.id)
-            .single();
+          if (userId) {
+            const { data: custRecord } = await supabase
+              .from('admin_users')
+              .select('active, sede_id')
+              .eq('id', userId)
+              .single();
 
-          if (custRecord && custRecord.active !== false) {
+            if (custRecord && custRecord.active !== false) {
+              setUserRole('customer');
+              localStorage.setItem('trv_user_role', 'customer');
+              const scopeSede = custRecord.sede_id || '';
+              setAdminScopeSedeId(scopeSede);
+              localStorage.setItem('trv_admin_scope_sede', scopeSede);
+            } else {
+              setIsAdminAuthenticated(false);
+              setUserRole(null);
+              localStorage.removeItem('trv_admin_auth');
+              localStorage.removeItem('trv_user_role');
+              localStorage.removeItem('trv_admin_scope_sede');
+              setAdminScopeSedeId('');
+              await supabase.auth.signOut();
+            }
+          } else {
             setUserRole('customer');
             localStorage.setItem('trv_user_role', 'customer');
-            const scopeSede = custRecord.sede_id || '';
-            setAdminScopeSedeId(scopeSede);
-            localStorage.setItem('trv_admin_scope_sede', scopeSede);
-          } else {
-            setIsAdminAuthenticated(false);
-            setUserRole(null);
-            localStorage.removeItem('trv_admin_auth');
-            localStorage.removeItem('trv_user_role');
-            localStorage.removeItem('trv_admin_scope_sede');
-            setAdminScopeSedeId('');
-            await supabase.auth.signOut();
+            const storedScope = localStorage.getItem('trv_admin_scope_sede') || '';
+            setAdminScopeSedeId(storedScope);
           }
         }
       }
