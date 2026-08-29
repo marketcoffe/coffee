@@ -52,7 +52,7 @@ ORDER BY tablename;
 SELECT '=== REPLICA IDENTITY ===' as section;
 SELECT 
   c.relname as table_name,
-  CASE c.relreplidentity
+  CASE c.relreplident
     WHEN 'd' THEN 'DEFAULT'
     WHEN 'n' THEN 'NOTHING'
     WHEN 'f' THEN 'FULL'
@@ -315,7 +315,7 @@ FROM pg_publication_tables WHERE pubname = 'supabase_realtime';
 -- Replica Identity
 SELECT 
   c.relname as table_name,
-  CASE c.relreplidentity WHEN 'f' THEN '✅ FULL' ELSE '❌ ' || c.relreplidentity END as status
+  CASE c.relreplident WHEN 'f' THEN '✅ FULL' ELSE '❌ ' || c.relreplident END as status
 FROM pg_class c
 JOIN pg_namespace n ON n.oid = c.relnamespace
 WHERE n.nspname = 'public' 
