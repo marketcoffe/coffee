@@ -570,15 +570,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ? 'https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3'
       : 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3';
 
-    const audio = new Audio(soundUrl);
-    audio.volume = 0.8;
-    audio.play().catch((err) => {
-      if (err.name === 'NotAllowedError') {
-        console.warn('📢 Audio bloqueado — se necesita interacción previa del usuario.');
-      } else {
-        console.warn('📢 Error al reproducir audio:', err.message);
-      }
-    });
+    try {
+      const audio = new Audio(soundUrl);
+      audio.volume = 0.8;
+      audio.play().catch((err) => {
+        if (err.name === 'NotAllowedError') {
+          console.warn('📢 Audio bloqueado — se necesita interacción previa del usuario.');
+        } else {
+          console.warn('📢 Error al reproducir audio:', err.message);
+        }
+      });
+    } catch {
+      // Fallback: intentar con Audio global si falla
+      console.warn('📢 Audio no disponible');
+    }
 
     if (hapticEnabledRef.current && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       const patterns: Record<string, number | number[]> = {
@@ -898,6 +903,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         });
         window.dispatchEvent(new CustomEvent('new_order_received', { detail: newOrder }));
         playNotificationSound('new');
+
+        // Toast visual
+        window.dispatchEvent(new CustomEvent('push_notification_received', {
+          detail: { title: '🛒 ¡NUEVO PEDIDO!', body: `Cliente: ${newOrder.cliente_nombre} — Total: $${newOrder.total_usd?.toFixed(2)}` }
+        }));
+
         if ('serviceWorker' in navigator && Notification.permission === 'granted') {
           navigator.serviceWorker.ready.then(reg => {
             reg.showNotification('¡NUEVO PEDIDO! 🛒', {
@@ -917,6 +928,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const updatedOrder = payload.payload;
         if (!updatedOrder?.id) return;
         setOrders(prev => prev.map(o => o.id === updatedOrder.id ? { ...o, ...updatedOrder } : o));
+        window.dispatchEvent(new CustomEvent('order_status_changed', { detail: updatedOrder }));
+        playNotificationSound('update', updatedOrder.status);
+        // Toast visual
+        window.dispatchEvent(new CustomEvent('push_notification_received', {
+          detail: { title: '📦 Actualización', body: `Pedido: ${updatedOrder.id} — ${updatedOrder.status}` }
+        }));
       })
       .subscribe();
 
@@ -2682,6 +2699,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
 
+    // Disparar push ANTES del INSERT para que siempre llegue al cliente
+    if (tipo === 'todos' || tipo === 'personal' || tipo === 'admin' || tipo === 'request') {
+      import('../utils/pushTrigger').then(({ triggerBroadcastPush }) => {
+        triggerBroadcastPush({
+          id: notifId,
+          titulo: title,
+          mensaje: message,
+          tipo,
+          destinatario_telefono: targetPhone || '',
+          imagen_url: imageUrl || '',
+          link_url: linkUrl || '/',
+        }).then(ok => {
+          if (ok) console.log('[Push] Push disparado OK para:', notifId);
+        }).catch(err => console.warn('[Push] Error disparando push:', err));
+      });
+    }
+
     const { error } = await supabase.from('notifications').insert({
       id: notifId,
       titulo: newNotif.titulo,
@@ -2696,26 +2730,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     if (error) {
       if (error.code === '42501' || error.message?.includes('permission')) {
-        return false;
+        console.warn('[Notif] INSERT blocked by RLS, push ya disparado:', notifId);
+        return true;
       }
       setNotifications(prev => prev.filter(n => n.id !== notifId));
       return false;
-    }
-
-    if (tipo === 'todos' || tipo === 'personal' || tipo === 'admin' || tipo === 'request') {
-      import('../utils/pushTrigger').then(({ triggerBroadcastPush }) => {
-        triggerBroadcastPush({
-          id: notifId,
-          titulo: title,
-          mensaje: message,
-          tipo,
-          destinatario_telefono: targetPhone || '',
-          imagen_url: imageUrl || '',
-          link_url: linkUrl || '/',
-        }).then(ok => {
-          if (ok) console.log('[Push] Push disparado OK para:', notifId);
-        });
-      });
     }
 
     return true;

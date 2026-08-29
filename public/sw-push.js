@@ -161,12 +161,14 @@ self.addEventListener('push', (event) => {
       .then((clients) => {
         const hasOpenClient = clients.some(c => c.visibilityState === 'visible');
 
+        // SIEMPRE mostrar notificación del sistema (native)
         const notificationPromise = self.registration.showNotification(title, options)
           .then(() => console.log('[SW Push] showNotification OK:', title))
           .catch((err) => console.error('[SW Push] Error showNotification:', err));
 
+        // Si la app está abierta, enviar también toast in-app + sonido
         if (hasOpenClient) {
-          console.log('[SW Push] App en foreground — notificación del sistema + toast SPA');
+          console.log('[SW Push] App en foreground — toast SPA adicional');
           clients.forEach((client) => {
             client.postMessage({ type: 'PLAY_NOTIFICATION_SOUND', soundUrl });
             client.postMessage({
@@ -176,7 +178,7 @@ self.addEventListener('push', (event) => {
             });
           });
         } else {
-          console.log('[SW Push] App en background — notificación del sistema');
+          console.log('[SW Push] App en background — solo notificación del sistema');
         }
 
         return notificationPromise;
