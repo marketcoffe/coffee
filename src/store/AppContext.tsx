@@ -740,6 +740,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           window.dispatchEvent(new CustomEvent('new_order_received', { detail: newOrder }));
           playNotificationSound('new');
           
+          // Toast visual en la app
+          window.dispatchEvent(new CustomEvent('push_notification_received', {
+            detail: { title: '🛒 ¡NUEVO PEDIDO!', body: `Cliente: ${newOrder.cliente_nombre} — Total: $${newOrder.total_usd?.toFixed(2)}` }
+          }));
+          
           // ✅ FIX: Usar SW showNotification para que aparezca en pantalla bloqueada
           if ('serviceWorker' in navigator && Notification.permission === 'granted') {
             navigator.serviceWorker.ready.then(reg => {
@@ -775,6 +780,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
           const cu = currentUserRef.current;
           if (cu && updatedOrder.cliente_telefono === cu.telefono) {
+            // Toast visual en la app
+            window.dispatchEvent(new CustomEvent('push_notification_received', {
+              detail: { title: '📦 Actualización de Pedido', body: `Tu pedido ahora está: ${updatedOrder.status}` }
+            }));
             if ('serviceWorker' in navigator && Notification.permission === 'granted') {
               const tiempo = updatedOrder.tiempo_estimado_entrega || '';
               navigator.serviceWorker.ready.then(reg => {
@@ -808,6 +817,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               return [newNotif, ...prev];
             });
             playNotificationSound('update');
+            // Toast visual en la app
+            window.dispatchEvent(new CustomEvent('push_notification_received', {
+              detail: { title: '🔔 Notificación', body: newNotif.mensaje || newNotif.titulo || 'Nueva notificación' }
+            }));
           }
         })
         // Escuchar cambios en FoodItems (CDC)
