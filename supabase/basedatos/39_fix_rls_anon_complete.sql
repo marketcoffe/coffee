@@ -47,10 +47,16 @@ BEGIN
     instance_id = COALESCE(v_instance_id, '00000000-0000-0000-0000-000000000000'::uuid)
   WHERE id = v_user_id;
   
-  -- Asegurar admin_users
-  INSERT INTO public.admin_users (id, email, nombre, role, active)
-  VALUES (v_user_id, p_email, p_email, 'operator', true)
-  ON CONFLICT (id) DO UPDATE SET active = true;
+  -- Asegurar admin_users con datos correctos
+  IF p_email = 'kecho8a@gmail.com' THEN
+    INSERT INTO public.admin_users (id, email, username, nombre, role, active)
+    VALUES (v_user_id, p_email, 'maketo', 'Market Coffee', 'admin', true)
+    ON CONFLICT (id) DO UPDATE SET active = true, role = 'admin', username = 'maketo', nombre = 'Market Coffee';
+  ELSE
+    INSERT INTO public.admin_users (id, email, username, nombre, role, active)
+    VALUES (v_user_id, p_email, 'marketcoffee', 'Market Coffee', 'operator', true)
+    ON CONFLICT (id) DO UPDATE SET active = true, role = 'operator', username = 'marketcoffee';
+  END IF;
   
   RETURN 'OK: ' || p_email || ' id=' || v_user_id;
 END;
