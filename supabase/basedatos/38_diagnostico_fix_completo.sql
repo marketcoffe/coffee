@@ -27,13 +27,19 @@ FROM admin_users
 WHERE email IN ('kecho8a@gmail.com', 'marketcoffe.ve@gmail.com')
 ORDER BY email;
 
--- 1c. Verificar si hay datos huérfanos en refresh_tokens
-SELECT '=== REFRESH TOKENS (huérfanos) ===' as section;
-SELECT rt.user_id, u.email, COUNT(*) as token_count
-FROM auth.refresh_tokens rt
-LEFT JOIN auth.users u ON u.id = rt.user_id
-WHERE u.id IS NULL
-GROUP BY rt.user_id, u.email;
+-- 1c. Verificar usuarios auth vs admin_users
+SELECT '=== AUTH vs ADMIN_USERS ===' as section;
+SELECT 
+  u.id as auth_id,
+  u.email,
+  a.id as admin_id,
+  a.role as admin_role,
+  a.active,
+  CASE WHEN a.id IS NULL THEN '❌ FALTA en admin_users' ELSE '✅ OK' END as status
+FROM auth.users u
+LEFT JOIN public.admin_users a ON a.id = u.id
+WHERE u.email IN ('kecho8a@gmail.com', 'marketcoffe.ve@gmail.com')
+ORDER BY u.email;
 
 -- 1d. Publicación realtime - qué tablas están habilitadas
 SELECT '=== REALTIME PUBLICATION ===' as section;
@@ -249,6 +255,52 @@ END $$;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.orders TO authenticated;
 
 SELECT '✅ RLS + GRANTS orders actualizados' as fix;
+
+-- ═══════════════════════════════════════════════════════════════
+-- PARTE 2b: RESET DE CONTRASEÑA DEL OPERADOR
+-- ═══════════════════════════════════════════════════════════════
+
+-- Función para resetear contraseña de usuario auth
+-- USO: SELECT reset_user_password('marketcoffe.ve@gmail.com', 'market.2026');
+CREATE OR REPLACE FUNCTION public.reset_user_password(p_email TEXT, p_new_password TEXT)
+RETURNS TEXT AS $$
+DECLARE
+  v_user_id UUID;
+  v_new_encrypted TEXT;
+BEGIN
+  -- Buscar el usuario
+  SELECT id INTO v_user_id FROM auth.users WHERE email = p_email;
+  
+  IF v_user_id IS NULL THEN
+    RETURN '❌ Usuario no encontrado: ' || p_email;
+  END IF;
+  
+  -- Generar hash bcrypt de la nueva contraseña
+  v_new_encrypted := crypt(p_new_password, gen_salt('bf'));
+  
+  -- Actualizar la contraseña en auth.users
+  UPDATE auth.users 
+  SET 
+    encrypted_password = v_new_encrypted,
+    email_confirmed_at = COALESCE(email_confirmed_at, NOW()),
+    raw_app_meta_data = COALESCE(raw_app_meta_data, '{}'::jsonb) || '{"provider": "email", "providers": ["email"]}'::jsonb,
+    updated_at = NOW()
+  WHERE id = v_user_id;
+  
+  -- Asegurar que existe en admin_users
+  INSERT INTO public.admin_users (id, email, nombre, role, active)
+  VALUES (v_user_id, p_email, p_email, 'operator', true)
+  ON CONFLICT (id) DO UPDATE SET active = true;
+  
+  RETURN '✅ Contraseña actualizada para ' || p_email || ' (id: ' || v_user_id || ')';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Ejecutar el reset para el operador
+SELECT public.reset_user_password('marketcoffe.ve@gmail.com', 'market.2026');
+
+-- También resetear admin por si acaso
+SELECT public.reset_user_password('kecho8a@gmail.com', 'Market.2026');
 
 -- ═══════════════════════════════════════════════════════════════
 -- PARTE 3: VERIFICACIÓN FINAL
