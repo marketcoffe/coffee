@@ -171,7 +171,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   const { activeSection, setActiveSection, sidebarCollapsed, toggleSidebarCollapsed } = useAdminStore();
   const themeColor = config.theme_color || '#A4D045';
   const isAdmin = userRole === 'admin';
-  const scopeSedeId = isAdmin ? '' : (adminScopeSedeId || '');
+  const scopeSedeId = '';
 
   const [showMoreSheet, setShowMoreSheet] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);

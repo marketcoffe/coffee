@@ -1041,22 +1041,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setAdminScopeSedeId('');
           localStorage.setItem('trv_admin_scope_sede', '');
         } else if (isOperator) {
+          // OPERATOR = same data access as admin, only UI sections differ
           if (userId) {
-            // Verificar que el operador esté activo y obtener su sede
             const { data: opRecord } = await supabase
               .from('admin_users')
-              .select('active, sede_id')
+              .select('active')
               .eq('id', userId)
               .single();
 
             if (opRecord && opRecord.active !== false) {
               setUserRole('operator');
               localStorage.setItem('trv_user_role', 'operator');
-              const scopeSede = opRecord.sede_id || '';
-              setAdminScopeSedeId(scopeSede);
-              localStorage.setItem('trv_admin_scope_sede', scopeSede);
+              setAdminScopeSedeId('');
+              localStorage.setItem('trv_admin_scope_sede', '');
             } else {
-              // Operador desactivado, cerrar sesión
               setIsAdminAuthenticated(false);
               setUserRole(null);
               localStorage.removeItem('trv_admin_auth');
@@ -1066,11 +1064,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               await supabase.auth.signOut();
             }
           } else {
-            // Fallback mode: use sede from localStorage
             setUserRole('operator');
             localStorage.setItem('trv_user_role', 'operator');
-            const storedScope = localStorage.getItem('trv_admin_scope_sede') || '';
-            setAdminScopeSedeId(storedScope);
+            setAdminScopeSedeId('');
+            localStorage.setItem('trv_admin_scope_sede', '');
           }
         } else if (isCustomer) {
           if (userId) {
@@ -1106,7 +1103,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       // Cargar productos de Supabase (si es admin, incluir inactivos)
       let productsQuery = supabase.from('products').select('*').range(0, 9999);
-      if (!isAdmin) {
+      if (!isAdmin && !isOperator) {
         productsQuery = productsQuery.or('activo.is.true,activo.is.null');
       }
       const { data: dbProducts } = await productsQuery;
@@ -1286,22 +1283,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         } catch (e) { console.warn('[initData] mesas failed:', e); }
       } else if (isOperator) {
-        // Operator: load orders (filtered by sede) + notifications + mesas
-        const currentSedeId = adminScopeSedeId || localStorage.getItem('trv_admin_scope_sede') || '';
-        const [ordersRes, notifsRes] = await Promise.all([
+        // OPERATOR = same data access as admin (no sede filtering)
+        const [ordersRes, usersRes, notifsRes] = await Promise.all([
           supabase.from('orders').select('*').order('fecha', { ascending: false }),
+          supabase.from('usuarios_clientes').select('*'),
           supabase.from('notifications').select('*').order('created_at', { ascending: false }),
         ]);
 
-        if (ordersRes.data) {
-          const allOrders = ordersRes.data as Order[];
-          if (currentSedeId) {
-            const principalId = (config.sedes || []).find(s => s.es_principal)?.id || (config.sedes || [])[0]?.id || '';
-            setOrders(allOrders.filter(o => (o.sede_id || principalId) === currentSedeId) as Order[]);
-          } else {
-            setOrders(allOrders);
-          }
-        }
+        if (ordersRes.data) setOrders(ordersRes.data as Order[]);
+        if (usersRes.data) setUsers(usersRes.data.map(u => ({ ...u, createdAt: u.created_at, contrasena: 'managed' })));
         if (notifsRes.data) setNotifications(notifsRes.data as InAppNotification[]);
 
         try {
@@ -2136,14 +2126,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (data) setOrders(data as Order[]);
       } else if (isOperator) {
         const { data } = await supabase.from('orders').select('*').order('fecha', { ascending: false });
-        if (data) {
-          const sedeId = adminScopeSedeId || localStorage.getItem('trv_admin_scope_sede') || '';
-          if (sedeId) {
-            setOrders(data.filter(o => (o.sede_id || principalSedeId) === sedeId) as Order[]);
-          } else {
-            setOrders(data as Order[]);
-          }
-        }
+        if (data) setOrders(data as Order[]);
       } else if (currentUser) {
         const { data } = await supabase.from('orders')
           .select('*')
@@ -2910,13 +2893,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           ]);
           if (ordersRes.data) {
             const allOrders = ordersRes.data as Order[];
-            if (isAdmin || !sedeId) {
-              // Admin sees all; operator with no assigned sede also sees all
-              setOrders(allOrders);
-            } else {
-              const principalId = (config.sedes || []).find(s => s.es_principal)?.id || (config.sedes || [])[0]?.id || '';
-              setOrders(allOrders.filter(o => (o.sede_id || principalId) === sedeId) as Order[]);
-            }
+            // Operator = same access as admin: see ALL orders
+            setOrders(allOrders);
           }
           if (notifsRes.data) setNotifications(notifsRes.data as InAppNotification[]);
 
@@ -2971,8 +2949,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         localStorage.setItem('trv_admin_auth', 'true');
         setUserRole('operator');
         localStorage.setItem('trv_user_role', 'operator');
-        setAdminScopeSedeId(sedeId);
-        localStorage.setItem('trv_admin_scope_sede', sedeId);
+        setAdminScopeSedeId('');
+        localStorage.setItem('trv_admin_scope_sede', '');
         return true;
       }
 
