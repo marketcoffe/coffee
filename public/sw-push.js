@@ -157,32 +157,29 @@ self.addEventListener('push', (event) => {
   };
 
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clients) => {
-        const hasOpenClient = clients.some(c => c.visibilityState === 'visible');
+    // SIEMPRE mostrar notificación nativa (independiente de si la app está abierta)
+    self.registration.showNotification(title, options)
+      .then(() => {
+        console.log('[SW Push] showNotification OK:', title);
 
-        // SIEMPRE mostrar notificación del sistema (native)
-        const notificationPromise = self.registration.showNotification(title, options)
-          .then(() => console.log('[SW Push] showNotification OK:', title))
-          .catch((err) => console.error('[SW Push] Error showNotification:', err));
-
-        // Si la app está abierta, enviar también toast in-app + sonido
-        if (hasOpenClient) {
-          console.log('[SW Push] App en foreground — toast SPA adicional');
-          clients.forEach((client) => {
-            client.postMessage({ type: 'PLAY_NOTIFICATION_SOUND', soundUrl });
-            client.postMessage({
-              type: 'SHOW_IN_APP_NOTIFICATION',
-              title, body, icon, badge, image, tag: tag, url: urlToOpen,
-              priority, soundUrl,
-            });
+        // Si la app está abierta, enviar also toast + sonido al SPA
+        return self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+          .then((clients) => {
+            const hasOpenClient = clients.some(c => c.visibilityState === 'visible');
+            if (hasOpenClient) {
+              console.log('[SW Push] App en foreground — toast SPA adicional');
+              clients.forEach((client) => {
+                client.postMessage({ type: 'PLAY_NOTIFICATION_SOUND', soundUrl });
+                client.postMessage({
+                  type: 'SHOW_IN_APP_NOTIFICATION',
+                  title, body, icon, badge, image, tag: tag, url: urlToOpen,
+                  priority, soundUrl,
+                });
+              });
+            }
           });
-        } else {
-          console.log('[SW Push] App en background — solo notificación del sistema');
-        }
-
-        return notificationPromise;
       })
+      .catch((err) => console.error('[SW Push] Error showNotification:', err))
   );
 });
 
