@@ -24,7 +24,7 @@ BEGIN
   SELECT id INTO v_instance_id FROM auth.instances LIMIT 1;
   
   -- Limpiar TODOS los datos de auth relacionados
-  DELETE FROM auth.refresh_tokens WHERE user_id = v_user_id;
+  DELETE FROM auth.refresh_tokens WHERE user_id = v_user_id::text;
   DELETE FROM auth.instances WHERE id = v_user_id;
   
   -- Generar hash bcrypt
