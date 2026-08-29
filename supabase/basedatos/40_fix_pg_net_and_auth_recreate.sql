@@ -40,7 +40,10 @@ BEGIN
   END IF;
 END $$;
 
--- 3. Crear admin correctamente via insert completo
+-- 4. Limpiar usuarios_clientes duplicados que causan conflicto con el trigger
+DELETE FROM public.usuarios_clientes WHERE email IN ('kecho8a@gmail.com', 'marketcoffe.ve@gmail.com');
+
+-- 5. Crear admin correctamente via insert completo
 DO $$
 DECLARE
   v_admin_id UUID := gen_random_uuid();
