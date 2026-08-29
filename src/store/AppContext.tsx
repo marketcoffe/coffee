@@ -1285,6 +1285,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             localStorage.setItem('trv_mesas', JSON.stringify(dbMesas));
           }
         } catch (e) { console.warn('[initData] mesas failed:', e); }
+      } else if (isOperator) {
+        // Operator: load orders (filtered by sede) + notifications + mesas
+        const currentSedeId = adminScopeSedeId || localStorage.getItem('trv_admin_scope_sede') || '';
+        const [ordersRes, notifsRes] = await Promise.all([
+          supabase.from('orders').select('*').order('fecha', { ascending: false }),
+          supabase.from('notifications').select('*').order('created_at', { ascending: false }),
+        ]);
+
+        if (ordersRes.data) {
+          const allOrders = ordersRes.data as Order[];
+          if (currentSedeId) {
+            const principalId = (config.sedes || []).find(s => s.es_principal)?.id || (config.sedes || [])[0]?.id || '';
+            setOrders(allOrders.filter(o => (o.sede_id || principalId) === currentSedeId) as Order[]);
+          } else {
+            setOrders(allOrders);
+          }
+        }
+        if (notifsRes.data) setNotifications(notifsRes.data as InAppNotification[]);
+
+        try {
+          const { data: dbMesas } = await supabase.from('mesas').select('*').order('numero_mesa');
+          if (dbMesas && dbMesas.length > 0) setMesas(dbMesas as Mesa[]);
+        } catch (e) { console.warn('[initData] mesas for operator failed:', e); }
       } else if (currentUser) {
         // Cargar Pedidos del usuario (por teléfono o ID)
         const { data: dbOrders } = await supabase.from('orders')
@@ -2111,10 +2134,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (isAdmin) {
         const { data } = await supabase.from('orders').select('*').order('fecha', { ascending: false });
         if (data) setOrders(data as Order[]);
-      } else if (isOperator && adminScopeSedeId) {
+      } else if (isOperator) {
         const { data } = await supabase.from('orders').select('*').order('fecha', { ascending: false });
         if (data) {
-          setOrders(data.filter(o => (o.sede_id || principalSedeId) === adminScopeSedeId) as Order[]);
+          const sedeId = adminScopeSedeId || localStorage.getItem('trv_admin_scope_sede') || '';
+          if (sedeId) {
+            setOrders(data.filter(o => (o.sede_id || principalSedeId) === sedeId) as Order[]);
+          } else {
+            setOrders(data as Order[]);
+          }
         }
       } else if (currentUser) {
         const { data } = await supabase.from('orders')
@@ -2882,9 +2910,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           ]);
           if (ordersRes.data) {
             const allOrders = ordersRes.data as Order[];
-            if (isAdmin) {
+            if (isAdmin || !sedeId) {
+              // Admin sees all; operator with no assigned sede also sees all
               setOrders(allOrders);
-            } else if (sedeId) {
+            } else {
               const principalId = (config.sedes || []).find(s => s.es_principal)?.id || (config.sedes || [])[0]?.id || '';
               setOrders(allOrders.filter(o => (o.sede_id || principalId) === sedeId) as Order[]);
             }
