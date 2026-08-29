@@ -996,9 +996,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       // BUG FIX: Si es admin/operador/customer, cargar TODO. Obtener sesión primero.
       const { data: { session } } = await supabase.auth.getSession();
-      const sessionEmail = session?.user?.email || '';
       const sessionRole = session?.user?.app_metadata?.role || session?.user?.user_metadata?.role;
-      let isAdmin = sessionEmail === 'kecho8a@gmail.com' || sessionRole === 'admin';
+      let isAdmin = sessionRole === 'admin';
       let isOperator = sessionRole === 'operator';
       let isCustomer = sessionRole === 'customer';
 
@@ -1372,9 +1371,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         if (session) {
-          const sessionEmail = session.user?.email || '';
           const sessionRole = session.user?.app_metadata?.role || session.user?.user_metadata?.role;
-          const isAdmin = sessionEmail === 'kecho8a@gmail.com' || sessionRole === 'admin';
+          const isAdmin = sessionRole === 'admin';
           const isOperator = sessionRole === 'operator';
           const isCustomer = sessionRole === 'customer';
           if (isAdmin || isOperator || isCustomer) {
@@ -1416,9 +1414,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (localStorage.getItem('trv_admin_auth') === 'true') {
           supabase.auth.getSession().then(({ data: { session: restoredSession } }) => {
             if (restoredSession) {
-              const sessionEmail = restoredSession.user?.email || '';
               const sessionRole = restoredSession.user?.app_metadata?.role || restoredSession.user?.user_metadata?.role;
-              const isAdmin = sessionEmail === 'kecho8a@gmail.com' || sessionRole === 'admin';
+              const isAdmin = sessionRole === 'admin';
               const isOperator = sessionRole === 'operator';
               const isCustomer = sessionRole === 'customer';
               if (isAdmin || isOperator || isCustomer) {
@@ -2107,9 +2104,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // latest orders even if the realtime subscription missed an event).
   const refreshOrders = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    const sessionEmail = session?.user?.email || '';
     const sessionRole = session?.user?.app_metadata?.role || session?.user?.user_metadata?.role;
-    let isAdmin = sessionEmail === 'kecho8a@gmail.com' || sessionRole === 'admin';
+    let isAdmin = sessionRole === 'admin';
     let isOperator = sessionRole === 'operator';
     const principalSedeId = (config.sedes || []).find(s => s.es_principal)?.id || (config.sedes || [])[0]?.id || '';
 

@@ -210,7 +210,7 @@ try {
     supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: true,
-        autoRefreshToken: false,
+        autoRefreshToken: true,
         detectSessionInUrl: true,
         flowType: 'pkce',
         lock: noopLock,

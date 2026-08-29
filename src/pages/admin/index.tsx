@@ -3,6 +3,7 @@ import { ErrorBoundary } from '../../components/ErrorBoundary';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 import { useApp } from '../../store/AppContext';
 import { useAdminStore } from '../../store/stores/adminStore';
+import { supabase } from '../../store/supabaseClient';
 import { Order, FoodItem } from '../../types/store';
 import { log } from '../../utils/logger';
 import {
@@ -171,13 +172,24 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
   const { activeSection, setActiveSection, sidebarCollapsed, toggleSidebarCollapsed } = useAdminStore();
   const themeColor = config.theme_color || '#A4D045';
   const isAdmin = userRole === 'admin';
-  const scopeSedeId = '';
+  const scopeSedeId = adminScopeSedeId || '';
 
   const [showMoreSheet, setShowMoreSheet] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openEditor, setOpenEditor] = useState<FoodItem | null>(null);
   const [showProductForm, setShowProductForm] = useState(false);
   const [newOrderFlash, setNewOrderFlash] = useState(false);
+  const [hasSupabaseSession, setHasSupabaseSession] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!cancelled) setHasSupabaseSession(!!session);
+    }).catch(() => {
+      if (!cancelled) setHasSupabaseSession(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -365,7 +377,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
 
         <div className="erp-content" style={{ padding: 16 }}>
           {/* Degraded mode warning — no real Supabase Auth session */}
-          {!isAdmin && localStorage.getItem('trv_admin_auth') === 'true' && (
+          {hasSupabaseSession === false && localStorage.getItem('trv_admin_auth') === 'true' && (
             <div className="mb-3 px-4 py-2 rounded-xl border border-amber-300 bg-amber-50 text-amber-800 text-xs font-medium flex items-center gap-2">
               <span className="text-base">⚠️</span>
               <span>Sesión sin conexión a Supabase Auth. Los datos se cargan localmente. Si el problema persiste, contacte al administrador.</span>
