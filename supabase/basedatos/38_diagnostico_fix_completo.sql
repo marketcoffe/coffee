@@ -35,13 +35,13 @@ SELECT
   a.id as admin_id,
   a.role as admin_role,
   a.active,
-  CASE WHEN a.id IS NULL THEN '❌ FALTA en admin_users' ELSE '✅ OK' END as status
+  CASE WHEN a.id IS NULL THEN 'FALTA en admin_users' ELSE 'OK' END as status
 FROM auth.users u
 LEFT JOIN public.admin_users a ON a.id = u.id
 WHERE u.email IN ('kecho8a@gmail.com', 'marketcoffe.ve@gmail.com')
 ORDER BY u.email;
 
--- 1d. Publicación realtime - qué tablas están habilitadas
+-- 1d. Publicacion realtime - que tablas estan habilitadas
 SELECT '=== REALTIME PUBLICATION ===' as section;
 SELECT tablename 
 FROM pg_publication_tables 
@@ -52,11 +52,12 @@ ORDER BY tablename;
 SELECT '=== REPLICA IDENTITY ===' as section;
 SELECT 
   c.relname as table_name,
-  CASE c.relreplident
+  CASE c.relreplident::text
     WHEN 'd' THEN 'DEFAULT'
     WHEN 'n' THEN 'NOTHING'
     WHEN 'f' THEN 'FULL'
     WHEN 'i' THEN 'INDEX'
+    ELSE c.relreplident::text
   END as replica_identity
 FROM pg_class c
 JOIN pg_namespace n ON n.oid = c.relnamespace
@@ -77,7 +78,7 @@ SELECT COUNT(*) as total,
   COUNT(*) FILTER (WHERE endpoint IS NOT NULL AND p256dh IS NOT NULL AND auth_secret IS NOT NULL) as valid
 FROM push_subscriptions;
 
--- 1h. Verificar GRANTS en tablas críticas
+-- 1h. Verificar GRANTS en tablas criticas
 SELECT '=== TABLE GRANTS ===' as section;
 SELECT 
   grantee, table_name, privilege_type
@@ -91,7 +92,7 @@ ORDER BY table_name, grantee, privilege_type;
 -- PARTE 2: FIXES
 -- ═══════════════════════════════════════════════════════════════
 
--- 2a. Asegurar REPLICA IDENTITY FULL en tablas críticas para CDC
+-- 2a. Asegurar REPLICA IDENTITY FULL en tablas criticas para CDC
 ALTER TABLE IF EXISTS public.orders REPLICA IDENTITY FULL;
 ALTER TABLE IF EXISTS public.notifications REPLICA IDENTITY FULL;
 ALTER TABLE IF EXISTS public.store_config REPLICA IDENTITY FULL;
@@ -99,74 +100,54 @@ ALTER TABLE IF EXISTS public.products REPLICA IDENTITY FULL;
 ALTER TABLE IF EXISTS public.mesas REPLICA IDENTITY FULL;
 ALTER TABLE IF EXISTS public.usuarios_clientes REPLICA IDENTITY FULL;
 
-SELECT '✅ REPLICA IDENTITY FULL aplicado' as fix;
+SELECT 'REPLICA IDENTITY FULL aplicado' as fix;
 
--- 2b. Agregar tablas a publicación supabase_realtime (ignora si ya existe)
+-- 2b. Agregar tablas a publicacion supabase_realtime (ignora si ya existe)
 DO $$
 BEGIN
-  -- orders
   IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='orders') THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
-    RAISE NOTICE '✅ orders agregado a supabase_realtime';
-  ELSE
-    RAISE NOTICE 'ℹ️ orders ya está en supabase_realtime';
+    RAISE NOTICE 'orders agregado a supabase_realtime';
   END IF;
 
-  -- notifications
   IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='notifications') THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
-    RAISE NOTICE '✅ notifications agregado a supabase_realtime';
-  ELSE
-    RAISE NOTICE 'ℹ️ notifications ya está en supabase_realtime';
+    RAISE NOTICE 'notifications agregado a supabase_realtime';
   END IF;
 
-  -- store_config
   IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='store_config') THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.store_config;
-    RAISE NOTICE '✅ store_config agregado a supabase_realtime';
-  ELSE
-    RAISE NOTICE 'ℹ️ store_config ya está en supabase_realtime';
+    RAISE NOTICE 'store_config agregado a supabase_realtime';
   END IF;
 
-  -- products
   IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='products') THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.products;
-    RAISE NOTICE '✅ products agregado a supabase_realtime';
-  ELSE
-    RAISE NOTICE 'ℹ️ products ya está en supabase_realtime';
+    RAISE NOTICE 'products agregado a supabase_realtime';
   END IF;
 
-  -- mesas
   IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='mesas') THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.mesas;
-    RAISE NOTICE '✅ mesas agregado a supabase_realtime';
-  ELSE
-    RAISE NOTICE 'ℹ️ mesas ya está en supabase_realtime';
+    RAISE NOTICE 'mesas agregado a supabase_realtime';
   END IF;
 END $$;
 
 -- 2c. RLS para push_subscriptions: permitir SELECT a anon (para Cloudflare Worker)
--- Primero eliminar política restrictiva si existe
 DROP POLICY IF EXISTS "push_subscriptions_insert_anon" ON public.push_subscriptions;
 DROP POLICY IF EXISTS "push_subscriptions_service_role_all" ON public.push_subscriptions;
 
--- Política: anon puede LEER todas las suscripciones (para push-notify Worker)
 CREATE POLICY "push_subscriptions_anon_select" ON public.push_subscriptions
   FOR SELECT TO anon USING (true);
 
--- Política: anon puede INSERTAR suscripciones
 CREATE POLICY "push_subscriptions_anon_insert" ON public.push_subscriptions
   FOR INSERT TO anon WITH CHECK (true);
 
--- Política: authenticated puede gestionar todas (admin/operator)
 CREATE POLICY "push_subscriptions_auth_all" ON public.push_subscriptions
   FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
--- Política: service_role puede todo
 CREATE POLICY "push_subscriptions_service_all" ON public.push_subscriptions
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 
-SELECT '✅ RLS push_subscriptions: anon puede SELECT + INSERT' as fix;
+SELECT 'RLS push_subscriptions: anon puede SELECT + INSERT' as fix;
 
 -- 2d. Asegurar que push_subscriptions tenga las columnas necesarias
 ALTER TABLE IF EXISTS public.push_subscriptions 
@@ -175,17 +156,16 @@ ALTER TABLE IF EXISTS public.push_subscriptions
   ADD COLUMN IF NOT EXISTS user_agent TEXT,
   ADD COLUMN IF NOT EXISTS last_used_at TIMESTAMPTZ DEFAULT NOW();
 
-SELECT '✅ push_subscriptions columnas verificadas' as fix;
+SELECT 'push_subscriptions columnas verificadas' as fix;
 
--- 2e. GRANT SELECT en push_subscriptions para anon
+-- 2e. GRANTS en push_subscriptions
 GRANT SELECT, INSERT ON public.push_subscriptions TO anon;
 GRANT ALL ON public.push_subscriptions TO authenticated;
 GRANT ALL ON public.push_subscriptions TO service_role;
 
-SELECT '✅ GRANTS push_subscriptions actualizados' as fix;
+SELECT 'GRANTS push_subscriptions actualizados' as fix;
 
--- 2f. Asegurar RLS en orders para que anon pueda SELECT (necesario para degraded mode)
--- Verificar si ya existe política de SELECT para orders
+-- 2f. RLS en orders para anon SELECT (degraded mode)
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -196,13 +176,11 @@ BEGIN
   ) THEN
     CREATE POLICY "orders_anon_select" ON public.orders
       FOR SELECT TO anon USING (true);
-    RAISE NOTICE '✅ orders: anon SELECT policy created';
-  ELSE
-    RAISE NOTICE 'ℹ️ orders: anon SELECT policy already exists';
+    RAISE NOTICE 'orders: anon SELECT policy created';
   END IF;
 END $$;
 
--- 2g. Asegurar RLS en notifications para anon
+-- 2g. RLS en notifications para anon SELECT
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -213,13 +191,11 @@ BEGIN
   ) THEN
     CREATE POLICY "notifications_anon_select" ON public.notifications
       FOR SELECT TO anon USING (true);
-    RAISE NOTICE '✅ notifications: anon SELECT policy created';
-  ELSE
-    RAISE NOTICE 'ℹ️ notifications: anon SELECT policy already exists';
+    RAISE NOTICE 'notifications: anon SELECT policy created';
   END IF;
 END $$;
 
--- 2h. Verificar/crear política UPDATE para orders (authenticated puede cambiar estado)
+-- 2h. RLS orders UPDATE para authenticated
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -229,13 +205,11 @@ BEGIN
   ) THEN
     CREATE POLICY "orders_auth_update" ON public.orders
       FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
-    RAISE NOTICE '✅ orders: authenticated UPDATE policy created';
-  ELSE
-    RAISE NOTICE 'ℹ️ orders: UPDATE policy already exists';
+    RAISE NOTICE 'orders: authenticated UPDATE policy created';
   END IF;
 END $$;
 
--- 2i. Verificar/crear política DELETE para orders (authenticated puede eliminar)
+-- 2i. RLS orders DELETE para authenticated
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -245,40 +219,33 @@ BEGIN
   ) THEN
     CREATE POLICY "orders_auth_delete" ON public.orders
       FOR DELETE TO authenticated USING (true);
-    RAISE NOTICE '✅ orders: authenticated DELETE policy created';
-  ELSE
-    RAISE NOTICE 'ℹ️ orders: DELETE policy already exists';
+    RAISE NOTICE 'orders: authenticated DELETE policy created';
   END IF;
 END $$;
 
--- 2j. Grants en orders para authenticated
+-- 2j. GRANTS en orders
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.orders TO authenticated;
 
-SELECT '✅ RLS + GRANTS orders actualizados' as fix;
+SELECT 'RLS + GRANTS orders actualizados' as fix;
 
 -- ═══════════════════════════════════════════════════════════════
--- PARTE 2b: RESET DE CONTRASEÑA DEL OPERADOR
+-- PARTE 2b: RESET DE CONTRASENA DEL OPERADOR
 -- ═══════════════════════════════════════════════════════════════
 
--- Función para resetear contraseña de usuario auth
--- USO: SELECT reset_user_password('marketcoffe.ve@gmail.com', 'market.2026');
 CREATE OR REPLACE FUNCTION public.reset_user_password(p_email TEXT, p_new_password TEXT)
 RETURNS TEXT AS $$
 DECLARE
   v_user_id UUID;
   v_new_encrypted TEXT;
 BEGIN
-  -- Buscar el usuario
   SELECT id INTO v_user_id FROM auth.users WHERE email = p_email;
   
   IF v_user_id IS NULL THEN
-    RETURN '❌ Usuario no encontrado: ' || p_email;
+    RETURN 'Usuario no encontrado: ' || p_email;
   END IF;
   
-  -- Generar hash bcrypt de la nueva contraseña
   v_new_encrypted := crypt(p_new_password, gen_salt('bf'));
   
-  -- Actualizar la contraseña en auth.users
   UPDATE auth.users 
   SET 
     encrypted_password = v_new_encrypted,
@@ -287,35 +254,34 @@ BEGIN
     updated_at = NOW()
   WHERE id = v_user_id;
   
-  -- Asegurar que existe en admin_users
   INSERT INTO public.admin_users (id, email, nombre, role, active)
   VALUES (v_user_id, p_email, p_email, 'operator', true)
   ON CONFLICT (id) DO UPDATE SET active = true;
   
-  RETURN '✅ Contraseña actualizada para ' || p_email || ' (id: ' || v_user_id || ')';
+  RETURN 'Contrasena actualizada para ' || p_email || ' (id: ' || v_user_id || ')';
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Ejecutar el reset para el operador
+-- Resetear contrasena del operador
 SELECT public.reset_user_password('marketcoffe.ve@gmail.com', 'market.2026');
 
--- También resetear admin por si acaso
+-- Resetear contrasena del admin
 SELECT public.reset_user_password('kecho8a@gmail.com', 'Market.2026');
 
 -- ═══════════════════════════════════════════════════════════════
--- PARTE 3: VERIFICACIÓN FINAL
+-- PARTE 3: VERIFICACION FINAL
 -- ═══════════════════════════════════════════════════════════════
 
-SELECT '=== VERIFICACIÓN FINAL ===' as section;
+SELECT '=== VERIFICACION FINAL ===' as section;
 
--- Realtime publication
+-- Realtime tables
 SELECT 'Realtime tables:' as check, string_agg(tablename, ', ') as tables
 FROM pg_publication_tables WHERE pubname = 'supabase_realtime';
 
 -- Replica Identity
 SELECT 
   c.relname as table_name,
-  CASE c.relreplident WHEN 'f' THEN '✅ FULL' ELSE '❌ ' || c.relreplident END as status
+  CASE c.relreplident::text WHEN 'f' THEN 'FULL' ELSE c.relreplident::text END as status
 FROM pg_class c
 JOIN pg_namespace n ON n.oid = c.relnamespace
 WHERE n.nspname = 'public' 
@@ -331,11 +297,11 @@ ORDER BY policyname;
 -- Auth users state
 SELECT 
   u.email,
-  CASE WHEN a.id IS NOT NULL THEN '✅' ELSE '❌ NO EN admin_users' END as admin_users_status,
+  CASE WHEN a.id IS NOT NULL THEN 'OK' ELSE 'FALTA en admin_users' END as admin_users_status,
   a.role as admin_role,
   a.active
 FROM auth.users u
 LEFT JOIN public.admin_users a ON a.id = u.id
 WHERE u.email IN ('kecho8a@gmail.com', 'marketcoffe.ve@gmail.com');
 
-SELECT '=== DIAGNÓSTICO COMPLETO ===' as done;
+SELECT '=== DIAGNOSTICO COMPLETO ===' as done;
