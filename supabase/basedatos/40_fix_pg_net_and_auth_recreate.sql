@@ -84,10 +84,10 @@ BEGIN
     'email', 'kecho8a@gmail.com', NOW(), NOW(), NOW()
   );
 
-  -- Crear admin_users
+  -- Crear admin_users (upsert por email)
   INSERT INTO public.admin_users (id, email, username, nombre, role, active)
   VALUES (v_admin_id, 'kecho8a@gmail.com', 'maketo', 'Market Coffee', 'admin', true)
-  ON CONFLICT (id) DO UPDATE SET active = true, role = 'admin', username = 'maketo', nombre = 'Market Coffee';
+  ON CONFLICT (email) DO UPDATE SET id = v_admin_id, active = true, role = 'admin', username = 'maketo', nombre = 'Market Coffee';
 
   -- Crear operador en auth.users
   INSERT INTO auth.users (
@@ -113,10 +113,10 @@ BEGIN
     'email', 'marketcoffe.ve@gmail.com', NOW(), NOW(), NOW()
   );
 
-  -- Crear admin_users para operador
+  -- Crear admin_users para operador (upsert por email)
   INSERT INTO public.admin_users (id, email, username, nombre, role, active)
   VALUES (v_op_id, 'marketcoffe.ve@gmail.com', 'marketcoffee', 'Market Coffee', 'operator', true)
-  ON CONFLICT (id) DO UPDATE SET active = true, role = 'operator', username = 'marketcoffee';
+  ON CONFLICT (email) DO UPDATE SET id = v_op_id, active = true, role = 'operator', username = 'marketcoffee';
 
   RAISE NOTICE 'Admin created: % (email: kecho8a@gmail.com)', v_admin_id;
   RAISE NOTICE 'Operator created: % (email: marketcoffe.ve@gmail.com)', v_op_id;
