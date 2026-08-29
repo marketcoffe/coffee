@@ -1879,7 +1879,7 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* ═══ 8. PWA DOWNLOAD INVITATION ═══ */}
       <section id="download-app" className="py-6 px-4 md:px-8 max-w-[1440px] mx-auto w-full scroll-mt-4">
-        <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: tc, color: '#1a1c1d' }}>
+        <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: '#A4D045', color: '#1a1c1d' }}>
           <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-black/5 rounded-full blur-2xl" />
           <div className="absolute -left-8 -top-8 w-24 h-24 bg-black/5 rounded-full blur-xl" />
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
@@ -1920,7 +1920,7 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* ═══ 9. GANA Y ACUMULA PUNTOS ═══ */}
       <section className="py-6 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
-        <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: isDarkMode ? '#1a1a1a' : '#2f3132' }}>
+        <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: '#1d4ed8' }}>
           <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full blur-3xl opacity-20" style={{ backgroundColor: tc }} />
           <div className="relative z-10">
             <div className="flex items-center gap-1.5 mb-2">
