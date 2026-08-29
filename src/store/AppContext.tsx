@@ -2860,7 +2860,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       // 3. Si signInWithPassword falla, establecer sesión local (fallback)
       if (error || !data?.session) {
-        console.warn('[Auth] signInWithPassword failed, using local session fallback:', error?.message || 'no session');
+        console.warn('[Auth] signInWithPassword failed:', error?.message || 'no session', '| email:', authEmail);
+        console.warn('[Auth] → Operador en modo degradado. Ejecutar 41_sync_admin_users_to_auth.sql en Supabase y resetear contraseña desde el panel si persiste.');
+
         const role = rpcResult.role!;
         const sedeId = rpcResult.sede_id || '';
         const userId = rpcResult.user_id || '';

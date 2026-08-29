@@ -79,6 +79,23 @@ BEGIN
         RETURN jsonb_build_object('success', false, 'error', 'Credenciales incorrectas.', 'locked', false, 'attempts_remaining', v_max_attempts - v_failed_count);
     END IF;
 
+    -- CRÍTICO: Validar contraseña con crypt()
+    v_is_valid := (v_password_hash = crypt(p_password, v_password_hash));
+
+    IF NOT v_is_valid THEN
+        INSERT INTO security_audit_logs (event_type, identifier, ip_address, user_agent, metadata)
+        VALUES ('login_failed', p_identifier, p_ip_address, p_user_agent,
+                jsonb_build_object('reason', 'invalid_password', 'attempt_number', v_failed_count + 1, 'user_email', v_user_email, 'user_role', v_user_record.role));
+
+        IF v_failed_count + 1 >= v_max_attempts THEN
+            INSERT INTO security_audit_logs (event_type, identifier, ip_address, user_agent, metadata)
+            VALUES ('account_locked', p_identifier, p_ip_address, p_user_agent,
+                    jsonb_build_object('reason', 'max_attempts_reached', 'total_failures', v_failed_count + 1, 'lockout_minutes', 15));
+        END IF;
+
+        RETURN jsonb_build_object('success', false, 'error', 'Credenciales incorrectas.', 'locked', false, 'attempts_remaining', GREATEST(0, v_max_attempts - v_failed_count - 1));
+    END IF;
+
     INSERT INTO security_audit_logs (event_type, identifier, ip_address, user_agent, metadata)
     VALUES ('login_success', p_identifier, p_ip_address, p_user_agent,
             jsonb_build_object('user_id', v_user_record.id, 'role', v_user_record.role, 'username', v_user_record.username));

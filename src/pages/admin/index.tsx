@@ -151,11 +151,11 @@ const ALL_SECTIONS = [
   { id: 'branding',        label: 'Personalizacion',   icon: Palette,         group: 'config', groupLabel: 'Configuracion', adminOnly: true },
   { id: 'pwa-config',      label: 'PWA',               icon: Smartphone,      group: 'config', adminOnly: true },
   { id: 'seo',             label: 'SEO',               icon: Search,          group: 'config', adminOnly: true },
-  { id: 'branches',        label: 'Sucursales',        icon: Building2,       group: 'config', adminOnly: true },
-  { id: 'roles',           label: 'Roles',             icon: Shield,          group: 'config', adminOnly: true },
+  { id: 'branches',        label: 'Sucursales',        icon: Building2,       group: 'config' },
+  { id: 'roles',           label: 'Roles',             icon: Shield,          group: 'config' },
   { id: 'system',          label: 'Sistema',           icon: Settings,        group: 'config', adminOnly: true },
-  { id: 'extras',          label: 'Extras Productos',  icon: Sliders,         group: 'config', adminOnly: true },
-  { id: 'faq',             label: 'FAQ',               icon: HelpCircle,      group: 'config', adminOnly: true },
+  { id: 'extras',          label: 'Extras Productos',  icon: Sliders,         group: 'config' },
+  { id: 'faq',             label: 'FAQ',               icon: HelpCircle,      group: 'config' },
   { id: 'password-reset',  label: 'Recuperar Clave',    icon: Key,             group: 'config' },
 ];
 

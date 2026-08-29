@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { RefreshCcw, FileJson, Bell, AlertTriangle, Terminal } from 'lucide-react';
 import { useToast } from '../../../../components/Toast';
+import DatabaseCleanup from './DatabaseCleanup';
 
 const SistemaSection: React.FC = () => {
   const { config, updateConfig, foodItems, coupons, notifications, currentUser, addNotification } = useApp();
@@ -183,6 +184,8 @@ const SistemaSection: React.FC = () => {
           <p className="text-slate-500">// No hay errores criticos registrados en esta sesion.</p>
         </div>
       </div>
+
+      <DatabaseCleanup />
 
       <div className="admin-card p-4">
         <div className="flex items-center gap-3 mb-3">
