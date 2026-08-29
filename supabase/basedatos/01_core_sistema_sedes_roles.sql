@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS store_config (
 
     -- Identidad del sitio
     site_nombre TEXT NOT NULL DEFAULT 'Market Coffee Sweet',
-    telefono_soporte TEXT NOT NULL DEFAULT '+584124058904',
+    telefono_soporte TEXT NOT NULL DEFAULT '+584123758879',
     direccion_fisica TEXT NOT NULL DEFAULT 'Av. Principal El Trigal, justo al frente de Patio Trigal, Valencia, Carabobo',
     tienda_lat NUMERIC(10, 6) NOT NULL DEFAULT 10.218500,
     tienda_lng NUMERIC(10, 6) NOT NULL DEFAULT -68.002100,
@@ -278,13 +278,12 @@ DECLARE
     v_welcome_bonus int;
     v_loyalty_config jsonb;
 BEGIN
-    INSERT INTO public.usuarios_clientes (id, nombre, email, telefono, contrasena)
+    INSERT INTO public.usuarios_clientes (id, nombre, email, telefono)
     VALUES (
         NEW.id::text,
         COALESCE(NEW.raw_user_meta_data->>'nombre', 'Usuario Nuevo'),
         NEW.email,
-        NULLIF(COALESCE(NEW.raw_user_meta_data->>'telefono', ''), ''),
-        'auth_managed'
+        NULLIF(COALESCE(NEW.raw_user_meta_data->>'telefono', ''), '')
     )
     ON CONFLICT (id) DO UPDATE SET
         nombre = COALESCE(EXCLUDED.nombre, usuarios_clientes.nombre),

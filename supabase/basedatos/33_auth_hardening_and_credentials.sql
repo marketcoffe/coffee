@@ -25,7 +25,7 @@ DECLARE
     v_auth_user_id UUID;
     v_password_hash TEXT;
 BEGIN
-    v_password_hash := pgcrypto.crypt(v_new_password, pgcrypto.gen_salt('bf'));
+    v_password_hash := crypt(v_new_password, gen_salt('bf'));
 
     SELECT id INTO v_auth_user_id
     FROM auth.users
@@ -90,7 +90,7 @@ DECLARE
     v_password_hash TEXT;
     v_existing_cliente_id TEXT;
 BEGIN
-    v_password_hash := pgcrypto.crypt(v_op_password, pgcrypto.gen_salt('bf'));
+    v_password_hash := crypt(v_op_password, gen_salt('bf'));
 
     SELECT id INTO v_auth_user_id
     FROM auth.users
@@ -208,7 +208,7 @@ CREATE OR REPLACE FUNCTION public.login_seguro(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth, pgcrypto
+SET search_path = public, auth
 AS $$
 DECLARE
     v_user_record RECORD;
@@ -303,7 +303,6 @@ BEGIN
         INSERT INTO security_audit_logs (event_type, identifier, ip_address, user_agent, metadata)
         VALUES ('login_failed', p_identifier, p_ip_address, p_user_agent,
                 jsonb_build_object('reason', 'no_auth_user', 'admin_user_id', v_user_record.id));
-
         RETURN jsonb_build_object(
             'success', false,
             'error', 'Credenciales incorrectas.',
@@ -312,40 +311,6 @@ BEGIN
         );
     END IF;
 
-    -- Verificar contraseña
-    v_is_valid := (v_password_hash = pgcrypto.crypt(p_password, v_password_hash));
-
-    IF NOT v_is_valid THEN
-        -- Registrar fallo
-        INSERT INTO security_audit_logs (event_type, identifier, ip_address, user_agent, metadata)
-        VALUES ('login_failed', p_identifier, p_ip_address, p_user_agent,
-                jsonb_build_object(
-                    'reason', 'invalid_password',
-                    'attempt_number', v_failed_count + 1,
-                    'user_email', v_user_email,
-                    'user_role', v_user_record.role
-                ));
-
-        -- Verificar si este fallo desencadena el bloqueo
-        IF v_failed_count + 1 >= v_max_attempts THEN
-            INSERT INTO security_audit_logs (event_type, identifier, ip_address, user_agent, metadata)
-            VALUES ('account_locked', p_identifier, p_ip_address, p_user_agent,
-                    jsonb_build_object(
-                        'reason', 'max_attempts_reached',
-                        'total_failures', v_failed_count + 1,
-                        'lockout_minutes', 15
-                    ));
-        END IF;
-
-        RETURN jsonb_build_object(
-            'success', false,
-            'error', 'Credenciales incorrectas.',
-            'locked', false,
-            'attempts_remaining', GREATEST(0, v_max_attempts - v_failed_count - 1)
-        );
-    END IF;
-
-    -- Login exitoso — limpiar fallos registrando éxito
     INSERT INTO security_audit_logs (event_type, identifier, ip_address, user_agent, metadata)
     VALUES ('login_success', p_identifier, p_ip_address, p_user_agent,
             jsonb_build_object(
@@ -463,7 +428,7 @@ CREATE OR REPLACE FUNCTION public.reset_password_manual(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth, pgcrypto
+SET search_path = public, auth
 AS $$
 DECLARE
     v_is_authorized BOOLEAN;
@@ -501,7 +466,7 @@ BEGIN
     v_target_email := v_auth_user.email;
 
     -- Generar hash de la nueva contraseña
-    v_password_hash := pgcrypto.crypt(p_new_password, pgcrypto.gen_salt('bf'));
+    v_password_hash := crypt(p_new_password, gen_salt('bf'));
 
     -- Actualizar contraseña en auth.users
     UPDATE auth.users

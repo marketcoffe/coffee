@@ -20,7 +20,7 @@ CREATE OR REPLACE FUNCTION public.login_seguro(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth, pgcrypto
+SET search_path = public, auth
 AS $$
 DECLARE
     v_user_record RECORD;

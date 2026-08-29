@@ -20,7 +20,7 @@ CREATE OR REPLACE FUNCTION public.login_seguro_cliente(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth, pgcrypto
+SET search_path = public, auth
 AS $$
 DECLARE
     v_user_record RECORD;
@@ -162,7 +162,7 @@ BEGIN
     END IF;
 
     -- Verificar contraseña
-    v_is_valid := (v_password_hash = pgcrypto.crypt(p_password, v_password_hash));
+    v_is_valid := (v_password_hash = crypt(p_password, v_password_hash));
 
     IF NOT v_is_valid THEN
         -- Registrar fallo

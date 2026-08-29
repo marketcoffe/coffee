@@ -20,7 +20,7 @@ DECLARE
     v_password_hash TEXT;
     v_existing_cliente_id TEXT;
 BEGIN
-    v_password_hash := pgcrypto.crypt(v_op_password, pgcrypto.gen_salt('bf'));
+    v_password_hash := crypt(v_op_password, gen_salt('bf'));
 
     -- Buscar si ya existe en auth.users
     SELECT id INTO v_auth_user_id
@@ -123,7 +123,7 @@ DECLARE
     v_auth_user_id UUID;
     v_password_hash TEXT;
 BEGIN
-    v_password_hash := pgcrypto.crypt(v_admin_password, pgcrypto.gen_salt('bf'));
+    v_password_hash := crypt(v_admin_password, gen_salt('bf'));
 
     SELECT id INTO v_auth_user_id
     FROM auth.users
