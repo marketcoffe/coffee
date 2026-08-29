@@ -1879,19 +1879,19 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* ═══ 8. PWA DOWNLOAD INVITATION ═══ */}
       <section id="download-app" className="py-6 px-4 md:px-8 max-w-[1440px] mx-auto w-full scroll-mt-4">
-        <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: tc, color: '#fff' }}>
+        <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: tc, color: '#1a1c1d' }}>
           <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-black/5 rounded-full blur-2xl" />
           <div className="absolute -left-8 -top-8 w-24 h-24 bg-black/5 rounded-full blur-xl" />
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
             <div className="flex-1">
               <div className="flex items-center gap-1.5 mb-2">
-                <Sparkles size={16} className="text-white" />
-                <span className="text-white/60 font-semibold text-[10px] uppercase tracking-widest">Exclusivo Móvil</span>
+                <Sparkles size={16} className="text-black/60" />
+                <span className="font-semibold text-[10px] uppercase tracking-widest text-black/50">Exclusivo Móvil</span>
               </div>
-              <h3 className="text-lg md:text-xl font-extrabold mb-2">
+              <h3 className="text-lg md:text-xl font-extrabold mb-2 text-black">
                 Descarga la app en tu móvil
               </h3>
-              <p className="text-white/60 mb-4 text-xs md:text-sm max-w-md">
+              <p className="text-black/60 mb-4 text-xs md:text-sm max-w-md">
                 Instálala directamente desde tu navegador y estate al tanto de nuestras promociones exclusivas. Sin descargas pesadas, directo a tu pantalla de inicio.
               </p>
               <div className="flex flex-col sm:flex-row gap-2">
@@ -1901,18 +1901,18 @@ export const Home: React.FC<HomeProps> = ({
                   } else {
                     setShowIOSInstallModal(true);
                   }
-                }} className="h-10 bg-black text-white rounded-lg px-5 flex items-center justify-center gap-2 border border-black/10 hover:bg-black/10 transition-colors font-bold text-xs">
+                }} className="h-10 bg-black text-white rounded-lg px-5 flex items-center justify-center gap-2 border border-black/10 hover:bg-black/80 transition-colors font-bold text-xs">
                   <Download size={16} />
                   Instalar App Web
                 </button>
-                <p className="text-[10px] text-white/50 flex items-center gap-1">
+                <p className="text-[10px] text-black/50 flex items-center gap-1">
                   <Smartphone size={12} />
                   Funciona como una app nativa en tu celular
                 </p>
               </div>
             </div>
             <div className="hidden md:flex items-center justify-center w-24 h-24 rounded-2xl bg-black/5 backdrop-blur-sm shrink-0">
-              <Smartphone size={36} className="text-white" />
+              <Smartphone size={36} className="text-black/70" />
             </div>
           </div>
         </div>
