@@ -10,6 +10,7 @@ import './index.css';
 // ═══════════════════════════════════════════════════════════════
 
 // Errores de JavaScript no capturados
+let _reloading = false;
 window.addEventListener('error', (event) => {
   const msg = event?.message || '';
   const isCorrupted = 
@@ -19,10 +20,17 @@ window.addEventListener('error', (event) => {
     msg.includes('Loading chunk') ||
     msg.includes('Importing a module script failed');
   
-  if (isCorrupted) {
+  if (isCorrupted && !_reloading) {
+    _reloading = true;
     log.warn('Main', 'Modulo dinamico corrupto detectado, limpiando cache y recargando...', { message: msg });
     if ('caches' in window) {
       caches.keys().then(names => Promise.all(names.map(n => caches.delete(n)))).catch(() => {});
+    }
+    // Unregister stale service workers so they don't serve old chunks
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        regs.forEach((r) => r.unregister());
+      }).catch(() => {});
     }
     setTimeout(() => window.location.reload(), 500);
     return;
