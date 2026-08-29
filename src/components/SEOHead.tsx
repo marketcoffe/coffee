@@ -8,9 +8,10 @@ import {
   getFAQSchema,
   getWebsiteSchema,
   getBreadcrumbSchema
-} from '../schemas';
+} from '../seo/schemaGenerator';
+import { useSEOProduct, useSEOHome } from '../seo/useSEO';
 import { escapeJsonForScript } from '../security/security';
-import { getCategories } from '../utils/categoryUtils';
+import { slugify } from '../utils/slug';
 
 interface SEOHeadProps {
   title?: string;
@@ -32,43 +33,39 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
   const { config, foodItems } = useApp();
   const indexedDBTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Hooks SEO anti-canibalización
+  const homeSEO = useSEOHome(config);
+  const productSEO = useSEOProduct(product, config);
+
+  const seo = type === 'product' ? productSEO : homeSEO;
+  const siteName = config.site_nombre || 'Market Coffee Sweet';
+
   useEffect(() => {
-    const siteName = config.site_nombre || 'Market Coffee Sweet';
-    const defaultTitle = config.seo_home_title || `Panadería y Comida Rápida en C. Apolo Valencia | ${siteName}`;
-    const defaultDesc = config.seo_home_description || `Market Coffee Sweet en C. Apolo, Valencia. Panadería fresca, hamburguesas, shawarmas, perros calientes, víveres, frutas, verduras, bebidas y agua potable. Delivery a domicilio en El Trigal, La Trigaleña, Prebo, La Viña, Mañongo, Naguanagua y San Diego.`;
-    const defaultKeywords = config.seo_home_keywords || `panadería C. Apolo Valencia, comida rápida Valencia Carabobo, hamburguesas delivery Prebo, shawarmas La Viña, víveres Mañongo, agua potable Naguanagua, pan fresco Apolo, minimarket Valencia, market coffee sweet`;
+    let seoTitle = title || seo.title;
+    let seoDesc = description || seo.description;
+    let seoKeywords = seo.keywords;
+    let ogImage = seo.ogImage;
+    let ogUrl = seo.ogUrl;
 
-    let seoTitle = title;
-    let seoDesc = description;
-    let seoKeywords = defaultKeywords;
-
-    if (type === 'home') {
-      seoTitle = title || defaultTitle;
-      seoDesc = description || defaultDesc;
-      seoKeywords = defaultKeywords;
-    }
-
+    // Override por tipo
     if (type === 'product' && product) {
-      seoTitle = `${product.nombre} | ${siteName}`;
-      seoDesc = product.descripcion
-        ? `${product.descripcion}. Pide ${product.nombre} con delivery en Valencia, El Trigal, Prebo, La Viña, Mañongo, Naguanagua y San Diego.`
-        : `Pide ${product.nombre} de la mejor calidad. Delivery express en minutos en Valencia, El Trigal y alrededores.`;
-      seoKeywords = `${product.nombre}, ${getCategories(product).join(', ')}, ${siteName}, delivery, Valencia, El Trigal, panadería, comida rápida`;
+      seoTitle = productSEO.title;
+      seoDesc = productSEO.description;
+      seoKeywords = productSEO.keywords;
+      ogImage = productSEO.ogImage;
+      ogUrl = productSEO.ogUrl;
     }
 
     if (type === 'catalog') {
       const category = filters?.category || '';
-      const filterText = category || 'Menú Completo';
-
-      seoTitle = config.seo_catalog_title || `Comprar ${filterText} | Catálogo ${siteName}`;
-      seoDesc = config.seo_catalog_description || `Menú de ${filterText}. Panadería, hamburguesas, shawarmas, víveres, frutas, verduras y más con delivery en Valencia. Pide online en ${siteName}.`;
-
-      const kwParts = [siteName, 'delivery', 'comida online', 'Valencia', 'El Trigal', 'Prebo', 'La Viña', 'Mañongo', 'Naguanagua', 'San Diego'];
-      if (category) kwParts.push(category.toLowerCase());
-      seoKeywords = kwParts.join(', ');
+      const siteUrl = config.site_url || 'https://marketcoffeesweet.com';
+      seoTitle = config.seo_catalog_title || `Comprar ${category || 'Menú Completo'} Online | ${siteName}`;
+      seoDesc = config.seo_catalog_description || `Menú de ${category || 'todos nuestros productos'}. Panadería, hamburguesas, shawarmas, víveres y más con delivery en Valencia.`;
+      seoKeywords = `${category.toLowerCase()}, delivery valencia, comprar online, ${siteName.toLowerCase()}`;
+      ogUrl = `${siteUrl}/catalogo/${slugify(category)}`;
     }
 
-    document.title = seoTitle ? `${seoTitle} | ${siteName}` : defaultTitle;
+    document.title = `${seoTitle} | ${siteName}`;
 
     const setMeta = (name: string, content: string, attr: 'name' | 'property' = 'name') => {
       let meta = document.querySelector(`meta[${attr}="${name}"]`);
@@ -80,55 +77,71 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       meta.setAttribute('content', content);
     };
 
-    setMeta('description', seoDesc || defaultDesc);
+    setMeta('description', seoDesc);
     setMeta('keywords', seoKeywords);
-    setMeta('og:title', seoTitle || defaultTitle, 'property');
-    setMeta('og:description', seoDesc || defaultDesc, 'property');
+    setMeta('og:title', seoTitle, 'property');
+    setMeta('og:description', seoDesc, 'property');
     setMeta('og:site_name', siteName, 'property');
     setMeta('og:locale', 'es_VE', 'property');
+    setMeta('og:url', ogUrl, 'property');
 
     if (type === 'product' && product) {
       setMeta('og:type', 'product', 'property');
-      setMeta('og:image', product.imagen_urls[0] || `${config.site_url || ''}/logo.png`, 'property');
+      setMeta('og:image', ogImage, 'property');
       setMeta('product:price:amount', String(product.precio_usd), 'property');
       setMeta('product:price:currency', 'USD', 'property');
     } else {
       setMeta('og:type', 'website', 'property');
-      setMeta('og:image', config.banners?.[0] || config.logo_url || 'https://marketcoffeesweet.com/logo.png', 'property');
+      setMeta('og:image', ogImage, 'property');
     }
 
     setMeta('twitter:card', 'summary_large_image');
-    setMeta('twitter:title', seoTitle || defaultTitle);
-    setMeta('twitter:description', seoDesc || defaultDesc);
+    setMeta('twitter:title', seoTitle);
+    setMeta('twitter:description', seoDesc);
+    setMeta('twitter:image', ogImage);
 
     // Geo tags
     setMeta('geo.region', 'VE', 'name');
     setMeta('geo.placename', 'Valencia, Carabobo', 'name');
-    setMeta('geo.position', '10.2279443;-67.997616', 'name');
+    setMeta('geo.position', '10.2185;-68.0021', 'name');
     setMeta('ICBM', '10.2185, -68.0021', 'name');
+
+    // Canonical link
+    const canonicalUrl = type === 'product' && product?.slug
+      ? `${config.site_url || 'https://marketcoffeesweet.com'}/producto/${product.slug}`
+      : ogUrl;
+    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.setAttribute('href', canonicalUrl);
 
     // PWA: Guardar config en IndexedDB
     if (indexedDBTimeoutRef.current) {
       clearTimeout(indexedDBTimeoutRef.current);
     }
     indexedDBTimeoutRef.current = setTimeout(() => {
-      const DB_NAME = 'foodapp-pwa';
-      const DB_VERSION = 1;
-      const STORE_NAME = 'config';
-      const openReq = indexedDB.open(DB_NAME, DB_VERSION);
-      openReq.onupgradeneeded = (e: IDBVersionChangeEvent) => {
-        (e.target as IDBOpenDBRequest).result.createObjectStore(STORE_NAME);
-      };
-      openReq.onsuccess = (e: Event) => {
-        const db = (e.target as IDBOpenDBRequest).result;
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
+      try {
+        const DB_NAME = 'foodapp-pwa';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'config';
+        const openReq = indexedDB.open(DB_NAME, DB_VERSION);
+        openReq.onupgradeneeded = (e: IDBVersionChangeEvent) => {
+          (e.target as IDBOpenDBRequest).result.createObjectStore(STORE_NAME);
+        };
+        openReq.onsuccess = (e: Event) => {
+          const db = (e.target as IDBOpenDBRequest).result;
+          const tx = db.transaction(STORE_NAME, 'readwrite');
+          const store = tx.objectStore(STORE_NAME);
 
-        if (config.logo_url) store.put(config.logo_url, 'logo_url');
-        if (config.pwa_icon_url) store.put(config.pwa_icon_url, 'pwa_icon_url');
-        if (config.site_nombre) store.put(config.site_nombre, 'site_name');
-        if (config.theme_color) store.put(config.theme_color, 'theme_color');
-      };
+          if (config.logo_url) store.put(config.logo_url, 'logo_url');
+          if (config.pwa_icon_url) store.put(config.pwa_icon_url, 'pwa_icon_url');
+          if (config.site_nombre) store.put(config.site_nombre, 'site_name');
+          if (config.theme_color) store.put(config.theme_color, 'theme_color');
+        };
+      } catch { /* IndexedDB no disponible */ }
     }, 500);
 
     // Apple Touch Icon dinámico
@@ -165,19 +178,21 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       appleTitleMeta.setAttribute('name', 'apple-mobile-web-app-title');
       document.head.appendChild(appleTitleMeta);
     }
-    appleTitleMeta.setAttribute('content', 'Market Coffee Sweet');
+    appleTitleMeta.setAttribute('content', siteName);
 
-    // JSON-LD Schema — SEO Premium from schemas.js
-    const existingScript = document.getElementById('marketcoffee-jsonld-schema');
-    if (existingScript) existingScript.remove();
-    const existingOrgScript = document.getElementById('marketcoffee-jsonld-org');
-    const existingWebScript = document.getElementById('marketcoffee-jsonld-web');
-    const existingFaqScript = document.getElementById('marketcoffee-jsonld-faq');
-    const existingBcScript = document.getElementById('marketcoffee-jsonld-bc');
-    if (existingOrgScript) existingOrgScript.remove();
-    if (existingWebScript) existingWebScript.remove();
-    if (existingFaqScript) existingFaqScript.remove();
-    if (existingBcScript) existingBcScript.remove();
+    // ═══ JSON-LD Schema — SEO Premium ═══
+    // Limpiar scripts existentes
+    const schemaIds = [
+      'marketcoffee-jsonld-schema',
+      'marketcoffee-jsonld-org',
+      'marketcoffee-jsonld-web',
+      'marketcoffee-jsonld-faq',
+      'marketcoffee-jsonld-bc'
+    ];
+    schemaIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    });
 
     let schemaObj: Record<string, unknown> | null = null;
 
@@ -199,7 +214,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       document.head.appendChild(webScript);
 
       // FAQ schema
-      const faqSchema = getFAQSchema(config.faq_items);
+      const faqSchema = getFAQSchema(config.faq_items || []);
       if (faqSchema) {
         const faqScript = document.createElement('script');
         faqScript.id = 'marketcoffee-jsonld-faq';
@@ -217,24 +232,41 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
     } else if (type === 'product' && product) {
       schemaObj = getProductSchema(product, config);
 
-      // Breadcrumb for product
+      // Breadcrumb for product (con categoría)
+      const category = Array.isArray(product.categoria) ? product.categoria[0] : product.categoria;
+      const siteUrl = config.site_url || 'https://marketcoffeesweet.com';
+      const breadcrumbItems: Array<{ name: string; url?: string }> = [
+        { name: 'Inicio', url: siteUrl },
+      ];
+      if (category) {
+        breadcrumbItems.push({
+          name: category,
+          url: `${siteUrl}/catalogo/${slugify(category)}`
+        });
+      }
+      breadcrumbItems.push({ name: product.nombre });
+
       const bcScript = document.createElement('script');
       bcScript.id = 'marketcoffee-jsonld-bc';
       bcScript.type = 'application/ld+json';
-      bcScript.innerHTML = escapeJsonForScript(getBreadcrumbSchema(config, [
-        { name: 'Inicio', url: 'https://marketcoffeesweet.com' },
-        { name: product.nombre }
-      ]));
+      bcScript.innerHTML = escapeJsonForScript(getBreadcrumbSchema(config, breadcrumbItems));
       document.head.appendChild(bcScript);
     } else if (type === 'catalog') {
-      // Breadcrumb for catalog
+      const category = filters?.category || '';
+      const siteUrl = config.site_url || 'https://marketcoffeesweet.com';
+      const breadcrumbItems: Array<{ name: string; url?: string }> = [
+        { name: 'Inicio', url: siteUrl },
+      ];
+      if (category) {
+        breadcrumbItems.push({ name: category });
+      } else {
+        breadcrumbItems.push({ name: 'Catálogo' });
+      }
+
       const bcScript = document.createElement('script');
       bcScript.id = 'marketcoffee-jsonld-bc';
       bcScript.type = 'application/ld+json';
-      bcScript.innerHTML = escapeJsonForScript(getBreadcrumbSchema(config, [
-        { name: 'Inicio', url: 'https://marketcoffeesweet.com' },
-        { name: 'Catálogo' }
-      ]));
+      bcScript.innerHTML = escapeJsonForScript(getBreadcrumbSchema(config, breadcrumbItems));
       document.head.appendChild(bcScript);
     }
 
@@ -249,7 +281,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
     return () => {
       if (indexedDBTimeoutRef.current) clearTimeout(indexedDBTimeoutRef.current);
     };
-  }, [config, title, description, type, product, filters, config.site_nombre, config.theme_color, config.logo_url, config.favicon_url, config.pwa_icon_url, foodItems]);
+  }, [config, title, description, type, product, filters, siteName, seo, productSEO, foodItems]);
 
   return null;
 };

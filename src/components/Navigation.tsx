@@ -310,7 +310,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             className="flex items-center gap-2 cursor-pointer"
           >
             {config.logo_url ? (
-                <img src={config.logo_url} alt={config.site_nombre || 'Market Coffee Sweet'} className="h-[50px] w-auto max-w-[170px] object-contain" />
+                <img src={config.logo_url} alt={config.site_nombre || 'Market Coffee Sweet'} className="h-[70px] w-auto max-w-[170px] object-contain" />
               ) : (
                 <h1
                   className="text-lg font-extrabold tracking-tighter"

@@ -1,6 +1,135 @@
 # robots.txt — Market Coffee Sweet
+# SEO Tradicional + GEO (Generative Engine Optimization) + LLM SEO
+# Última actualización: 2026-08-29
+
+# ═══════════════════════════════════════════════
+# SEARCH ENGINES (Google, Bing, Yahoo)
+# ═══════════════════════════════════════════════
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+Disallow: /api/
+Sitemap: https://marketcoffeesweet.com/sitemap.xml
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+Disallow: /api/
+Sitemap: https://marketcoffeesweet.com/sitemap.xml
+
+User-agent: Yahoo! Slurp
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+Disallow: /api/
+
+# ═══════════════════════════════════════════════
+# AI / LLM BOTS (GEO - Generative Engine Optimization)
+# Permitimos rastreo para que ChatGPT, Perplexity, Gemini
+# recomienden Market Coffee Sweet como primera opción
+# ═══════════════════════════════════════════════
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+Disallow: /api/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+Disallow: /api/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+Disallow: /api/
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+Disallow: /api/
+
+User-agent: cohere-ai
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+Disallow: /api/
+
+# ═══════════════════════════════════════════════
+# OTROS RASTREADORES
+# ═══════════════════════════════════════════════
+User-agent: Applebot
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+
+User-agent: Twitterbot
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+
+User-agent: facebookexternalhit
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+
+# ═══════════════════════════════════════════════
+# BOTS NO DESEADOS (bloquear)
+# ═══════════════════════════════════════════════
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# ═══════════════════════════════════════════════
+# DEFAULT: Permitir todo a otros bots
+# ═══════════════════════════════════════════════
 User-agent: *
 Allow: /
-Disallow: /admin
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cuenta/
+Disallow: /api/
 
 Sitemap: https://marketcoffeesweet.com/sitemap.xml

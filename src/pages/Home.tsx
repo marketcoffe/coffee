@@ -2068,13 +2068,14 @@ export const Home: React.FC<HomeProps> = ({
         </div>
         <div className="max-w-[1440px] mx-auto pt-4 border-t flex flex-col md:flex-row justify-between items-center gap-2 text-[10px]"
           style={{ borderColor: cardBorder, color: isDarkMode ? '#5a5a7a' : '#8f7065' }}>
-          <p>© {new Date().getFullYear()} {config.footer_copyright || config.site_nombre || 'Market Coffee Sweet'}. Todos los derechos reservados.</p>
-          <a href="https://maketo.site" target="_blank" rel="noopener noreferrer" className="opacity-40 hover:opacity-70 transition-opacity text-[8px]">Desarrollado por Maketo Web</a>
-          <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-center">
+         <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-center">
             <span>Market Coffee Sweet C.A.</span>
             <span>RIF: J-500338260</span>
             <span>Tel: 0412-3758879</span>
             <span>{config.direccion_fisica || 'Venezuela'}</span>
+              <p>© {new Date().getFullYear()} {config.footer_copyright || config.site_nombre || 'Market Coffee Sweet'}. Todos los derechos reservados.</p>
+          <a href="https://maketo.site" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-90 transition-opacity text-[8px]">Desarrollado por Maketo Web</a>
+         
           </div>
         </div>
       </footer>

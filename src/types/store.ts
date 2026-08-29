@@ -50,6 +50,7 @@ export interface FoodItem {
   id: string;
   nombre: string;
   descripcion: string;
+  slug?: string;
   categoria: string[];
   subcategoria?: string;
   precio_usd: number;
