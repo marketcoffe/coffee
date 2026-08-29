@@ -62,14 +62,14 @@ BEGIN
     instance_id, id, aud, role, email, encrypted_password,
     email_confirmed_at, created_at, updated_at, confirmation_token,
     recovery_token, email_change_token_new, email_change, last_sign_in_at,
-    raw_app_meta_data, raw_user_meta_data, is_super_admin, confirmed_at
+    raw_app_meta_data, raw_user_meta_data, is_super_admin
   ) VALUES (
     v_instance_id, v_admin_id, 'authenticated', 'authenticated',
     'kecho8a@gmail.com', v_admin_encrypted,
     NOW(), NOW(), NOW(), '', '', '', '', NOW(),
     '{"provider": "email", "providers": ["email"]}'::jsonb,
     '{"nombre": "Market Coffee", "username": "maketo", "role": "admin"}'::jsonb,
-    false, NOW()
+    false
   );
 
   -- Crear identidad para admin
@@ -91,14 +91,14 @@ BEGIN
     instance_id, id, aud, role, email, encrypted_password,
     email_confirmed_at, created_at, updated_at, confirmation_token,
     recovery_token, email_change_token_new, email_change, last_sign_in_at,
-    raw_app_meta_data, raw_user_meta_data, is_super_admin, confirmed_at
+    raw_app_meta_data, raw_user_meta_data, is_super_admin
   ) VALUES (
     v_instance_id, v_op_id, 'authenticated', 'authenticated',
     'marketcoffe.ve@gmail.com', v_op_encrypted,
     NOW(), NOW(), NOW(), '', '', '', '', NOW(),
     '{"provider": "email", "providers": ["email"]}'::jsonb,
     '{"nombre": "Market Coffee", "username": "marketcoffee", "role": "operator"}'::jsonb,
-    false, NOW()
+    false
   );
 
   -- Crear identidad para operador
