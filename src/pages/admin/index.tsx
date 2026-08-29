@@ -364,6 +364,13 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
         </header>
 
         <div className="erp-content" style={{ padding: 16 }}>
+          {/* Degraded mode warning — no real Supabase Auth session */}
+          {!isAdmin && localStorage.getItem('trv_admin_auth') === 'true' && (
+            <div className="mb-3 px-4 py-2 rounded-xl border border-amber-300 bg-amber-50 text-amber-800 text-xs font-medium flex items-center gap-2">
+              <span className="text-base">⚠️</span>
+              <span>Sesión sin conexión a Supabase Auth. Los datos se cargan localmente. Si el problema persiste, contacte al administrador.</span>
+            </div>
+          )}
           <Suspense fallback={<SectionLoader />}>
             <LazyErrorBoundary sectionName={sectionLabel}>
               {renderSection()}

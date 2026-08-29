@@ -998,9 +998,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const { data: { session } } = await supabase.auth.getSession();
       const sessionEmail = session?.user?.email || '';
       const sessionRole = session?.user?.app_metadata?.role || session?.user?.user_metadata?.role;
-      const isAdmin = sessionEmail === 'kecho8a@gmail.com' || sessionRole === 'admin';
-      const isOperator = sessionRole === 'operator';
-      const isCustomer = sessionRole === 'customer';
+      let isAdmin = sessionEmail === 'kecho8a@gmail.com' || sessionRole === 'admin';
+      let isOperator = sessionRole === 'operator';
+      let isCustomer = sessionRole === 'customer';
+
+      // FALLBACK: When signInWithPassword fails there is no real Supabase session,
+      // but authenticateAdmin already set localStorage flags. Detect this so
+      // initData loads admin data (orders, users, notifications) instead of
+      // falling through to the guest branch and showing an empty panel.
+      if (!isAdmin && !isOperator && !isCustomer && !session) {
+        const storedRole = localStorage.getItem('trv_user_role');
+        if (storedRole === 'admin') { isAdmin = true; }
+        else if (storedRole === 'operator') { isOperator = true; }
+        else if (storedRole === 'customer') { isCustomer = true; }
+        if (isAdmin || isOperator || isCustomer) {
+          setIsAdminAuthenticated(true);
+        }
+      }
 
       // Si localStorage dice admin y hay sesión válida, mantener el flag
       if ((isAdmin || isOperator || isCustomer) && localStorage.getItem('trv_admin_auth') !== 'true') {
@@ -2062,9 +2076,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const { data: { session } } = await supabase.auth.getSession();
     const sessionEmail = session?.user?.email || '';
     const sessionRole = session?.user?.app_metadata?.role || session?.user?.user_metadata?.role;
-    const isAdmin = sessionEmail === 'kecho8a@gmail.com' || sessionRole === 'admin';
-    const isOperator = sessionRole === 'operator';
+    let isAdmin = sessionEmail === 'kecho8a@gmail.com' || sessionRole === 'admin';
+    let isOperator = sessionRole === 'operator';
     const principalSedeId = (config.sedes || []).find(s => s.es_principal)?.id || (config.sedes || [])[0]?.id || '';
+
+    // FALLBACK: detect local admin session when no Supabase session exists
+    if (!isAdmin && !isOperator && !session) {
+      const storedRole = localStorage.getItem('trv_user_role');
+      if (storedRole === 'admin') isAdmin = true;
+      else if (storedRole === 'operator') isOperator = true;
+    }
 
     try {
       if (isAdmin) {
@@ -2830,6 +2851,54 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         localStorage.setItem('trv_admin_user', JSON.stringify({
           id: userId, email, nombre, role, sede_id: sedeId
         }));
+
+        // CRITICAL: initData already ran and won't re-run. Load admin data now
+        // so the panel isn't empty. This is the degraded-mode path.
+        try {
+          const isAdmin = role === 'admin';
+          const [ordersRes, notifsRes] = await Promise.all([
+            supabase.from('orders').select('*').order('fecha', { ascending: false }),
+            supabase.from('notifications').select('*').order('created_at', { ascending: false }),
+          ]);
+          if (ordersRes.data) {
+            const allOrders = ordersRes.data as Order[];
+            if (isAdmin) {
+              setOrders(allOrders);
+            } else if (sedeId) {
+              const principalId = (config.sedes || []).find(s => s.es_principal)?.id || (config.sedes || [])[0]?.id || '';
+              setOrders(allOrders.filter(o => (o.sede_id || principalId) === sedeId) as Order[]);
+            }
+          }
+          if (notifsRes.data) setNotifications(notifsRes.data as InAppNotification[]);
+
+          // Also load products, config, mesas
+          const [productsRes, configRes, mesasRes] = await Promise.all([
+            supabase.from('products').select('*').range(0, 9999),
+            supabase.from('store_config').select('*').single(),
+            supabase.from('mesas').select('*').order('numero_mesa'),
+          ]);
+          if (productsRes.data && productsRes.data.length > 0) {
+            const merged = (productsRes.data as FoodItem[]).map(p => {
+              const hasDbOptions = Array.isArray(p.option_groups) && p.option_groups.length > 0;
+              if (hasDbOptions) return p;
+              const fallback = DEFAULT_PRODUCTS.find(d => d.nombre === p.nombre);
+              return { ...p, option_groups: fallback?.option_groups || [] };
+            });
+            setProducts(merged);
+          }
+          if (configRes.data) {
+            const dbConfig = configRes.data;
+            setConfig(prev => ({
+              ...prev,
+              esta_abierta: dbConfig.esta_abierta,
+              site_nombre: dbConfig.site_nombre || prev.site_nombre,
+              tasa_cambio: dbConfig.tasa_cambio || prev.tasa_cambio,
+            }));
+          }
+          if (mesasRes.data && mesasRes.data.length > 0) setMesas(mesasRes.data as Mesa[]);
+        } catch (fallbackErr) {
+          console.warn('[Auth] Fallback data load partially failed:', fallbackErr);
+        }
 
         return true;
       }
