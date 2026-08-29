@@ -1,2 +1,7 @@
-# SPA fallback - Cloudflare Pages serves index.html for unmatched routes automatically
-# Only add explicit redirects for non-HTML routes if needed
+# Cloudflare Pages Redirects & Error Pages
+
+# Custom 404 page
+/*  /404.html  404
+
+# Custom 500 page (server errors)
+/*  /500.html  500
