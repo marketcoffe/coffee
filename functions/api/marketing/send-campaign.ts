@@ -65,7 +65,8 @@ export const onRequestPost: any = async (context: any) => {
     if (campaign.segment_filter === 'all') {
       const { data: subs } = await supabase
         .from('push_subscriptions')
-        .select('id, user_id, endpoint, p256dh, auth_secret, destinatario_telefono, anonymous_id');
+        .select('id, user_id, endpoint, p256dh, auth_secret, destinatario_telefono, anonymous_id')
+        .eq('is_active', true);
       targetSubscriptions = (subs || []).filter((s: any) => s.endpoint && s.p256dh && s.auth_secret);
     } else {
       const { data: segUsers } = await supabase
@@ -77,6 +78,7 @@ export const onRequestPost: any = async (context: any) => {
         const { data: subs } = await supabase
           .from('push_subscriptions')
           .select('id, user_id, endpoint, p256dh, auth_secret, destinatario_telefono, anonymous_id')
+          .eq('is_active', true)
           .in('user_id', userIds);
         targetSubscriptions = (subs || []).filter((s: any) => s.endpoint && s.p256dh && s.auth_secret);
       }

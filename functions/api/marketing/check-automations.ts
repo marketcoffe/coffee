@@ -163,6 +163,7 @@ export const onRequestPost: any = async (context: any) => {
             .from('push_subscriptions')
             .select('endpoint, p256dh, auth_secret')
             .eq('destinatario_telefono', user.telefono.trim())
+            .eq('is_active', true)
             .single();
 
           if (sub && sub.endpoint && sub.p256dh && sub.auth_secret) {

@@ -434,7 +434,8 @@ export const onRequestPost: any = async (context: any) => {
     try {
       const { data, error } = await supabase
         .from('push_subscriptions')
-        .select('id, user_id, endpoint, p256dh, auth_secret, destinatario_telefono, anonymous_id');
+        .select('id, user_id, endpoint, p256dh, auth_secret, destinatario_telefono, anonymous_id')
+        .eq('is_active', true);
       if (error) {
         console.error('[push-notify] Error fetching subscriptions:', error.message);
         return new Response(JSON.stringify({ error: 'Failed to fetch subscriptions: ' + error.message }), {
