@@ -80,7 +80,7 @@ BEGIN
     id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at
   ) VALUES (
     v_admin_id, v_admin_id,
-    '{"sub": "' || v_admin_id || '", "email": "kecho8a@gmail.com", "email_verified": true}'::jsonb,
+    jsonb_build_object('sub', v_admin_id::text, 'email', 'kecho8a@gmail.com', 'email_verified', true),
     'email', NOW(), NOW(), NOW()
   );
 
@@ -109,7 +109,7 @@ BEGIN
     id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at
   ) VALUES (
     v_op_id, v_op_id,
-    '{"sub": "' || v_op_id || '", "email": "marketcoffe.ve@gmail.com", "email_verified": true}'::jsonb,
+    jsonb_build_object('sub', v_op_id::text, 'email', 'marketcoffe.ve@gmail.com', 'email_verified', true),
     'email', NOW(), NOW(), NOW()
   );
 
