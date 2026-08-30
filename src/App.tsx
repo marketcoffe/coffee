@@ -559,7 +559,14 @@ function AppContent() {
         </main>
 
         {/* ═══ MOBILE BOTTOM NAV - oculto en panel admin ═══ */}
-        {tab !== 'admin' && tab !== 'mesa_checkout' && tab !== 'checkout' && <BottomNav currentTab={tab} setTab={setTab} />}
+        {tab !== 'admin' && tab !== 'mesa_checkout' && tab !== 'checkout' && (
+          <BottomNav
+            currentTab={tab}
+            setTab={setTab}
+            onMenuClick={() => { setSelectedCategory('Comida Rapida'); setTab('catalog'); }}
+            onSearchClick={() => { setSelectedCategory(''); setTab('catalog'); }}
+          />
+        )}
 
         {/* ═══ PRODUCT MODAL ═══ */}
         <ProductModal

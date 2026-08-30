@@ -5,9 +5,11 @@ import { useApp } from '../store/AppContext';
 interface BottomNavProps {
   currentTab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout';
   setTab: (tab: 'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout') => void;
+  onMenuClick?: () => void;
+  onSearchClick?: () => void;
 }
 
-export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setTab }) => {
+export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setTab, onMenuClick, onSearchClick }) => {
   const { cart, config, isDarkMode } = useApp();
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   const themeColor = config.theme_color || '#A4D045';
@@ -38,7 +40,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setTab }) => {
 
           const handleTabClick = () => {
             if (tabItem.isSearch) {
-              setTab('catalog');
+              onSearchClick?.() || setTab('catalog');
+            } else if (tabItem.label === 'Menu') {
+              onMenuClick?.() || setTab('catalog');
             } else {
               setTab(tabItem.id);
             }

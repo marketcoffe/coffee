@@ -309,7 +309,7 @@ export const Home: React.FC<HomeProps> = ({
       <div className="flex-1 flex flex-col min-w-0">
 
       {/* ═══ 1. HERO — Horizontal Swipe Carousel ═══ */}
-      <section className="relative w-full overflow-hidden aspect-[3/4] md:aspect-[2/1]">
+      <section className="relative w-full overflow-hidden aspect-[3/4] md:aspect-[3/2]">
         <div
           ref={heroScrollRef}
           onScroll={handleHeroScroll}
@@ -1920,7 +1920,7 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* ═══ 9. GANA Y ACUMULA PUNTOS ═══ */}
       <section className="py-6 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
-        <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: '#FB923C' }}>
+        <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: '#c2aa97' }}>
           <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full blur-3xl opacity-20" style={{ backgroundColor: tc }} />
           <div className="relative z-10">
             <div className="flex items-center gap-1.5 mb-2">
