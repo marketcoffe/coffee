@@ -309,7 +309,7 @@ export const Home: React.FC<HomeProps> = ({
       <div className="flex-1 flex flex-col min-w-0">
 
       {/* ═══ 1. HERO — Horizontal Swipe Carousel ═══ */}
-      <section className="relative w-full overflow-hidden aspect-[3/4] md:aspect-[3/2]">
+      <section className="relative w-full overflow-hidden aspect-[3/4] md:max-w-[1300px] md:mx-auto md:h-[500px] md:aspect-auto">
         <div
           ref={heroScrollRef}
           onScroll={handleHeroScroll}
