@@ -179,7 +179,8 @@ export const onRequestPost: any = async (context: any) => {
     }
 
     if (dbError) {
-      return new Response(JSON.stringify({ error: 'Failed to save subscription' }), {
+      console.error('[register-subscription] DB error:', dbError.message, dbError.code, dbError.details);
+      return new Response(JSON.stringify({ error: 'Failed to save subscription', details: dbError.message, code: dbError.code }), {
         status: 500,
         headers: { 'Content-Type': 'application/json', ...buildCorsHeaders(request, env) }
       });
