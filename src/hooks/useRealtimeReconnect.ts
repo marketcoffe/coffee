@@ -19,6 +19,11 @@ export function useRealtimeReconnect({
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const retriesRef = useRef(0);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef = useRef(true);
+
+  // Estabilizar callbacks sin causar re-suscripciones
+  const onReconnectRef = useRef(onReconnect);
+  onReconnectRef.current = onReconnect;
 
   const cleanup = useCallback(() => {
     if (reconnectTimerRef.current) {
@@ -41,17 +46,18 @@ export function useRealtimeReconnect({
     cleanup();
 
     retriesRef.current += 1;
-    const delay = retryDelayMs * Math.min(retriesRef.current, 5);
+    const delay = retryDelayMs * Math.pow(2, retriesRef.current - 1);
     console.log(`[RealtimeReconnect] Reconnecting to "${channelName}" in ${delay}ms (attempt ${retriesRef.current}/${maxRetries})`);
 
     reconnectTimerRef.current = setTimeout(() => {
+      if (!mountedRef.current) return;
       const channel = supabase.channel(channelName);
 
       channel.subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           console.log(`[RealtimeReconnect] Channel "${channelName}" reconnected`);
           retriesRef.current = 0;
-          onReconnect?.();
+          onReconnectRef.current?.();
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           console.warn(`[RealtimeReconnect] Channel "${channelName}" failed: ${status}`);
           reconnect();
@@ -60,19 +66,21 @@ export function useRealtimeReconnect({
 
       channelRef.current = channel;
     }, delay);
-  }, [channelName, maxRetries, retryDelayMs, onReconnect, cleanup]);
+  }, [channelName, maxRetries, retryDelayMs, cleanup]);
 
   useEffect(() => {
+    mountedRef.current = true;
     if (!enabled) return;
 
     const channel = supabase.channel(channelName);
 
     channel.on('system', { event: 'reconnect' }, () => {
       console.log(`[RealtimeReconnect] System reconnect event for "${channelName}"`);
-      onReconnect?.();
+      onReconnectRef.current?.();
     });
 
     channel.subscribe((status) => {
+      if (!mountedRef.current) return;
       if (status === 'SUBSCRIBED') {
         retriesRef.current = 0;
       } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
@@ -82,8 +90,11 @@ export function useRealtimeReconnect({
 
     channelRef.current = channel;
 
-    return cleanup;
-  }, [channelName, enabled, reconnect, onReconnect, cleanup]);
+    return () => {
+      mountedRef.current = false;
+      cleanup();
+    };
+  }, [channelName, enabled, reconnect, cleanup]);
 
   return { reconnect, cleanup };
 }

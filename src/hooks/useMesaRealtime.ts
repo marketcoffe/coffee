@@ -30,6 +30,7 @@ export function useMesaRealtime(options: UseMesaRealtimeOptions = {}): UseMesaRe
   const [isConnected, setIsConnected] = useState(false);
   const [lastEvent, setLastEvent] = useState<string | null>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const mountedRef = useRef(true);
   const callbacksRef = useRef({ onStatusChange, onPaymentConfirmed, onOrderRejected, onNewOrder });
 
   callbacksRef.current = { onStatusChange, onPaymentConfirmed, onOrderRejected, onNewOrder };
@@ -98,6 +99,7 @@ export function useMesaRealtime(options: UseMesaRealtimeOptions = {}): UseMesaRe
     channelRef.current = channel;
 
     return () => {
+      mountedRef.current = false;
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;

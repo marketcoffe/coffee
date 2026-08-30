@@ -3,15 +3,25 @@
 
 declare const PagesFunction: any;
 
-const CORS_HEADERS: Record<string, string> = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, x-push-webhook-secret',
-  'Access-Control-Max-Age': '86400',
-};
+function getAllowedOrigin(request: Request, env: any): string {
+  const origin = request.headers.get('Origin') || '';
+  const allowed = (env.ALLOWED_ORIGINS || '').split(',').map((s: string) => s.trim());
+  if (allowed.includes(origin)) return origin;
+  return allowed[0] || '';
+}
 
-export const onRequestOptions: any = async () => {
-  return new Response(null, { status: 204, headers: CORS_HEADERS });
+function getCORSHeaders(request: Request, env: any): Record<string, string> {
+  return {
+    'Access-Control-Allow-Origin': getAllowedOrigin(request, env),
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, x-push-webhook-secret',
+    'Access-Control-Max-Age': '86400',
+  };
+}
+
+export const onRequestOptions: any = async (context: any) => {
+  const { request, env } = context;
+  return new Response(null, { status: 204, headers: getCORSHeaders(request, env) });
 };
 
 function safeCompare(a: string, b: string): boolean {
@@ -25,18 +35,24 @@ function safeCompare(a: string, b: string): boolean {
 
 export const onRequestPost: any = async (context: any) => {
   const { request, env } = context;
+  const corsHeaders = getCORSHeaders(request, env);
 
   const rawAuthHeader = request.headers.get('x-push-webhook-secret') || '';
   const authHeader = rawAuthHeader.trim();
   const configuredSecret = [env.WEBHOOK_SECRET, env.webhook_secret, env.PUSH_WEBHOOK_SECRET, env.push_webhook_secret].find(Boolean) || '';
 
-  if (configuredSecret && authHeader) {
-    if (!safeCompare(authHeader, configuredSecret)) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json', ...CORS_HEADERS }
-      });
-    }
+  if (!configuredSecret) {
+    return new Response(JSON.stringify({ error: 'Server misconfigured: no webhook secret set' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  }
+
+  if (!authHeader || !safeCompare(authHeader, configuredSecret)) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
   }
 
   const supabaseUrl = env.SUPABASE_URL;
@@ -44,7 +60,7 @@ export const onRequestPost: any = async (context: any) => {
   if (!supabaseUrl || !supabaseKey) {
     return new Response(JSON.stringify({ error: 'Supabase not configured' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json', ...CORS_HEADERS }
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
   }
 
@@ -174,12 +190,14 @@ export const onRequestPost: any = async (context: any) => {
   }
 
   return new Response(JSON.stringify({ success: true, campaigns_processed: processed }), {
-    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS }
+    headers: { 'Content-Type': 'application/json', ...corsHeaders }
   });
 };
 
-export const onRequestGet: any = async () => {
+export const onRequestGet: any = async (context: any) => {
+  const { request, env } = context;
+  const corsHeaders = getCORSHeaders(request, env);
   return new Response(JSON.stringify({ status: 'ok', service: 'send-campaign' }), {
-    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS }
+    headers: { 'Content-Type': 'application/json', ...corsHeaders }
   });
 };

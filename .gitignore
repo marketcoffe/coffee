@@ -4,6 +4,34 @@ dist/
 coverage/
 .DS_Store
 *.log
-.env*
+
+# ─────────────────────────────────────────────────────────────────
+# VARIABLES DE ENTORNO — NUNCA commitear .env real
+# ─────────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.development
+.env.staging
+.env.production
+
+# Permitir solo el ejemplo sanitizado
 !.env.example
-!.env.production
+
+# ─────────────────────────────────────────────────────────────────
+# SCRIPTS SQL CONFIDENCIALES — contiene credenciales y esquemas
+# ─────────────────────────────────────────────────────────────────
+supabase/basedatos/
+
+# ─────────────────────────────────────────────────────────────────
+# ARCHIVOS GENERADOS / TEMPORALES
+# ─────────────────────────────────────────────────────────────────
+*.sql.bak
+*.tmp
+vite.log
+lint*.txt
+errormap.txt
+errors.txt
+resid.txt
+restantes.txt
+mejor.md
+dev.log

@@ -36,10 +36,13 @@ export function useOrdersRealtime(options: UseOrdersRealtimeOptions = {}): UseOr
   const [lastEvent, setLastEvent] = useState<string | null>(null);
 
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef = useRef(true);
   const callbacksRef = useRef({ onNewOrder, onStatusChange });
   callbacksRef.current = { onNewOrder, onStatusChange };
 
-  const playSound = useCallback(() => {
+  const playSoundRef = useRef(() => {});
+  playSoundRef.current = () => {
     if (!soundEnabled) return;
     try {
       const audio = new Audio(NOTIFICATION_SOUND_URL);
@@ -48,7 +51,7 @@ export function useOrdersRealtime(options: UseOrdersRealtimeOptions = {}): UseOr
     } catch {
       /* silent — audio not available */
     }
-  }, [soundEnabled]);
+  };
 
   const reconnect = useCallback(() => {
     if (channelRef.current) {
@@ -71,7 +74,7 @@ export function useOrdersRealtime(options: UseOrdersRealtimeOptions = {}): UseOr
           if (!order?.id) return;
           setLastEvent(`INSERT:${order.id}`);
           callbacksRef.current.onNewOrder?.(order);
-          playSound();
+          playSoundRef.current();
         }
       )
       .on(
@@ -89,7 +92,7 @@ export function useOrdersRealtime(options: UseOrdersRealtimeOptions = {}): UseOr
         if (!order?.id) return;
         setLastEvent(`BROADCAST_NEW:${order.id}`);
         callbacksRef.current.onNewOrder?.(order);
-        playSound();
+        playSoundRef.current();
       })
       .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
         const order = payload.payload;
@@ -101,11 +104,12 @@ export function useOrdersRealtime(options: UseOrdersRealtimeOptions = {}): UseOr
         setIsConnected(status === 'SUBSCRIBED');
         setConnectionStatus(status);
         if (status === 'SUBSCRIBED') {
-          console.warn('[useOrdersRealtime] Conectado a canal admin_orders_realtime');
+          mountedRef.current && console.warn('[useOrdersRealtime] Conectado a canal admin_orders_realtime');
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          console.warn(`[useOrdersRealtime] Estado: ${status} — reintentando en 5s`);
-          setTimeout(() => {
-            if (channelRef.current) {
+          mountedRef.current && console.warn(`[useOrdersRealtime] Estado: ${status} — reintentando en 5s`);
+          if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+          reconnectTimerRef.current = setTimeout(() => {
+            if (mountedRef.current && channelRef.current) {
               supabase.removeChannel(channelRef.current);
               channelRef.current = null;
             }
@@ -116,12 +120,17 @@ export function useOrdersRealtime(options: UseOrdersRealtimeOptions = {}): UseOr
     channelRef.current = channel;
 
     return () => {
+      mountedRef.current = false;
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
       }
     };
-  }, [enabled, playSound]);
+  }, [enabled]);
 
   return { isConnected, connectionStatus, lastEvent, reconnect };
 }
