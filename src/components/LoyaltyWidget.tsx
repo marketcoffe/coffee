@@ -3,6 +3,7 @@ import { supabase } from '../store/supabaseClient';
 import { useApp } from '../store/AppContext';
 import type { LoyaltyUserLevel, LoyaltyReward, LoyaltyHistory } from '../types/store';
 import { Award, Star, Gift, Share2, Copy, Check, ChevronRight, Trophy, ArrowUp, ArrowDown, RefreshCw } from 'lucide-react';
+import { PointsEarnedModal } from './PointsEarnedModal';
 
 interface LoyaltyWidgetProps {
   themeColor: string;
@@ -17,9 +18,13 @@ export const LoyaltyWidget: React.FC<LoyaltyWidgetProps> = ({ themeColor }) => {
   const [copied, setCopied] = useState(false);
   const [activeView, setActiveView] = useState<'balance' | 'catalog' | 'history' | 'referral'>('balance');
   const [redeemingId, setRedeemingId] = useState<string | null>(null);
+  const [showPointsModal, setShowPointsModal] = useState(false);
+  const [redeemedPoints, setRedeemedPoints] = useState(0);
+  const [redeemedBalance, setRedeemedBalance] = useState(0);
 
   const loadData = useCallback(async () => {
     if (!currentUser?.id) return;
+    console.log('[LoyaltyWidget] loadData — fetching for user:', currentUser.id);
     setLoading(true);
     try {
       const [levelRes, rewardsRes, historyRes] = await Promise.all([
@@ -28,11 +33,17 @@ export const LoyaltyWidget: React.FC<LoyaltyWidgetProps> = ({ themeColor }) => {
         supabase.from('loyalty_history').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(20),
       ]);
 
+      if (levelRes.error) console.error('[LoyaltyWidget] loadData — level error:', levelRes.error);
+      if (rewardsRes.error) console.error('[LoyaltyWidget] loadData — rewards error:', rewardsRes.error);
+      if (historyRes.error) console.error('[LoyaltyWidget] loadData — history error:', historyRes.error);
+
+      console.log('[LoyaltyWidget] loadData — results', { level: !!levelRes.data, rewards: rewardsRes.data?.length || 0, history: historyRes.data?.length || 0 });
+
       if (levelRes.data) setUserLevel(levelRes.data as LoyaltyUserLevel);
       if (rewardsRes.data) setRewards(rewardsRes.data as LoyaltyReward[]);
       if (historyRes.data) setHistory(historyRes.data as LoyaltyHistory[]);
     } catch (err) {
-      console.error('[LoyaltyWidget] error:', err);
+      console.error('[LoyaltyWidget] loadData — exception:', err);
     } finally {
       setLoading(false);
     }
@@ -63,6 +74,7 @@ export const LoyaltyWidget: React.FC<LoyaltyWidgetProps> = ({ themeColor }) => {
 
   const handleRedeem = async (reward: LoyaltyReward) => {
     if (!currentUser?.id) return;
+    console.log('[LoyaltyWidget] handleRedeem — RPC call', { userId: currentUser.id, rewardId: reward.id, rewardName: reward.name, cost: reward.points_cost });
     setRedeemingId(reward.id);
     try {
       const { data, error } = await supabase.rpc('redeem_loyalty_reward', {
@@ -70,9 +82,13 @@ export const LoyaltyWidget: React.FC<LoyaltyWidgetProps> = ({ themeColor }) => {
         p_reward_id: reward.id,
       });
       if (error || !data?.success) {
-        console.error('[redeem] error:', error || data?.error);
+        console.error('[LoyaltyWidget] handleRedeem — RPC failed:', error || data?.error);
         return;
       }
+      console.log('[LoyaltyWidget] handleRedeem — RPC success', { remaining: data.remaining_points, spent: data.points_spent, coupon: data.coupon_code });
+      setRedeemedPoints(data.points_spent || reward.points_cost);
+      setRedeemedBalance(data.remaining_points ?? 0);
+      setShowPointsModal(true);
       loadData();
     } finally {
       setRedeemingId(null);
@@ -321,6 +337,15 @@ export const LoyaltyWidget: React.FC<LoyaltyWidgetProps> = ({ themeColor }) => {
           )}
         </div>
       )}
+
+      <PointsEarnedModal
+        isOpen={showPointsModal}
+        onClose={() => setShowPointsModal(false)}
+        points={redeemedPoints}
+        newBalance={redeemedBalance}
+        reason="recompensa canjeada"
+        themeColor={themeColor}
+      />
     </div>
   );
 };

@@ -2961,91 +2961,50 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // --- LOYALTY / FIDELIZACIÓN ---
-  const earnLoyaltyPoints = async (userId: string, orderId: string, amountUsd: number, sedeId?: string) => {
-    const loyaltyConfig = config.loyalty;
-    if (!loyaltyConfig?.enabled || amountUsd < loyaltyConfig.min_order_for_points) return;
-    
-    const user = users.find(u => u.id === userId);
-    if (!user) return;
-    
-    const tier = getUserLoyaltyTier(userId);
-    const multiplier = tier?.multiplier || 1;
-    const basePoints = Math.floor(amountUsd * loyaltyConfig.points_per_dollar * multiplier);
-    const pwaBonus = user.is_pwa_installed ? 1.5 : 1;
-    const pointsEarned = Math.floor(basePoints * pwaBonus);
-    
-    if (pointsEarned <= 0) return;
-    
-    const tx: LoyaltyTransaction = {
-      id: `loy-tx-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
-      user_id: userId,
-      operation: 'suma',
-      reason: 'compra',
-      points: pointsEarned,
-      description: user.is_pwa_installed ? `Compra #${orderId.slice(-8)} (Bonus App x1.5)` : `Compra #${orderId.slice(-8)}`,
-      order_id: orderId,
-      created_at: new Date().toISOString(),
-    };
-    
-    // Persistir a Supabase (idempotente por unique index en user_id+order_id)
+  const earnLoyaltyPoints = async (userId: string, orderId: string, _amountUsd: number, _sedeId?: string) => {
+    console.log('[Loyalty] earnLoyaltyPoints — syncDesdeDB', { userId, orderId });
+    // SEGURIDAD: La acreditación de puntos por compra la maneja el trigger
+    // `trigger_order_delivery_points` en PostgreSQL cuando el status cambia a 'Entregado'.
+    // Esta función SOLO sincroniza el saldo desde la DB al estado local del frontend.
     try {
-      const { error: txErr } = await supabase.from('loyalty_history').insert({
-        user_id: tx.user_id,
-        operation: tx.operation,
-        reason: tx.reason,
-        points: tx.points,
-        description: tx.description,
-        order_id: tx.order_id,
-        created_by: 'system',
-      });
-      if (txErr && txErr.code !== '23505') { // 23505 = duplicate key (ya ganó puntos por esta orden)
-        console.error('[Loyalty] Error guardando transaccion:', txErr.message);
+      const { data: userData, error } = await supabase
+        .from('usuarios_clientes')
+        .select('puntos_fidelidad, puntos_historicos')
+        .eq('id', userId)
+        .single();
+      if (error || !userData) {
+        console.error('[Loyalty] earnLoyaltyPoints — DB query failed:', error);
+        return;
       }
-      // Actualizar puntos en Supabase (ambos campos para compatibilidad)
-      const { error: ptsErr } = await supabase.from('usuarios_clientes')
-        .update({
-          puntos_fidelidad: (user.puntos_fidelidad || user.loyalty_points || 0) + pointsEarned,
-          puntos_historicos: (user.puntos_historicos || user.loyalty_lifetime_points || 0) + pointsEarned,
-          loyalty_points: (user.loyalty_points || user.puntos_fidelidad || 0) + pointsEarned,
-          loyalty_lifetime_points: (user.loyalty_lifetime_points || user.puntos_historicos || 0) + pointsEarned,
-        })
-        .eq('id', userId);
-      if (ptsErr) console.error('[Loyalty] Error actualizando puntos:', ptsErr.message);
-    } catch (e) {
-      console.error('[Loyalty] Sync failed:', e);
-    }
-    
-    // Actualizar estado local
-    setLoyaltyTransactions(prev => [...prev, tx]);
-    setUsers(prev => prev.map(u => {
-      if (u.id !== userId) return u;
-      return {
-        ...u,
-        puntos_fidelidad: (u.puntos_fidelidad || u.loyalty_points || 0) + pointsEarned,
-        puntos_historicos: (u.puntos_historicos || u.loyalty_lifetime_points || 0) + pointsEarned,
-        loyalty_points: (u.loyalty_points || 0) + pointsEarned,
-        loyalty_lifetime_points: (u.loyalty_lifetime_points || 0) + pointsEarned,
-      };
-    }));
-    if (currentUser?.id === userId) {
-      setCurrentUser(prev => prev ? {
-        ...prev,
-        puntos_fidelidad: (prev.puntos_fidelidad || prev.loyalty_points || 0) + pointsEarned,
-        puntos_historicos: (prev.puntos_historicos || prev.loyalty_lifetime_points || 0) + pointsEarned,
-        loyalty_points: (prev.loyalty_points || 0) + pointsEarned,
-        loyalty_lifetime_points: (prev.loyalty_lifetime_points || 0) + pointsEarned,
-      } : prev);
-    }
 
-    // Notificar al usuario que ganó puntos
-    addNotification(
-      '¡Puntos Ganados!',
-      `Ganaste ${pointsEarned} puntos por tu pedido #${orderId.slice(-8)}. ${user.is_pwa_installed ? '(Bonus App x1.5)' : ''}¡Sigue comprando para subir de nivel!`,
-      'personal',
-      user.telefono || undefined,
-      undefined,
-      '/profile'
-    );
+      const newPoints = userData.puntos_fidelidad ?? 0;
+      const newLifetime = userData.puntos_historicos ?? 0;
+      console.log('[Loyalty] earnLoyaltyPoints — DB result', { newPoints, newLifetime });
+
+      setUsers(prev => prev.map(u => {
+        if (u.id !== userId) return u;
+        return { ...u, puntos_fidelidad: newPoints, puntos_historicos: newLifetime, loyalty_points: newPoints, loyalty_lifetime_points: newLifetime };
+      }));
+      if (currentUser?.id === userId) {
+        setCurrentUser(prev => prev ? { ...prev, puntos_fidelidad: newPoints, puntos_historicos: newLifetime, loyalty_points: newPoints, loyalty_lifetime_points: newLifetime } : prev);
+      }
+      console.log('[Loyalty] earnLoyaltyPoints — state updated');
+
+      // Notificar al usuario (el trigger ya acreditó los puntos en DB)
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        addNotification(
+          '¡Puntos Ganados!',
+          `Tus puntos por el pedido #${orderId.slice(-8)} han sido acreditados. ¡Sigue comprando para subir de nivel!`,
+          'personal',
+          user.telefono || undefined,
+          undefined,
+          '/profile'
+        );
+      }
+    } catch (e) {
+      console.error('[Loyalty] earnLoyaltyPoints — exception:', e);
+    }
   };
 
   // --- PWA INSTALL DETECTION ---
@@ -3111,44 +3070,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const redeemRewardItem = async (userId: string, rewardId: string): Promise<boolean> => {
-    const reward = rewardCatalog.find(r => r.id === rewardId);
-    if (!reward || !reward.active) return false;
-    const user = users.find(u => u.id === userId);
-    if (!user || (user.puntos_fidelidad || user.loyalty_points || 0) < reward.points_cost) return false;
-    
-    const tx: LoyaltyTransaction = {
-      id: `loy-tx-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
-      user_id: userId,
-      operation: 'resta',
-      reason: 'canje',
-      points: reward.points_cost,
-      description: `Canje: ${reward.name}`,
-      created_at: new Date().toISOString(),
-    };
+    console.log('[Loyalty] redeemRewardItem — RPC call', { userId, rewardId });
+    // SEGURIDAD: Usar RPC atómica con FOR UPDATE para prevenir race conditions
+    const { data: result, error } = await supabase.rpc('redeem_loyalty_reward', {
+      p_user_id: userId,
+      p_reward_id: rewardId,
+    });
 
-    const newPoints = (user.puntos_fidelidad || user.loyalty_points || 0) - reward.points_cost;
-
-    // Persistir a Supabase
-    try {
-      const { error: txErr } = await supabase.from('loyalty_history').insert({
-        user_id: tx.user_id,
-        operation: tx.operation,
-        reason: tx.reason,
-        points: tx.points,
-        description: tx.description,
-        created_by: userId,
-      });
-      if (txErr) console.error('[Loyalty] Error guardando canje:', txErr.message);
-      const { error: ptsErr } = await supabase.from('usuarios_clientes')
-        .update({ puntos_fidelidad: newPoints, loyalty_points: newPoints })
-        .eq('id', userId);
-      if (ptsErr) console.error('[Loyalty] Error actualizando puntos:', ptsErr.message);
-    } catch (e) {
-      console.error('[Loyalty] Sync failed:', e);
+    if (error || !result?.success) {
+      console.error('[Loyalty] redeemRewardItem — RPC failed:', error || result?.error);
+      return false;
     }
-    
-    // Actualizar estado local
-    setLoyaltyTransactions(prev => [...prev, tx]);
+    console.log('[Loyalty] redeemRewardItem — RPC success', { remaining: result.remaining_points, spent: result.points_spent, coupon: result.coupon_code });
+
+    // Sincronizar estado local desde la respuesta de la RPC
+    const newPoints = result.remaining_points;
     setUsers(prev => prev.map(u => {
       if (u.id !== userId) return u;
       return { ...u, puntos_fidelidad: newPoints, loyalty_points: newPoints };
@@ -3156,18 +3092,62 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (currentUser?.id === userId) {
       setCurrentUser(prev => prev ? { ...prev, puntos_fidelidad: newPoints, loyalty_points: newPoints } : prev);
     }
+
+    // Registrar en transactions local
+    const reward = rewardCatalog.find(r => r.id === rewardId);
+    const tx: LoyaltyTransaction = {
+      id: `loy-tx-${Date.now()}`,
+      user_id: userId,
+      operation: 'resta',
+      reason: 'canje',
+      points: result.points_spent,
+      description: `Canje: ${reward?.name || 'Recompensa'}`,
+      created_at: new Date().toISOString(),
+    };
+    setLoyaltyTransactions(prev => [...prev, tx]);
+    console.log('[Loyalty] redeemRewardItem — state updated');
+
     return true;
   };
 
   const redeemLoyaltyPoints = async (userId: string, pointsToRedeem: number, orderId?: string): Promise<boolean> => {
+    console.log('[Loyalty] redeemLoyaltyPoints — RPC call', { userId, pointsToRedeem, orderId });
     const loyaltyConfig = config.loyalty;
-    if (!loyaltyConfig?.enabled) return false;
-    
-    const user = users.find(u => u.id === userId);
-    if (!user || (user.puntos_fidelidad || user.loyalty_points || 0) < pointsToRedeem) return false;
-    
+    if (!loyaltyConfig?.enabled) {
+      console.warn('[Loyalty] redeemLoyaltyPoints — loyalty disabled, aborting');
+      return false;
+    }
+
+    // SEGURIDAD: Usar RPC atómica con FOR UPDATE para prevenir race conditions
+    const { data: result, error } = await supabase.rpc('process_loyalty_points', {
+      p_user_id: userId,
+      p_points: pointsToRedeem,
+      p_operation: 'resta',
+      p_reason: 'canje',
+      p_description: orderId ? `Canje en pedido #${orderId.slice(-8)}` : 'Canje de puntos',
+      p_order_id: orderId || null,
+      p_created_by: userId,
+    });
+
+    if (error || !result?.success) {
+      console.error('[Loyalty] redeemLoyaltyPoints — RPC failed:', error || result?.error);
+      return false;
+    }
+    console.log('[Loyalty] redeemLoyaltyPoints — RPC success', { newPoints: result.new_points, previous: result.previous_points, change: result.points_change });
+
+    // Sincronizar estado local desde la respuesta de la RPC
+    const newPoints = result.new_points;
+    setUsers(prev => prev.map(u => {
+      if (u.id !== userId) return u;
+      return { ...u, puntos_fidelidad: newPoints, loyalty_points: newPoints };
+    }));
+    if (currentUser?.id === userId) {
+      setCurrentUser(prev => prev ? { ...prev, puntos_fidelidad: newPoints, loyalty_points: newPoints } : prev);
+    }
+
+    // Registrar en transactions local para historial inmediato
     const tx: LoyaltyTransaction = {
-      id: `loy-tx-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+      id: result.history_id || `loy-tx-${Date.now()}`,
       user_id: userId,
       operation: 'resta',
       reason: 'canje',
@@ -3176,39 +3156,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       order_id: orderId,
       created_at: new Date().toISOString(),
     };
-    
-    const newPoints = (user.puntos_fidelidad || user.loyalty_points || 0) - pointsToRedeem;
-
-    // Persistir a Supabase
-    try {
-      const { error: txErr } = await supabase.from('loyalty_history').insert({
-        user_id: tx.user_id,
-        operation: tx.operation,
-        reason: tx.reason,
-        points: tx.points,
-        description: tx.description,
-        order_id: tx.order_id || null,
-        created_by: userId,
-      });
-      if (txErr) console.error('[Loyalty] Error guardando canje:', txErr.message);
-      const { error: ptsErr } = await supabase.from('usuarios_clientes')
-        .update({ puntos_fidelidad: newPoints, loyalty_points: newPoints })
-        .eq('id', userId);
-      if (ptsErr) console.error('[Loyalty] Error actualizando puntos:', ptsErr.message);
-    } catch (e) {
-      console.error('[Loyalty] Sync failed:', e);
-    }
-    
-    // Actualizar estado local
     setLoyaltyTransactions(prev => [...prev, tx]);
-    setUsers(prev => prev.map(u => {
-      if (u.id !== userId) return u;
-      return { ...u, puntos_fidelidad: newPoints, loyalty_points: newPoints };
-    }));
-    if (currentUser?.id === userId) {
-      setCurrentUser(prev => prev ? { ...prev, puntos_fidelidad: newPoints, loyalty_points: newPoints } : prev);
-    }
-    
+    console.log('[Loyalty] redeemLoyaltyPoints — state updated');
+
     return true;
   };
 
@@ -3239,11 +3189,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const adjustUserPoints = async (userId: string, points: number, reason: string) => {
+    console.log('[Loyalty] adjustUserPoints — RPC call', { userId, points, reason, adminId: currentUser?.id });
+    // SEGURIDAD: Usar RPC atómica con verificación de rol admin
+    const { data: result, error } = await supabase.rpc('adjust_loyalty_points', {
+      p_user_id: userId,
+      p_points: Math.abs(points),
+      p_operation: points >= 0 ? 'suma' : 'resta',
+      p_reason: 'ajuste_admin',
+      p_description: reason,
+      p_admin_id: currentUser?.id || 'unknown',
+    });
+
+    if (error || !result?.success) {
+      console.error('[Loyalty] adjustUserPoints — RPC failed:', error || result?.error);
+      return;
+    }
+    console.log('[Loyalty] adjustUserPoints — RPC success', { newPoints: result.new_points, previous: result.previous_points, change: result.points_change });
+
+    // Sincronizar estado local desde la respuesta de la RPC
+    const newPoints = result.new_points;
     const user = users.find(u => u.id === userId);
-    if (!user) return;
+    const newLifetime = points > 0
+      ? (user?.puntos_historicos || user?.loyalty_lifetime_points || 0) + Math.abs(points)
+      : user?.puntos_historicos || user?.loyalty_lifetime_points || 0;
+
+    setUsers(prev => prev.map(u => {
+      if (u.id !== userId) return u;
+      return { ...u, puntos_fidelidad: newPoints, puntos_historicos: newLifetime, loyalty_points: newPoints, loyalty_lifetime_points: newLifetime };
+    }));
 
     const tx: LoyaltyTransaction = {
-      id: `loy-tx-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+      id: result.history_id || `loy-tx-${Date.now()}`,
       user_id: userId,
       operation: points >= 0 ? 'suma' : 'resta',
       reason: 'ajuste_admin',
@@ -3251,35 +3227,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       description: reason,
       created_at: new Date().toISOString(),
     };
-    
-    const newPoints = Math.max(0, (user.puntos_fidelidad || user.loyalty_points || 0) + points);
-    const newLifetime = points > 0
-      ? (user.puntos_historicos || user.loyalty_lifetime_points || 0) + points
-      : user.puntos_historicos || user.loyalty_lifetime_points || 0;
-
-    // Persistir a Supabase (solo admin puede llegar aqui)
-    try {
-      await supabase.from('loyalty_history').insert({
-        user_id: tx.user_id,
-        operation: tx.operation,
-        reason: tx.reason,
-        points: tx.points,
-        description: tx.description,
-        created_by: 'admin',
-      });
-      await supabase.from('usuarios_clientes')
-        .update({ puntos_fidelidad: newPoints, puntos_historicos: newLifetime, loyalty_points: newPoints, loyalty_lifetime_points: newLifetime })
-        .eq('id', userId);
-    } catch (e) {
-      console.error('[Loyalty] Adjust sync failed:', e);
-    }
-
-    // Actualizar estado local
     setLoyaltyTransactions(prev => [...prev, tx]);
-    setUsers(prev => prev.map(u => {
-      if (u.id !== userId) return u;
-      return { ...u, puntos_fidelidad: newPoints, puntos_historicos: newLifetime, loyalty_points: newPoints, loyalty_lifetime_points: newLifetime };
-    }));
+    console.log('[Loyalty] adjustUserPoints — state updated');
   };
 
   const getLoyaltyTransactions = (userId: string): LoyaltyTransaction[] => {

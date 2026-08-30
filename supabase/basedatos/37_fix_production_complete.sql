@@ -70,6 +70,11 @@ DROP POLICY IF EXISTS "notifications_select_auth" ON notifications;
 CREATE POLICY "notifications_select_auth" ON notifications
     FOR SELECT TO authenticated USING (true);
 
+-- Permitir a anon leer notificaciones (necesario para admin en modo degradado)
+DROP POLICY IF EXISTS "notifications_select_anon" ON notifications;
+CREATE POLICY "notifications_select_anon" ON notifications
+    FOR SELECT TO anon USING (true);
+
 DROP POLICY IF EXISTS "notifications_update_auth" ON notifications;
 CREATE POLICY "notifications_update_auth" ON notifications
     FOR UPDATE TO authenticated

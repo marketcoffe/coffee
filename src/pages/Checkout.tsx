@@ -8,6 +8,7 @@ import { CartUpsell } from '../components/CartUpsell';
 import { OrderTracker } from '../components/OrderTracker';
 import { OrderSuccessStep } from '../components/mesa/OrderSuccessStep';
 import { OrderTypeModal } from '../components/OrderTypeModal';
+import { PointsEarnedModal } from '../components/PointsEarnedModal';
 import { FoodItem, Coupon, Order, StoreConfig, DeliveryZone } from '../types/store';
 import { haversineKm, findNearestSede } from '../utils/geo';
 import { getWhatsAppPhone } from '../utils/phone';
@@ -19,7 +20,7 @@ interface CheckoutProps {
 }
 
 export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
-  const { cart, config, addToCart, updateCartQuantity, removeFromCart, createOrder, registerGuestUser, currentUser, coupons, updateCoupon, orders, earnLoyaltyPoints, clearCart, mesas, fetchMesas } = useApp();
+  const { cart, config, addToCart, updateCartQuantity, removeFromCart, createOrder, registerGuestUser, currentUser, coupons, updateCoupon, orders, earnLoyaltyPoints, redeemLoyaltyPoints, clearCart, mesas, fetchMesas } = useApp();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
@@ -28,6 +29,17 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [couponError, setCouponError] = useState('');
   const [showCelebration, setShowCelebration] = useState(false);
+
+  // Canje de puntos
+  const [usePoints, setUsePoints] = useState(false);
+  const [pointsToRedeem, setPointsToRedeem] = useState(0);
+  const [pointsDiscount, setPointsDiscount] = useState(0);
+  const [pointsError, setPointsError] = useState('');
+
+  // Modal de puntos ganados
+  const [showPointsModal, setShowPointsModal] = useState(false);
+  const [earnedPoints, setEarnedPoints] = useState(0);
+  const [earnedPointsBalance, setEarnedPointsBalance] = useState(0);
 
   const hasFreeDeliveryItem = cart.some(item => item.item.delivery_gratis);
 
@@ -358,8 +370,25 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
     }
   }
   const effectiveShippingAfterCoupon = (appliedCoupon?.coupon_type === 'free_shipping') ? 0 : effectiveShippingCost;
-  const totalUsd = subtotalUsd - discountFromCoupon + effectiveShippingAfterCoupon;
+
+  // Canje de puntos: calcular descuento
+  const loyaltyConfig = config.loyalty;
+  const userPoints = currentUser?.puntos_fidelidad || currentUser?.loyalty_points || 0;
+  const pointsRedemptionRate = loyaltyConfig?.redemption_rate || 100; // 100 puntos = $1
+  const maxDiscountPercent = loyaltyConfig?.max_discount_percent || 30;
+  const pointsValueUsd = userPoints / pointsRedemptionRate; // Valor total de puntos en $
+  const maxPointsDiscount = subtotalUsd * (maxDiscountPercent / 100); // Max descuento por %
+  const effectivePointsDiscount = usePoints && pointsToRedeem > 0
+    ? Math.min(pointsToRedeem / pointsRedemptionRate, maxPointsDiscount, subtotalUsd - discountFromCoupon)
+    : 0;
+
+  const totalUsd = subtotalUsd - discountFromCoupon - effectivePointsDiscount + effectiveShippingAfterCoupon;
   const totalBs = totalUsd * config.tasa_cambio;
+
+  // Puntos estimados a ganar con este pedido
+  const estimatedPointsToEarn = loyaltyConfig?.enabled && currentUser && totalUsd >= (loyaltyConfig?.min_order_for_points || 0)
+    ? Math.floor(totalUsd * (loyaltyConfig?.points_per_dollar || 1))
+    : 0;
 
   const handleShippingMethodChange = (method: 'mapa' | 'recogida' | 'zonas') => {
     setShippingMethod(method);
@@ -446,6 +475,30 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
     setCouponInput('');
     setShowCelebration(true);
     setTimeout(() => setShowCelebration(false), 3000);
+  };
+
+  const handleToggleUsePoints = (checked: boolean) => {
+    console.log('[Checkout] handleToggleUsePoints', { checked, userPoints, maxDiscountPercent, pointsRedemptionRate });
+    setUsePoints(checked);
+    setPointsError('');
+    if (checked) {
+      const maxByPercent = subtotalUsd * (maxDiscountPercent / 100);
+      const maxByAvailable = userPoints;
+      const maxUsable = Math.min(maxByAvailable, Math.floor(maxByPercent * pointsRedemptionRate));
+      console.log('[Checkout] handleToggleUsePoints — maxUsable', { maxByPercent, maxByAvailable, maxUsable });
+      setPointsToRedeem(maxUsable > 0 ? maxUsable : 0);
+    } else {
+      setPointsToRedeem(0);
+    }
+  };
+
+  const handlePointsChange = (value: number) => {
+    setPointsError('');
+    const clamped = Math.max(0, Math.min(value, userPoints));
+    const maxByPercent = Math.floor((subtotalUsd - discountFromCoupon) * (maxDiscountPercent / 100) * pointsRedemptionRate);
+    const finalPoints = Math.min(clamped, maxByPercent);
+    console.log('[Checkout] handlePointsChange', { input: value, clamped, maxByPercent, finalPoints });
+    setPointsToRedeem(finalPoints);
   };
 
   const validateStep1 = (): boolean => {
@@ -562,6 +615,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
       costo_envio_usd: orderType === 'mesa' ? 0 : effectiveShippingAfterCoupon,
       descuento_cupon_usd: discountFromCoupon,
       cupon_codigo: appliedCoupon?.code,
+      descuento_puntos_usd: effectivePointsDiscount > 0 ? effectivePointsDiscount : undefined,
+      puntos_canjeados: effectivePointsDiscount > 0 ? pointsToRedeem : undefined,
       metodo_pago: orderType === 'mesa' ? mesaPaymentMethod : selectedPayment,
       lat: orderType === 'mesa' ? config.coordenadas_tienda.lat : shippingLat,
       lng: orderType === 'mesa' ? config.coordenadas_tienda.lng : shippingLng,
@@ -574,15 +629,26 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
     } as any, preOrderId);
 
     if (created) {
+      console.log('[Checkout] Order created', { orderId: created.id, total: created.total_usd, pointsDiscount: effectivePointsDiscount, pointsRedeemed: pointsToRedeem });
       if (orderType === 'mesa') {
         setMesaOrderConfirmed(true);
         setMesaPaymentPhase(true);
       }
       setProcessedOrder(created);
 
-      // Otorgar puntos de fidelidad al usuario
-      if (currentUser?.id && created.total_usd) {
+      // SEGURIDAD: Los puntos por compra se acreditan via trigger de DB
+      // (trigger_order_delivery_points) cuando el status cambia a 'Entregado'.
+      // Solo sincronizamos el saldo actual al estado local del frontend.
+      if (currentUser?.id) {
+        console.log('[Checkout] earnLoyaltyPoints — syncing user points from DB');
         earnLoyaltyPoints(currentUser.id, created.id, created.total_usd, selectedSedeId || undefined);
+      }
+
+      // Canje de puntos: descontar vía RPC atómica
+      if (currentUser?.id && effectivePointsDiscount > 0 && pointsToRedeem > 0) {
+        console.log('[Checkout] redeemLoyaltyPoints — RPC call', { userId: currentUser.id, points: pointsToRedeem, orderId: created.id, discount: effectivePointsDiscount });
+        const redeemResult = await redeemLoyaltyPoints(currentUser.id, pointsToRedeem, created.id);
+        console.log('[Checkout] redeemLoyaltyPoints — result', redeemResult);
       }
 
       if (orderType !== 'mesa') {
@@ -1468,6 +1534,61 @@ ${productosDetailText}
                       </p>
                     )}
                   </div>
+
+                  {/* Canje de Puntos */}
+                  {loyaltyConfig?.enabled && currentUser && userPoints > 0 && (
+                    <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-[11px] font-bold uppercase text-[#8f7065] flex items-center gap-1.5">
+                          ⭐ Usar Puntos
+                        </label>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                          {userPoints} pts = ${pointsValueUsd.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={usePoints}
+                            onChange={(e) => handleToggleUsePoints(e.target.checked)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                        </label>
+                        <span className="text-xs text-[#5b4137]">
+                          {usePoints ? `Canjeando ${pointsToRedeem} puntos` : 'Activar para canjear'}
+                        </span>
+                      </div>
+                      {usePoints && (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="range"
+                              min={0}
+                              max={Math.min(userPoints, Math.floor((subtotalUsd - discountFromCoupon) * (maxDiscountPercent / 100) * pointsRedemptionRate))}
+                              value={pointsToRedeem}
+                              onChange={(e) => handlePointsChange(Number(e.target.value))}
+                              className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                            />
+                            <input
+                              type="number"
+                              min={0}
+                              max={userPoints}
+                              value={pointsToRedeem}
+                              onChange={(e) => handlePointsChange(Number(e.target.value))}
+                              className="w-16 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-lg px-2 py-1 text-xs text-center font-bold outline-none"
+                            />
+                          </div>
+                          <p className="text-[10px] text-[#8f7065]">
+                            Descuento: <span className="font-bold text-amber-600">-${effectivePointsDiscount.toFixed(2)}</span>
+                            {maxDiscountPercent > 0 && ` (máx. ${maxDiscountPercent}%)`}
+                          </p>
+                        </div>
+                      )}
+                      {pointsError && <span className="text-[11px] text-red-500 mt-1 block">{pointsError}</span>}
+                    </div>
+                  )}
                 </>
               ) : (
                 <>
@@ -1500,6 +1621,12 @@ ${productosDetailText}
                           <span className="font-bold">{appliedCoupon.coupon_type === 'free_shipping' ? 'Envio Gratis' : `-$${discountFromCoupon.toFixed(2)}`}</span>
                         </div>
                       )}
+                      {effectivePointsDiscount > 0 && (
+                        <div className="flex justify-between text-xs text-amber-700">
+                          <span>⭐ Canje de puntos ({pointsToRedeem} pts):</span>
+                          <span className="font-bold">-${effectivePointsDiscount.toFixed(2)}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between text-xs">
                         <span className="text-[#8f7065]">Envío ({shippingMethod === 'recogida' ? 'Recogida' : shippingZone}):</span>
                         <span className="font-bold">{appliedCoupon?.coupon_type === 'free_shipping' ? 'Gratis (Cupon)' : effectiveShippingAfterCoupon === 0 ? 'Gratis' : `$${effectiveShippingAfterCoupon.toFixed(2)}`}</span>
@@ -1511,6 +1638,14 @@ ${productosDetailText}
                           <span className="text-[10px] text-[#8f7065] ml-2">{totalBs.toFixed(2)} Bs.</span>
                         </div>
                       </div>
+                      {estimatedPointsToEarn > 0 && (
+                        <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-[#e4beb1]/10">
+                          <span className="text-amber-500 text-xs">⭐</span>
+                          <span className="text-[11px] text-amber-700 font-semibold">
+                            Ganarás <span className="font-black">{estimatedPointsToEarn}</span> puntos con este pedido
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -2054,6 +2189,16 @@ ${productosDetailText}
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Modal de puntos ganados */}
+      <PointsEarnedModal
+        isOpen={showPointsModal}
+        onClose={() => setShowPointsModal(false)}
+        points={earnedPoints}
+        newBalance={earnedPointsBalance}
+        reason="por tu compra"
+        themeColor={themeColor}
+      />
     </div>
   );
 };

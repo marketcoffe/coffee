@@ -154,6 +154,30 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
   const userPoints = currentUser ? getUserLoyaltyPoints(currentUser.id) : 0;
   const userTier = currentUser ? getUserLoyaltyTier(currentUser.id) : null;
 
+  // Historial de puntos
+  const [pointsHistory, setPointsHistory] = useState<Array<{
+    id: string; points: number; operation: string; reason: string; description: string; created_at: string;
+  }>>([]);
+  const [showPointsHistory, setShowPointsHistory] = useState(false);
+
+  useEffect(() => {
+    if (!currentUser?.id || !showPointsHistory) return;
+    console.log('[ClientePanel] Loading points history for user:', currentUser.id);
+    supabase.from('loyalty_history')
+      .select('id, points, operation, reason, description, created_at')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false })
+      .limit(15)
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('[ClientePanel] Points history load error:', error);
+          return;
+        }
+        console.log('[ClientePanel] Points history loaded:', data?.length || 0, 'records');
+        if (data) setPointsHistory(data);
+      });
+  }, [currentUser?.id, showPointsHistory]);
+
   const activeCoupons = useMemo(() => {
     return coupons.filter(c => {
       if (!c.active) return false;
@@ -631,6 +655,49 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
                   </span>
                 </div>
               )}
+
+              {/* Historial de puntos */}
+              <button
+                onClick={() => setShowPointsHistory(!showPointsHistory)}
+                className="w-full mt-3 flex items-center justify-between text-[11px] font-bold text-[#8f7065] uppercase"
+              >
+                <span>Historial de puntos</span>
+                <motion.div animate={{ rotate: showPointsHistory ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                  <ChevronDown size={14} />
+                </motion.div>
+              </button>
+              <AnimatePresence>
+                {showPointsHistory && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="mt-2 space-y-1.5 max-h-48 overflow-y-auto">
+                      {pointsHistory.length === 0 ? (
+                        <p className="text-[10px] text-[#8f7065] text-center py-2">Sin movimientos aun</p>
+                      ) : pointsHistory.map((tx) => (
+                        <div key={tx.id} className="flex items-center justify-between text-[11px] py-1.5 border-b border-[#e4beb1]/10 last:border-0">
+                          <div className="flex items-center gap-2">
+                            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${tx.operation === 'suma' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'}`}>
+                              {tx.operation === 'suma' ? '+' : '-'}
+                            </span>
+                            <div>
+                              <p className="font-semibold text-[#1a1c1d] truncate max-w-[140px]">{tx.description || tx.reason}</p>
+                              <p className="text-[9px] text-[#8f7065]">{new Date(tx.created_at).toLocaleDateString('es-VE', { day: '2-digit', month: 'short' })}</p>
+                            </div>
+                          </div>
+                          <span className={`font-bold ${tx.operation === 'suma' ? 'text-emerald-600' : 'text-red-500'}`}>
+                            {tx.operation === 'suma' ? '+' : '-'}{tx.points}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         )}

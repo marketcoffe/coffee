@@ -123,6 +123,8 @@ export interface Order {
   costo_envio_usd: number;
   descuento_cupon_usd?: number;
   cupon_codigo?: string;
+  descuento_puntos_usd?: number;
+  puntos_canjeados?: number;
   total_usd: number;
   total_bs: number;
   metodo_pago: 'Pago Móvil' | 'Zelle' | 'Efectivo' | 'Transferencia' | 'Otro' | 'Pendiente';
