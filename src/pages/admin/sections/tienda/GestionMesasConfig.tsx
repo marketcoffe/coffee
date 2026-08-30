@@ -300,7 +300,7 @@ export default function GestionMesasConfig() {
                     <div key={order.id} className="flex items-center justify-between p-3 bg-[#f9f9fb] rounded-xl border border-[#e4beb1]/10">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-[#1a1c1d]">{order.id.slice(-8)}</span>
+                          <span className="text-xs font-bold text-[#1a1c1d]">{order.id}</span>
                           <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                             order.status === 'completado' || order.status === 'Entregado' ? 'bg-emerald-100 text-emerald-700' :
                             order.status === 'Cancelado' || order.status === 'cancelado' ? 'bg-red-100 text-red-700' :

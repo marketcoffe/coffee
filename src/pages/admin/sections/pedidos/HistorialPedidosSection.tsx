@@ -225,7 +225,7 @@ const HistorialPedidosSection: React.FC<HistorialPedidosSectionProps> = ({ scope
                   className="flex items-center justify-between px-3 sm:px-4 py-2.5 cursor-pointer hover:bg-slate-50 transition-colors"
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-[10px] sm:text-xs font-black text-slate-900 shrink-0">#{order.id.slice(-4).toUpperCase()}</span>
+                    <span className="text-[10px] sm:text-xs font-black text-slate-900 shrink-0">#{order.id.toUpperCase()}</span>
                     <span className={`flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${badge.bg} ${badge.color} shrink-0`}>
                       {badge.icon}
                       {order.status}

@@ -124,7 +124,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onAdvanceStatus, on
         {/* Header: Order number + status + timer */}
         <div className="flex items-center gap-2">
           <span className={`order-number ${kitchenMode ? 'text-lg font-black' : 'text-[10px]'} text-slate-400 shrink-0`}>
-            #{order.id.slice(-4).toUpperCase()}
+            #{order.id.toUpperCase()}
           </span>
           <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${statusCfg.bg} ${statusCfg.color} ${kitchenMode ? 'text-[11px] px-3 py-1' : ''}`}>
             {statusCfg.label}

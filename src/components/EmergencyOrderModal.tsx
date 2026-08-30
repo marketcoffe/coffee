@@ -416,7 +416,7 @@ export default function EmergencyOrderModal() {
                     {typeConfig.label}
                   </span>
                   <span className="text-[10px] text-slate-400 font-mono">
-                    #{order.id.slice(-4).toUpperCase()}
+                    #{order.id.toUpperCase()}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">

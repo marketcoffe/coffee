@@ -153,7 +153,7 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
   const handleWhatsApp = useCallback((order: Order) => {
     const phone = order.cliente_telefono?.replace(/\D/g, '');
     if (!phone) return;
-    window.open(`https://wa.me/58${phone}?text=Tu pedido #${order.id.slice(-4)} esta ${order.status}`, '_blank');
+    window.open(`https://wa.me/58${phone}?text=Tu pedido #${order.id} esta ${order.status}`, '_blank');
   }, []);
 
   const exportCSV = () => {

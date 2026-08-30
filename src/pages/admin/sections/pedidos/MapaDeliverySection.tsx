@@ -154,7 +154,7 @@ const MapaDeliverySection: React.FC<MapaDeliverySectionProps> = ({ scopeSedeId }
                     <div className="p-3">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-black text-slate-900">#{order.id.slice(-4).toUpperCase()}</span>
+                          <span className="text-xs font-black text-slate-900">#{order.id.toUpperCase()}</span>
                           {cfg && (
                             <span className={`flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.color} ${cfg.border} border`}>
                               {cfg.icon}

@@ -368,7 +368,7 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
                 <Package size={14} style={{ color: themeColor }} />
               </div>
               <div>
-                <p className="text-xs font-bold text-[#1a1c1d]">#{order.id.slice(-8).toUpperCase()}</p>
+                <p className="text-xs font-bold text-[#1a1c1d]">#{order.id.toUpperCase()}</p>
                 <p className="text-[10px] text-[#8f7065]">{itemCount} {itemCount === 1 ? 'artículo' : 'artículos'}</p>
               </div>
             </div>
@@ -488,7 +488,7 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <p className="text-xs font-bold text-[#1a1c1d]">#{order.id.slice(-8).toUpperCase()}</p>
+            <p className="text-xs font-bold text-[#1a1c1d]">#{order.id.toUpperCase()}</p>
             <span
               className="px-2 py-0.5 rounded-lg text-[10px] font-bold border"
               style={{

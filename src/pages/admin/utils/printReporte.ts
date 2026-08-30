@@ -43,7 +43,7 @@ export function printReporte(data: ReporteData, config: any) {
     data.pedidos.forEach(p => {
       pedidosHtml += `
         <tr>
-          <td style="font-size:7px;width:30px">${p.id.slice(-6)}</td>
+          <td style="font-size:7px;width:30px">${p.id}</td>
           <td style="font-size:7px">${p.cliente}</td>
           <td style="font-size:7px;text-align:center;width:20px">${p.items}</td>
           <td style="font-size:7px;text-align:right;width:36px">$${p.total.toFixed(2)}</td>

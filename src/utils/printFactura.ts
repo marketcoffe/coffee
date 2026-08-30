@@ -12,7 +12,7 @@ export function printFactura(order: Order, config: any) {
   const phone = config?.telefono_soporte || '';
   const rif = config?.rif || config?.cedula || '';
   const date = new Date(order.fecha).toLocaleString('es-VE');
-  const orderId = order.id.slice(-8);
+  const orderId = order.id;
 
   const subtotal = order.subtotal_usd || order.total_usd || 0;
   const shipping = order.costo_envio_usd || 0;

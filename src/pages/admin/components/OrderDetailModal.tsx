@@ -84,7 +84,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
     const phone = order.cliente_telefono?.replace(/\D/g, '');
     if (!phone) return;
     const text = encodeURIComponent(
-      `Hola ${order.cliente_nombre}, tu pedido #${order.id.slice(-4).toUpperCase()} esta en estado: ${statusCfg.label}. Total: $${order.total_usd?.toFixed(2)}`
+      `Hola ${order.cliente_nombre}, tu pedido #${order.id.toUpperCase()} esta en estado: ${statusCfg.label}. Total: $${order.total_usd?.toFixed(2)}`
     );
     window.open(`https://wa.me/58${phone}?text=${text}`, '_blank');
   };
@@ -184,7 +184,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                   </span>
                 )}
                 <h2 className="text-white font-bold text-sm">
-                  #{order.id.slice(-4).toUpperCase()}
+                  #{order.id.toUpperCase()}
                 </h2>
               </div>
               <p className="text-white/80 text-[11px]">{deliveryCfg.label} — {statusCfg.label}</p>

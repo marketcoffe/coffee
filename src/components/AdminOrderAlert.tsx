@@ -177,7 +177,7 @@ export default function AdminOrderAlert() {
                           #{index + 1}
                         </span>
                         <span className="text-[10px] font-bold text-slate-900">
-                          #{order.id.slice(-4).toUpperCase()}
+                          #{order.id.toUpperCase()}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">

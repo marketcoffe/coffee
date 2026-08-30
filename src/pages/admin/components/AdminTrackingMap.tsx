@@ -172,7 +172,7 @@ export const AdminTrackingMap: React.FC<AdminTrackingMapProps> = ({
         html: `<div style="position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer">
           ${isSelected ? `<span style="position:absolute;width:${size + 12}px;height:${size + 12}px;border-radius:50%;background:${color};opacity:0.2;${pulseAnimation}"></span>` : ''}
           <div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;transition:all 0.2s">
-            <span style="color:white;font-size:9px;font-weight:900;text-shadow:0 1px 2px rgba(0,0,0,0.3);line-height:1">#${order.id.slice(-3)}</span>
+            <span style="color:white;font-size:9px;font-weight:900;text-shadow:0 1px 2px rgba(0,0,0,0.3);line-height:1">#${order.id}</span>
           </div>
         </div>`,
         className: '',

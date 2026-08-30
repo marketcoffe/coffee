@@ -7,7 +7,7 @@ export function printMesaTicket(order: Order, config: any) {
   const address = config?.direccion_fisica || '';
   const phone = config?.telefono_soporte || '';
   const date = new Date(order.fecha).toLocaleString('es-VE');
-  const orderId = order.id.slice(-8);
+  const orderId = order.id;
   const mesaNum = order.numero_mesa || '?';
   const clientName = order.nombre_cliente || order.cliente_nombre || 'Cliente';
   const paymentMethod = order.metodo_pago || 'N/A';

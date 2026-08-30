@@ -17,7 +17,7 @@ export const TicketDigitalModal: React.FC<TicketDigitalModalProps> = ({ order, i
   const [copied, setCopied] = useState(false);
 
   const ticketCode = order.ticket_code || `#M-${order.numero_mesa || '?'}`;
-  const shortId = order.id.slice(-8);
+  const shortId = order.id;
 
   const handleCopy = async () => {
     try {

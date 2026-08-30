@@ -590,7 +590,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
     const finalClientName = orderType === 'mesa' ? clientName : (currentUser?.nombre || clientName);
     const cleanedPhone = clientPhone.replace(/[\s\-()]/g, '');
 
-    const preOrderId = `PED-${Math.floor(1000 + Math.random() * 9000)}-VAL-${new Date().getFullYear()}`;
+    const preOrderId = `ORD-${String(Math.floor(10000 + Math.random() * 90000)).padStart(6, '0')}`;
 
     const created = await createOrder({
       cliente_nombre: finalClientName || 'Cliente sin nombre',
