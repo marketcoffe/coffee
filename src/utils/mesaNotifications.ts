@@ -2,7 +2,7 @@ import { supabase } from '../store/supabaseClient';
 
 /**
  * Send a push notification to a specific phone number's subscription
- * Uses the Supabase Edge Function / API webhook
+ * Uses the /api/push-notify webhook endpoint with compatible payload format
  */
 export async function sendMesaPushNotification(
   targetPhone: string,
@@ -12,53 +12,27 @@ export async function sendMesaPushNotification(
 ): Promise<boolean> {
   console.log('[Push] sendMesaPushNotification:', { targetPhone, title, body: body.substring(0, 60) });
   try {
-    // Get the push subscription for this phone
-    const { data: subscriptions, error: fetchError } = await supabase
-      .from('push_subscriptions')
-      .select('endpoint, p256dh, auth_secret')
-      .eq('destinatario_telefono', targetPhone.trim())
-      .eq('is_active', true)
-      .limit(1);
-
-    if (fetchError) {
-      console.error('[Push] Error consultando push_subscriptions:', fetchError.message);
-      return false;
-    }
-    if (!subscriptions || subscriptions.length === 0) {
-      console.warn('[Push] No active subscription for phone:', targetPhone);
-      return false;
-    }
-
-    const sub = subscriptions[0];
-    console.log('[Push] Suscripción encontrada:', sub.endpoint.substring(0, 50));
-
-    // Send via the webhook endpoint
     const webhookUrl = import.meta.env.VITE_PUSH_WEBHOOK_URL;
     if (!webhookUrl) {
       console.error('[Push] VITE_PUSH_WEBHOOK_URL no configurada');
       return false;
     }
 
-    console.log('[Push] Enviando a webhook:', webhookUrl);
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        subscription: {
-          endpoint: sub.endpoint,
-          keys: {
-            p256dh: sub.p256dh,
-            auth: sub.auth_secret
-          }
-        },
-        notification: {
-          title,
-          body,
+        record: {
+          titulo: title,
+          mensaje: body,
+          tipo: 'personal',
+          destinatario_telefono: targetPhone.trim(),
+          imagen_url: (data && typeof data === 'object' && 'imagen_url' in data ? data.imagen_url : undefined) || '',
+          link_url: (data && typeof data === 'object' && 'link_url' in data ? data.link_url : undefined) || '/',
           icon: '/icon.png',
           badge: '/icon.png',
           data: data || {},
-          vibrate: [200, 100, 200],
-          requireInteraction: true
+          requireInteraction: true,
         }
       })
     });
@@ -95,14 +69,16 @@ export async function sendMesaBroadcastPush(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        broadcast: true,
-        notification: {
-          title,
-          body,
+        record: {
+          titulo: title,
+          mensaje: body,
+          tipo: 'todos',
+          imagen_url: (data && typeof data === 'object' && 'imagen_url' in data ? data.imagen_url : undefined) || '',
+          link_url: (data && typeof data === 'object' && 'link_url' in data ? data.link_url : undefined) || '/',
           icon: '/icon.png',
           badge: '/icon.png',
           data: data || {},
-          vibrate: [200, 100, 200]
+          requireInteraction: false,
         }
       })
     });

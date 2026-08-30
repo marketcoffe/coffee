@@ -2701,19 +2701,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // Disparar push ANTES del INSERT para que siempre llegue al cliente
     if (tipo === 'todos' || tipo === 'personal' || tipo === 'admin' || tipo === 'request') {
-      import('../utils/pushTrigger').then(({ triggerBroadcastPush }) => {
-        triggerBroadcastPush({
-          id: notifId,
-          titulo: title,
-          mensaje: message,
-          tipo,
-          destinatario_telefono: targetPhone || '',
-          imagen_url: imageUrl || '',
-          link_url: linkUrl || '/',
-        }).then(ok => {
-          if (ok) console.log('[Push] Push disparado OK para:', notifId);
-        }).catch(err => console.warn('[Push] Error disparando push:', err));
-      });
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        import('../utils/pushTrigger').then(({ triggerBroadcastPush }) => {
+          triggerBroadcastPush({
+            id: notifId,
+            titulo: title,
+            mensaje: message,
+            tipo,
+            destinatario_telefono: targetPhone || '',
+            imagen_url: imageUrl || '',
+            link_url: linkUrl || '/',
+          }).then(ok => {
+            if (ok) console.log('[Push] Push disparado OK para:', notifId);
+          }).catch(err => console.warn('[Push] Error disparando push:', err));
+        });
+      }
     }
 
     const { error } = await supabase.from('notifications').insert({
@@ -2802,6 +2804,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!('PushManager' in window)) {
       console.warn('[PushSync] PushManager no disponible');
       return { success: false, error: 'PushManager no disponible en este navegador' };
+    }
+    if (typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
+      console.warn('[PushSync] Permiso de notificacion denegado o default');
+      return { success: false, error: 'Permiso de notificacion no concedido' };
     }
 
     try {

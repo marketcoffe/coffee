@@ -3,15 +3,43 @@
 
 declare const PagesFunction: any;
 
-const CORS_HEADERS: Record<string, string> = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, x-push-webhook-secret',
-  'Access-Control-Max-Age': '86400',
-};
+const DEFAULT_ALLOWED_ORIGINS = [
+  'https://marketcoffesweet.com',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+];
 
-export const onRequestOptions: any = async () => {
-  return new Response(null, { status: 204, headers: CORS_HEADERS });
+function resolveAllowedOrigins(env: any): string[] {
+  const raw = env.ALLOWED_ORIGINS;
+  if (!raw) return DEFAULT_ALLOWED_ORIGINS;
+  const list = String(raw).split(',').map((s: string) => s.trim()).filter(Boolean);
+  return list.length ? list : DEFAULT_ALLOWED_ORIGINS;
+}
+
+function isOriginAllowed(origin: string, env: any): boolean {
+  if (!origin) return false;
+  const allowed = resolveAllowedOrigins(env);
+  if (allowed.includes('*')) return true;
+  return allowed.indexOf(origin) !== -1;
+}
+
+function buildCorsHeaders(request: any, env: any): Record<string, string> {
+  const origin = request?.headers?.get('origin') || '';
+  const headers: Record<string, string> = {
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, x-push-webhook-secret',
+    'Access-Control-Max-Age': '86400',
+    'Vary': 'Origin',
+  };
+  const resolved = resolveAllowedOrigins(env);
+  if (resolved.indexOf('*') !== -1) headers['Access-Control-Allow-Origin'] = '*';
+  else if (isOriginAllowed(origin, env)) headers['Access-Control-Allow-Origin'] = origin;
+  return headers;
+}
+
+export const onRequestOptions: any = async (context: any) => {
+  const { request, env } = context;
+  return new Response(null, { status: 204, headers: buildCorsHeaders(request, env) });
 };
 
 function safeCompare(a: string, b: string): boolean {
@@ -34,7 +62,7 @@ export const onRequestPost: any = async (context: any) => {
     if (!safeCompare(authHeader, configuredSecret)) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json', ...CORS_HEADERS }
+        headers: { 'Content-Type': 'application/json', ...buildCorsHeaders(request, env) }
       });
     }
   }
@@ -44,7 +72,7 @@ export const onRequestPost: any = async (context: any) => {
   if (!supabaseUrl || !supabaseKey) {
     return new Response(JSON.stringify({ error: 'Supabase not configured' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json', ...CORS_HEADERS }
+      headers: { 'Content-Type': 'application/json', ...buildCorsHeaders(request, env) }
     });
   }
 
@@ -55,7 +83,7 @@ export const onRequestPost: any = async (context: any) => {
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json', ...CORS_HEADERS }
+      headers: { 'Content-Type': 'application/json', ...buildCorsHeaders(request, env) }
     });
   }
 
@@ -66,12 +94,13 @@ export const onRequestPost: any = async (context: any) => {
   }
 
   return new Response(JSON.stringify({ success: true, segments: counts }), {
-    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS }
+    headers: { 'Content-Type': 'application/json', ...buildCorsHeaders(request, env) }
   });
 };
 
-export const onRequestGet: any = async () => {
+export const onRequestGet: any = async (context: any) => {
+  const { request, env } = context;
   return new Response(JSON.stringify({ status: 'ok', service: 'evaluate-segments' }), {
-    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS }
+    headers: { 'Content-Type': 'application/json', ...buildCorsHeaders(request, env) }
   });
 };

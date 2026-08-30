@@ -650,29 +650,29 @@ describe('GET diagnostic endpoints', () => {
 // ════════════════════════════════════════════════════════════════════════════
 describe('sw-push.js logic', () => {
   it('dedup TTL is 60 seconds', () => {
-    const file = readFileSync('E:/food-app/public/sw-push.js', 'utf8');
+    const file = readFileSync('E:/market-coffe/public/sw-push.js', 'utf8');
     const match = file.match(/DEDUP_TTL_MS\s*=\s*(\d+)/);
     expect(match).toBeTruthy();
     expect(Number(match![1])).toBe(60000);
   });
 
   it('uses marketcoffee- prefix in tag generation', () => {
-    const file = readFileSync('E:/food-app/public/sw-push.js', 'utf8');
+    const file = readFileSync('E:/market-coffe/public/sw-push.js', 'utf8');
     expect(file).toContain("'marketcoffee-' + String(payload.id || Date.now())");
   });
 
   it('strips marketcoffee- prefix in click handler', () => {
-    const file = readFileSync('E:/food-app/public/sw-push.js', 'utf8');
+    const file = readFileSync('E:/market-coffe/public/sw-push.js', 'utf8');
     expect(file).toContain("rawTag.replace(/^marketcoffee-/, '')");
   });
 
   it('click handler calls track-event endpoint', () => {
-    const file = readFileSync('E:/food-app/public/sw-push.js', 'utf8');
+    const file = readFileSync('E:/market-coffe/public/sw-push.js', 'utf8');
     expect(file).toContain("/api/marketing/track-event");
   });
 
   it('dedup check prevents duplicate notifications within TTL', () => {
-    const file = readFileSync('E:/food-app/public/sw-push.js', 'utf8');
+    const file = readFileSync('E:/market-coffe/public/sw-push.js', 'utf8');
     expect(file).toContain('recentlyShown.has(tagKey)');
   });
 });

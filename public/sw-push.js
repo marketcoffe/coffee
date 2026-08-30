@@ -273,8 +273,19 @@ self.addEventListener('pushsubscriptionchange', (event) => {
   console.log('[SW] pushsubscriptionchange disparado');
   console.log('[SW] Old subscription:', event.oldSubscription?.endpoint?.substring(0, 50));
 
+  const subscribeOptions = {
+    userVisibleOnly: true,
+  };
+  if (vapidPublicKey) {
+    try {
+      subscribeOptions.applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
+    } catch (e) {
+      console.error('[SW] VAPID key invalida para pushsubscriptionchange:', e);
+    }
+  }
+
   event.waitUntil(
-    self.registration.pushManager.subscribe(event.oldSubscription ? event.oldSubscription.options : { userVisibleOnly: true })
+    self.registration.pushManager.subscribe(subscribeOptions)
       .then((newSubscription) => {
         console.log('[SW] Nueva suscripción obtenida:', newSubscription.endpoint.substring(0, 50));
         // Enviar la nueva suscripción al backend
@@ -322,8 +333,22 @@ function arrayBufferToBase64url(buffer) {
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+  const raw = atob(base64);
+  return Uint8Array.from(raw, (c) => c.charCodeAt(0));
+}
+
+// ─── VAPID key para pushsubscriptionchange ───
+let vapidPublicKey = '';
+
 // ─── Message handler ───
 self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SET_VAPID_PUBLIC_KEY') {
+    vapidPublicKey = event.data.vapidPublicKey || '';
+  }
+
   if (event.data?.type === 'SET_ANONYMOUS_ID') {
     self._anonymous_id = event.data.anonymous_id;
   }
@@ -438,11 +463,13 @@ function replayQueue() {
 // Interceptar POSTs offline
 self.addEventListener('fetch', (event) => {
   const req = event.request;
-  if (req.method === 'POST' && req.url.indexOf('/api/') !== -1 && !navigator.onLine) {
+  if (req.method === 'POST' && req.url.indexOf('/api/') !== -1) {
     event.respondWith(
-      enqueueRequest(req)
-        .then(() => new Response(JSON.stringify({ queued: true }), { headers: { 'Content-Type': 'application/json' } }))
-        .catch(() => new Response(JSON.stringify({ queued: true }), { headers: { 'Content-Type': 'application/json' } }))
+      fetch(req).catch(() => {
+        return enqueueRequest(req)
+          .then(() => new Response(JSON.stringify({ queued: true }), { headers: { 'Content-Type': 'application/json' } }))
+          .catch(() => new Response(JSON.stringify({ queued: true }), { headers: { 'Content-Type': 'application/json' } }));
+      })
     );
   }
 });

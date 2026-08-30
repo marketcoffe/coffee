@@ -153,14 +153,15 @@ export const onRequestPost: any = async (context: any) => {
       try {
         await webpush.sendNotification(subInfo, JSON.stringify(payloadForSW));
 
-        const notifId = payloadForSW.id;
-        await supabase.from('notifications').insert({
-          id: notifId, titulo: campaign.title, mensaje: campaign.body,
-          fecha: new Date().toISOString(), tipo: 'personal',
-          destinatario_telefono: sub.destinatario_telefono || '',
-          imagen_url: campaign.image_url || '',
-          link_url: campaign.link_url || '/', leida: false
-        });
+      const notifId = payloadForSW.id;
+      const campaignTipo = campaign.segment_filter === 'all' ? 'todos' : 'todos';
+      await supabase.from('notifications').insert({
+        id: notifId, titulo: campaign.title, mensaje: campaign.body,
+        fecha: new Date().toISOString(), tipo: campaignTipo,
+        destinatario_telefono: sub.destinatario_telefono || '',
+        imagen_url: campaign.image_url || '',
+        link_url: campaign.link_url || '/', leida: false
+      });
 
         await supabase.from('push_events').insert({
           notification_id: notifId, campaign_id: campaign.id,

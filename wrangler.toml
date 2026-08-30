@@ -19,5 +19,5 @@ compatibility_flags = ["nodejs_compat"]
 # ---- Rate limiting para los endpoints /api/* --------------------------------
 # Crear un KV namespace en Cloudflare y descomentar/ajustar el id:
 [[kv_namespaces]]
-binding = "AUTH_RATE_LIMIT_KV"
+binding = "PUSH_RATE_LIMIT_KV"
 id = "8105c93734f04d8da4d1473c2c3ddf8a"

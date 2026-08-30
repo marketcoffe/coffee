@@ -85,6 +85,15 @@ if ('serviceWorker' in navigator) {
         console.log('[Main] SW registrado correctamente:', reg.scope);
         log.info('SW', `Registrado correctamente: ${reg.scope}`);
         setInterval(() => reg.update(), 60 * 60 * 1000);
+
+        const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+        if (vapidPublicKey) {
+          const controller = navigator.serviceWorker.controller;
+          const target = controller || reg.active;
+          if (target) {
+            target.postMessage({ type: 'SET_VAPID_PUBLIC_KEY', vapidPublicKey });
+          }
+        }
       })
       .catch((err) => {
         console.error('[Main] Error al registrar SW:', err);
