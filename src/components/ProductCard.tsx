@@ -78,6 +78,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         {/* Heart button */}
         <button
           onClick={handleToggleFavorite}
+          aria-label={isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}
           className={`absolute top-2 right-2 z-20 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 ${
             isFav
               ? 'text-white shadow-lg'
@@ -136,6 +137,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <RippleButton
           onClick={handleAddToCart}
           disabled={isAgotado}
+          aria-label={`Agregar ${item.nombre} al carrito`}
           className="absolute bottom-2 right-2 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-90 hover:scale-110 disabled:opacity-50"
           style={{
             backgroundColor: themeColor,
