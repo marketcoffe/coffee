@@ -1076,9 +1076,19 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
                   <div key={coupon.id} className="bg-white border-2 border-dashed rounded-2xl p-4 relative overflow-hidden" style={{ borderColor: themeColor + '60' }}>
                     <div className="absolute top-0 right-0 w-16 h-16 rounded-bl-full" style={{ backgroundColor: themeColor + '10' }} />
                     <div className="flex flex-col items-center text-center gap-2">
-                      <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: themeColor }}>Cupón de Descuento</p>
-                      <p className="text-3xl font-black" style={{ color: themeColor }}>{coupon.discount_percent}%</p>
-                      <p className="text-[11px] text-[#8f7065] font-bold">de descuento</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: themeColor }}>
+                        {coupon.coupon_type === 'free_shipping' ? 'Envío Gratis' : 'Cupón de Descuento'}
+                      </p>
+                      <p className="text-3xl font-black" style={{ color: themeColor }}>
+                        {coupon.coupon_type === 'fixed'
+                          ? `$${coupon.discount_amount || 0}`
+                          : coupon.coupon_type === 'free_shipping'
+                          ? '🚚'
+                          : `${coupon.discount_percent}%`}
+                      </p>
+                      <p className="text-[11px] text-[#8f7065] font-bold">
+                        {coupon.coupon_type === 'free_shipping' ? 'en tu pedido' : 'de descuento'}
+                      </p>
                       <div className="bg-[#eeeef0] border border-[#e4beb1]/10 rounded-xl px-4 py-2 font-mono text-lg font-black tracking-wider text-[#1a1c1d]">
                         {coupon.code}
                       </div>

@@ -307,6 +307,24 @@ BEGIN
     -- Generar codigo de cupón
     v_coupon_code := 'LOY-' || UPPER(SUBSTRING(MD5(RANDOM()::TEXT) FROM 1 FOR 8));
 
+    -- Insertar cupón en la tabla coupons para que el usuario pueda usarlo en checkout
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'coupons') THEN
+        INSERT INTO coupons (code, discount_percent, discount_amount, coupon_type, active, description, min_purchase)
+        VALUES (
+            v_coupon_code,
+            CASE WHEN v_reward.reward_type = 'discount_percent' THEN v_reward.reward_value ELSE 0 END,
+            CASE WHEN v_reward.reward_type = 'discount_fixed' THEN v_reward.reward_value ELSE 0 END,
+            CASE
+                WHEN v_reward.reward_type = 'free_shipping' THEN 'free_shipping'
+                WHEN v_reward.reward_type = 'discount_fixed' THEN 'fixed'
+                ELSE 'percentage'
+            END,
+            true,
+            'Canje de puntos: ' || v_reward.name,
+            0
+        );
+    END IF;
+
     -- Registrar en historial
     INSERT INTO loyalty_history (user_id, points, operation, reason, description, reward_id, created_by)
     VALUES (p_user_id, v_reward.points_cost, 'resta', 'canje',

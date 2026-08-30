@@ -9,6 +9,7 @@ import { OrderTracker } from '../components/OrderTracker';
 import { OrderSuccessStep } from '../components/mesa/OrderSuccessStep';
 import { OrderTypeModal } from '../components/OrderTypeModal';
 import { PointsEarnedModal } from '../components/PointsEarnedModal';
+import { useToast } from '../components/Toast';
 import { FoodItem, Coupon, Order, StoreConfig, DeliveryZone } from '../types/store';
 import { haversineKm, findNearestSede } from '../utils/geo';
 import { getWhatsAppPhone } from '../utils/phone';
@@ -21,6 +22,7 @@ interface CheckoutProps {
 
 export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const { cart, config, addToCart, updateCartQuantity, removeFromCart, createOrder, registerGuestUser, currentUser, coupons, updateCoupon, orders, earnLoyaltyPoints, redeemLoyaltyPoints, clearCart, mesas, fetchMesas } = useApp();
+  const { showToast } = useToast();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
@@ -475,6 +477,12 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
     setCouponInput('');
     setShowCelebration(true);
     setTimeout(() => setShowCelebration(false), 3000);
+    const discountLabel = found.coupon_type === 'fixed'
+      ? `$${found.discount_amount || 0} de descuento`
+      : found.coupon_type === 'free_shipping'
+      ? 'Envío gratis'
+      : `${found.discount_percent}% de descuento`;
+    showToast('success', `Cupón aplicado: ${discountLabel}`);
   };
 
   const handleToggleUsePoints = (checked: boolean) => {
@@ -642,6 +650,14 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
       if (currentUser?.id) {
         console.log('[Checkout] earnLoyaltyPoints — syncing user points from DB');
         earnLoyaltyPoints(currentUser.id, created.id, created.total_usd, selectedSedeId || undefined);
+
+        // Mostrar modal de puntos ganados (estimado)
+        const pointsPerDollar = config.loyalty?.points_per_dollar || 10;
+        const estimatedPts = Math.floor(created.total_usd * pointsPerDollar);
+        const currentBalance = currentUser?.puntos_fidelidad || currentUser?.loyalty_points || 0;
+        setEarnedPoints(estimatedPts);
+        setEarnedPointsBalance(currentBalance + estimatedPts);
+        setShowPointsModal(true);
       }
 
       // Canje de puntos: descontar vía RPC atómica

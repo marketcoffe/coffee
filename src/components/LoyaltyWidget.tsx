@@ -21,6 +21,7 @@ export const LoyaltyWidget: React.FC<LoyaltyWidgetProps> = ({ themeColor }) => {
   const [showPointsModal, setShowPointsModal] = useState(false);
   const [redeemedPoints, setRedeemedPoints] = useState(0);
   const [redeemedBalance, setRedeemedBalance] = useState(0);
+  const [redeemedCouponCode, setRedeemedCouponCode] = useState<string | undefined>(undefined);
 
   const loadData = useCallback(async () => {
     if (!currentUser?.id) return;
@@ -88,6 +89,7 @@ export const LoyaltyWidget: React.FC<LoyaltyWidgetProps> = ({ themeColor }) => {
       console.log('[LoyaltyWidget] handleRedeem — RPC success', { remaining: data.remaining_points, spent: data.points_spent, coupon: data.coupon_code });
       setRedeemedPoints(data.points_spent || reward.points_cost);
       setRedeemedBalance(data.remaining_points ?? 0);
+      setRedeemedCouponCode(data.coupon_code);
       setShowPointsModal(true);
       loadData();
     } finally {
@@ -340,11 +342,12 @@ export const LoyaltyWidget: React.FC<LoyaltyWidgetProps> = ({ themeColor }) => {
 
       <PointsEarnedModal
         isOpen={showPointsModal}
-        onClose={() => setShowPointsModal(false)}
+        onClose={() => { setShowPointsModal(false); setRedeemedCouponCode(undefined); }}
         points={redeemedPoints}
         newBalance={redeemedBalance}
         reason="recompensa canjeada"
         themeColor={themeColor}
+        couponCode={redeemedCouponCode}
       />
     </div>
   );

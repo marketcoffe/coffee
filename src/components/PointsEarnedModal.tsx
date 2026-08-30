@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Star, PartyPopper } from 'lucide-react';
+import { X, Star, PartyPopper, Copy, Check } from 'lucide-react';
 
 interface PointsEarnedModalProps {
   isOpen: boolean;
@@ -9,6 +9,7 @@ interface PointsEarnedModalProps {
   newBalance?: number;
   reason?: string;
   themeColor?: string;
+  couponCode?: string;
 }
 
 export const PointsEarnedModal: React.FC<PointsEarnedModalProps> = ({
@@ -18,7 +19,25 @@ export const PointsEarnedModal: React.FC<PointsEarnedModalProps> = ({
   newBalance,
   reason,
   themeColor = '#FF6B35',
+  couponCode,
 }) => {
+  const [copiedCoupon, setCopiedCoupon] = useState(false);
+
+  const handleCopyCoupon = async () => {
+    if (!couponCode) return;
+    try {
+      await navigator.clipboard.writeText(couponCode);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = couponCode;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    setCopiedCoupon(true);
+    setTimeout(() => setCopiedCoupon(false), 2000);
+  };
   useEffect(() => {
     if (isOpen) {
       console.log('[PointsModal] Opening', { points, newBalance, reason });
@@ -116,6 +135,29 @@ export const PointsEarnedModal: React.FC<PointsEarnedModalProps> = ({
                 <p className="text-lg font-black" style={{ color: themeColor }}>
                   {newBalance} <span className="text-xs font-bold text-gray-400">puntos</span>
                 </p>
+              </motion.div>
+            )}
+
+            {/* Coupon code from redemption */}
+            {couponCode && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.65 }}
+                className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4"
+              >
+                <p className="text-[10px] text-amber-700 uppercase font-bold mb-1.5">Tu cupón de descuento</p>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-lg font-black font-mono tracking-widest text-amber-700">{couponCode}</span>
+                  <button
+                    onClick={handleCopyCoupon}
+                    className="p-1.5 rounded-lg transition-all active:scale-95"
+                    style={{ backgroundColor: copiedCoupon ? '#10B981' : themeColor, color: '#fff' }}
+                  >
+                    {copiedCoupon ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
+                </div>
+                <p className="text-[10px] text-amber-600 mt-1.5">Cópialo y úsalo en tu próximo pedido</p>
               </motion.div>
             )}
 
