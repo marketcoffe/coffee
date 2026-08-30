@@ -2969,9 +2969,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (!rpcResult.success) {
         return rpcResult;
       }
-      // 2. RPC validó — establecer sesión directamente (sin signInWithPassword)
-      // signInWithPassword falla cuando auth.users tiene instance_id incorrecto.
-      // El RPC ya validó credenciales, rate limiting y lockout — es seguro usar sesión local.
+      // 2. RPC validó — establecer sesión Supabase real
+      // Las migraciones 34/43 corrigen instance_id en auth.users, así que
+      // signInWithPassword funciona correctamente. Crea sesión JWT real
+      // para que RLS permita writes a store_config y Storage.
+      const signInEmail = rpcResult.email || identifier.trim();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: signInEmail,
+        password: pass.trim(),
+      });
+      if (signInError) {
+        console.warn('[Auth] signInWithPassword felló, usando sesión local:', signInError.message);
+      }
 
       const role = rpcResult.role!;
       const sedeId = rpcResult.sede_id || '';
