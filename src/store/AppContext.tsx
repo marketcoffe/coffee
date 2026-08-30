@@ -2938,13 +2938,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return { success: false, error: 'Error de conexión.' };
     }
   };
-      await supabase.auth.signOut();
-      return { ...rpcResult, success: false, error: 'Sin permisos de acceso al panel.' };
-    } catch (err) {
-      console.error('[Auth] authenticateAdmin exception:', err);
-      return { success: false, error: 'Error inesperado.' };
-    }
-  };
 
   const logoutAdmin = async () => {
     await supabase.auth.signOut();
