@@ -87,6 +87,7 @@ export const compressImage = async (
 
 /**
  * Sube un archivo a un bucket de Supabase Storage con reintentos.
+ * Usa /api/upload-image (service_role) para evitar problemas de RLS.
  * Retorna la URL pública del archivo.
  */
 export const uploadFileToStorage = async (
@@ -102,6 +103,25 @@ export const uploadFileToStorage = async (
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
+      // Try API endpoint first (bypasses RLS with service_role)
+      const formData = new FormData();
+      formData.append('file', file instanceof Blob ? file : new Blob([await file.arrayBuffer()], { type: file.type || 'image/webp' }), fileName);
+      formData.append('bucket', bucket);
+      formData.append('folder', folder);
+
+      const resp = await fetch('/api/upload-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await resp.json().catch(() => ({}));
+
+      if (resp.ok && result.url) {
+        return result.url;
+      }
+
+      // Fallback: direct Supabase client (works if user has auth session)
+      console.warn('[Storage] API upload failed, trying direct Supabase:', result.error);
       const { error: uploadError } = await supabase.storage
         .from(bucket)
         .upload(filePath, file, {
