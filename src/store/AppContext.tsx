@@ -2877,124 +2877,67 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (!rpcResult.success) {
         return rpcResult;
       }
+      // 2. RPC validó — establecer sesión directamente (sin signInWithPassword)
+      // signInWithPassword falla cuando auth.users tiene instance_id incorrecto.
+      // El RPC ya validó credenciales, rate limiting y lockout — es seguro usar sesión local.
 
-      // 2. RPC validó — intentar establecer sesión Supabase Auth
-      const isEmail = identifier.includes('@');
-      let authEmail = identifier.trim();
-      if (!isEmail && rpcResult.email) {
-        authEmail = rpcResult.email;
-      }
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: authEmail,
-        password: pass.trim()
-      });
-
-      // 3. Si signInWithPassword falla, establecer sesión local (fallback)
-      if (error || !data?.session) {
-        console.warn('[Auth] signInWithPassword failed:', error?.message || 'no session', '| email:', authEmail);
-        console.warn('[Auth] → Operador en modo degradado. Ejecutar 41_sync_admin_users_to_auth.sql en Supabase y resetear contraseña desde el panel si persiste.');
-
-        const role = rpcResult.role!;
-        const sedeId = rpcResult.sede_id || '';
-        const userId = rpcResult.user_id || '';
-        const nombre = rpcResult.nombre || '';
-        const email = rpcResult.email || authEmail;
-
-        setIsAdminAuthenticated(true);
-        localStorage.setItem('trv_admin_auth', 'true');
-        setUserRole(role);
-        localStorage.setItem('trv_user_role', role);
-        setAdminScopeSedeId(sedeId);
-        localStorage.setItem('trv_admin_scope_sede', sedeId);
-
-        // Guardar datos del usuario para uso del panel
-        localStorage.setItem('trv_admin_user', JSON.stringify({
-          id: userId, email, nombre, role, sede_id: sedeId
-        }));
-
-        // CRITICAL: initData already ran and won't re-run. Load admin data now
-        // so the panel isn't empty. This is the degraded-mode path.
-        try {
-          const isAdmin = role === 'admin';
-          const [ordersRes, notifsRes] = await Promise.all([
-            supabase.from('orders').select('*').order('fecha', { ascending: false }),
-            supabase.from('notifications').select('*').order('created_at', { ascending: false }),
-          ]);
-          if (ordersRes.data) {
-            const allOrders = ordersRes.data as Order[];
-            // Operator = same access as admin: see ALL orders
-            setOrders(allOrders);
-          }
-          if (notifsRes.data) setNotifications(notifsRes.data as InAppNotification[]);
-
-          // Also load products, config, mesas
-          const [productsRes, configRes, mesasRes] = await Promise.all([
-            supabase.from('products').select('*').range(0, 9999),
-            supabase.from('store_config').select('*').single(),
-            supabase.from('mesas').select('*').order('numero_mesa'),
-          ]);
-          if (productsRes.data && productsRes.data.length > 0) {
-            const merged = (productsRes.data as FoodItem[]).map(p => {
-              const hasDbOptions = Array.isArray(p.option_groups) && p.option_groups.length > 0;
-              if (hasDbOptions) return p;
-              const fallback = DEFAULT_PRODUCTS.find(d => d.nombre === p.nombre);
-              return { ...p, option_groups: fallback?.option_groups || [] };
-            });
-            setProducts(merged);
-          }
-          if (configRes.data) {
-            const dbConfig = configRes.data;
-            setConfig(prev => ({
-              ...prev,
-              esta_abierta: dbConfig.esta_abierta,
-              site_nombre: dbConfig.site_nombre || prev.site_nombre,
-              tasa_cambio: dbConfig.tasa_cambio || prev.tasa_cambio,
-            }));
-          }
-          if (mesasRes.data && mesasRes.data.length > 0) setMesas(mesasRes.data as Mesa[]);
-        } catch (fallbackErr) {
-          console.warn('[Auth] Fallback data load partially failed:', fallbackErr);
-        }
-
-        return true;
-      }
-
-      // 4. signInWithPassword exitoso
       const role = rpcResult.role!;
       const sedeId = rpcResult.sede_id || '';
+      const userId = rpcResult.user_id || '';
+      const nombre = rpcResult.nombre || '';
+      const email = rpcResult.email || identifier.trim();
 
-      if (role === 'admin') {
-        setIsAdminAuthenticated(true);
-        localStorage.setItem('trv_admin_auth', 'true');
-        setUserRole('admin');
-        localStorage.setItem('trv_user_role', 'admin');
-        setAdminScopeSedeId('');
-        localStorage.setItem('trv_admin_scope_sede', '');
-        return true;
+      setIsAdminAuthenticated(true);
+      localStorage.setItem('trv_admin_auth', 'true');
+      setUserRole(role);
+      localStorage.setItem('trv_user_role', role);
+      setAdminScopeSedeId(sedeId);
+      localStorage.setItem('trv_admin_scope_sede', sedeId);
+
+      localStorage.setItem('trv_admin_user', JSON.stringify({
+        id: userId, email, nombre, role, sede_id: sedeId
+      }));
+
+      // Cargar datos del admin panel
+      try {
+        const [ordersRes, notifsRes, productsRes, configRes, mesasRes] = await Promise.all([
+          supabase.from('orders').select('*').order('fecha', { ascending: false }),
+          supabase.from('notifications').select('*').order('created_at', { ascending: false }),
+          supabase.from('products').select('*').range(0, 9999),
+          supabase.from('store_config').select('*').single(),
+          supabase.from('mesas').select('*').order('numero_mesa'),
+        ]);
+        if (ordersRes.data) setOrders(ordersRes.data as Order[]);
+        if (notifsRes.data) setNotifications(notifsRes.data as InAppNotification[]);
+        if (productsRes.data && productsRes.data.length > 0) {
+          const merged = (productsRes.data as FoodItem[]).map(p => {
+            const hasDbOptions = Array.isArray(p.option_groups) && p.option_groups.length > 0;
+            if (hasDbOptions) return p;
+            const fallback = DEFAULT_PRODUCTS.find(d => d.nombre === p.nombre);
+            return { ...p, option_groups: fallback?.option_groups || [] };
+          });
+          setProducts(merged);
+        }
+        if (configRes.data) {
+          const dbConfig = configRes.data;
+          setConfig(prev => ({
+            ...prev,
+            esta_abierta: dbConfig.esta_abierta,
+            site_nombre: dbConfig.site_nombre || prev.site_nombre,
+            tasa_cambio: dbConfig.tasa_cambio || prev.tasa_cambio,
+          }));
+        }
+        if (mesasRes.data && mesasRes.data.length > 0) setMesas(mesasRes.data as Mesa[]);
+      } catch (dataErr) {
+        console.warn('[Auth] Data load partially failed:', dataErr);
       }
 
-      if (role === 'operator') {
-        setIsAdminAuthenticated(true);
-        localStorage.setItem('trv_admin_auth', 'true');
-        setUserRole('operator');
-        localStorage.setItem('trv_user_role', 'operator');
-        setAdminScopeSedeId('');
-        localStorage.setItem('trv_admin_scope_sede', '');
-        return true;
-      }
-
-      if (role === 'customer') {
-        setIsAdminAuthenticated(true);
-        localStorage.setItem('trv_admin_auth', 'true');
-        setUserRole('customer');
-        localStorage.setItem('trv_user_role', 'customer');
-        setAdminScopeSedeId(sedeId);
-        localStorage.setItem('trv_admin_scope_sede', sedeId);
-        return true;
-      }
-
-      console.error('User has no admin/operator/customer role');
+      return true;
+    } catch (err) {
+      console.error('[Auth] authenticateAdmin error:', err);
+      return { success: false, error: 'Error de conexión.' };
+    }
+  };
       await supabase.auth.signOut();
       return { ...rpcResult, success: false, error: 'Sin permisos de acceso al panel.' };
     } catch (err) {
