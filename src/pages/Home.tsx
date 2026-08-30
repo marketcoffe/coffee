@@ -309,7 +309,7 @@ export const Home: React.FC<HomeProps> = ({
       <div className="flex-1 flex flex-col min-w-0">
 
       {/* ═══ 1. HERO — Horizontal Swipe Carousel ═══ */}
-      <section className="relative w-full mt-5 overflow-hidden aspect-[3/4] md:max-w-[1400px] md:mx-auto md:h-[600px] md:aspect-auto">
+      <section className="relative w-full mt-3 overflow-hidden aspect-[3/4] md:max-w-[1400px] md:mx-auto md:h-[600px] md:aspect-auto">
         <div
           ref={heroScrollRef}
           onScroll={handleHeroScroll}
@@ -333,7 +333,7 @@ export const Home: React.FC<HomeProps> = ({
                   {config.banners_mobile?.[idx] && (
                     <source media="(max-width: 767px)" srcSet={config.banners_mobile[idx]} />
                   )}
-                  <img alt="" className="absolute inset-0 w-full h-full object-cover" src={banner} loading={idx === 0 ? 'eager' : 'lazy'} fetchPriority={idx === 0 ? 'high' : 'auto'} />
+                  <img alt="" className="absolute inset-0 w-full h-full object-cover object-center" src={banner} loading={idx === 0 ? 'eager' : 'lazy'} fetchPriority={idx === 0 ? 'high' : 'auto'} />
                 </picture>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
                 <div className="absolute bottom-8 left-5 right-5 md:bottom-16 md:left-16 md:right-auto md:max-w-2xl">
