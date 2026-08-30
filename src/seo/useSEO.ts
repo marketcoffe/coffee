@@ -8,7 +8,7 @@ import { FoodItem, StoreConfig } from '../types/store';
 import { slugify } from '../utils/slug';
 
 const SITE_NAME = 'Market Coffee Sweet';
-const SITE_URL = 'https://marketcoffeesweet.com';
+const SITE_URL = 'https://marketcoffesweet.com';
 
 // ─── Plantillas de título anti-canibalización ───
 const TITLE_TEMPLATES = {

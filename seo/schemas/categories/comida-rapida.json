@@ -3,7 +3,7 @@
   "@type": "MenuSection",
   "name": "Comida Rápida",
   "description": "Hamburguesas resuelve, perros calientes, shawarmas, club house y más. Sabor rápido para cuando tienes prisa.",
-  "url": "https://marketcoffeesweet.com/catalog?category=Comida+Rapida",
+  "url": "https://marketcoffesweet.com/catalog?category=Comida+Rapida",
   "hasMenuSection": [],
   "offers": {
     "@type": "AggregateOffer",

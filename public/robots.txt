@@ -11,7 +11,7 @@ Disallow: /admin/
 Disallow: /checkout/
 Disallow: /cuenta/
 Disallow: /api/
-Sitemap: https://marketcoffeesweet.com/sitemap.xml
+Sitemap: https://marketcoffesweet.com/sitemap.xml
 
 User-agent: Bingbot
 Allow: /
@@ -19,7 +19,7 @@ Disallow: /admin/
 Disallow: /checkout/
 Disallow: /cuenta/
 Disallow: /api/
-Sitemap: https://marketcoffeesweet.com/sitemap.xml
+Sitemap: https://marketcoffesweet.com/sitemap.xml
 
 User-agent: Yahoo! Slurp
 Allow: /
@@ -132,4 +132,4 @@ Disallow: /checkout/
 Disallow: /cuenta/
 Disallow: /api/
 
-Sitemap: https://marketcoffeesweet.com/sitemap.xml
+Sitemap: https://marketcoffesweet.com/sitemap.xml

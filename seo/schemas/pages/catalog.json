@@ -3,12 +3,12 @@
   "@type": "CollectionPage",
   "name": "Catálogo | Market Coffee Sweet",
   "description": "Explora nuestro catálogo completo: panadería fresca, comida rápida, víveres, frutas y verduras, bebidas, chucherías y más. Delivery en Valencia, El Trigal, Prebo, La Viña, Mañongo, Naguanagua y San Diego.",
-  "url": "https://marketcoffeesweet.com/catalog",
+  "url": "https://marketcoffesweet.com/catalog",
   "isPartOf": {
-    "@id": "https://marketcoffeesweet.com/#website"
+    "@id": "https://marketcoffesweet.com/#website"
   },
   "about": {
-    "@id": "https://marketcoffeesweet.com/#localbusiness"
+    "@id": "https://marketcoffesweet.com/#localbusiness"
   },
   "mainEntity": {
     "@type": "ItemList",
@@ -24,13 +24,13 @@
         "@type": "ListItem",
         "position": 1,
         "name": "Inicio",
-        "item": "https://marketcoffeesweet.com"
+        "item": "https://marketcoffesweet.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Catálogo",
-        "item": "https://marketcoffeesweet.com/catalog"
+        "item": "https://marketcoffesweet.com/catalog"
       }
     ]
   }

@@ -58,7 +58,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
 
     if (type === 'catalog') {
       const category = filters?.category || '';
-      const siteUrl = config.site_url || 'https://marketcoffeesweet.com';
+      const siteUrl = config.site_url || 'https://marketcoffesweet.com';
       seoTitle = config.seo_catalog_title || `Comprar ${category || 'Menú Completo'} Online | ${siteName}`;
       seoDesc = config.seo_catalog_description || `Menú de ${category || 'todos nuestros productos'}. Panadería, hamburguesas, shawarmas, víveres y más con delivery en Valencia.`;
       seoKeywords = `${category.toLowerCase()}, delivery valencia, comprar online, ${siteName.toLowerCase()}`;
@@ -117,7 +117,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
 
     // Canonical link
     const canonicalUrl = type === 'product' && product?.slug
-      ? `${config.site_url || 'https://marketcoffeesweet.com'}/producto/${product.slug}`
+      ? `${config.site_url || 'https://marketcoffesweet.com'}/producto/${product.slug}`
       : ogUrl;
     let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonicalLink) {
@@ -243,7 +243,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
 
       // Breadcrumb for product (con categoría)
       const category = Array.isArray(product.categoria) ? product.categoria[0] : product.categoria;
-      const siteUrl = config.site_url || 'https://marketcoffeesweet.com';
+      const siteUrl = config.site_url || 'https://marketcoffesweet.com';
       const breadcrumbItems: Array<{ name: string; url?: string }> = [
         { name: 'Inicio', url: siteUrl },
       ];
@@ -262,7 +262,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       document.head.appendChild(bcScript);
     } else if (type === 'catalog') {
       const category = filters?.category || '';
-      const siteUrl = config.site_url || 'https://marketcoffeesweet.com';
+      const siteUrl = config.site_url || 'https://marketcoffesweet.com';
       const breadcrumbItems: Array<{ name: string; url?: string }> = [
         { name: 'Inicio', url: siteUrl },
       ];

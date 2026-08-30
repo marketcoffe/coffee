@@ -3,7 +3,7 @@
   "@type": "MenuSection",
   "name": "Panadería y Pastelería",
   "description": "Pan canilla, sobado, cachitos, dulces, tortas y toda nuestra panadería fresca del día.",
-  "url": "https://marketcoffeesweet.com/catalog?category=Panaderia",
+  "url": "https://marketcoffesweet.com/catalog?category=Panaderia",
   "hasMenuSection": [],
   "offers": {
     "@type": "AggregateOffer",

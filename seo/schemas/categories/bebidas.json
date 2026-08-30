@@ -3,7 +3,7 @@
   "@type": "MenuSection",
   "name": "Bebidas y Licores",
   "description": "Refrescos, jugos, cervezas, licores y toda variedad de bebidas frías.",
-  "url": "https://marketcoffeesweet.com/catalog?category=Bebidas",
+  "url": "https://marketcoffesweet.com/catalog?category=Bebidas",
   "hasMenuSection": [],
   "offers": {
     "@type": "AggregateOffer",

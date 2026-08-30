@@ -7,7 +7,7 @@ import { useApp } from '../store/AppContext';
 import { getCategories } from '../utils/categoryUtils';
 import { FoodItem } from '../types/store';
 
-const SITE_URL = 'https://marketcoffeesweet.com';
+const SITE_URL = 'https://marketcoffesweet.com';
 
 interface SEOOptions {
   title?: string;

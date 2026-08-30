@@ -1,7 +1,7 @@
 // schemas.js — SEO JSON-LD para Market Coffee Sweet
 /* global window */
 
-const SITE_URL = 'https://marketcoffeesweet.com';
+const SITE_URL = 'https://marketcoffesweet.com';
 
 export function getOrganizationSchema(config) {
   return {

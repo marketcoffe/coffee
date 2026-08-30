@@ -2098,7 +2098,7 @@ export const Home: React.FC<HomeProps> = ({
                 <h4 className="font-bold text-slate-800 mb-1">2. Descripcion del Servicio</h4>
                 <p>Market Coffee Sweet es una plataforma de pedidos en linea que ofrece productos de mercado, panaderia y comida rapida con servicio de delivery. El servicio esta disponible exclusivamente en la Republica Bolivariana de Venezuela.</p>
                 <p className="mt-2"><strong>Market Coffee Sweet C.A.</strong> | <strong>RIF:</strong> J-500338260</p>
-                <p><strong>Dominio:</strong> https://marketcoffeesweet.com | <strong>Telefono:</strong> 0412-3758879</p>
+                <p><strong>Dominio:</strong> https://marketcoffesweet.com | <strong>Telefono:</strong> 0412-3758879</p>
               </div>
               <div>
                 <h4 className="font-bold text-slate-800 mb-1">3. Registro y Cuenta</h4>
@@ -2187,7 +2187,7 @@ export const Home: React.FC<HomeProps> = ({
                 <h4 className="font-bold text-slate-800 mb-1">10. Contacto</h4>
                 <p>Para cualquier consulta sobre esta politica de privacidad o para ejercer sus derechos, puede contactarnos a traves de WhatsApp al numero proporcionado en la plataforma.</p>
                 <p className="mt-2"><strong>Market Coffee Sweet C.A.</strong> | <strong>RIF:</strong> J-500338260</p>
-                <p><strong>Dominio:</strong> https://marketcoffeesweet.com | <strong>Telefono:</strong> 0412-3758879</p>
+                <p><strong>Dominio:</strong> https://marketcoffesweet.com | <strong>Telefono:</strong> 0412-3758879</p>
               </div>
             </div>
           </div>

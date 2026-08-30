@@ -3,15 +3,15 @@
   "@type": "WebPage",
   "name": "Market Coffee Sweet | Panadería, Comida Rápida y Víveres en Valencia",
   "description": "Tu minimarket de confianza en El Trigal, Valencia. Panadería fresca, comida rápida (hamburguesas, shawarmas, perros calientes), víveres, frutas, verduras, bebidas y agua potable con delivery a domicilio.",
-  "url": "https://marketcoffeesweet.com",
+  "url": "https://marketcoffesweet.com",
   "isPartOf": {
-    "@id": "https://marketcoffeesweet.com/#website"
+    "@id": "https://marketcoffesweet.com/#website"
   },
   "about": {
-    "@id": "https://marketcoffeesweet.com/#localbusiness"
+    "@id": "https://marketcoffesweet.com/#localbusiness"
   },
   "mainEntity": {
-    "@id": "https://marketcoffeesweet.com/#localbusiness"
+    "@id": "https://marketcoffesweet.com/#localbusiness"
   },
   "breadcrumb": {
     "@type": "BreadcrumbList",
@@ -20,7 +20,7 @@
         "@type": "ListItem",
         "position": 1,
         "name": "Inicio",
-        "item": "https://marketcoffeesweet.com"
+        "item": "https://marketcoffesweet.com"
       }
     ]
   }

@@ -3,14 +3,14 @@
   "@graph": [
     {
       "@type": "Organization",
-      "@id": "https://marketcoffeesweet.com/#organization",
+      "@id": "https://marketcoffesweet.com/#organization",
       "name": "Market Coffee Sweet",
       "legalName": "Market Coffee Sweet C.A.",
       "taxID": "J500338260",
-      "url": "https://marketcoffeesweet.com",
+      "url": "https://marketcoffesweet.com",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://marketcoffeesweet.com/logo.png",
+        "url": "https://marketcoffesweet.com/logo.png",
         "width": 512,
         "height": 512
       },
@@ -42,18 +42,18 @@
     },
     {
       "@type": ["Bakery", "GroceryStore", "FastFoodRestaurant"],
-      "@id": "https://marketcoffeesweet.com/#localbusiness",
+      "@id": "https://marketcoffesweet.com/#localbusiness",
       "name": "Market Coffee Sweet",
       "legalName": "Market Coffee Sweet C.A.",
       "taxID": "J500338260",
-      "url": "https://marketcoffeesweet.com",
+      "url": "https://marketcoffesweet.com",
       "telephone": "+584123758879",
       "priceRange": "$$",
       "image": [
-        "https://marketcoffeesweet.com/fachada.jpg",
-        "https://marketcoffeesweet.com/logo.png"
+        "https://marketcoffesweet.com/fachada.jpg",
+        "https://marketcoffesweet.com/logo.png"
       ],
-      "logo": "https://marketcoffeesweet.com/logo.png",
+      "logo": "https://marketcoffesweet.com/logo.png",
       "description": "Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado. Ubicados en C. Apolo, Valencia, Carabobo.",
       "address": {
         "@type": "PostalAddress",
@@ -89,7 +89,7 @@
       ],
       "hasMenu": {
         "@type": "Menu",
-        "url": "https://marketcoffeesweet.com/catalog"
+        "url": "https://marketcoffesweet.com/catalog"
       },
       "openingHoursSpecification": [
         {
@@ -104,7 +104,7 @@
         "@type": "OrderAction",
         "target": {
           "@type": "EntryPoint",
-          "urlTemplate": "https://marketcoffeesweet.com/checkout",
+          "urlTemplate": "https://marketcoffesweet.com/checkout",
           "actionPlatform": [
             "http://schema.org/DesktopWebPlatform",
             "http://schema.org/MobileWebPlatform"
@@ -118,18 +118,18 @@
     },
     {
       "@type": "WebSite",
-      "@id": "https://marketcoffeesweet.com/#website",
+      "@id": "https://marketcoffesweet.com/#website",
       "name": "Market Coffee Sweet",
-      "url": "https://marketcoffeesweet.com",
+      "url": "https://marketcoffesweet.com",
       "description": "Tu minimarket de confianza, panadería, comida rápida de la buena y víveres para resolver el mercado.",
       "publisher": {
-        "@id": "https://marketcoffeesweet.com/#organization"
+        "@id": "https://marketcoffesweet.com/#organization"
       },
       "potentialAction": {
         "@type": "SearchAction",
         "target": {
           "@type": "EntryPoint",
-          "urlTemplate": "https://marketcoffeesweet.com/catalog?q={search_term_string}"
+          "urlTemplate": "https://marketcoffesweet.com/catalog?q={search_term_string}"
         },
         "query-input": "required name=search_term_string"
       }

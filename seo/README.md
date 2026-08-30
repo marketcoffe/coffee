@@ -134,7 +134,7 @@ El schema global incluye:
 
 Para verificar que los schemas están correctamente implementados:
 
-1. Ve a https://marketcoffeesweet.com
+1. Ve a https://marketcoffesweet.com
 2. Abre las herramientas de desarrollador (F12)
 3. Busca `<script type="application/ld+json">` en el `<head>`
 4. Valida el schema en https://search.google.com/structured-data/testing-tool

@@ -3,7 +3,7 @@
   "@type": "MenuSection",
   "name": "Frutas y Verduras Frescas",
   "description": "Frutas y verduras fresquitas directo del mercado para tu familia.",
-  "url": "https://marketcoffeesweet.com/catalog?category=Frutas+y+Verduras",
+  "url": "https://marketcoffesweet.com/catalog?category=Frutas+y+Verduras",
   "hasMenuSection": [],
   "offers": {
     "@type": "AggregateOffer",

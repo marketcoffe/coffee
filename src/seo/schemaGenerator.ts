@@ -5,7 +5,7 @@
  * Optimizado para GEO (Generative Engine Optimization) + LLM SEO
  */
 
-const SITE_URL = 'https://marketcoffeesweet.com';
+const SITE_URL = 'https://marketcoffesweet.com';
 const SITE_NAME = 'Market Coffee Sweet';
 
 // ─── Mapeo de categorías SEO-friendly (anti-canibalización) ───

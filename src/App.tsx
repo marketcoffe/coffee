@@ -209,7 +209,7 @@ function AppContent() {
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
   const isAdminUrl = pathname.startsWith('/admin');
   const isHome = pathname === '/' || pathname === '/coffe' || pathname === '';
-  const isCatalogUrl = pathname === '/catalog' || pathname.startsWith('/catalogo/') || pathname.startsWith('/producto/');
+  const isCatalogUrl = pathname === '/catalog';
   const is404Url = !isHome && !isAdminUrl && !isCatalogUrl;
   const [tab, setTab] = useState<'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout'>((isAdminAuthenticated || isAdminUrl) ? 'admin' : isCatalogUrl ? 'catalog' : 'home');
 
@@ -238,13 +238,7 @@ function AppContent() {
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [mesaOrderForPayment, setMesaOrderForPayment] = useState<any>(null);
   const [is404, setIs404] = useState(is404Url);
-  const [initialCategory] = useState(() => {
-    if (pathname.startsWith('/catalogo/')) {
-      return pathname.replace('/catalogo/', '').replace(/-/g, ' ');
-    }
-    return '';
-  });
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Custom Overlays & Modals

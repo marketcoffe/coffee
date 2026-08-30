@@ -1,6 +1,6 @@
 import { FoodItem } from '../types/store';
 
-const SITE_URL = 'https://marketcoffeesweet.com';
+const SITE_URL = 'https://marketcoffesweet.com';
 const SITE_NAME = 'Market Coffee Sweet';
 
 export interface ProductSchemaOptions {
