@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "start": "npm run dev",
-    "build": "vite build && node -e \"require('fs').cpSync('functions','dist/functions',{recursive:true})\"",
+    "build": "vite build",
     "preview": "vite preview",
     "icons": "node generate-icons.cjs",
     "clean": "rm -rf dist server.js",
