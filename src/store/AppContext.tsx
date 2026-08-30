@@ -530,6 +530,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   // --- MOTOR DE TIEMPO REAL (SUPABASE CHANNELS) ---
+  const normalizePhone = (phone: unknown): string => {
+    return String(phone || '').replace(/[\s\-()+]/g, '').trim();
+  };
+
   const currentUserRef = useRef<AppUser | null>(currentUser);
   const isAdminAuthenticatedRef = useRef(isAdminAuthenticated);
   const configSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -699,7 +703,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           );
 
           const cu = currentUserRef.current;
-          if (cu && updated.cliente_telefono === cu.telefono) {
+          if (cu && normalizePhone(updated.cliente_telefono) === normalizePhone(cu.telefono)) {
             // ✅ FIX: Usar SW showNotification (aparece en pantalla inicial del móvil)
             if ('serviceWorker' in navigator && Notification.permission === 'granted') {
               const direccion = updated.direccion_envio || '';
@@ -719,8 +723,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                   requireInteraction: true,
                   data: { url: '/profile' }
                 } as NotificationOptions);
-              });
+              }).catch((err) => console.warn('[Push] showNotification CDC UPDATE failed:', err));
             }
+
+            // Respaldo push servidor para segundo plano en móvil (iOS/Android)
+            import('../utils/pushTrigger').then(({ triggerBroadcastPush }) => {
+              const direccion = updated.direccion_envio || '';
+              const tiempo = updated.tiempo_estimado_entrega || '';
+              const extras = [direccion ? `\nUbicación: ${direccion}` : '', tiempo ? `\nTiempo estimado: ${tiempo}` : '']
+                .filter(Boolean)
+                .join('');
+
+              triggerBroadcastPush({
+                id: `order-update-${updated.id}`,
+                titulo: `${config.site_nombre || 'App'}: Actualización de Pedido`,
+                mensaje: `Tu pedido ${updated.id} ahora está: ${updated.status}${extras}`,
+                tipo: 'personal',
+                destinatario_telefono: updated.cliente_telefono,
+                link_url: '/profile'
+              }).catch(err => console.warn('[Push] Error disparando push order update:', err));
+            });
           }
         })
         // Escuchar Pedidos Nuevos vía CDC (INSERT) — respaldo si el broadcast no llega
@@ -763,8 +785,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 requireInteraction: true,
                   data: { url: '/admin' }
                 } as NotificationOptions);
-            });
+            }).catch((err) => console.warn('[Push] showNotification new_order mainChannel failed:', err));
           }
+
+          // Respaldo push servidor para admins en segundo plano
+          import('../utils/pushTrigger').then(({ triggerBroadcastPush }) => {
+            triggerBroadcastPush({
+              id: `new-order-${newOrder.id}`,
+              titulo: '🛒 ¡NUEVO PEDIDO!',
+              mensaje: `Cliente: ${newOrder.cliente_nombre} — Total: $${newOrder.total_usd?.toFixed(2)}`,
+              tipo: 'admin',
+              link_url: '/admin'
+            }).catch(err => console.warn('[Push] Error disparando push new order:', err));
+          });
         })
         // Escuchar cambios de estado vía BROADCAST (Ultra Rápido, <100ms)
         .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
@@ -784,7 +817,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           playNotificationSound('update', updatedOrder.status);
 
           const cu = currentUserRef.current;
-          if (cu && updatedOrder.cliente_telefono === cu.telefono) {
+          if (cu && normalizePhone(updatedOrder.cliente_telefono) === normalizePhone(cu.telefono)) {
             // Toast visual en la app
             window.dispatchEvent(new CustomEvent('push_notification_received', {
               detail: { title: '📦 Actualización de Pedido', body: `Tu pedido ahora está: ${updatedOrder.status}` }
@@ -802,8 +835,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                   requireInteraction: true,
                   data: { url: '/profile' }
                 } as NotificationOptions);
-              });
+              }).catch((err) => console.warn('[Push] showNotification order_status mainChannel failed:', err));
             }
+
+            // Respaldo push servidor para segundo plano en móvil
+            import('../utils/pushTrigger').then(({ triggerBroadcastPush }) => {
+              const tiempo = updatedOrder.tiempo_estimado_entrega || '';
+              triggerBroadcastPush({
+                id: `order-update-${updatedOrder.id}`,
+                titulo: `${config.site_nombre || 'App'}: Actualización de Pedido`,
+                mensaje: `Tu pedido ${updatedOrder.id} ahora está: ${updatedOrder.status}${tiempo ? `\nTiempo estimado: ${tiempo}` : ''}`,
+                tipo: 'personal',
+                destinatario_telefono: updatedOrder.cliente_telefono,
+                link_url: '/profile'
+              }).catch(err => console.warn('[Push] Error disparando push order status:', err));
+            });
           }
         })
         // Escuchar Notificaciones (CDC)
@@ -813,7 +859,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           // Validar si es para el usuario actual (broadcasts visibles para todos)
           const cu = currentUserRef.current;
           const isForMe = newNotif.tipo === 'todos' ||
-                         (cu && newNotif.tipo === 'personal' && newNotif.destinatario_telefono === cu.telefono) ||
+                         (cu && newNotif.tipo === 'personal' && normalizePhone(newNotif.destinatario_telefono) === normalizePhone(cu.telefono)) ||
                          (isAdminAuthenticatedRef.current && (newNotif.tipo === 'request' || newNotif.tipo === 'admin'));
 
           if (isForMe) {
@@ -904,24 +950,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         window.dispatchEvent(new CustomEvent('new_order_received', { detail: newOrder }));
         playNotificationSound('new');
 
-        // Toast visual
-        window.dispatchEvent(new CustomEvent('push_notification_received', {
-          detail: { title: '🛒 ¡NUEVO PEDIDO!', body: `Cliente: ${newOrder.cliente_nombre} — Total: $${newOrder.total_usd?.toFixed(2)}` }
-        }));
+        const cu = currentUserRef.current;
+        const isOwner = cu && normalizePhone(newOrder.cliente_telefono) === normalizePhone(cu.telefono);
+        const isAdmin = isAdminAuthenticatedRef.current;
 
-        if ('serviceWorker' in navigator && Notification.permission === 'granted') {
-          navigator.serviceWorker.ready.then(reg => {
-            reg.showNotification('¡NUEVO PEDIDO! 🛒', {
-              body: `Cliente: ${newOrder.cliente_nombre} — Total: $${newOrder.total_usd?.toFixed(2)}`,
-              icon: '/icon.png',
-              badge: '/icon.png',
-              tag: `new-order-${newOrder.id}`,
-              renotify: true,
-              vibrate: [200, 100, 200],
-              requireInteraction: true,
-              data: { url: '/admin' }
-            } as NotificationOptions);
-          });
+        if (isAdmin || isOwner) {
+          window.dispatchEvent(new CustomEvent('push_notification_received', {
+            detail: { title: '🛒 ¡NUEVO PEDIDO!', body: `Cliente: ${newOrder.cliente_nombre} — Total: $${newOrder.total_usd?.toFixed(2)}` }
+          }));
+
+          if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+            navigator.serviceWorker.ready.then(reg => {
+              reg.showNotification('¡NUEVO PEDIDO! 🛒', {
+                body: `Cliente: ${newOrder.cliente_nombre} — Total: $${newOrder.total_usd?.toFixed(2)}`,
+                icon: '/icon.png',
+                badge: '/icon.png',
+                tag: `new-order-${newOrder.id}`,
+                renotify: true,
+                vibrate: [200, 100, 200],
+                requireInteraction: true,
+                data: { url: isAdmin ? '/admin' : '/profile' }
+              } as NotificationOptions);
+            }).catch((err) => console.warn('[Push] showNotification new_order broadcastChan failed:', err));
+          }
         }
       })
       .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
@@ -930,10 +981,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setOrders(prev => prev.map(o => o.id === updatedOrder.id ? { ...o, ...updatedOrder } : o));
         window.dispatchEvent(new CustomEvent('order_status_changed', { detail: updatedOrder }));
         playNotificationSound('update', updatedOrder.status);
-        // Toast visual
-        window.dispatchEvent(new CustomEvent('push_notification_received', {
-          detail: { title: '📦 Actualización', body: `Pedido: ${updatedOrder.id} — ${updatedOrder.status}` }
-        }));
+
+        const cu = currentUserRef.current;
+        const isOwner = cu && normalizePhone(updatedOrder.cliente_telefono) === normalizePhone(cu.telefono);
+
+        if (isOwner) {
+          window.dispatchEvent(new CustomEvent('push_notification_received', {
+            detail: { title: '📦 Actualización de Pedido', body: `Tu pedido ahora está: ${updatedOrder.status}` }
+          }));
+
+          const tiempo = updatedOrder.tiempo_estimado_entrega || '';
+          if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+            navigator.serviceWorker.ready.then(reg => {
+              reg.showNotification(`${config.site_nombre || 'App'}: Actualización de Pedido`, {
+                body: `Tu pedido ${updatedOrder.id} ahora está: ${updatedOrder.status}${tiempo ? `\nTiempo estimado: ${tiempo}` : ''}`,
+                icon: '/icon.png',
+                badge: '/icon.png',
+                tag: `order-update-${updatedOrder.id}`,
+                renotify: true,
+                vibrate: [200, 100, 200],
+                requireInteraction: true,
+                data: { url: '/profile' }
+              } as NotificationOptions);
+            }).catch((err) => console.warn('[Push] showNotification order_status broadcastChan failed:', err));
+          }
+
+          import('../utils/pushTrigger').then(({ triggerBroadcastPush }) => {
+            triggerBroadcastPush({
+              id: `order-update-${updatedOrder.id}`,
+              titulo: `${config.site_nombre || 'App'}: Actualización de Pedido`,
+              mensaje: `Tu pedido ${updatedOrder.id} ahora está: ${updatedOrder.status}${tiempo ? `\nTiempo estimado: ${tiempo}` : ''}`,
+              tipo: 'personal',
+              destinatario_telefono: updatedOrder.cliente_telefono,
+              link_url: '/profile'
+            }).catch(err => console.warn('[Push] Error disparando push order status broadcastChan:', err));
+          });
+        }
       })
       .subscribe();
 

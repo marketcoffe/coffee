@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useApp } from '../store/AppContext';
 import { Bell, X } from 'lucide-react';
 
+const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent);
+const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+
 // Funcion auxiliar para convertir la llave VAPID de Base64 a Uint8Array
 const urlBase64ToUint8Array = (base64String: string) => {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -112,8 +115,9 @@ export const PushNotificationModal: React.FC = () => {
       setIsOpen(false);
 
       if (res === 'granted') {
-        // Suscribirse al Push Manager con VAPID keys
+        console.log('[PushModal] Permiso concedido, suscribiendo...');
         const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+
         if (vapidKey && navigator.serviceWorker) {
           try {
             const registration = await navigator.serviceWorker.ready;
@@ -122,7 +126,8 @@ export const PushNotificationModal: React.FC = () => {
               applicationServerKey: urlBase64ToUint8Array(vapidKey)
             });
 
-            // Enviar suscripcion al endpoint para guardarla en la base de datos
+            console.log('[PushModal] Suscripción push creada:', pushSubscription.endpoint.substring(0, 50));
+
             const anonymousId = localStorage.getItem('trv_anonymous_id') || crypto.randomUUID();
             localStorage.setItem('trv_anonymous_id', anonymousId);
 
@@ -142,19 +147,23 @@ export const PushNotificationModal: React.FC = () => {
                 })
               });
               const result = await response.json();
-              console.warn('Push subscription registration result:', result);
+              console.log('[PushModal] Registro suscripción:', response.status, result);
               if (!response.ok || result.error) {
-                console.error('Failed to register subscription:', result);
+                console.error('[PushModal] Failed to register subscription:', result);
               }
             } catch (subErr) {
-              console.error('Error sending subscription to server:', subErr);
+              console.error('[PushModal] Error sending subscription to server:', subErr);
+            }
+
+            const vapidKeyForSW = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+            if (vapidKeyForSW && registration.active) {
+              registration.active.postMessage({ type: 'SET_VAPID_PUBLIC_KEY', vapidPublicKey: vapidKeyForSW });
             }
           } catch (subErr) {
-            console.error('Error subscribing to push manager:', subErr);
+            console.error('[PushModal] Error subscribing to push manager:', subErr);
           }
         }
 
-        // Trigger a gorgeous, helpful native welcoming notification
         navigator.serviceWorker.ready.then(reg => {
           reg.showNotification('Notificaciones Activas!', {
             body: 'Ahora recibiras alertas en tiempo real sobre tus pedidos y ofertas frescas de ' + (config.site_nombre || 'nuestra tienda') + '.',
@@ -162,10 +171,13 @@ export const PushNotificationModal: React.FC = () => {
             badge: '/icon.png',
             vibrate: [200, 100, 200],
             tag: 'welcome-trv'
-          } as NotificationOptions);
+          } as NotificationOptions).catch((err) => {
+            console.error('[PushModal] showNotification welcome failed:', err);
+          });
+        }).catch((err) => {
+          console.error('[PushModal] serviceWorker.ready failed:', err);
         });
 
-        // Also add it inside the app database notifications (notify admin that user enabled push)
         if (currentUser) {
           addNotification(
             'Notificaciones Habilitadas',
@@ -174,10 +186,10 @@ export const PushNotificationModal: React.FC = () => {
           );
         }
       } else if (res === 'denied') {
-        // No notificar a todos - cada usuario gestiona sus propios permisos
+        console.warn('[PushModal] Permiso de notificacion denegado');
       }
     } catch (err) {
-      console.error('Error requesting push permission:', err);
+      console.error('[PushModal] Error requesting push permission:', err);
     }
   };
 
@@ -228,6 +240,11 @@ export const PushNotificationModal: React.FC = () => {
             <p className="text-[11px] text-zinc-500 leading-normal font-sans">
               Para brindarte nuestro servicio express en <strong>Valencia</strong>, requerimos permiso para enviarte alertas instantáneas directamente a tu pantalla.
             </p>
+            {isIOS() && !isStandalone() && (
+              <p className="text-[10px] text-amber-600 leading-normal font-sans bg-amber-50 border border-amber-100 rounded-lg p-2">
+                📱 En iOS, las notificaciones push requieren instalar la app. Toca <strong>Compartir → “Agregar a pantalla de inicio”</strong> antes de activar.
+              </p>
+            )}
           </div>
 
           {/* Core Feature Highlights Visual Layout */}

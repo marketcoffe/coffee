@@ -29,6 +29,7 @@
       "purpose": "maskable"
     }
   ],
+  "apple-touch-icon": "/icon.png",
   "categories": ["food", "market", "bakery", "fast-food"],
   "shortcuts": [
     {

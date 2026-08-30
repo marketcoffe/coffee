@@ -156,6 +156,8 @@ self.addEventListener('push', (event) => {
     ]
   };
 
+  console.log('[SW Push] Mostrando notificación nativa:', title, 'priority:', priority, 'requireInteraction:', options.requireInteraction);
+
   event.waitUntil(
     // SIEMPRE mostrar notificación nativa (independiente de si la app está abierta)
     self.registration.showNotification(title, options)
@@ -208,7 +210,7 @@ self.addEventListener('notificationclick', (event) => {
       body: JSON.stringify({
         notification_id: notifId,
         event_type: 'clicked',
-        anonymous_id: self._anonymous_id || ''
+        anonymous_id: ''
       })
     }).catch(() => {});
   }
@@ -259,7 +261,7 @@ self.addEventListener('notificationclose', (event) => {
       body: JSON.stringify({
         notification_id: notifId,
         event_type: 'dismissed',
-        anonymous_id: self._anonymous_id || ''
+        anonymous_id: ''
       })
     }).catch(() => {});
   }

@@ -86,14 +86,34 @@ if ('serviceWorker' in navigator) {
         log.info('SW', `Registrado correctamente: ${reg.scope}`);
         setInterval(() => reg.update(), 60 * 60 * 1000);
 
-        const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-        if (vapidPublicKey) {
-          const controller = navigator.serviceWorker.controller;
-          const target = controller || reg.active;
+        const sendVapidKey = () => {
+          const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+          if (!vapidPublicKey) return;
+          const target = navigator.serviceWorker.controller || reg.active;
           if (target) {
             target.postMessage({ type: 'SET_VAPID_PUBLIC_KEY', vapidPublicKey });
           }
-        }
+        };
+
+        sendVapidKey();
+
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          console.log('[Main] SW controller cambió, reenviando VAPID key...');
+          sendVapidKey();
+        });
+
+        reg.addEventListener('updatefound', () => {
+          console.log('[Main] SW update found, esperando nuevo SW...');
+          const newWorker = reg.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'activated') {
+                console.log('[Main] Nuevo SW activado, reenviando VAPID key...');
+                sendVapidKey();
+              }
+            });
+          }
+        });
       })
       .catch((err) => {
         console.error('[Main] Error al registrar SW:', err);
