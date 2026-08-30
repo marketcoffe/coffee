@@ -2683,13 +2683,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
       configSaveTimeoutRef.current = setTimeout(async () => {
         try {
-          const { data: { session } } = await supabase.auth.getSession();
-          if (!session) {
-            console.warn('[Config] No hay sesión activa, reintentando sync en próximo cambio...');
-            // NO borramos pendingConfigRef - se reintentará en el próximo cambio
-            return;
-          }
-
           const settingsToSave = { ...pendingConfigRef.current };
           pendingConfigRef.current = {};
 
@@ -2742,14 +2735,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     setConfig(prev => ({ ...prev, tasa_cambio: rate }));
     
-    // Sincronizar con Supabase (con auth check)
+    // Sincronizar con Supabase (via anon policy)
     (async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          console.warn('[Config] No hay sesión activa, omitiendo sync de tasa a Supabase');
-          return;
-        }
         const { error } = await supabase.from('store_config').update({ tasa_cambio: rate }).eq('id', 1);
         if (error) console.error('[Config] Error syncing rate to DB:', error);
       } catch (e) {
