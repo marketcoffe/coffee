@@ -53,16 +53,27 @@ const FidelizacionSection: React.FC = () => {
       if (rwRes.data) setRewards(rwRes.data as LoyaltyReward[]);
       if (histRes.data) setHistory(histRes.data as LoyaltyHistory[]);
 
-      // Referral stats
-      const { count: totalRef } = await supabase.from('referral_tracking').select('*', { count: 'exact', head: true });
-      const { count: completedRef } = await supabase.from('referral_tracking').select('*', { count: 'exact', head: true }).eq('status', 'bonus_paid');
-      const { count: usersWithCode } = await supabase.from('usuarios_clientes').select('*', { count: 'exact', head: true }).not('codigo_referido', 'is', null);
+      // Referral stats (con fallback individual si falla RLS o tabla no existe)
+      let totalRef = 0;
+      let completedRef = 0;
+      let usersWithCode = 0;
 
-      setReferralStats({
-        total: totalRef || 0,
-        completed: completedRef || 0,
-        users_with_code: usersWithCode || 0,
-      });
+      try {
+        const refRes = await supabase.from('referral_tracking').select('*', { count: 'exact', head: true });
+        totalRef = refRes.count || 0;
+      } catch { /* referral_tracking puede no estar disponible para anon */ }
+
+      try {
+        const compRes = await supabase.from('referral_tracking').select('*', { count: 'exact', head: true }).eq('status', 'bonus_paid');
+        completedRef = compRes.count || 0;
+      } catch { /* ignore */ }
+
+      try {
+        const codeRes = await supabase.from('usuarios_clientes').select('*', { count: 'exact', head: true }).not('codigo_referido', 'is', null);
+        usersWithCode = codeRes.count || 0;
+      } catch { /* ignore */ }
+
+      setReferralStats({ total: totalRef, completed: completedRef, users_with_code: usersWithCode });
     } catch (err) {
       console.error('[Fidelizacion] load error:', err);
     } finally {
