@@ -48,7 +48,8 @@ function generateSlug(text: string): string {
 
 /**
  * Genera el XML del sitemap completo.
- * Prioridades: Home (1.0) > Catálogo (0.9) > Categorías (0.8) > Productos (0.7)
+ * Solo incluye: Home, Catálogo, Categorías y Productos.
+ * NO incluye: cart, checkout, admin, profile.
  */
 export function generateSitemapXML(
   categories: SitemapCategory[],
@@ -127,7 +128,7 @@ export function generateCategorySitemap(categories: SitemapCategory[]): string {
 
 /**
  * Genera sitemap con productos de Supabase.
- * Llamar desde un endpoint o script de build.
+ * Solo incluye Home, Catálogo, Categorías y Productos.
  */
 export function generateFullSitemap(
   categories: Array<{ name: string }>,

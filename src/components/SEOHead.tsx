@@ -79,6 +79,15 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
 
     setMeta('description', seoDesc);
     setMeta('keywords', seoKeywords);
+
+    // Noindex para páginas privadas (admin, checkout, etc.)
+    if (type === 'admin') {
+      setMeta('robots', 'noindex, nofollow');
+      setMeta('googlebot', 'noindex, nofollow');
+    } else {
+      setMeta('robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
+      setMeta('googlebot', 'index, follow');
+    }
     setMeta('og:title', seoTitle, 'property');
     setMeta('og:description', seoDesc, 'property');
     setMeta('og:site_name', siteName, 'property');

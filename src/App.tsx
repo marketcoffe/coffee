@@ -205,12 +205,13 @@ function AppContent() {
     }
   }, [config.theme_color, config.pwa_icon_url, config.splash_logo_url, config.site_nombre, config.logo_url, config.favicon_url]);
 
-  // Route/Tab controllers - si es admin/operador autenticado O si la URL es /admin, abrir directo en su panel
+  // Route/Tab controllers - deteccion de ruta en carga inicial
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
-  const isAdminUrl = pathname.startsWith('/admin') || pathname.startsWith('/admin');
-  const isHome = pathname === '/' || pathname === '/coffe' || pathname === '/' || pathname === '';
-  const is404Url = !isHome && !isAdminUrl;
-  const [tab, setTab] = useState<'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout'>((isAdminAuthenticated || isAdminUrl) ? 'admin' : 'home');
+  const isAdminUrl = pathname.startsWith('/admin');
+  const isHome = pathname === '/' || pathname === '/coffe' || pathname === '';
+  const isCatalogUrl = pathname === '/catalog' || pathname.startsWith('/catalogo/') || pathname.startsWith('/producto/');
+  const is404Url = !isHome && !isAdminUrl && !isCatalogUrl;
+  const [tab, setTab] = useState<'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout'>((isAdminAuthenticated || isAdminUrl) ? 'admin' : isCatalogUrl ? 'catalog' : 'home');
 
   // Admin: body background blanco para evitar espacio marrón al hacer scroll
   useEffect(() => {
@@ -237,7 +238,13 @@ function AppContent() {
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [mesaOrderForPayment, setMesaOrderForPayment] = useState<any>(null);
   const [is404, setIs404] = useState(is404Url);
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [initialCategory] = useState(() => {
+    if (pathname.startsWith('/catalogo/')) {
+      return pathname.replace('/catalogo/', '').replace(/-/g, ' ');
+    }
+    return '';
+  });
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Custom Overlays & Modals
