@@ -343,7 +343,7 @@ export interface LoyaltyHistory {
   user_id: string;
   points: number;
   operation: 'suma' | 'resta';
-  reason: 'bienvenida' | 'primer_pedido' | 'compra' | 'referido' | 'referido_registro' | 'canje' | 'ajuste_admin' | 'bono_review' | 'bono_diario' | 'expiracion';
+  reason: 'bienvenida' | 'primer_pedido' | 'compra' | 'referido' | 'referido_registro' | 'canje' | 'ajuste_admin' | 'bono_review' | 'bono_diario' | 'expiracion' | 'bono_pwa';
   description: string;
   order_id?: string;
   reward_id?: string;

@@ -363,7 +363,7 @@ export default function AdminIndex({ setTab }: AdminIndexProps) {
           )}
         </header>
 
-        <div className="erp-content" style={{ padding: 16 }}>
+        <div className="erp-content p-4 pb-24 lg:pb-4">
           <Suspense fallback={<SectionLoader />}>
             <LazyErrorBoundary sectionName={sectionLabel}>
               {renderSection()}

@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 const FidelizacionSection: React.FC = () => {
-  const { config, users } = useApp();
+  const { config, users, updateConfig } = useApp();
   const themeColor = config.theme_color || '#A4D045';
 
   const [activeTab, setActiveTab] = useState<'dashboard' | 'levels' | 'rewards' | 'history' | 'adjust' | 'referrals'>('dashboard');
@@ -88,7 +88,12 @@ const FidelizacionSection: React.FC = () => {
     if (!loyaltyConfig) return;
     const newVal = !loyaltyConfig.enabled;
     const { error } = await supabase.from('loyalty_config').update({ enabled: newVal, updated_at: new Date().toISOString() }).eq('id', 1);
-    if (!error) setLoyaltyConfig({ ...loyaltyConfig, enabled: newVal });
+    if (!error) {
+      setLoyaltyConfig({ ...loyaltyConfig, enabled: newVal });
+      // Sincronizar con store_config.loyalty para que el frontend y los SQL triggers estén alineados
+      const currentLoyalty = (config.loyalty || {}) as Record<string, unknown>;
+      updateConfig({ loyalty: { ...currentLoyalty, enabled: newVal } as LoyaltyConfig });
+    }
   };
 
   const handleConfigField = async (field: string, value: number) => {

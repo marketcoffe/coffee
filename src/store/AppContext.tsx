@@ -3108,6 +3108,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (currentUser?.id === userId) {
       setCurrentUser(prev => prev ? { ...prev, is_pwa_installed: true, pwa_installed_at: new Date().toISOString() } : prev);
     }
+
+    // Reclamar bono PWA si el sistema de fidelización está habilitado
+    try {
+      const { data: result } = await supabase.rpc('claim_pwa_bonus', { p_user_id: userId });
+      if (result?.success) {
+        console.log('[Loyalty] PWA bonus claimed:', result.points_awarded, 'points');
+        // Sincronizar saldo desde DB
+        const { data: userData } = await supabase
+          .from('usuarios_clientes')
+          .select('puntos_fidelidad, puntos_historicos')
+          .eq('id', userId)
+          .single();
+        if (userData) {
+          setUsers(prev => prev.map(u =>
+            u.id === userId ? { ...u, puntos_fidelidad: userData.puntos_fidelidad, puntos_historicos: userData.puntos_historicos } : u
+          ));
+          if (currentUser?.id === userId) {
+            setCurrentUser(prev => prev ? { ...prev, puntos_fidelidad: userData.puntos_fidelidad, puntos_historicos: userData.puntos_historicos } : prev);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[Loyalty] claim_pwa_bonus failed (non-critical):', e);
+    }
   };
 
   const detectPwaInstalled = (): boolean => {
