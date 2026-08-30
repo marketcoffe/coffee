@@ -1335,6 +1335,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             tiers: dbConfig.loyalty.tiers?.length ? dbConfig.loyalty.tiers : (prev.loyalty?.tiers || []),
             bonus_actions: { ...(prev.loyalty?.bonus_actions || {}), ...(dbConfig.loyalty?.bonus_actions || {}) },
           } : prev.loyalty,
+          print_config: {
+            paper_size: dbConfig.print_config?.paper_size || prev.print_config?.paper_size || '58mm',
+          },
         }));
       }
 

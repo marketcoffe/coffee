@@ -513,6 +513,11 @@ export interface StoreConfig {
   brand_users_count?: string;
   brand_section_title?: string;
   brand_section_subtitle?: string;
+  print_config?: PrintConfig;
+}
+
+export interface PrintConfig {
+  paper_size?: '58mm' | '80mm';
 }
 
 // ============================================================================

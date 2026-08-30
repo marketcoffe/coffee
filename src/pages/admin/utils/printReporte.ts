@@ -1,7 +1,9 @@
 /**
- * Genera e imprime un REPORTE de ventas/resumen para impresora termica 58mm.
+ * Genera e imprime un REPORTE de ventas/resumen para impresora termica.
  * Util para cierre de caja, reporte diario, o resumen de pedidos.
  */
+
+import { printThermalTicket, PaperSize } from '../../../utils/printBase';
 
 export interface ReporteData {
   titulo: string;
@@ -31,9 +33,7 @@ export interface ReporteData {
 }
 
 export function printReporte(data: ReporteData, config: any) {
-  const w = window.open('', '_blank');
-  if (!w) return;
-
+  const paperSize: PaperSize = config?.print_config?.paper_size || '58mm';
   const businessName = config?.site_nombre || 'MARKET COFFEE SWEET';
   const address = config?.direccion_fisica || '';
   const now = new Date().toLocaleString('es-VE');
@@ -51,64 +51,13 @@ export function printReporte(data: ReporteData, config: any) {
     });
   }
 
-  const html = `<!DOCTYPE html>
-<html>
-<head>
-  <title>${data.titulo}</title>
-  <style>
-    @page { margin: 0; size: 58mm auto; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 9px;
-      width: 48mm;
-      padding: 2mm;
-      color: #000;
-      line-height: 1.3;
-    }
-    .center { text-align: center; }
-    .bold { font-weight: bold; }
-    .large { font-size: 12px; letter-spacing: 1px; }
-    .medium { font-size: 9px; }
-    .small { font-size: 8px; }
-    .xsmall { font-size: 7px; }
-    .line { border-top: 1px dashed #000; margin: 3px 0; }
-    .double-line { border-top: 2px solid #000; margin: 4px 0; }
-    table { width: 100%; border-collapse: collapse; }
-    td { padding: 1px 0; vertical-align: top; }
-    .summary td { font-size: 8px; padding: 1px 0; }
-    .summary td:last-child { text-align: right; font-weight: bold; }
-    .summary .section-row td {
-      font-size: 9px;
-      font-weight: bold;
-      border-top: 1px solid #000;
-      padding-top: 3px;
-      padding-bottom: 1px;
-    }
-    .summary .total-row td {
-      font-size: 10px;
-      font-weight: bold;
-      border-top: 2px solid #000;
-      padding-top: 3px;
-    }
-    .reporte-header {
-      text-align: center;
-      font-size: 10px;
-      font-weight: bold;
-      letter-spacing: 1px;
-      padding: 3px 0;
-      border: 1px solid #000;
-      margin: 3px 0;
-    }
-  </style>
-</head>
-<body>
+  const body = `
   <!-- Header -->
   <div class="center bold large">${businessName}</div>
   ${address ? `<div class="center xsmall">${address}</div>` : ''}
   <div class="double-line"></div>
 
-  <div class="reporte-header">${data.titulo}</div>
+  <div style="text-align:center;font-size:10px;font-weight:bold;letter-spacing:1px;padding:3px 0;border:1px solid #000;margin:3px 0">${data.titulo}</div>
 
   <!-- Fechas -->
   <div style="margin:3px 0">
@@ -119,33 +68,33 @@ export function printReporte(data: ReporteData, config: any) {
   <div class="line"></div>
 
   <!-- Resumen de Pedidos -->
-  <table class="summary">
-    <tr class="section-row"><td colspan="2">PEDIDOS</td></tr>
-    <tr><td>Total pedidos:</td><td>${data.totalPedidos}</td></tr>
-    <tr><td>Delivery:</td><td>${data.porDelivery}</td></tr>
-    <tr><td>Pickup:</td><td>${data.porPickup}</td></tr>
-    <tr><td>Mesa:</td><td>${data.porMesa}</td></tr>
+  <table>
+    <tr><td colspan="2" style="font-size:9px;font-weight:bold;border-top:1px solid #000;padding-top:3px;padding-bottom:1px">PEDIDOS</td></tr>
+    <tr><td style="font-size:8px;padding:1px 0">Total pedidos:</td><td style="font-size:8px;padding:1px 0;text-align:right;font-weight:bold">${data.totalPedidos}</td></tr>
+    <tr><td style="font-size:8px;padding:1px 0">Delivery:</td><td style="font-size:8px;padding:1px 0;text-align:right;font-weight:bold">${data.porDelivery}</td></tr>
+    <tr><td style="font-size:8px;padding:1px 0">Pickup:</td><td style="font-size:8px;padding:1px 0;text-align:right;font-weight:bold">${data.porPickup}</td></tr>
+    <tr><td style="font-size:8px;padding:1px 0">Mesa:</td><td style="font-size:8px;padding:1px 0;text-align:right;font-weight:bold">${data.porMesa}</td></tr>
   </table>
   <div class="line"></div>
 
   <!-- Resumen Financiero -->
-  <table class="summary">
-    <tr class="section-row"><td colspan="2">INGRESOS</td></tr>
-    <tr><td>Subtotal:</td><td>$${data.totalIngresos.toFixed(2)}</td></tr>
-    ${data.totalEnvios > 0 ? `<tr><td>Envios:</td><td>$${data.totalEnvios.toFixed(2)}</td></tr>` : ''}
-    ${data.totalDescuentos > 0 ? `<tr><td>Descuentos:</td><td>-$${data.totalDescuentos.toFixed(2)}</td></tr>` : ''}
-    <tr><td>IVA (16%):</td><td>$${data.totalIVA.toFixed(2)}</td></tr>
-    <tr class="total-row"><td>TOTAL:</td><td>$${(data.totalIngresos + data.totalEnvios - data.totalDescuentos).toFixed(2)}</td></tr>
+  <table>
+    <tr><td colspan="2" style="font-size:9px;font-weight:bold;border-top:1px solid #000;padding-top:3px;padding-bottom:1px">INGRESOS</td></tr>
+    <tr><td style="font-size:8px;padding:1px 0">Subtotal:</td><td style="font-size:8px;padding:1px 0;text-align:right;font-weight:bold">$${data.totalIngresos.toFixed(2)}</td></tr>
+    ${data.totalEnvios > 0 ? `<tr><td style="font-size:8px;padding:1px 0">Envios:</td><td style="font-size:8px;padding:1px 0;text-align:right;font-weight:bold">$${data.totalEnvios.toFixed(2)}</td></tr>` : ''}
+    ${data.totalDescuentos > 0 ? `<tr><td style="font-size:8px;padding:1px 0">Descuentos:</td><td style="font-size:8px;padding:1px 0;text-align:right;font-weight:bold">-$${data.totalDescuentos.toFixed(2)}</td></tr>` : ''}
+    <tr><td style="font-size:8px;padding:1px 0">IVA (16%):</td><td style="font-size:8px;padding:1px 0;text-align:right;font-weight:bold">$${data.totalIVA.toFixed(2)}</td></tr>
+    <tr><td style="font-size:10px;font-weight:bold;border-top:2px solid #000;padding-top:3px;padding:1px 0">TOTAL:</td><td style="font-size:10px;font-weight:bold;border-top:2px solid #000;padding-top:3px;text-align:right;padding:1px 0">$${(data.totalIngresos + data.totalEnvios - data.totalDescuentos).toFixed(2)}</td></tr>
   </table>
   <div class="line"></div>
 
   <!-- Metodos de Pago -->
-  <table class="summary">
-    <tr class="section-row"><td colspan="2">FORMAS DE PAGO</td></tr>
-    ${data.efectivo > 0 ? `<tr><td>Efectivo:</td><td>$${data.efectivo.toFixed(2)}</td></tr>` : ''}
-    ${data.tdc > 0 ? `<tr><td>TDC/TDD:</td><td>$${data.tdc.toFixed(2)}</td></tr>` : ''}
-    ${data.pagoMovil > 0 ? `<tr><td>Pago Movil:</td><td>$${data.pagoMovil.toFixed(2)}</td></tr>` : ''}
-    ${data.otroPago > 0 ? `<tr><td>Otro:</td><td>$${data.otroPago.toFixed(2)}</td></tr>` : ''}
+  <table>
+    <tr><td colspan="2" style="font-size:9px;font-weight:bold;border-top:1px solid #000;padding-top:3px;padding-bottom:1px">FORMAS DE PAGO</td></tr>
+    ${data.efectivo > 0 ? `<tr><td style="font-size:8px;padding:1px 0">Efectivo:</td><td style="font-size:8px;padding:1px 0;text-align:right;font-weight:bold">$${data.efectivo.toFixed(2)}</td></tr>` : ''}
+    ${data.tdc > 0 ? `<tr><td style="font-size:8px;padding:1px 0">TDC/TDD:</td><td style="font-size:8px;padding:1px 0;text-align:right;font-weight:bold">$${data.tdc.toFixed(2)}</td></tr>` : ''}
+    ${data.pagoMovil > 0 ? `<tr><td style="font-size:8px;padding:1px 0">Pago Movil:</td><td style="font-size:8px;padding:1px 0;text-align:right;font-weight:bold">$${data.pagoMovil.toFixed(2)}</td></tr>` : ''}
+    ${data.otroPago > 0 ? `<tr><td style="font-size:8px;padding:1px 0">Otro:</td><td style="font-size:8px;padding:1px 0;text-align:right;font-weight:bold">$${data.otroPago.toFixed(2)}</td></tr>` : ''}
   </table>
 
   ${data.pedidos && data.pedidos.length > 0 ? `
@@ -165,11 +114,7 @@ export function printReporte(data: ReporteData, config: any) {
 
   <div class="double-line"></div>
   <div class="center small bold">Market Coffee Sweet</div>
-  <div class="center xsmall">Reporte generado automaticamente</div>
-</body>
-</html>`;
+  <div class="center xsmall">Reporte generado automaticamente</div>`;
 
-  w.document.write(html);
-  w.document.close();
-  w.print();
+  printThermalTicket(data.titulo, body, paperSize);
 }

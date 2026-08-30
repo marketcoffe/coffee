@@ -1,13 +1,12 @@
 import { Order } from '../../types/store';
+import { printThermalTicket, PaperSize } from './printBase';
 
 /**
- * Genera e imprime una FACTURA simplificada para impresora termica 58mm.
+ * Genera e imprime una FACTURA simplificada para impresora termica.
  * Incluye datos fiscales: RIF, numero de factura, IVA desglosado, metodo de pago.
  */
 export function printFactura(order: Order, config: any) {
-  const w = window.open('', '_blank');
-  if (!w) return;
-
+  const paperSize: PaperSize = config?.print_config?.paper_size || '58mm';
   const businessName = config?.site_nombre || 'MARKET COFFEE SWEET';
   const address = config?.direccion_fisica || '';
   const phone = config?.telefono_soporte || '';
@@ -26,7 +25,6 @@ export function printFactura(order: Order, config: any) {
     order.tipo_entrega === 'mesa' ? `MESA #${order.numero_mesa || ''}` :
     (order.tipo_entrega as string)?.toUpperCase() || '';
 
-  // Numero de factura basado en el ID del pedido
   const facturaNum = `FC-${orderId}`;
 
   let itemsHtml = '';
@@ -42,57 +40,7 @@ export function printFactura(order: Order, config: any) {
       </tr>`;
   });
 
-  const html = `<!DOCTYPE html>
-<html>
-<head>
-  <title>Factura ${facturaNum}</title>
-  <style>
-    @page { margin: 0; size: 58mm auto; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 9px;
-      width: 48mm;
-      padding: 2mm;
-      color: #000;
-      line-height: 1.3;
-    }
-    .center { text-align: center; }
-    .bold { font-weight: bold; }
-    .large { font-size: 12px; letter-spacing: 1px; }
-    .medium { font-size: 9px; }
-    .small { font-size: 8px; }
-    .xsmall { font-size: 7px; }
-    .line { border-top: 1px dashed #000; margin: 3px 0; }
-    .double-line { border-top: 2px solid #000; margin: 4px 0; }
-    table { width: 100%; border-collapse: collapse; }
-    td { padding: 1px 0; vertical-align: top; }
-    .totals td { padding: 1px 0; font-size: 8px; }
-    .totals td:last-child { text-align: right; }
-    .totals .total-row td {
-      font-size: 10px;
-      font-weight: bold;
-      border-top: 1px solid #000;
-      padding-top: 2px;
-    }
-    .totals .iva-row td { font-size: 8px; font-style: italic; }
-    .factura-header {
-      text-align: center;
-      font-size: 10px;
-      font-weight: bold;
-      letter-spacing: 1px;
-      padding: 3px 0;
-      border: 1px solid #000;
-      margin: 3px 0;
-    }
-    .fiscal-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 7px;
-    }
-  </style>
-</head>
-<body>
+  const body = `
   <!-- Header Fiscal -->
   <div class="center bold large">${businessName}</div>
   ${rif ? `<div class="center small">RIF: ${rif}</div>` : ''}
@@ -100,19 +48,19 @@ export function printFactura(order: Order, config: any) {
   ${phone ? `<div class="center xsmall">Tel: ${phone}</div>` : ''}
   <div class="double-line"></div>
 
-  <div class="factura-header">FACTURA</div>
+  <div style="text-align:center;font-size:10px;font-weight:bold;letter-spacing:1px;padding:3px 0;border:1px solid #000;margin:3px 0">FACTURA</div>
 
   <!-- Datos de la Factura -->
   <div style="margin:3px 0">
-    <div class="fiscal-row">
+    <div style="display:flex;justify-content:space-between;font-size:7px">
       <span class="bold">Nro:</span>
       <span>${facturaNum}</span>
     </div>
-    <div class="fiscal-row">
+    <div style="display:flex;justify-content:space-between;font-size:7px">
       <span class="bold">Fecha:</span>
       <span>${date}</span>
     </div>
-    <div class="fiscal-row">
+    <div style="display:flex;justify-content:space-between;font-size:7px">
       <span class="bold">Tipo:</span>
       <span>${deliveryLabel}</span>
     </div>
@@ -143,7 +91,7 @@ export function printFactura(order: Order, config: any) {
     <tr><td>Subtotal:</td><td>$${subtotal.toFixed(2)}</td></tr>
     ${discount > 0 ? `<tr><td>Descuento:</td><td>-$${discount.toFixed(2)}</td></tr>` : ''}
     ${shipping > 0 ? `<tr><td>Envio:</td><td>$${shipping.toFixed(2)}</td></tr>` : ''}
-    <tr class="iva-row"><td>IVA (16%):</td><td>$${iva.toFixed(2)}</td></tr>
+    <tr class="iva-row" style="font-size:8px;font-style:italic"><td>IVA (16%):</td><td>$${iva.toFixed(2)}</td></tr>
     <tr class="total-row"><td>TOTAL:</td><td>$${total.toFixed(2)}</td></tr>
   </table>
   <div class="double-line"></div>
@@ -159,25 +107,15 @@ export function printFactura(order: Order, config: any) {
       <div class="small bold">USD</div>
     </div>
   </div>
-  ${order.referencia_pago ? `
-  <div class="xsmall">REF: ${order.referencia_pago}</div>
-  ` : ''}
-  ${order.banco_origen ? `
-  <div class="xsmall">BANCO: ${order.banco_origen}</div>
-  ` : ''}
+  ${order.referencia_pago ? `<div class="xsmall">REF: ${order.referencia_pago}</div>` : ''}
+  ${order.banco_origen ? `<div class="xsmall">BANCO: ${order.banco_origen}</div>` : ''}
   <div class="line"></div>
 
   <!-- Pie Fiscal -->
-  <div class="center xsmall" style="margin-top:2px">
-    Este documento no constituye factura fiscal.
-  </div>
+  <div class="center xsmall" style="margin-top:2px">Este documento no constituye factura fiscal.</div>
   <div class="center xsmall">computarizada</div>
   <div class="center small bold" style="margin-top:3px">Gracias por su compra!</div>
-  <div class="center xsmall">Market Coffee Sweet</div>
-</body>
-</html>`;
+  <div class="center xsmall">Market Coffee Sweet</div>`;
 
-  w.document.write(html);
-  w.document.close();
-  w.print();
+  printThermalTicket(`Factura ${facturaNum}`, body, paperSize);
 }

@@ -1,9 +1,8 @@
 import { Order } from '../../../types/store';
+import { printThermalTicket, PaperSize } from '../../../utils/printBase';
 
 export function printOrderTicket(order: Order, config: any) {
-  const w = window.open('', '_blank');
-  if (!w) return;
-
+  const paperSize: PaperSize = config?.print_config?.paper_size || '58mm';
   const businessName = config?.site_nombre || 'MARKET COFFEE SWEET';
   const address = config?.direccion_fisica || '';
   const phone = config?.telefono_soporte || '';
@@ -43,45 +42,7 @@ export function printOrderTicket(order: Order, config: any) {
       </tr>`;
   });
 
-  const html = `<!DOCTYPE html>
-<html>
-<head>
-  <title>Pedido #${orderId}</title>
-  <style>
-    @page { margin: 0; size: 58mm auto; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 10px;
-      width: 48mm;
-      padding: 2mm;
-      color: #000;
-      line-height: 1.3;
-    }
-    .center { text-align: center; }
-    .bold { font-weight: bold; }
-    .large { font-size: 13px; letter-spacing: 1px; }
-    .medium { font-size: 10px; }
-    .small { font-size: 9px; }
-    .xsmall { font-size: 7px; }
-    .line { border-top: 1px dashed #000; margin: 3px 0; }
-    .double-line { border-top: 2px solid #000; margin: 4px 0; }
-    table { width: 100%; border-collapse: collapse; }
-    td { padding: 1px 0; vertical-align: top; }
-    .totals td { padding: 1px 0; font-size: 9px; }
-    .totals td:last-child { text-align: right; }
-    .totals .total-row td { font-size: 11px; font-weight: bold; border-top: 1px solid #000; padding-top: 2px; }
-    .badge {
-      display: inline-block;
-      border: 1px solid #000;
-      padding: 2px 6px;
-      font-size: 8px;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-  </style>
-</head>
-<body>
+  const body = `
   <!-- Business Header -->
   <div class="center bold large">${businessName}</div>
   ${address ? `<div class="center xsmall">${address}</div>` : ''}
@@ -136,11 +97,7 @@ export function printOrderTicket(order: Order, config: any) {
 
   <!-- Footer -->
   <div class="center small bold">Gracias por su compra!</div>
-  <div class="center xsmall" style="margin-top:1px">Market Coffee Sweet</div>
-</body>
-</html>`;
+  <div class="center xsmall" style="margin-top:1px">Market Coffee Sweet</div>`;
 
-  w.document.write(html);
-  w.document.close();
-  w.print();
+  printThermalTicket(`Pedido #${orderId}`, body, paperSize);
 }

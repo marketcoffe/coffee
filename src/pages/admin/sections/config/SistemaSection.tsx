@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useApp } from '../../../../store/AppContext';
-import { RefreshCcw, FileJson, Bell, AlertTriangle, Terminal } from 'lucide-react';
+import { RefreshCcw, FileJson, Bell, AlertTriangle, Terminal, Printer } from 'lucide-react';
 import { useToast } from '../../../../components/Toast';
 import DatabaseCleanup from './DatabaseCleanup';
 
@@ -10,6 +10,7 @@ const SistemaSection: React.FC = () => {
   const restoreInputRef = useRef<HTMLInputElement>(null);
   const [webhookUrl, setWebhookUrl] = useState(config.push_webhook_url || '');
   const [webhookSecret, setWebhookSecret] = useState(config.push_webhook_secret || '');
+  const [paperSize, setPaperSize] = useState<'58mm' | '80mm'>(config.print_config?.paper_size || '58mm');
   const [notifPermission, setNotifPermission] = useState<NotificationPermission>(
     typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'denied'
   );
@@ -182,6 +183,38 @@ const SistemaSection: React.FC = () => {
           <p className="text-slate-500">// Los errores se muestran en la consola del navegador (F12)</p>
           <p className="text-slate-500">// Usa Ctrl+Shift+J para abrir la consola en Chrome</p>
           <p className="text-slate-500">// No hay errores criticos registrados en esta sesion.</p>
+        </div>
+      </div>
+
+      <div className="admin-card p-4">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="p-2.5 bg-pink-100 text-pink-600 rounded-xl"><Printer size={20} /></div>
+          <div>
+            <h4 className="text-sm font-bold text-pink-900">Configuracion de Impresora</h4>
+            <p className="text-[11px] text-pink-700">Selecciona el tamano de papel de tu impresora termica.</p>
+          </div>
+        </div>
+        <div className="flex flex-col gap-3">
+          <div>
+            <label className="text-[10px] font-bold text-slate-500 uppercase">Tamano de Papel</label>
+            <select
+              value={paperSize}
+              onChange={e => setPaperSize(e.target.value as '58mm' | '80mm')}
+              className="admin-input mt-1 font-mono text-[11px]"
+            >
+              <option value="58mm">58mm - Termica chica (standard)</option>
+              <option value="80mm">80mm - Termica grande</option>
+            </select>
+          </div>
+          <button
+            onClick={() => {
+              updateConfig({ print_config: { paper_size: paperSize } });
+              showToast('success', 'Configuracion de impresora guardada.');
+            }}
+            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-widest transition-all cursor-pointer"
+          >
+            Guardar Config Impresora
+          </button>
         </div>
       </div>
 
