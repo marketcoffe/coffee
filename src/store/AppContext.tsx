@@ -58,7 +58,7 @@ interface AppContextProps {
   
   // Checkout & Order Actions
   createOrder: (orderData: Omit<Order, 'id' | 'subtotal_usd' | 'total_usd' | 'total_bs' | 'fecha' | 'status'> & { descuento_cupon_usd?: number; cupon_codigo?: string }, preGeneratedId?: string) => Promise<Order | null>;
-  registerGuestUser: (orderData: { cliente_nombre: string; cliente_telefono: string; cliente_email?: string }) => Promise<void>;
+  registerGuestUser: (orderData: { cliente_nombre: string; cliente_telefono: string; cliente_email?: string }) => Promise<string | null>;
   updateOrderStatus: (orderId: string, status: Order['status'], estimatedTime?: string, notas?: string) => Promise<boolean>;
   confirmMesaPayment: (orderId: string) => Promise<boolean>;
   updateOrderItems: (orderId: string, newItems: OrderItem[]) => Promise<void>;
@@ -1990,9 +1990,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Auto-registro de invitados: se llama DESPUÉS de que el checkout ya procesó
   // el pedido, para evitar que setCurrentUser dispare initData y desmonte el
   // componente durante el flujo de pago.
-  const registerGuestUser = async (orderData: { cliente_nombre: string; cliente_telefono: string; cliente_email?: string }) => {
-    if (currentUser) return;
-    if (!orderData.cliente_email && !orderData.cliente_telefono) return;
+  const registerGuestUser = async (orderData: { cliente_nombre: string; cliente_telefono: string; cliente_email?: string }): Promise<string | null> => {
+    if (currentUser) return currentUser.id;
+    if (!orderData.cliente_email && !orderData.cliente_telefono) return null;
 
     const cleanPhone = orderData.cliente_telefono.replace(/[\s\-()]/g, '');
     const email = (orderData.cliente_email || '').trim().toLowerCase() || `${cleanPhone}@guest.foodapp.local`;
@@ -2077,6 +2077,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         newUser.telefono
       ).catch(() => {});
     }
+
+    return userId;
   };
 
   const updateOrderStatus = async (orderId: string, status: Order['status'], estimatedTime?: string, notas?: string) => {

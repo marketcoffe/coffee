@@ -105,7 +105,8 @@ export const uploadFileToStorage = async (
     try {
       // Try API endpoint first (bypasses RLS with service_role)
       const formData = new FormData();
-      formData.append('file', file instanceof Blob ? file : new Blob([await file.arrayBuffer()], { type: file.type || 'image/webp' }), fileName);
+      const blob = file instanceof Blob ? file : new Blob([file as unknown as BlobPart]);
+      formData.append('file', blob, fileName);
       formData.append('bucket', bucket);
       formData.append('folder', folder);
 

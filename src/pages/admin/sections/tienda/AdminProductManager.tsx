@@ -47,7 +47,7 @@ const ConnectionBadge: React.FC<{ status: 'checking' | 'connected' | 'mock' | 'e
  * - Upload de imágenes centralizado via storageService
  * - Wrapping seguro de addFoodItem/updateFoodItem con manejo de errores
  */
-const AdminProductManager: React.FC<AdminProductManagerProps> = ({ onEdit, onCreate }) => {
+const AdminProductManager = ({ onEdit, onCreate }: AdminProductManagerProps) => {
   const { addFoodItem, updateFoodItem, config } = useApp();
   const { showToast } = useToast();
   const themeColor = config.theme_color || '#A4D045';

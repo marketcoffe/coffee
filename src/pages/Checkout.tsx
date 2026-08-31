@@ -594,9 +594,26 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
     }
     setIsProcessing(true);
 
-    const finalUserId = currentUser?.id;
-    const finalClientName = orderType === 'mesa' ? clientName : (currentUser?.nombre || clientName);
     const cleanedPhone = clientPhone.replace(/[\s\-()]/g, '');
+
+    // Auto-registro de invitado ANTES de crear el pedido para que
+    // usuario_id/cliente_uid tengan el ID correcto desde el inicio
+    let registeredUserId = currentUser?.id || null;
+    if (!currentUser && (clientEmail || cleanedPhone)) {
+      try {
+        const userId = await registerGuestUser({
+          cliente_nombre: clientName || 'Cliente sin nombre',
+          cliente_telefono: cleanedPhone || '00000000',
+          cliente_email: clientEmail || ''
+        });
+        if (userId) registeredUserId = userId;
+      } catch (err) {
+        console.warn('[Checkout] Guest registration failed:', err);
+      }
+    }
+
+    const finalUserId = registeredUserId;
+    const finalClientName = orderType === 'mesa' ? clientName : (currentUser?.nombre || clientName);
 
     const preOrderId = `ORD-${String(Math.floor(10000 + Math.random() * 90000)).padStart(6, '0')}`;
 
@@ -647,9 +664,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
       // SEGURIDAD: Los puntos por compra se acreditan via trigger de DB
       // (trigger_order_delivery_points) cuando el status cambia a 'Entregado'.
       // Solo sincronizamos el saldo actual al estado local del frontend.
-      if (currentUser?.id) {
-        console.log('[Checkout] earnLoyaltyPoints — syncing user points from DB');
-        earnLoyaltyPoints(currentUser.id, created.id, created.total_usd, selectedSedeId || undefined);
+      if (registeredUserId) {
+        console.log('[Checkout] earnLoyaltyPoints — syncing user points from DB', { userId: registeredUserId });
+        earnLoyaltyPoints(registeredUserId, created.id, created.total_usd, selectedSedeId || undefined);
 
         // Mostrar modal de puntos ganados (estimado)
         const pointsPerDollar = config.loyalty?.points_per_dollar || 10;
@@ -661,9 +678,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
       }
 
       // Canje de puntos: descontar vía RPC atómica
-      if (currentUser?.id && effectivePointsDiscount > 0 && pointsToRedeem > 0) {
-        console.log('[Checkout] redeemLoyaltyPoints — RPC call', { userId: currentUser.id, points: pointsToRedeem, orderId: created.id, discount: effectivePointsDiscount });
-        const redeemResult = await redeemLoyaltyPoints(currentUser.id, pointsToRedeem, created.id);
+      if (registeredUserId && effectivePointsDiscount > 0 && pointsToRedeem > 0) {
+        console.log('[Checkout] redeemLoyaltyPoints — RPC call', { userId: registeredUserId, points: pointsToRedeem, orderId: created.id, discount: effectivePointsDiscount });
+        const redeemResult = await redeemLoyaltyPoints(registeredUserId, pointsToRedeem, created.id);
         console.log('[Checkout] redeemLoyaltyPoints — result', redeemResult);
       }
 
@@ -739,16 +756,6 @@ ${productosDetailText}
         if (cleanPhone.startsWith('0')) cleanPhone = '58' + cleanPhone.substring(1);
         const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMessage)}`;
         window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-      }
-
-      // Auto-registro de invitado DESPUÉS de confirmar el pedido (fuera de createOrder
-      // para evitar que dispare initData y desmonte el componente durante el checkout)
-      if (!currentUser && (clientEmail || cleanedPhone)) {
-        registerGuestUser({
-          cliente_nombre: finalClientName || 'Cliente sin nombre',
-          cliente_telefono: cleanedPhone || '00000000',
-          cliente_email: clientEmail || ''
-        }).catch(err => console.warn('[Checkout] Guest registration failed:', err));
       }
     } else {
       setValidationError('Error: No se pudo registrar el pedido. Verifique su conexión.');

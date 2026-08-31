@@ -64,7 +64,7 @@ function base64UrlDecode(str: string): Uint8Array {
 function getVapidAudience(endpoint: string): string {
   if (endpoint.includes('fcm.googleapis.com')) return 'https://fcm.googleapis.com';
   if (endpoint.includes('push.services.mozilla.com')) return 'https://updates.push.services.mozilla.com';
-  if (endpoint.push) {
+  if (endpoint.startsWith('http')) {
     try { return new URL(endpoint).origin; } catch {}
   }
   return new URL(endpoint).origin;

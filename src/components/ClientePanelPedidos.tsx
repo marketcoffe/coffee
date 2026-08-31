@@ -240,7 +240,7 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
       const phone = userPhoneRef.current;
 
       const channel = supabase
-        .channel(`cliente_orders_${cu.id}`)
+        .channel(`cliente_orders_${cu?.id || 'anon'}`)
         .on(
           'postgres_changes',
           { event: 'UPDATE', schema: 'public', table: 'orders' },
@@ -251,8 +251,8 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
             const ph = userPhoneRef.current;
             const isMine =
               (ph && updated.cliente_telefono === ph) ||
-              (cur.id && updated.usuario_id === cur.id) ||
-              (cur.id && updated.cliente_uid === cur.id);
+              (cur?.id && updated.usuario_id === cur.id) ||
+              (cur?.id && updated.cliente_uid === cur.id);
             if (isMine) {
               console.log('[ClientePanel] Pedido actualizado:', updated.id, updated.status);
               setLocalOrders(prev =>
@@ -271,8 +271,8 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
             const ph = userPhoneRef.current;
             const isMine =
               (ph && inserted.cliente_telefono === ph) ||
-              (cur.id && inserted.usuario_id === cur.id) ||
-              (cur.id && inserted.cliente_uid === cur.id);
+              (cur?.id && inserted.usuario_id === cur.id) ||
+              (cur?.id && inserted.cliente_uid === cur.id);
             if (isMine) {
               console.log('[ClientePanel] Nuevo pedido:', inserted.id, inserted.status);
               setLocalOrders(prev => {
@@ -289,8 +289,8 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
           const ph = userPhoneRef.current;
           const isMine =
             (ph && updated.cliente_telefono === ph) ||
-            (cur.id && updated.usuario_id === cur.id) ||
-            (cur.id && updated.cliente_uid === cur.id);
+            (cur?.id && updated.usuario_id === cur.id) ||
+            (cur?.id && updated.cliente_uid === cur.id);
           if (isMine) {
             console.log('[ClientePanel] Broadcast order_status:', updated.id, updated.status);
             setLocalOrders(prev =>

@@ -1,4 +1,4 @@
-import { Order } from '../../types/store';
+import { Order } from '../types/store';
 import { printThermalTicket, PaperSize } from './printBase';
 
 /**

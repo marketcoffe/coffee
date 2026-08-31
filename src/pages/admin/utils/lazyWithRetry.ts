@@ -27,6 +27,7 @@ export function lazyWithRetry<T extends ComponentType<any>>(
   };
 
   return lazy(() => {
+    let bustCounter = 0;
     return new Promise<{ default: T }>((resolve, reject) => {
       const attempt = (remaining: number) => {
         factory()

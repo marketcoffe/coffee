@@ -658,8 +658,11 @@ BEGIN
         SELECT * INTO v_config FROM loyalty_config WHERE id = 1;
         IF NOT v_config.enabled THEN RETURN NEW; END IF;
 
-        -- Obtener datos del usuario
+        -- Obtener datos del usuario (fallback: buscar por telefono si cliente_uid no existe)
         SELECT * INTO v_user FROM usuarios_clientes WHERE id = NEW.cliente_uid;
+        IF NOT FOUND AND NEW.cliente_telefono IS NOT NULL AND TRIM(NEW.cliente_telefono) != '' THEN
+            SELECT * INTO v_user FROM usuarios_clientes WHERE telefono = TRIM(NEW.cliente_telefono);
+        END IF;
         IF NOT FOUND THEN RETURN NEW; END IF;
 
         -- Verificar si es primera orden
@@ -915,5 +918,5 @@ CREATE INDEX IF NOT EXISTS idx_push_subscriptions_phone_active ON push_subscript
 
 -- Products: busqueda por categoria y stock
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
-CREATE INDEX IF NOT EXISTS idx_products_categoria ON products USING GIN(categoria gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_products_categoria ON products USING GIN(categoria);
 CREATE INDEX IF NOT EXISTS idx_products_stock_low ON products(stock) WHERE stock <= 5 AND activo = true;
