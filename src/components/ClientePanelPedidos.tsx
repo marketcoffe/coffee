@@ -122,6 +122,14 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
   const [copiedCoupon, setCopiedCoupon] = useState<string | null>(null);
   const [localOrders, setLocalOrders] = useState<Order[]>([]);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectRetriesRef = useRef(0);
+  const currentUserRef = useRef(currentUser);
+  const userPhoneRef = useRef(userPhone);
+
+  // Actualizar refs sin causar re-render del effect
+  useEffect(() => { currentUserRef.current = currentUser; }, [currentUser]);
+  useEffect(() => { userPhoneRef.current = userPhone; }, [userPhone]);
 
   useEffect(() => {
     setLocalOrders(orders);
@@ -214,77 +222,111 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
 
   useEffect(() => {
     if (!currentUser) return;
-    console.log('[ClientePanel] Suscribiéndose a realtime para usuario:', currentUser.id);
+    const MAX_DELAY = 30000;
+    const BASE_DELAY = 2000;
 
-    const channel = supabase
-      .channel(`cliente_orders_${currentUser.id}`)
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'orders' },
-        (payload: Record<string, unknown>) => {
-          const updated = payload.new as Order;
+    const connectChannel = () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
+
+      console.log('[ClientePanel] Suscribiéndose a realtime para usuario:', currentUser.id);
+
+      const cu = currentUserRef.current;
+      const phone = userPhoneRef.current;
+
+      const channel = supabase
+        .channel(`cliente_orders_${cu.id}`)
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'orders' },
+          (payload: Record<string, unknown>) => {
+            const updated = payload.new as Order;
+            if (!updated?.id) return;
+            const cur = currentUserRef.current;
+            const ph = userPhoneRef.current;
+            const isMine =
+              (ph && updated.cliente_telefono === ph) ||
+              (cur.id && updated.usuario_id === cur.id) ||
+              (cur.id && updated.cliente_uid === cur.id);
+            if (isMine) {
+              console.log('[ClientePanel] Pedido actualizado:', updated.id, updated.status);
+              setLocalOrders(prev =>
+                prev.map(o => o.id === updated.id ? { ...o, ...updated } : o)
+              );
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'orders' },
+          (payload: Record<string, unknown>) => {
+            const inserted = payload.new as Order;
+            if (!inserted?.id) return;
+            const cur = currentUserRef.current;
+            const ph = userPhoneRef.current;
+            const isMine =
+              (ph && inserted.cliente_telefono === ph) ||
+              (cur.id && inserted.usuario_id === cur.id) ||
+              (cur.id && inserted.cliente_uid === cur.id);
+            if (isMine) {
+              console.log('[ClientePanel] Nuevo pedido:', inserted.id, inserted.status);
+              setLocalOrders(prev => {
+                if (prev.some(o => o.id === inserted.id)) return prev;
+                return [inserted, ...prev];
+              });
+            }
+          }
+        )
+        .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
+          const updated = payload.payload;
           if (!updated?.id) return;
+          const cur = currentUserRef.current;
+          const ph = userPhoneRef.current;
           const isMine =
-            (userPhone && updated.cliente_telefono === userPhone) ||
-            (currentUser.id && updated.usuario_id === currentUser.id) ||
-            (currentUser.id && updated.cliente_uid === currentUser.id);
+            (ph && updated.cliente_telefono === ph) ||
+            (cur.id && updated.usuario_id === cur.id) ||
+            (cur.id && updated.cliente_uid === cur.id);
           if (isMine) {
-            console.log('[ClientePanel] Pedido actualizado:', updated.id, updated.status);
+            console.log('[ClientePanel] Broadcast order_status:', updated.id, updated.status);
             setLocalOrders(prev =>
               prev.map(o => o.id === updated.id ? { ...o, ...updated } : o)
             );
           }
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'orders' },
-        (payload: Record<string, unknown>) => {
-          const inserted = payload.new as Order;
-          if (!inserted?.id) return;
-          const isMine =
-            (userPhone && inserted.cliente_telefono === userPhone) ||
-            (currentUser.id && inserted.usuario_id === currentUser.id) ||
-            (currentUser.id && inserted.cliente_uid === currentUser.id);
-          if (isMine) {
-            console.log('[ClientePanel] Nuevo pedido:', inserted.id, inserted.status);
-            setLocalOrders(prev => {
-              if (prev.some(o => o.id === inserted.id)) return prev;
-              return [inserted, ...prev];
-            });
+        })
+        .subscribe((status: string) => {
+          console.log('[ClientePanel] Canal realtime status:', status);
+          if (status === 'SUBSCRIBED') {
+            reconnectRetriesRef.current = 0;
+          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            console.warn(`[ClientePanelPedidos] Canal desconectado (${status}), reconectando...`);
+            const delay = Math.min(BASE_DELAY * Math.pow(2, reconnectRetriesRef.current), MAX_DELAY);
+            reconnectRetriesRef.current += 1;
+            reconnectTimerRef.current = setTimeout(() => connectChannel(), delay);
           }
-        }
-      )
-      .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
-        const updated = payload.payload;
-        if (!updated?.id) return;
-        const isMine =
-          (userPhone && updated.cliente_telefono === userPhone) ||
-          (currentUser.id && updated.usuario_id === currentUser.id) ||
-          (currentUser.id && updated.cliente_uid === currentUser.id);
-        if (isMine) {
-          console.log('[ClientePanel] Broadcast order_status:', updated.id, updated.status);
-          setLocalOrders(prev =>
-            prev.map(o => o.id === updated.id ? { ...o, ...updated } : o)
-          );
-        }
-      })
-      .subscribe((status: string) => {
-        console.log('[ClientePanel] Canal realtime status:', status);
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          console.warn('[ClientePanelPedidos] Canal desconectado:', status);
-        }
-      });
+        });
 
-    channelRef.current = channel;
+      channelRef.current = channel;
+    };
+
+    connectChannel();
 
     return () => {
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
       }
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
     };
-  }, [currentUser, userPhone]);
+  }, [currentUser?.id, userPhone]);
 
   const OrderProgressBar: React.FC<{ order: Order }> = ({ order }) => {
     const orderType = order.tipo_entrega || order.tipo_pedido || 'delivery';

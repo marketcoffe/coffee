@@ -1385,8 +1385,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         // Cargar datos del usuario actual para que users[] tenga loyalty_points
         try {
-          const { data: dbUser } = await supabase.from('usuarios_clientes')
-            .select('*').eq('id', currentUser.id).single();
+          let { data: dbUser } = await supabase.from('usuarios_clientes')
+            .select('*').eq('id', currentUser.id).maybeSingle();
+          // Si el usuario no existe en la DB (guest), crearlo automaticamente
+          if (!dbUser && currentUser.id.startsWith('guest-')) {
+            await supabase.rpc('ensure_guest_user', {
+              p_id: currentUser.id,
+              p_nombre: currentUser.nombre || 'Cliente',
+              p_telefono: currentUser.telefono || ''
+            });
+            // Re-query despues de crear
+            const { data: retryUser } = await supabase.from('usuarios_clientes')
+              .select('*').eq('id', currentUser.id).maybeSingle();
+            dbUser = retryUser;
+          }
           if (dbUser) {
             setUsers([{ ...dbUser, createdAt: dbUser.created_at, contrasena: 'managed' } as AppUser]);
             setCurrentUser(prev => prev ? { ...prev, ...dbUser } : prev);
@@ -2098,12 +2110,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
       return false;
     } else {
-      // Enviar notificación DESPUÉS del UPDATE exitoso (fire-and-forget, no bloquea)
-      if (targetPhone) {
-        addNotification('Estado de Pedido Actualizado', statusMsg, 'personal', targetPhone, undefined, '/profile');
-      } else {
-        addNotification('Estado de Pedido Actualizado', statusMsg, 'admin', undefined, undefined, '/admin');
-      }
+      // ✅ El INSERT en notifications + push server-side lo maneja el trigger
+      // trigger_notify_order_status_change → handle_new_notification_push → net.http_post
+      // Solo necesitamos el broadcast para UI inmediata en el cliente
 
       // Broadcast instantáneo para que el cliente reciba el cambio en <100ms
       try {
@@ -3006,7 +3015,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         .from('usuarios_clientes')
         .select('puntos_fidelidad, puntos_historicos')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
       if (error || !userData) {
         console.error('[Loyalty] earnLoyaltyPoints — DB query failed:', error);
         return;
