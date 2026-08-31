@@ -750,6 +750,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
 ${productosDetailText}
 *Total Neto a Pagar:* $${totalUsd.toFixed(2)} / ${totalBs.toFixed(2)} Bs.
 *Metodo de Pago:* ${selectedPayment}${selectedPayment === 'Efectivo' && cashBills ? `\n*Billetes:* ${cashBills}` : ''}
+${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
 ----------------------------------`;
 
         let cleanPhone = checkoutWhatsAppPhone().replace(/\D/g, '');

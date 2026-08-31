@@ -31,14 +31,14 @@ export function printOrderTicket(order: Order, config: any) {
       : '';
     const itemTotal = (item.precio_usd * item.cantidad).toFixed(2);
     itemsHtml += `
-      <tr>
-        <td style="width:24px;text-align:center;font-weight:bold;font-size:9px">${item.cantidad}x</td>
-        <td style="font-size:9px">
+      <tr class="item-row">
+        <td style="width:24px;text-align:center">${item.cantidad}x</td>
+        <td>
           ${item.nombre}
           ${optStr}
           ${removedStr}
         </td>
-        <td style="text-align:right;width:50px;font-weight:bold;font-size:9px">$${itemTotal}</td>
+        <td style="text-align:right;width:50px">$${itemTotal}</td>
       </tr>`;
   });
 
@@ -59,6 +59,12 @@ export function printOrderTicket(order: Order, config: any) {
   <div class="xsmall">${order.cliente_telefono}</div>
   <div class="line"></div>
 
+  ${order.notas_admin ? `
+  <div style="margin:3px 0;padding:3px;border:1px dashed #000">
+    <div class="small" style="margin-bottom:1px">NOTAS:</div>
+    <div class="medium">${order.notas_admin}</div>
+  </div>` : ''}
+
   <!-- Items -->
   <div class="xsmall bold" style="margin-bottom:2px">ITEMS:</div>
   <table>
@@ -72,7 +78,7 @@ export function printOrderTicket(order: Order, config: any) {
     ${shipping > 0 ? `<tr><td>Envio:</td><td>$${shipping.toFixed(2)}</td></tr>` : ''}
     ${discount > 0 ? `<tr><td>Descuento${order.cupon_codigo ? ` (${order.cupon_codigo})` : ''}:</td><td>-$${discount.toFixed(2)}</td></tr>` : ''}
     <tr><td>IVA (16%):</td><td>$${iva.toFixed(2)}</td></tr>
-    <tr class="total-row"><td>TOTAL:</td><td>$${order.total_usd?.toFixed(2)}</td></tr>
+    <tr class="total-row"><td>TOTAL:</td><td>$${order.total_usd?.toFixed(2)}${order.total_bs ? ` / ${order.total_bs.toFixed(2)} Bs.` : ''}</td></tr>
   </table>
   <div class="line"></div>
 

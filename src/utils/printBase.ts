@@ -53,6 +53,7 @@ export function getPrintPageCss(paperSize: PaperSize = '58mm'): string {
     body {
       font-family: 'Courier New', Courier, monospace;
       font-size: ${d.fontSize};
+      font-weight: bold;
       width: ${d.bodyWidth};
       padding: 2mm;
       color: #000;
@@ -69,6 +70,7 @@ export function getPrintPageCss(paperSize: PaperSize = '58mm'): string {
     .double-line { border-top: 2px solid #000; margin: 4px 0; }
     table { width: 100%; border-collapse: collapse; }
     td { padding: 1px 0; vertical-align: top; }
+    .item-row td { font-size: ${d.sizes.medium}; font-weight: bold; padding: 2px 0; }
     .totals td { padding: 1px 0; font-size: ${d.sizes.small}; }
     .totals td:last-child { text-align: right; }
     .totals .total-row td { font-size: ${d.sizes.large}; font-weight: bold; border-top: 1px solid #000; padding-top: 2px; }

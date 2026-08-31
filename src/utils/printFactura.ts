@@ -33,10 +33,10 @@ export function printFactura(order: Order, config: any) {
     const itemIva = itemSubtotal * 0.16;
     const itemTotal = itemSubtotal + itemIva;
     itemsHtml += `
-      <tr>
-        <td style="width:20px;text-align:center;font-size:8px">${item.cantidad}x</td>
-        <td style="font-size:8px">${item.nombre}</td>
-        <td style="text-align:right;width:46px;font-size:8px">$${itemTotal.toFixed(2)}</td>
+      <tr class="item-row">
+        <td style="width:20px;text-align:center">${item.cantidad}x</td>
+        <td>${item.nombre}</td>
+        <td style="text-align:right;width:46px">$${itemTotal.toFixed(2)}</td>
       </tr>`;
   });
 
@@ -74,13 +74,19 @@ export function printFactura(order: Order, config: any) {
   ${order.tipo_entrega === 'delivery' && order.direccion_envio ? `<div class="xsmall">Dir: ${order.direccion_envio}</div>` : ''}
   <div class="line"></div>
 
+  ${order.notas_admin ? `
+  <div style="margin:3px 0;padding:3px;border:1px dashed #000">
+    <div class="small" style="margin-bottom:1px">NOTAS:</div>
+    <div class="medium">${order.notas_admin}</div>
+  </div>` : ''}
+
   <!-- Detalle de Items -->
   <div class="xsmall bold" style="margin-bottom:2px">DETALLE:</div>
   <table>
     <tr style="border-bottom:1px solid #000">
-      <td style="width:20px;font-size:7px;font-weight:bold">Cant</td>
-      <td style="font-size:7px;font-weight:bold">Producto</td>
-      <td style="text-align:right;width:46px;font-size:7px;font-weight:bold">Total</td>
+      <td style="width:20px" class="xsmall">Cant</td>
+      <td class="xsmall">Producto</td>
+      <td style="text-align:right;width:46px" class="xsmall">Total</td>
     </tr>
     ${itemsHtml}
   </table>
@@ -92,7 +98,7 @@ export function printFactura(order: Order, config: any) {
     ${discount > 0 ? `<tr><td>Descuento:</td><td>-$${discount.toFixed(2)}</td></tr>` : ''}
     ${shipping > 0 ? `<tr><td>Envio:</td><td>$${shipping.toFixed(2)}</td></tr>` : ''}
     <tr class="iva-row" style="font-size:8px;font-style:italic"><td>IVA (16%):</td><td>$${iva.toFixed(2)}</td></tr>
-    <tr class="total-row"><td>TOTAL:</td><td>$${total.toFixed(2)}</td></tr>
+    <tr class="total-row"><td>TOTAL:</td><td>$${total.toFixed(2)}${order.total_bs ? ` / ${order.total_bs.toFixed(2)} Bs.` : ''}</td></tr>
   </table>
   <div class="double-line"></div>
 
