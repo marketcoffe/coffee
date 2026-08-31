@@ -643,7 +643,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     let mainChannel: ReturnType<typeof supabase.channel> | null = null;
     let broadcastChan: ReturnType<typeof supabase.channel> | null = null;
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
-    let reconnectRetries = 0;
+    let broadcastReconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let mainRetries = 0;
+    let broadcastRetries = 0;
     const MAX_DELAY = 30000;
     const BASE_DELAY = 2000;
 
@@ -939,12 +941,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         .subscribe((status: string) => {
           if (status === 'SUBSCRIBED') {
             console.warn('✅ Conectado al sistema Realtime de Marketo');
-            reconnectRetries = 0;
+            mainRetries = 0;
           } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
             console.warn(`[Realtime] Canal desconectado (${status}), reconectando...`);
-            const delay = Math.min(BASE_DELAY * Math.pow(2, reconnectRetries), MAX_DELAY);
-            reconnectRetries += 1;
-            reconnectTimer = setTimeout(() => connectRealtime(), delay);
+            const delay = Math.min(BASE_DELAY * Math.pow(2, mainRetries), MAX_DELAY);
+            mainRetries += 1;
+            reconnectTimer = setTimeout(() => reconnectMain(), delay);
           }
         });
 
@@ -968,13 +970,191 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         playNotificationSound('update', updatedOrder.status);
       })
       .subscribe((status: string) => {
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        if (status === 'SUBSCRIBED') {
+          broadcastRetries = 0;
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           console.warn(`[Realtime] Broadcast canal desconectado (${status}), reconectando...`);
-          const delay = Math.min(BASE_DELAY * Math.pow(2, reconnectRetries), MAX_DELAY);
-          reconnectRetries += 1;
-          reconnectTimer = setTimeout(() => connectRealtime(), delay);
+          const delay = Math.min(BASE_DELAY * Math.pow(2, broadcastRetries), MAX_DELAY);
+          broadcastRetries += 1;
+          broadcastReconnectTimer = setTimeout(() => reconnectBroadcast(), delay);
         }
       });
+
+    // Reconexión independiente para mainChannel (sin destruir broadcastChan)
+    const reconnectMain = () => {
+      if (mainChannel) {
+        supabase.removeChannel(mainChannel);
+        mainChannel = null;
+      }
+      if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+
+      try {
+        mainChannel = supabase.channel('marketo_realtime_system');
+
+        mainChannel
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'store_config' }, (payload: Record<string, unknown>) => {
+          const newRow = (payload as { new?: Record<string, unknown> })?.new;
+          if (newRow) {
+            setConfig(prev => {
+              const pending = pendingConfigRef.current;
+              const safeNewRow: Record<string, unknown> = {};
+              Object.keys(newRow).forEach(key => {
+                if (!(key in pending)) {
+                  safeNewRow[key] = newRow[key];
+                }
+              });
+              return {
+                ...prev,
+                ...safeNewRow,
+                tasa_cambio: Number(safeNewRow.tasa_cambio) || prev.tasa_cambio,
+                coordenadas_tienda: safeNewRow.tienda_lat ? { lat: Number(safeNewRow.tienda_lat), lng: Number(safeNewRow.tienda_lng) } : prev.coordenadas_tienda,
+                banners: [safeNewRow.banner_url_1, safeNewRow.banner_url_2, safeNewRow.banner_url_3].filter(Boolean).length > 0 
+                  ? [safeNewRow.banner_url_1, safeNewRow.banner_url_2, safeNewRow.banner_url_3].filter(Boolean) as string[]
+                  : prev.banners
+              };
+            });
+          }
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, (payload: Record<string, unknown>) => {
+          const updated = payload.new as Order;
+          const old = payload.old as Order;
+          if (!updated?.id) return;
+          if (old && old.status !== updated.status) {
+            playNotificationSound('update', updated.status);
+          }
+          setOrders(prev => prev.map(o => o.id === updated.id ? { ...o, ...updated } : o));
+          const cu = currentUserRef.current;
+          if (cu && normalizePhone(updated.cliente_telefono) === normalizePhone(cu.telefono)) {
+            if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+              navigator.serviceWorker.ready.then(reg => {
+                return reg.showNotification(`${config.site_nombre || 'App'}: Actualización de Pedido`, {
+                  body: `Tu pedido ${updated.id} ahora está: ${updated.status}`,
+                  icon: '/icon.png', badge: '/icon.png',
+                  tag: `order-update-${updated.id}`, renotify: true,
+                  vibrate: [200, 100, 200], requireInteraction: true,
+                  data: { url: '/profile' }
+                } as NotificationOptions);
+              }).catch(() => {});
+            }
+          }
+        })
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload: Record<string, unknown>) => {
+          const newOrder = payload.new as Order;
+          if (!newOrder?.id) return;
+          setOrders(prev => {
+            if (prev.some(o => o.id === newOrder.id)) return prev;
+            return [newOrder, ...prev];
+          });
+          if (newOrder.tipo_pedido === 'mesa' || newOrder.tipo_entrega === 'mesa') {
+            playNotificationSound('new');
+          }
+        })
+        .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
+          const newOrder = payload.payload;
+          setOrders(prev => [newOrder, ...prev]);
+          window.dispatchEvent(new CustomEvent('new_order_received', { detail: newOrder }));
+          playNotificationSound('new');
+        })
+        .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
+          const updatedOrder = payload.payload;
+          if (!updatedOrder?.id) return;
+          setOrders(prev => prev.map(o => o.id === updatedOrder.id ? { ...o, ...updatedOrder } : o));
+          window.dispatchEvent(new CustomEvent('order_status_changed', { detail: updatedOrder }));
+          playNotificationSound('update', updatedOrder.status);
+        })
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (payload: Record<string, unknown>) => {
+          const newNotif = payload.new as InAppNotification;
+          const cu = currentUserRef.current;
+          const isForMe = newNotif.tipo === 'todos' ||
+            (cu && newNotif.tipo === 'personal' && normalizePhone(newNotif.destinatario_telefono) === normalizePhone(cu.telefono)) ||
+            (isAdminAuthenticatedRef.current && (newNotif.tipo === 'request' || newNotif.tipo === 'admin'));
+          if (isForMe) {
+            setNotifications(prev => {
+              if (prev.some(n => n.id === newNotif.id)) return prev;
+              return [newNotif, ...prev];
+            });
+            playNotificationSound('update');
+          }
+        })
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'products' }, (payload: Record<string, unknown>) => {
+          const inserted = (payload as { new?: Record<string, unknown> })?.new;
+          if (!inserted?.id) return;
+          setProducts(prev => {
+            const idxById = prev.findIndex(p => p.id === inserted.id);
+            if (idxById >= 0) { const copy = [...prev]; copy[idxById] = { ...copy[idxById], ...inserted }; return copy; }
+            return [inserted as unknown as FoodItem, ...prev];
+          });
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'products' }, (payload: Record<string, unknown>) => {
+          const updated = (payload as { new?: Record<string, unknown> })?.new;
+          if (!updated?.id) return;
+          setProducts(prev => {
+            const idxById = prev.findIndex(p => p.id === updated.id);
+            if (idxById >= 0) { const copy = [...prev]; copy[idxById] = { ...copy[idxById], ...updated }; return copy; }
+            return [updated as unknown as FoodItem, ...prev];
+          });
+        })
+        .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'products' }, (payload: Record<string, unknown>) => {
+          const deleted = (payload as { old?: Record<string, unknown> })?.old;
+          if (!deleted) return;
+          setProducts(prev => deleted.id ? prev.filter(p => p.id !== deleted.id) : prev);
+        })
+        .subscribe((status: string) => {
+          if (status === 'SUBSCRIBED') {
+            mainRetries = 0;
+          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            console.warn(`[Realtime] Canal reconectado (${status}), reintentando...`);
+            const delay = Math.min(BASE_DELAY * Math.pow(2, mainRetries), MAX_DELAY);
+            mainRetries += 1;
+            reconnectTimer = setTimeout(() => reconnectMain(), delay);
+          }
+        });
+      } catch (e) {
+        console.error('Realtime reconnectMain failed:', e);
+      }
+    };
+
+    // Reconexión independiente para broadcastChan (sin destruir mainChannel)
+    const reconnectBroadcast = () => {
+      if (broadcastChan) {
+        supabase.removeChannel(broadcastChan);
+        broadcastChan = null;
+      }
+      if (broadcastReconnectTimer) { clearTimeout(broadcastReconnectTimer); broadcastReconnectTimer = null; }
+
+      try {
+        broadcastChan = supabase.channel('marketo_broadcast_send')
+          .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
+            const newOrder = payload.payload;
+            if (!newOrder?.id) return;
+            setOrders(prev => {
+              if (prev.some(o => o.id === newOrder.id)) return prev;
+              return [newOrder, ...prev];
+            });
+            window.dispatchEvent(new CustomEvent('new_order_received', { detail: newOrder }));
+            playNotificationSound('new');
+          })
+          .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
+            const updatedOrder = payload.payload;
+            if (!updatedOrder?.id) return;
+            setOrders(prev => prev.map(o => o.id === updatedOrder.id ? { ...o, ...updatedOrder } : o));
+            window.dispatchEvent(new CustomEvent('order_status_changed', { detail: updatedOrder }));
+            playNotificationSound('update', updatedOrder.status);
+          })
+          .subscribe((status: string) => {
+            if (status === 'SUBSCRIBED') {
+              broadcastRetries = 0;
+            } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+              console.warn(`[Realtime] Broadcast reconectado (${status}), reintentando...`);
+              const delay = Math.min(BASE_DELAY * Math.pow(2, broadcastRetries), MAX_DELAY);
+              broadcastRetries += 1;
+              broadcastReconnectTimer = setTimeout(() => reconnectBroadcast(), delay);
+            }
+          });
+      } catch (e) {
+        console.error('Realtime reconnectBroadcast failed:', e);
+      }
+    };
 
     } catch (e) {
       console.error('Realtime channels failed:', e);
@@ -987,6 +1167,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (mainChannel) supabase.removeChannel(mainChannel);
       if (broadcastChan) supabase.removeChannel(broadcastChan);
       if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (broadcastReconnectTimer) clearTimeout(broadcastReconnectTimer);
     };
   }, [currentUser]);
   useEffect(() => {

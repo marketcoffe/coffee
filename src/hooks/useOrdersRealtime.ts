@@ -34,6 +34,7 @@ export function useOrdersRealtime(options: UseOrdersRealtimeOptions = {}): UseOr
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('connecting');
   const [lastEvent, setLastEvent] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -61,6 +62,7 @@ export function useOrdersRealtime(options: UseOrdersRealtimeOptions = {}): UseOr
   }, []);
 
   useEffect(() => {
+    mountedRef.current = true;
     if (!enabled) return;
 
     const channel = supabase.channel('admin_orders_realtime');
@@ -109,9 +111,12 @@ export function useOrdersRealtime(options: UseOrdersRealtimeOptions = {}): UseOr
           mountedRef.current && console.warn(`[useOrdersRealtime] Estado: ${status} — reintentando en 5s`);
           if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
           reconnectTimerRef.current = setTimeout(() => {
-            if (mountedRef.current && channelRef.current) {
-              supabase.removeChannel(channelRef.current);
-              channelRef.current = null;
+            if (mountedRef.current) {
+              if (channelRef.current) {
+                supabase.removeChannel(channelRef.current);
+                channelRef.current = null;
+              }
+              setRetryCount(c => c + 1);
             }
           }, 5000);
         }
@@ -130,7 +135,7 @@ export function useOrdersRealtime(options: UseOrdersRealtimeOptions = {}): UseOr
         channelRef.current = null;
       }
     };
-  }, [enabled]);
+  }, [enabled, retryCount]);
 
   return { isConnected, connectionStatus, lastEvent, reconnect };
 }

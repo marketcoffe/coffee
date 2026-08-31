@@ -1077,7 +1077,7 @@ ${productosDetailText}
           <ArrowLeft size={18} className="text-[#1a1c1d]" />
         </button>
         <div className="flex-1">
-          <h1 className="text-[16px] font-bold text-[#1a1c1d]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+          <h1 className="text-[16px] font-bold text-[#1a1c1d]" style={{ fontFamily: 'var(--font-display)' }}>
             {orderTypeSelected ? 'Checkout' : 'Tu Carrito'}
           </h1>
           <p className="text-[11px] text-[#8f7065]">Paso {currentStep} de 3</p>

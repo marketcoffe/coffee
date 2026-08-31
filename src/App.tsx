@@ -97,14 +97,26 @@ function AppContent() {
     document.documentElement.style.setProperty('--font-display', `"${fontName}", sans-serif`);
 
     // Cargar la fuente desde Google Fonts si no está ya cargada
-    const loadedFonts = Array.from(document.querySelectorAll('link[href*="fonts.googleapis.com/css"]'))
-      .map((el) => el.getAttribute('data-font-name') || '');
-    if (!loadedFonts.includes(fontName) && fontName !== 'Plus Jakarta Sans' && fontName !== 'Inter') {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;500;600;700;800&display=swap`;
-      link.setAttribute('data-font-name', fontName);
-      document.head.appendChild(link);
+    const existingLinks = Array.from(document.querySelectorAll('link[data-font-name]'));
+    const loadedFontNames = existingLinks.map(el => el.getAttribute('data-font-name') || '');
+
+    if (fontName !== 'Plus Jakarta Sans' && fontName !== 'Inter') {
+      // Limpiar links de fuentes dinámicas anteriores (no las base del index.html)
+      existingLinks.forEach(el => {
+        const name = el.getAttribute('data-font-name') || '';
+        if (name !== fontName) {
+          el.remove();
+        }
+      });
+
+      if (!loadedFontNames.includes(fontName)) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;500;600;700;800&display=swap`;
+        link.setAttribute('data-font-name', fontName);
+        link.onerror = () => console.warn(`[Font] Error cargando fuente: ${fontName}`);
+        document.head.appendChild(link);
+      }
     }
   }, [config.font_display]);
 
