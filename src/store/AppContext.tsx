@@ -1053,6 +1053,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return shouldFetchRate();
   };
 
+  // Escuchar actualización de puntos desde ClientePanelPedidos cuando status = 'Entregado'
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (!detail) return;
+      const { puntos_fidelidad, puntos_historicos } = detail;
+      setCurrentUser(prev => {
+        if (!prev) return prev;
+        if (prev.puntos_fidelidad === puntos_fidelidad && prev.puntos_historicos === puntos_historicos) return prev;
+        return { ...prev, puntos_fidelidad, puntos_historicos, loyalty_points: puntos_fidelidad, loyalty_lifetime_points: puntos_historicos };
+      });
+      setUsers(prev => prev.map(u => {
+        if (!currentUser || u.id !== currentUser.id) return u;
+        return { ...u, puntos_fidelidad, puntos_historicos, loyalty_points: puntos_fidelidad, loyalty_lifetime_points: puntos_historicos };
+      }));
+      console.log('[Loyalty] Puntos actualizados via CustomEvent:', { puntos_fidelidad, puntos_historicos });
+    };
+    window.addEventListener('loyalty_points_updated', handler);
+    return () => window.removeEventListener('loyalty_points_updated', handler);
+  }, [currentUser?.id]);
+
   useEffect(() => {
     const initData = async () => {
       setIsGlobalLoading(true);

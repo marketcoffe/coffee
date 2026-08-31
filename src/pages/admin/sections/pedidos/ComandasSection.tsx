@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { useOrders } from '../../hooks/useOrders';
 import { Order } from '../../../../types/store';
@@ -7,7 +7,7 @@ import { OrderCard, sortOrdersByPriority } from '../../components/OrderCard';
 import { OrderDetailModal } from '../../components/OrderDetailModal';
 import { printOrderTicket } from '../../utils/printUtils';
 import { Tooltip } from '../../components/Tooltip';
-import { supabase } from '../../../../store/supabaseClient';
+
 
 type TabStatus = 'Pendiente' | 'En preparacion' | 'En camino' | 'Entregado' | 'Cancelado' | 'Todos';
 
@@ -57,31 +57,16 @@ const ComandasSection: React.FC<ComandasSectionProps> = ({ scopeSedeId }) => {
   const [sedeFilter, setSedeFilter] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   // Escuchar broadcasts para updates instantáneos (<100ms)
+  // Usa los CustomEvents despachados desde AppContext broadcastChan global
   useEffect(() => {
-    // Canal separado para broadcasts (enviados desde createOrder/updateOrderStatus)
-    const broadcastChan = supabase
-      .channel('marketo_broadcast_send')
-      .on('broadcast', { event: 'new_order_broadcast' }, () => {
-        refreshOrders();
-      })
-      .on('broadcast', { event: 'order_status_broadcast' }, (payload: { payload: Order }) => {
-        const updated = payload.payload;
-        if (updated?.id) {
-          refreshOrders();
-        }
-      })
-      .subscribe();
-
-    channelRef.current = broadcastChan;
-
+    const handleOrderUpdate = () => { refreshOrders(); };
+    window.addEventListener('new_order_received', handleOrderUpdate);
+    window.addEventListener('order_status_changed', handleOrderUpdate);
     return () => {
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
-      }
+      window.removeEventListener('new_order_received', handleOrderUpdate);
+      window.removeEventListener('order_status_changed', handleOrderUpdate);
     };
   }, [refreshOrders]);
 

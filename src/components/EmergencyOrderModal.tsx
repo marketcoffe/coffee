@@ -149,6 +149,7 @@ export default function EmergencyOrderModal() {
   const [isConnected, setIsConnected] = useState(false);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const broadcastRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const broadcastCleanupRef = useRef<(() => void) | null>(null);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const retriesRef = useRef(0);
   const dismissedIdsRef = useRef<Set<string>>(new Set());
@@ -206,9 +207,9 @@ export default function EmergencyOrderModal() {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
     }
-    if (broadcastRef.current) {
-      supabase.removeChannel(broadcastRef.current);
-      broadcastRef.current = null;
+    if (broadcastCleanupRef.current) {
+      broadcastCleanupRef.current();
+      broadcastCleanupRef.current = null;
     }
     if (reconnectTimerRef.current) {
       clearTimeout(reconnectTimerRef.current);
@@ -249,7 +250,17 @@ export default function EmergencyOrderModal() {
       .subscribe();
 
     channelRef.current = channel;
-    broadcastRef.current = broadcastChan;
+
+    // Escuchar broadcasts via CustomEvent global (AppContext broadcastChan)
+    const handleNewOrder = (e: Event) => {
+      const order = (e as CustomEvent).detail as Order;
+      if (order && !dismissedIdsRef.current.has(order.id)) {
+        addOrdersBatch([order]);
+        playNewOrderBeep();
+      }
+    };
+    window.addEventListener('new_order_received', handleNewOrder);
+    broadcastCleanupRef.current = () => window.removeEventListener('new_order_received', handleNewOrder);
   }, [addOrdersBatch]);
 
   useEffect(() => {
@@ -259,9 +270,9 @@ export default function EmergencyOrderModal() {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
       }
-      if (broadcastRef.current) {
-        supabase.removeChannel(broadcastRef.current);
-        broadcastRef.current = null;
+      if (broadcastCleanupRef.current) {
+        broadcastCleanupRef.current();
+        broadcastCleanupRef.current = null;
       }
       if (reconnectTimerRef.current) {
         clearTimeout(reconnectTimerRef.current);

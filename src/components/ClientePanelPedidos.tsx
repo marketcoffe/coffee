@@ -258,6 +258,20 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
               setLocalOrders(prev =>
                 prev.map(o => o.id === updated.id ? { ...o, ...updated } : o)
               );
+              if (updated.status === 'Entregado' && currentUserRef.current?.id) {
+                supabase.from('usuarios_clientes')
+                  .select('puntos_fidelidad, puntos_historicos')
+                  .eq('id', currentUserRef.current.id)
+                  .maybeSingle()
+                  .then(({ data }) => {
+                    if (data) {
+                      window.dispatchEvent(new CustomEvent('loyalty_points_updated', {
+                        detail: { puntos_fidelidad: data.puntos_fidelidad, puntos_historicos: data.puntos_historicos }
+                      }));
+                      console.log('[ClientePanel] Puntos re-leídos tras Entregado:', data);
+                    }
+                  });
+              }
             }
           }
         )
@@ -296,6 +310,20 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
             setLocalOrders(prev =>
               prev.map(o => o.id === updated.id ? { ...o, ...updated } : o)
             );
+            if (updated.status === 'Entregado' && currentUserRef.current?.id) {
+              supabase.from('usuarios_clientes')
+                .select('puntos_fidelidad, puntos_historicos')
+                .eq('id', currentUserRef.current.id)
+                .maybeSingle()
+                .then(({ data }) => {
+                  if (data) {
+                    window.dispatchEvent(new CustomEvent('loyalty_points_updated', {
+                      detail: { puntos_fidelidad: data.puntos_fidelidad, puntos_historicos: data.puntos_historicos }
+                    }));
+                    console.log('[ClientePanel] Broadcast: puntos re-leídos tras Entregado:', data);
+                  }
+                });
+            }
           }
         })
         .subscribe((status: string) => {
