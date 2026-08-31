@@ -640,6 +640,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [currentUser]);
 
   useEffect(() => {
+    if (!currentUser) return;
     let mainChannel: ReturnType<typeof supabase.channel> | null = null;
     let broadcastChan: ReturnType<typeof supabase.channel> | null = null;
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
