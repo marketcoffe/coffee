@@ -78,7 +78,7 @@ export const Home: React.FC<HomeProps> = ({
 
   const activeItems = useMemo(() => foodItems.filter(p => p.activo !== false), [foodItems]);
   const promoItems = useMemo(() => activeItems.filter(p => p.es_promo), [activeItems]);
-  const activeCombos = useMemo(() => (config.combos || []).filter(c => c?.active), [config.combos]);
+
   const faqItems = useMemo(() => config.faq_items && config.faq_items.length > 0 ? config.faq_items : DEFAULT_FAQ, [config.faq_items]);
   const activePromotions = useMemo(() => {
     const now = new Date().toISOString();
@@ -240,7 +240,7 @@ export const Home: React.FC<HomeProps> = ({
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const offerRef = useRef<HTMLDivElement>(null);
-  const comboRef = useRef<HTMLDivElement>(null);
+
   const panaderiaRef = useRef<HTMLDivElement>(null);
   const comidaRapidaRef = useRef<HTMLDivElement>(null);
   const reposteriaRef = useRef<HTMLDivElement>(null);
@@ -582,82 +582,41 @@ export const Home: React.FC<HomeProps> = ({
               </div>
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Ofertas Flash</h3>
             </div>
-            <button onClick={() => setTab('catalog')} className="font-semibold text-xs flex items-center gap-1 transition-all" style={{ color: tc }}>
-              Ver Todo <ChevronRight size={14} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setTab('catalog')} className="font-semibold text-xs flex items-center gap-1 transition-all" style={{ color: tc }}>
+                Ver Todo <ChevronRight size={14} />
+              </button>
+              <button onClick={() => scroll(offerRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronLeft size={16} />
+              </button>
+              <button onClick={() => scroll(offerRef, 'right')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
 
-          {/* Desktop: Grid */}
-          <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {promoItems.slice(0, 8).map((item) => {
+          <div ref={offerRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+            {promoItems.slice(0, 10).map((item) => {
               const discount = item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd
                 ? Math.round(((item.precio_anterior_usd - item.precio_usd) / item.precio_anterior_usd) * 100) : 0;
               return (
-                <div key={item.id} className="relative rounded-2xl border-2 overflow-hidden group cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5"
-                  style={{ backgroundColor: cardBg, borderColor: tc, boxShadow: `0 0 20px ${tc}25` }}
-                  onClick={() => onViewProductDetails(item)}>
-                  <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-white font-bold text-[9px]"
-                    style={{ backgroundColor: tc }}>
-                    <Zap size={10} fill="currentColor" /> FLASH
-                  </div>
-                  <div className="relative h-36 overflow-hidden">
-                    <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    {discount > 0 && <div className="absolute top-2 right-2 bg-red-500 text-white font-bold px-2 py-0.5 rounded-lg text-[10px]">-{discount}%</div>}
-                    {item.estimated_prep_time && (
-                      <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                        <Clock size={10} /> {item.estimated_prep_time}min
-                      </div>
-                    )}
-                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                      className="absolute bottom-2 right-2 w-9 h-9 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
-                      style={{ backgroundColor: tc, color: '#fff' }}>
-                      <Plus size={16} />
-                    </button>
-                  </div>
-                  <div className="p-3">
-                    <p className="text-[10px] uppercase tracking-wider font-medium mb-0.5" style={{ color: text2 }}>{formatCategories(item)}</p>
-                    <h4 className="text-sm font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
-                    <div className="flex items-center gap-1.5 mb-1.5">
-                      {renderStars(getProductAverageRating(item.id))}
-                      <span className="text-[10px] font-medium" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-base" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[10px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
-                        {item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd && (
-                          <span className="line-through text-[11px]" style={{ color: `${text2}66` }}>${item.precio_anterior_usd.toFixed(2)}</span>
-                        )}
-                      </div>
-                      <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                        className="w-7 h-7 rounded-full flex items-center justify-center md:hidden"
-                        style={{ backgroundColor: surfaceContainer, color: tc }}>
-                        <Plus size={14} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Mobile: Horizontal Carousel */}
-          <div ref={offerRef} className="flex md:hidden gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
-            {promoItems.slice(0, 8).map((item) => {
-              const discount = item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd
-                ? Math.round(((item.precio_anterior_usd - item.precio_usd) / item.precio_anterior_usd) * 100) : 0;
-              return (
-                <div key={item.id} className="relative w-[180px] rounded-xl border-2 overflow-hidden shrink-0 cursor-pointer"
+                <div key={item.id} className="relative w-[180px] md:w-[calc((100%-48px)/5)] rounded-xl border-2 overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                   style={{ backgroundColor: cardBg, borderColor: tc, boxShadow: `0 0 12px ${tc}20` }}
                   onClick={() => onViewProductDetails(item)}>
                   <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-white font-bold text-[8px]"
                     style={{ backgroundColor: tc }}>
                     <Zap size={8} fill="currentColor" /> FLASH
                   </div>
-                  <div className="relative h-[130px]">
+                  <div className="relative h-[130px] md:h-[180px]">
                     <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-cover" />
                     {discount > 0 && <div className="absolute top-1.5 right-1.5 bg-red-500 text-white font-bold px-1.5 py-0.5 rounded-md text-[9px]">-{discount}%</div>}
+                    {item.estimated_prep_time && (
+                      <div className="absolute bottom-1.5 left-1.5 bg-black/50 backdrop-blur-sm text-white text-[9px] font-medium px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                        <Clock size={9} /> {item.estimated_prep_time}min
+                      </div>
+                    )}
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                      className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow"
+                      className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-all"
                       style={{ backgroundColor: tc, color: '#fff' }}>
                       <Plus size={12} />
                     </button>
@@ -669,11 +628,18 @@ export const Home: React.FC<HomeProps> = ({
                       {renderStars(getProductAverageRating(item.id), 9)}
                       <span className="text-[9px]" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
-                      {item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd && (
-                        <span className="line-through text-[10px]" style={{ color: `${text2}66` }}>${item.precio_anterior_usd.toFixed(2)}</span>
-                      )}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
+                        {item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd && (
+                          <span className="line-through text-[10px]" style={{ color: `${text2}66` }}>${item.precio_anterior_usd.toFixed(2)}</span>
+                        )}
+                      </div>
+                      <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                        className="w-6 h-6 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: surfaceContainer, color: tc }}>
+                        <Plus size={12} />
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -707,61 +673,12 @@ export const Home: React.FC<HomeProps> = ({
             </div>
           </div>
 
-          {/* Desktop: Grid */}
-          <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {masVendidosItems.map((item) => (
-              <div key={item.id} className="relative rounded-2xl border overflow-hidden group cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5"
+          <div ref={masVendidosRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+            {masVendidosItems.slice(0, 10).map((item) => (
+              <div key={item.id} className="w-[180px] md:w-[calc((100%-48px)/5)] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: cardBg, borderColor: cardBorder }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-white font-bold text-[9px]"
-                  style={{ backgroundColor: '#f97316' }}>
-                  <TrendingUp size={10} fill="currentColor" /> MÁS VENDIDO
-                </div>
-                <div className="relative h-36 overflow-hidden">
-                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  {item.estimated_prep_time && (
-                    <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                      <Clock size={10} /> {item.estimated_prep_time}min
-                    </div>
-                  )}
-                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                    className="absolute bottom-2 right-2 w-9 h-9 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
-                    style={{ backgroundColor: tc, color: '#fff' }}>
-                    <Plus size={16} />
-                  </button>
-                </div>
-                <div className="p-3">
-                  <p className="text-[10px] uppercase tracking-wider font-medium mb-0.5" style={{ color: text2 }}>{formatCategories(item)}</p>
-                  <h4 className="text-sm font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    {renderStars(getProductAverageRating(item.id))}
-                    <span className="text-[10px] font-medium" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-base" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[10px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
-                      {item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd && (
-                        <span className="line-through text-[11px]" style={{ color: `${text2}66` }}>${item.precio_anterior_usd.toFixed(2)}</span>
-                      )}
-                    </div>
-                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                      className="w-7 h-7 rounded-full flex items-center justify-center md:hidden"
-                      style={{ backgroundColor: surfaceContainer, color: tc }}>
-                      <Plus size={14} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Mobile: Horizontal Carousel */}
-          <div ref={masVendidosRef} className="flex md:hidden gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
-            {masVendidosItems.map((item) => (
-              <div key={item.id} className="w-[180px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
-                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
-                onClick={() => onViewProductDetails(item)}>
-                <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
+                <div className="relative h-[130px] md:h-[180px] overflow-hidden" style={{ backgroundColor: cardBg }}>
                   <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   <span className="absolute top-1.5 left-1.5 text-[7px] font-bold text-white px-1 py-px rounded"
                     style={{ backgroundColor: '#f97316' }}>
@@ -777,9 +694,9 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                      className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
+                      className="w-6 h-6 rounded-full flex items-center justify-center"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
                       <Plus size={12} />
                     </button>
@@ -815,66 +732,22 @@ export const Home: React.FC<HomeProps> = ({
             </div>
           </div>
 
-          {/* Desktop: Grid */}
-          <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {combosCategoriaItems.map((item) => (
-              <div key={item.id} className="relative rounded-2xl border overflow-hidden group cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5"
-                style={{ backgroundColor: cardBg, borderColor: tc, boxShadow: `0 0 15px ${tc}15` }}
+          <div ref={combosCategoriaRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+            {combosCategoriaItems.slice(0, 10).map((item) => (
+              <div key={item.id} className="w-[180px] md:w-[calc((100%-48px)/5)] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
+                style={{ backgroundColor: cardBg, borderColor: tc, boxShadow: `0 0 12px ${tc}15` }}
                 onClick={() => onViewProductDetails(item)}>
-                <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-white font-bold text-[9px]"
-                  style={{ backgroundColor: tc }}>
-                  <ShoppingCart size={10} /> COMBO
-                </div>
-                <div className="relative h-36 overflow-hidden">
-                  <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  {item.estimated_prep_time && (
-                    <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                      <Clock size={10} /> {item.estimated_prep_time}min
-                    </div>
-                  )}
-                  <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                    className="absolute bottom-2 right-2 w-9 h-9 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
-                    style={{ backgroundColor: tc, color: '#fff' }}>
-                    <Plus size={16} />
-                  </button>
-                </div>
-                <div className="p-3">
-                  <p className="text-[10px] uppercase tracking-wider font-medium mb-0.5" style={{ color: text2 }}>{formatCategories(item)}</p>
-                  <h4 className="text-sm font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    {renderStars(getProductAverageRating(item.id))}
-                    <span className="text-[10px] font-medium" style={{ color: text2 }}>{getProductAverageRating(item.id).toFixed(1)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-base" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[10px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
-                      {item.precio_anterior_usd && item.precio_anterior_usd > item.precio_usd && (
-                        <span className="line-through text-[11px]" style={{ color: `${text2}66` }}>${item.precio_anterior_usd.toFixed(2)}</span>
-                      )}
-                    </div>
-                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                      className="w-7 h-7 rounded-full flex items-center justify-center md:hidden"
-                      style={{ backgroundColor: surfaceContainer, color: tc }}>
-                      <Plus size={14} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Mobile: Horizontal Carousel */}
-          <div ref={combosCategoriaRef} className="flex md:hidden gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
-            {combosCategoriaItems.map((item) => (
-              <div key={item.id} className="w-[180px] rounded-xl border overflow-hidden shrink-0 cursor-pointer group transition-all hover:-translate-y-0.5"
-                style={{ backgroundColor: cardBg, borderColor: cardBorder }}
-                onClick={() => onViewProductDetails(item)}>
-                <div className="relative h-[130px] overflow-hidden" style={{ backgroundColor: cardBg }}>
+                <div className="relative h-[130px] md:h-[180px] overflow-hidden" style={{ backgroundColor: cardBg }}>
                   <img src={safeImg(item.imagen_urls)} alt={item.nombre} className="w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-400" />
                   <span className="absolute top-1.5 left-1.5 text-[7px] font-bold text-white px-1 py-px rounded"
                     style={{ backgroundColor: tc }}>
                     COMBO
                   </span>
+                  {item.estimated_prep_time && (
+                    <div className="absolute bottom-1.5 left-1.5 bg-black/50 backdrop-blur-sm text-white text-[9px] font-medium px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                      <Clock size={9} /> {item.estimated_prep_time}min
+                    </div>
+                  )}
                   <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                     className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center shadow hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
                     style={{ backgroundColor: tc, color: '#fff' }}>
@@ -885,9 +758,9 @@ export const Home: React.FC<HomeProps> = ({
                   <p className="text-[9px] uppercase tracking-wider mb-0.5 line-clamp-2" style={{ color: text2 }}>{formatCategories(item)}</p>
                   <h4 className="text-xs font-bold line-clamp-2 mb-1" style={{ color: text1 }}>{item.nombre}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}{vesRate && <span className="text-[9px] font-medium block" style={{ color: text2 }}>{formatVes(item.precio_usd, vesRate)} Bs</span>}</span>
+                    <span className="font-bold text-sm" style={{ color: tc }}>${item.precio_usd.toFixed(2)}</span>
                     <button onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                      className="w-6 h-6 rounded-full flex items-center justify-center md:hidden"
+                      className="w-6 h-6 rounded-full flex items-center justify-center"
                       style={{ backgroundColor: surfaceContainer, color: tc }}>
                       <Plus size={12} />
                     </button>
@@ -899,83 +772,7 @@ export const Home: React.FC<HomeProps> = ({
         </section>
       )}
 
-      {/* ═══ 2. COMBOS EXPLOSIVOS ═══ */}
-      {activeCombos.length > 0 && (
-        <section className="py-4 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-bold" style={{ color: text1 }}>Combos Explosivos</h3>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setTab('catalog')} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
-                Ver más <ChevronRight size={14} />
-              </button>
-              <button onClick={() => scroll(comboRef, 'left')} className="w-8 h-8 rounded-full border flex items-center justify-center" style={{ borderColor: cardBorder, color: text1 }}>
-                <ChevronLeft size={16} />
-              </button>
-              <button onClick={() => scroll(comboRef, 'right')} className="w-8 h-8 rounded-full flex items-center justify-center text-white shadow" style={{ backgroundColor: tc }}>
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </div>
 
-          {/* Desktop: Grid */}
-          <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-4">
-            {activeCombos.map((combo) => {
-              const prods = (combo.product_ids || []).map(id => activeItems.find(p => p.id === id)).filter(Boolean) as FoodItem[];
-              const img = combo.imagen_url || prods[0]?.imagen_urls?.[0] || '';
-              return (
-                <div key={combo.id} className="flex rounded-2xl border overflow-hidden h-36 transition-all hover:-translate-y-1 group cursor-pointer"
-                  style={{ backgroundColor: cardBg, borderColor: cardBorder }}>
-                  <div className="w-1/3 relative overflow-hidden">
-                    {img ? <img src={img} alt={combo.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                      : <div className="w-full h-full flex items-center justify-center text-2xl" style={{ backgroundColor: cardBg }}>🎁</div>}
-                  </div>
-                  <div className="w-2/3 p-4 flex flex-col justify-center">
-                    <h5 className="text-sm font-bold mb-1 line-clamp-2" style={{ color: text1 }}>{combo.nombre}</h5>
-                    <p className="text-[11px] mb-3 line-clamp-2" style={{ color: text2 }}>{combo.descripcion}</p>
-                    <div className="flex items-center justify-between mt-auto">
-                      <span className="font-bold text-base" style={{ color: tc }}>-{combo.discount_percent}%</span>
-                      <button onClick={(e) => { e.stopPropagation(); setTab('catalog'); }}
-                        className="w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:text-white"
-                        style={{ backgroundColor: surfaceContainer, color: tc }}
-                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = tc; e.currentTarget.style.color = '#fff'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = surfaceContainer; e.currentTarget.style.color = tc; }}>
-                        <ShoppingCart size={14} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Mobile: Horizontal Carousel */}
-          <div ref={comboRef} className="flex md:hidden gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
-            {activeCombos.map((combo) => {
-              const prods = (combo.product_ids || []).map(id => activeItems.find(p => p.id === id)).filter(Boolean) as FoodItem[];
-              const img = combo.imagen_url || prods[0]?.imagen_urls?.[0] || '';
-              return (
-                <div key={combo.id} className="flex w-[180px] rounded-xl border overflow-hidden h-[150px] shrink-0"
-                  style={{ backgroundColor: cardBg, borderColor: cardBorder }}>
-                  <div className="w-1/3">
-                    {img ? <img src={img} alt={combo.nombre} className="w-full h-full object-cover" />
-                      : <div className="w-full h-full flex items-center justify-center text-2xl" style={{ backgroundColor: cardBg }}>🎁</div>}
-                  </div>
-                  <div className="w-2/3 p-3 flex flex-col justify-center">
-                    <h5 className="text-sm font-bold mb-0.5 line-clamp-2" style={{ color: text1 }}>{combo.nombre}</h5>
-                    <p className="text-[10px] mb-2 line-clamp-2" style={{ color: text2 }}>{combo.descripcion}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm" style={{ color: tc }}>-{combo.discount_percent}%</span>
-                      <button className="w-7 h-7 rounded-full flex items-center justify-center" style={{ backgroundColor: surfaceContainer, color: tc }}>
-                        <ShoppingCart size={12} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
 
       {/* ═══ 5A. PANADERÍA ═══ */}
       {panaderiaItems.length > 0 && (
@@ -1920,7 +1717,7 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* ═══ 9. GANA Y ACUMULA PUNTOS ═══ */}
       <section className="py-6 px-4 md:px-8 max-w-[1440px] mx-auto w-full">
-        <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: '#c2aa97' }}>
+        <div className="rounded-2xl p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: '#212121' }}>
           <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full blur-3xl opacity-20" style={{ backgroundColor: tc }} />
           <div className="relative z-10">
             <div className="flex items-center gap-1.5 mb-2">
