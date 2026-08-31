@@ -652,6 +652,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         supabase.removeChannel(mainChannel);
         mainChannel = null;
       }
+      if (broadcastChan) {
+        supabase.removeChannel(broadcastChan);
+        broadcastChan = null;
+      }
       if (reconnectTimer) {
         clearTimeout(reconnectTimer);
         reconnectTimer = null;

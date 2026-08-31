@@ -148,7 +148,6 @@ export default function EmergencyOrderModal() {
   const [audioUnlocked, setAudioUnlocked] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-  const broadcastRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const broadcastCleanupRef = useRef<(() => void) | null>(null);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const retriesRef = useRef(0);
@@ -237,17 +236,6 @@ export default function EmergencyOrderModal() {
           reconnectTimerRef.current = setTimeout(() => connectChannel(), delay);
         }
       });
-
-    // Broadcast listener en canal separado
-    const broadcastChan = supabase.channel('marketo_broadcast_send')
-      .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
-        const order = payload.payload;
-        if (order && !dismissedIdsRef.current.has(order.id)) {
-          addOrdersBatch([order]);
-          playNewOrderBeep();
-        }
-      })
-      .subscribe();
 
     channelRef.current = channel;
 
