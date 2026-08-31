@@ -957,7 +957,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         window.dispatchEvent(new CustomEvent('order_status_changed', { detail: updatedOrder }));
         playNotificationSound('update', updatedOrder.status);
       })
-      .subscribe();
+      .subscribe((status: string) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.warn(`[Realtime] Broadcast canal desconectado (${status}), reconectando...`);
+          const delay = Math.min(BASE_DELAY * Math.pow(2, reconnectRetries), MAX_DELAY);
+          reconnectRetries += 1;
+          reconnectTimer = setTimeout(() => connectRealtime(), delay);
+        }
+      });
 
     } catch (e) {
       console.error('Realtime channels failed:', e);

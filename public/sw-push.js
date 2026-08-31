@@ -35,13 +35,20 @@ self.addEventListener('fetch', (event) => {
     if (url.pathname.startsWith('/api/')) return;
     if (event.request.destination === 'document') {
       event.respondWith(
-        caches.open('workbox-precache-v2').then((cache) => {
-          return cache.match('/index.html').then((cached) => {
-            if (cached) return cached;
-            return fetch(event.request, { redirect: 'follow' }).catch(() => {
-              return new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/html' } });
-            });
-          });
+        // 1. Fetch desde la red (Cloudflare _redirects sirve index.html para rutas SPA)
+        fetch(event.request, { redirect: 'follow' }).then((resp) => {
+          if (resp.ok) return resp;
+          // 2. Si el servidor retorna 404/5xx, servir index.html desde cache
+          return caches.open('workbox-precache-v2').then((cache) =>
+            cache.match('/index.html').then((cached) => cached || resp)
+          );
+        }).catch(() => {
+          // 3. Offline: servir index.html desde cache
+          return caches.open('workbox-precache-v2').then((cache) =>
+            cache.match('/index.html').then((cached) =>
+              cached || new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/html' } })
+            )
+          );
         })
       );
     }
