@@ -608,12 +608,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // ✅ FIX: Sincronizar suscripción push automáticamente cuando el usuario inicia sesión
   // Si el usuario ya tiene permisos de notificación granted, sincronizar su suscripción con la DB
+  const lastPushSyncRef = useRef(0);
   useEffect(() => {
     if (!currentUser) return;
     if (typeof window === 'undefined') return;
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
 
     const syncOnLogin = async () => {
+      // Cooldown: max 1 vez cada 30 segundos para evitar re-renders en cascada
+      const now = Date.now();
+      if (now - lastPushSyncRef.current < 30000) return;
+      lastPushSyncRef.current = now;
+
       try {
         const permission = Notification.permission;
         if (permission === 'granted') {
@@ -1401,7 +1407,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
           if (dbUser) {
             setUsers([{ ...dbUser, createdAt: dbUser.created_at, contrasena: 'managed' } as AppUser]);
-            setCurrentUser(prev => prev ? { ...prev, ...dbUser } : prev);
+            // Solo actualizar si los datos realmente cambiaron (evita re-renders en cascada)
+            setCurrentUser(prev => {
+              if (!prev) return prev;
+              if (prev.puntos_fidelidad === dbUser.puntos_fidelidad &&
+                  prev.puntos_historicos === dbUser.puntos_historicos &&
+                  prev.loyalty_points === dbUser.loyalty_points &&
+                  prev.loyalty_lifetime_points === dbUser.loyalty_lifetime_points &&
+                  prev.is_pwa_installed === dbUser.is_pwa_installed) {
+                return prev; // Sin cambios, mantener misma referencia
+              }
+              return { ...prev, ...dbUser };
+            });
           }
         } catch (e) { console.warn('[initData] user profile load failed:', e); }
       } else {
