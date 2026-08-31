@@ -2074,31 +2074,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ...updatePayload
     } : o));
 
-    const targetPhone = prevOrder?.cliente_telefono;
-    const clientName = prevOrder?.cliente_nombre || 'Cliente';
-    const isMesa = prevOrder?.tipo_entrega === 'mesa' || prevOrder?.tipo_pedido === 'mesa';
-    const mesaNum = prevOrder?.numero_mesa;
-
-    let statusMsg = `Tu pedido ${orderId} ahora se encuentra en estado: ${status}.`;
-    if (isMesa) {
-      if (status === 'En preparación') {
-        statusMsg = `🍳 ¡${clientName}! Tu pedido de Mesa ${mesaNum} está en preparación.`;
-      } else if (status === 'Listo') {
-        statusMsg = `✅ ¡${clientName}! Tu pedido de Mesa ${mesaNum} está listo. ¡Puedes pasar a recogerlo!`;
-      } else if (status === 'Entregado') {
-        statusMsg = `✅ Pedido de Mesa ${mesaNum} completado. ¡Gracias por preferirnos!`;
-      }
-    } else {
-      if (status === 'En preparación') {
-        statusMsg = `🥬 ¡Buenas noticias, ${clientName}! Tu pedido ${orderId} ya está en preparación.`;
-      } else if (status === 'En camino') {
-        statusMsg = `🛵 ¡Tu pedido ${orderId} va en camino!`;
-      } else if (status === 'Entregado') {
-        statusMsg = `✅ Pedido ${orderId} entregado con éxito. ¡Gracias por preferir a ${config.site_nombre || 'nuestra tienda'}!`;
-      }
-    }
-    if (estimatedTime) statusMsg += ` Tiempo estimado: ${estimatedTime}.`;
-
     const { error } = await supabase.from('orders')
       .update(updatePayload)
       .eq('id', orderId);

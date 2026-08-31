@@ -121,6 +121,7 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
   const [showCupones, setShowCupones] = useState(false);
   const [copiedCoupon, setCopiedCoupon] = useState<string | null>(null);
   const [localOrders, setLocalOrders] = useState<Order[]>([]);
+  const userPhone = currentUser?.telefono || '';
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectRetriesRef = useRef(0);
@@ -134,8 +135,6 @@ export default function ClientePanelPedidos(_props: ClientePanelPedidosProps) {
   useEffect(() => {
     setLocalOrders(orders);
   }, [orders]);
-
-  const userPhone = currentUser?.telefono || '';
 
   const activeOrders = useMemo(() => {
     return localOrders.filter(o => {
