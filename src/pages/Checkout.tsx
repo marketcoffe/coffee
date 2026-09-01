@@ -114,8 +114,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
     return availableMesas.length > 0 ? availableMesas[0].numero_mesa : 1;
   });
   const [orderTypeSelected, setOrderTypeSelected] = useState(false);
-  const [paymentReference, setPaymentReference] = useState('');
-  const [paymentBank, setPaymentBank] = useState('');
   const [mesaOrderConfirmed, setMesaOrderConfirmed] = useState(false);
   const [showTypeModal, setShowTypeModal] = useState(false);
   const [waitingForAdmin, setWaitingForAdmin] = useState<boolean>(() =>
@@ -579,6 +577,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const isFakeEmail = currentUser?.email?.includes('@guest.foodapp.local');
     if (orderType === 'mesa') {
       // Validación simplificada para mesa - solo nombre, el pago se maneja después
       if (!clientName.trim()) {
@@ -586,7 +585,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
         return;
       }
     } else {
-      if (!currentUser && !validateGuestContact()) return;
+      if ((!currentUser || isFakeEmail) && !validateGuestContact()) return;
       if (!paymentConfirmed) {
         setValidationError('Confirma el método de pago para continuar.');
         return;
@@ -599,7 +598,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
     // Auto-registro de invitado ANTES de crear el pedido para que
     // usuario_id/cliente_uid tengan el ID correcto desde el inicio
     let registeredUserId = currentUser?.id || null;
-    if (!currentUser && (clientEmail || cleanedPhone)) {
+    if (orderType !== 'mesa' && (!currentUser || isFakeEmail) && (clientEmail || cleanedPhone)) {
       try {
         const userId = await registerGuestUser({
           cliente_nombre: clientName || 'Cliente sin nombre',
@@ -766,18 +765,10 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
 
   const handleSendMesaPayment = async () => {
     if (!processedOrder) return;
-    if (mesaPaymentMethod === 'Pago Móvil' && !paymentReference.trim()) {
-      setValidationError('Ingresa la referencia de pago.');
-      return;
-    }
     setValidationError('');
     setIsProcessing(true);
 
     const updates: any = { metodo_pago: mesaPaymentMethod };
-    if (mesaPaymentMethod === 'Pago Móvil') {
-      updates.referencia_pago = paymentReference;
-      updates.banco_origen = 'Banesco (0134)';
-    }
 
     if (!processedOrder?.id) {
       setValidationError('Error: pedido no encontrado.');
@@ -925,26 +916,8 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
                       </div>
                     </div>
                     <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {displayOrder.total_bs?.toFixed(2)} Bs.</p>
-                    <div className="space-y-2 mt-2 pt-2 border-t border-[#e4beb1]/10">
-                      <div>
-                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Tu Banco Emisor *</label>
-                        <select value={paymentBank} onChange={(e) => setPaymentBank(e.target.value)} className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer">
-                          <option value="Banesco">Banesco (0134)</option>
-                          <option value="Mercantil">Mercantil (0102)</option>
-                          <option value="Venezuela">Banco de Venezuela (0102)</option>
-                          <option value="Provincial">Provincial (0108)</option>
-                          <option value="Bancaribe">Bancaribe (0114)</option>
-                          <option value="Exterior">Banco Exterior (0115)</option>
-                          <option value="Nacional">Nacional de Crédito (0191)</option>
-                          <option value="BOD">BOD (0128)</option>
-                          <option value="Plaza">Banco Plaza (0138)</option>
-                          <option value="Otros">Otros</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia de Pago *</label>
-                        <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
-                      </div>
+                    <div className="mt-2 pt-2 border-t border-[#e4beb1]/10 p-2 rounded-lg" style={{ backgroundColor: `${themeColor}10` }}>
+                      <p className="text-[10px] text-center font-bold" style={{ color: themeColor }}>Muestre el comprobante de pago en caja para validar su pago</p>
                     </div>
                   </div>
                 )}
@@ -982,7 +955,7 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
                 {isProcessing ? 'Procesando...' : 'Pagar en Caja'}
               </button>
             ) : (
-              <button onClick={handleSendMesaPayment} disabled={isProcessing || (mesaPaymentMethod === 'Pago Móvil' && !paymentReference.trim())} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : '#10b981' }}>
+              <button onClick={handleSendMesaPayment} disabled={isProcessing} className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`} style={{ backgroundColor: isProcessing ? '#9ca3af' : '#10b981' }}>
                 {isProcessing ? 'Procesando...' : 'Enviar Pago'}
               </button>
             )}
@@ -1728,7 +1701,7 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
 
           {currentStep === 3 && (
             <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="p-4">
-              {orderType !== 'mesa' && !currentUser && (
+              {orderType !== 'mesa' && (!currentUser || currentUser.email?.includes('@guest.foodapp.local')) && (
                 <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
                   <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#1a1c1d] mb-3">Tus Datos</h3>
                   <div className="space-y-3">
@@ -1754,7 +1727,7 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
                 </div>
               )}
 
-              {orderType !== 'mesa' && currentUser && (
+              {orderType !== 'mesa' && currentUser && !currentUser.email?.includes('@guest.foodapp.local') && (
                 <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 text-white rounded-full flex items-center justify-center font-bold text-xs" style={{ backgroundColor: themeColor }}>{currentUser.nombre[0]}</div>
@@ -1825,26 +1798,8 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
                         </div>
                       </div>
                       <p className="text-center font-black py-1 rounded" style={{ color: themeColor }}>Calcular: {totalBs.toFixed(2)} Bs.</p>
-                      <div className="space-y-2 mt-2 pt-2 border-t border-[#e4beb1]/10">
-                        <div>
-                          <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Tu Banco Emisor *</label>
-                          <select value={paymentBank} onChange={(e) => setPaymentBank(e.target.value)} className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer">
-                            <option value="Banesco">Banesco (0134)</option>
-                            <option value="Mercantil">Mercantil (0102)</option>
-                            <option value="Venezuela">Banco de Venezuela (0102)</option>
-                            <option value="Provincial">Provincial (0108)</option>
-                            <option value="Bancaribe">Bancaribe (0114)</option>
-                            <option value="Exterior">Banco Exterior (0115)</option>
-                            <option value="Nacional">Nacional de Crédito (0191)</option>
-                            <option value="BOD">BOD (0128)</option>
-                            <option value="Plaza">Banco Plaza (0138)</option>
-                            <option value="Otros">Otros</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia de Pago *</label>
-                          <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
-                        </div>
+                      <div className="mt-2 pt-2 border-t border-[#e4beb1]/10 p-2 rounded-lg" style={{ backgroundColor: `${themeColor}10` }}>
+                        <p className="text-[10px] text-center font-bold" style={{ color: themeColor }}>Por favor adjuntar el capture del pago al WhatsApp</p>
                       </div>
                     </div>
                   )}
@@ -2135,27 +2090,8 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
                         </div>
                       </div>
                        <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {(processedOrder as Order).total_bs?.toFixed(2)} Bs.</p>
-
-                      <div className="space-y-2 mt-3 pt-3 border-t border-[#e4beb1]/10">
-                        <div>
-                          <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Tu Banco Emisor *</label>
-                          <select value={paymentBank} onChange={(e) => setPaymentBank(e.target.value)} className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer">
-                            <option value="Banesco">Banesco (0134)</option>
-                            <option value="Mercantil">Mercantil (0102)</option>
-                            <option value="Venezuela">Banco de Venezuela (0102)</option>
-                            <option value="Provincial">Provincial (0108)</option>
-                            <option value="Bancaribe">Bancaribe (0114)</option>
-                            <option value="Exterior">Banco Exterior (0115)</option>
-                            <option value="Nacional">Nacional de Crédito (0191)</option>
-                            <option value="BOD">BOD (0128)</option>
-                            <option value="Plaza">Banco Plaza (0138)</option>
-                            <option value="Otros">Otros</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia de Pago *</label>
-                          <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
-                        </div>
+                      <div className="mt-2 pt-2 border-t border-[#e4beb1]/10 p-2 rounded-lg" style={{ backgroundColor: `${themeColor}10` }}>
+                        <p className="text-[10px] text-center font-bold" style={{ color: themeColor }}>Por favor adjuntar el capture del pago al WhatsApp</p>
                       </div>
                     </div>
                   )}
@@ -2165,20 +2101,11 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
 
             {/* Botón fijo - Confirmar pago */}
             <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e4beb1]/10 p-4 z-20">
-               {(processedOrder as Order).metodo_pago !== 'Efectivo' && (!paymentReference.trim() || ((processedOrder as Order).metodo_pago === 'Pago Móvil' && !paymentBank)) && (
-                <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded-xl text-xs font-semibold text-amber-700 text-center">
-                  Complete los datos de pago para confirmar
-                </div>
-              )}
               <button
                 onClick={async () => {
-                  if ((processedOrder as Order).metodo_pago !== 'Efectivo' && (!paymentReference.trim() || ((processedOrder as Order).metodo_pago === 'Pago Móvil' && !paymentBank))) return;
                   setPaymentConfirmedByAdmin(true);
                 }}
-                disabled={(processedOrder as Order).metodo_pago !== 'Efectivo' && (!paymentReference.trim() || ((processedOrder as Order).metodo_pago === 'Pago Móvil' && !paymentBank))}
-                className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer ${
-                  ((processedOrder as Order).metodo_pago !== 'Efectivo' && (!paymentReference.trim() || ((processedOrder as Order).metodo_pago === 'Pago Móvil' && !paymentBank))) ? 'opacity-50' : ''
-                }`}
+                className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer`}
                 style={{ backgroundColor: '#10b981' }}
               >
                 <CheckCircle size={16} />

@@ -2227,7 +2227,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // el pedido, para evitar que setCurrentUser dispare initData y desmonte el
   // componente durante el flujo de pago.
   const registerGuestUser = async (orderData: { cliente_nombre: string; cliente_telefono: string; cliente_email?: string }): Promise<string | null> => {
-    if (currentUser) return currentUser.id;
+    const isFakeEmail = currentUser?.email?.includes('@guest.foodapp.local');
+    if (currentUser && !isFakeEmail) return currentUser.id;
     if (!orderData.cliente_email && !orderData.cliente_telefono) return null;
 
     const cleanPhone = orderData.cliente_telefono.replace(/[\s\-()]/g, '');

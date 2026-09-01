@@ -116,7 +116,7 @@ const PromocionesSection: React.FC = () => {
           tipo: 'todos',
           imagen_url: promo.image_url || '',
           link_url: '/ofertas',
-        });
+        }).catch(err => console.warn('[Promos] Client-side push backup failed:', err));
       }
     } catch (err: any) {
       showToast('error', err.message || 'Error al enviar promocion');

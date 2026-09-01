@@ -186,7 +186,7 @@ const AdminPushManager: React.FC = () => {
         imagen_url: imageUrl || '',
         link_url: linkUrl || '/',
         priority: priority,
-      });
+      }).catch(err => console.warn('[PushManager] Client-side push backup failed:', err));
 
       setTitle('');
       setMessage('');
