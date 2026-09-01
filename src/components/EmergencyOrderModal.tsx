@@ -11,6 +11,7 @@ import { printMesaTicket } from '../utils/printMesaTicket';
 let audioCtx: AudioContext | null = null;
 let alertOscillator: OscillatorNode | null = null;
 let alertGain: GainNode | null = null;
+let alertLoopTimer: ReturnType<typeof setTimeout> | null = null;
 
 function getAudioContext(): AudioContext {
   if (!audioCtx) {
@@ -57,12 +58,23 @@ function startContinuousAlert(): void {
     alertGain.connect(ctx.destination);
 
     alertOscillator.start(ctx.currentTime);
-    (alertOscillator as any).loop = true;
+    // OscillatorNode no tiene .loop — programar repetición manual
+    alertLoopTimer = setTimeout(() => {
+      try {
+        if (alertOscillator && ctx.state === 'running') {
+          alertOscillator.start(ctx.currentTime);
+        }
+      } catch {}
+    }, 600);
   } catch {}
 }
 
 function stopContinuousAlert(): void {
   try {
+    if (alertLoopTimer) {
+      clearTimeout(alertLoopTimer);
+      alertLoopTimer = null;
+    }
     if (alertOscillator) {
       alertOscillator.stop();
       alertOscillator.disconnect();

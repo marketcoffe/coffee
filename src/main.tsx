@@ -9,30 +9,40 @@ import './index.css';
 // Capturan errores no atrapados en cualquier módulo/componente
 // ═══════════════════════════════════════════════════════════════
 
-// Errores de JavaScript no capturados
-let _reloading = false;
-window.addEventListener('error', (event) => {
-  const msg = event?.message || '';
-  const isCorrupted = 
-    msg.includes('NS_ERROR_CORRUPTED_CONTENT') || 
+// Reusable cleanup: clear all caches + unregister all SWs
+async function cleanCachesAndReload(reason: string) {
+  try {
+    if ('caches' in window) {
+      const names = await caches.keys();
+      await Promise.all(names.map((n) => caches.delete(n)));
+    }
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.unregister()));
+    }
+  } catch { /* ignore */ }
+  log.warn('Main', `Cleanup completado, recargando... (${reason})`);
+  window.location.reload();
+}
+
+function isCorruptedMessage(msg: string): boolean {
+  return (
+    msg.includes('NS_ERROR_CORRUPTED_CONTENT') ||
     msg.includes('error loading dynamically imported module') ||
     msg.includes('Failed to fetch dynamically imported module') ||
     msg.includes('Loading chunk') ||
-    msg.includes('Importing a module script failed');
-  
-  if (isCorrupted && !_reloading) {
+    msg.includes('Importing a module script failed')
+  );
+}
+
+// Errores de JavaScript no capturados (script execution errors)
+let _reloading = false;
+window.addEventListener('error', (event) => {
+  const msg = event?.message || '';
+
+  if (isCorruptedMessage(msg) && !_reloading) {
     _reloading = true;
-    log.warn('Main', 'Modulo dinamico corrupto detectado, limpiando cache y recargando...', { message: msg });
-    if ('caches' in window) {
-      caches.keys().then(names => Promise.all(names.map(n => caches.delete(n)))).catch(() => {});
-    }
-    // Unregister stale service workers so they don't serve old chunks
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then((regs) => {
-        regs.forEach((r) => r.unregister());
-      }).catch(() => {});
-    }
-    setTimeout(() => window.location.reload(), 500);
+    cleanCachesAndReload(msg);
     return;
   }
 
@@ -45,9 +55,17 @@ window.addEventListener('error', (event) => {
   });
 });
 
-// Promesas rechazadas no capturadas (incluye Supabase, fetch, etc.)
+// Promesas rechazadas no capturadas (incluye dynamic import() failures, Supabase, fetch, etc.)
 window.addEventListener('unhandledrejection', (event) => {
   const msg = event?.reason?.message || String(event?.reason || '');
+
+  // Dynamic import() rejections (chunk errors / corrupted modules)
+  if (isCorruptedMessage(msg) && !_reloading) {
+    _reloading = true;
+    event.preventDefault();
+    cleanCachesAndReload(msg);
+    return;
+  }
 
   // Suprimir errores conocidos de Supabase LockManager (race condition entre tabs)
   if (msg.includes('LockManager lock') && msg.includes('auth-token')) {

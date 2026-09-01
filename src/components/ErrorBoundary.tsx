@@ -13,6 +13,7 @@ interface State {
   hasError: boolean;
   error: Error | null;
   errorInfo: string | null;
+  isChunkError: boolean;
 }
 
 /**
@@ -28,11 +29,17 @@ interface State {
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null, errorInfo: null };
+    this.state = { hasError: false, error: null, errorInfo: null, isChunkError: false };
   }
 
   static getDerivedStateFromError(error: Error): Partial<State> {
-    return { hasError: true, error };
+    const msg = error?.message || '';
+    const isChunkError =
+      msg.includes('loading dynamically imported module') ||
+      msg.includes('Failed to fetch dynamically imported module') ||
+      msg.includes('NS_ERROR_CORRUPTED_CONTENT') ||
+      msg.includes('Importing a module script failed');
+    return { hasError: true, error, isChunkError };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
@@ -78,6 +85,14 @@ export class ErrorBoundary extends Component<Props, State> {
           >
             Reintentar
           </button>
+          {this.state.isChunkError && (
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-2 px-4 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-lg cursor-pointer transition-colors"
+            >
+              Recargar pagina
+            </button>
+          )}
         </div>
       );
     }

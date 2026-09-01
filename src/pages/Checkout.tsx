@@ -643,8 +643,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
       descuento_puntos_usd: effectivePointsDiscount > 0 ? effectivePointsDiscount : undefined,
       puntos_canjeados: effectivePointsDiscount > 0 ? pointsToRedeem : undefined,
       metodo_pago: orderType === 'mesa' ? mesaPaymentMethod : selectedPayment,
-      lat: orderType === 'mesa' ? config.coordenadas_tienda.lat : shippingLat,
-      lng: orderType === 'mesa' ? config.coordenadas_tienda.lng : shippingLng,
+      lat: orderType === 'mesa' ? config?.coordenadas_tienda?.lat : shippingLat,
+      lng: orderType === 'mesa' ? config?.coordenadas_tienda?.lng : shippingLng,
       direccion_envio: orderType === 'mesa' ? `Mesa #${mesaNumber}` : `${shippingZone} (Distancia: ${shippingDistance}km)`,
       distancia_km: orderType === 'mesa' ? 0 : shippingDistance,
       notas_admin: orderNotes,
@@ -777,6 +777,12 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
     if (mesaPaymentMethod === 'Pago Móvil') {
       updates.referencia_pago = paymentReference;
       updates.banco_origen = 'Banesco (0134)';
+    }
+
+    if (!processedOrder?.id) {
+      setValidationError('Error: pedido no encontrado.');
+      setIsProcessing(false);
+      return;
     }
 
     const { error } = await supabase.rpc('actualizar_pedido_cliente', {

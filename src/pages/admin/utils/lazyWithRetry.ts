@@ -47,6 +47,20 @@ export function lazyWithRetry<T extends ComponentType<any>>(
               errMsg.includes('NS_ERROR_CORRUPTED_CONTENT');
 
             if (remaining > 0 && (isChunkError || isCorrupted)) {
+              // NS_ERROR_CORRUPTED_CONTENT = archivo corrupto en servidor/CDN.
+              // Reintentar no ayuda — limpiar caches + desregistrar SW y rechazar
+              // para que LazyErrorBoundary muestre fallback con opción de recarga limpia.
+              if (isCorrupted) {
+                await clearRelevantCaches();
+                try {
+                  if ('serviceWorker' in navigator) {
+                    const regs = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(regs.map((r) => r.unregister()));
+                  }
+                } catch { /* ignore */ }
+                reject(error);
+                return;
+              }
               bustCounter++;
               // Clear caches so a fresh copy is fetched on next attempt
               await clearRelevantCaches();
@@ -54,8 +68,8 @@ export function lazyWithRetry<T extends ComponentType<any>>(
               setTimeout(() => attempt(remaining - 1), wait);
             } else {
               // All retries exhausted — reject so React's ErrorBoundary
-              // renders a fallback. The global handler in main.tsx will
-              // detect the chunk error and trigger a cache-clear + reload.
+              // renders a fallback with a clean-reload button.
+              await clearRelevantCaches();
               reject(error);
             }
           });

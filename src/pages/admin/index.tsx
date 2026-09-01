@@ -87,6 +87,24 @@ function LazyErrorBoundary({ children, sectionName }: { children: React.ReactNod
   const [hasError, setHasError] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  const isChunkError = error?.message?.includes('loading dynamically imported module') ||
+    error?.message?.includes('NS_ERROR_CORRUPTED_CONTENT') ||
+    error?.message?.includes('Importing a module script failed') || false;
+
+  const handleCleanReload = async () => {
+    try {
+      if ('caches' in window) {
+        const names = await caches.keys();
+        await Promise.all(names.map((n) => caches.delete(n)));
+      }
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+      }
+    } catch { /* ignore */ }
+    window.location.reload();
+  };
+
   if (hasError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[200px] p-6 rounded-xl border border-amber-200 bg-amber-50 text-center">
@@ -101,6 +119,14 @@ function LazyErrorBoundary({ children, sectionName }: { children: React.ReactNod
         >
           Reintentar
         </button>
+        {isChunkError && (
+          <button
+            onClick={handleCleanReload}
+            className="mt-2 px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg cursor-pointer"
+          >
+            Recargar pagina
+          </button>
+        )}
       </div>
     );
   }
