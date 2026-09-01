@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../store/AppContext';
 import { supabase } from '../../store/supabaseClient';
 import { CheckCircle, Copy, Check, X, Building2 } from 'lucide-react';
@@ -43,9 +43,6 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
   const mesaColor = '#e67e22';
 
   const [paymentMethod, setPaymentMethod] = useState<'Pago Móvil' | 'Efectivo' | 'Punto'>('Pago Móvil');
-  const [selectedBankId, setSelectedBankId] = useState<string>('');
-  const [paymentBank, setPaymentBank] = useState('Banesco');
-  const [paymentReference, setPaymentReference] = useState('');
   const [paymentPhone, setPaymentPhone] = useState(currentUser?.telefono || '');
   const [isProcessing, setIsProcessing] = useState(false);
   const [validationError, setValidationError] = useState('');
@@ -65,30 +62,20 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
         if (!error && data && data.length > 0) {
           console.log('[PantallaPago] Bank accounts from BD:', data.length, 'cuentas');
           setBankAccounts(data);
-          const principal = data.find((b: BankAccount) => b.es_principal) || data[0];
-          setSelectedBankId(principal.id);
-          setPaymentBank(principal.banco_nombre);
         } else {
           console.warn('[PantallaPago] No bank accounts in BD — using fallback');
-          // Fallback a datos hardcodeados si la BD no tiene datos
           setBankAccounts([FALLBACK_BANK]);
-          setSelectedBankId(FALLBACK_BANK.id);
-          setPaymentBank(FALLBACK_BANK.banco_nombre);
         }
       } catch (err) {
         console.error('[PantallaPago] Exception fetching bank accounts:', err);
         setBankAccounts([FALLBACK_BANK]);
-        setSelectedBankId(FALLBACK_BANK.id);
-        setPaymentBank(FALLBACK_BANK.banco_nombre);
       }
       setLoadingBanks(false);
     };
     fetchBankAccounts();
   }, []);
 
-  const selectedBank = useMemo(() => {
-    return bankAccounts.find(b => b.id === selectedBankId) || bankAccounts[0] || FALLBACK_BANK;
-  }, [bankAccounts, selectedBankId]);
+  const selectedBank = bankAccounts[0] || FALLBACK_BANK;
 
   const handleCopy = async (text: string, fieldId: string) => {
     try { await navigator.clipboard.writeText(text); } catch {
@@ -110,26 +97,15 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
     </button>
   );
 
-  const formatBankLabel = (bank: BankAccount) => {
-    const codeMatch = bank.numero_cuenta.match(/^(\d{4})/);
-    const code = codeMatch ? codeMatch[1] : '';
-    return code ? `${bank.banco_nombre} (${code})` : bank.banco_nombre;
-  };
-
   const handleSendPayment = async () => {
-    if (paymentMethod === 'Pago Móvil' && !paymentReference.trim()) {
-      setValidationError('Ingresa la referencia de pago.');
-      return;
-    }
     setValidationError('');
     setIsProcessing(true);
 
     try {
-      const bankLabel = formatBankLabel(selectedBank);
       const { error } = await supabase.rpc('reportar_pago_movil', {
         p_order_id: order.id,
-        p_banco_origen: bankLabel,
-        p_referencia: paymentReference,
+        p_banco_origen: selectedBank.banco_nombre,
+        p_referencia: '',
         p_telefono_emisor: paymentPhone || order.cliente_telefono,
         p_monto: order.total_usd
       });
@@ -240,7 +216,7 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[9px] font-bold uppercase flex items-center gap-1" style={{ color: mesaColor }}>
                           <Building2 size={10} />
-                          {formatBankLabel(selectedBank)}
+                          {selectedBank.banco_nombre}
                         </span>
                         {selectedBank.es_principal && (
                           <span className="text-[8px] px-1 py-0.5 rounded-full text-white font-bold" style={{ backgroundColor: mesaColor }}>Principal</span>
@@ -280,50 +256,9 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
                       </div>
                     </div>
 
-                    {/* Selector de cuenta bancaria si hay múltiples */}
-                    {bankAccounts.length > 1 && (
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[9px] text-[#8f7065] uppercase">Otra cuenta disponible</label>
-                        <div className="flex flex-wrap gap-1.5">
-                          {bankAccounts.map(bank => (
-                            <button
-                              key={bank.id}
-                              onClick={() => { setSelectedBankId(bank.id); setPaymentBank(bank.banco_nombre); }}
-                              className={`text-[9px] px-2 py-1 rounded-lg font-bold transition-all cursor-pointer border ${
-                                selectedBankId === bank.id
-                                  ? 'text-white border-transparent'
-                                  : 'bg-white text-[#5b4137] border-[#e4beb1]/20 hover:bg-[#eeeef0]'
-                              }`}
-                              style={selectedBankId === bank.id ? { backgroundColor: mesaColor } : {}}
-                            >
-                              {formatBankLabel(bank)}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
                     <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {order.total_bs?.toFixed(2)} Bs.</p>
-                    <div className="space-y-2 mt-2 pt-2 border border-[#e4beb1]/10 rounded-xl p-3">
-                      <div>
-                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Tu Banco Emisor *</label>
-                        <select value={paymentBank} onChange={(e) => setPaymentBank(e.target.value)} className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d] appearance-none cursor-pointer">
-                          <option value="Banesco">Banesco (0134)</option>
-                          <option value="Mercantil">Mercantil (0102)</option>
-                          <option value="Venezuela">Banco de Venezuela (0102)</option>
-                          <option value="Provincial">Provincial (0108)</option>
-                          <option value="Bancaribe">Bancaribe (0114)</option>
-                          <option value="Exterior">Banco Exterior (0115)</option>
-                          <option value="Nacional">Nacional de Crédito (0191)</option>
-                          <option value="BOD">BOD (0128)</option>
-                          <option value="Plaza">Banco Plaza (0138)</option>
-                          <option value="Otros">Otros</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-[9px] text-[#8f7065] uppercase block mb-1">Referencia de Pago *</label>
-                        <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Ej: 1234567890" className="w-full bg-white border border-[#e4beb1]/10 rounded-lg px-3 py-2 text-xs outline-none font-bold text-[#1a1c1d]" />
-                      </div>
+                    <div className="mt-2 pt-2 border-t border-[#e4beb1]/10 p-2 rounded-lg" style={{ backgroundColor: `${themeColor}10` }}>
+                      <p className="text-[10px] text-center font-bold" style={{ color: themeColor }}>Muestre el comprobante de pago en caja para validar su pago</p>
                     </div>
                   </>
                 )}
@@ -366,7 +301,7 @@ export const PantallaPagoMesa: React.FC<PantallaPagoMesaProps> = ({
             {isProcessing ? 'Procesando...' : 'Pagar en Caja'}
           </button>
         ) : (
-          <button onClick={handleSendPayment} disabled={isProcessing || (paymentMethod === 'Pago Móvil' && !paymentReference.trim())}
+          <button onClick={handleSendPayment} disabled={isProcessing}
             className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all active:scale-[0.98] cursor-pointer ${isProcessing ? 'opacity-50' : ''}`}
             style={{ backgroundColor: isProcessing ? '#9ca3af' : '#10b981' }}>
             {isProcessing ? 'Procesando...' : 'Enviar Pago'}
