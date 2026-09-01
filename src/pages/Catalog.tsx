@@ -60,7 +60,7 @@ export const Catalog: React.FC<CatalogProps> = ({
 
   return (
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: c.bg }}>
-      <SEOHead type="catalog" />
+      <SEOHead type="catalog" filters={{ category: selectedCategory }} />
 
       {/* Top Bar */}
       <div className="sticky top-0 z-10 px-4 py-3" style={{ backgroundColor: isDarkMode ? 'rgba(10,10,20,0.85)' : 'rgba(249,249,251,0.8)', backdropFilter: 'blur(20px)' }}>

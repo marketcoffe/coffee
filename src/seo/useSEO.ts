@@ -134,7 +134,7 @@ export function useSEOCategory(
     const siteUrl = config.site_url || SITE_URL;
     const siteName = config.site_nombre || SITE_NAME;
     const categorySlug = slugify(category);
-    const categoryUrl = `${siteUrl}/catalogo/${categorySlug}`;
+    const categoryUrl = `${siteUrl}/catalog/${categorySlug}`;
 
     // Título único por categoría
     const titleTemplate = TITLE_TEMPLATES.category[

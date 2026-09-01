@@ -87,7 +87,7 @@ export function useSEO(options: SEOOptions) {
             `Compra ${cat.toLowerCase()} fresca con delivery rápido en Valencia, El Trigal, Prebo, La Viña, Mañongo y alrededores. Pide online en ${siteName}.`;
           seoKeywords = `${cat.toLowerCase()} Valencia, ${cat.toLowerCase()} delivery, comprar ${cat.toLowerCase()}, ${siteName}, Valencia Carabobo`;
           canonicalUrl = options.categorySlug
-            ? `${SITE_URL}/catalogo/${options.categorySlug}`
+            ? `${SITE_URL}/catalog/${options.categorySlug}`
             : SITE_URL;
         }
         break;

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "include": ["/api/*"],
+  "exclude": [],
+  "rules": [
+    { "handlers": ["static"], "pattern": "/assets/.*" },
+    { "handlers": ["static"], "pattern": "/images/.*" },
+    { "handlers": ["static"], "pattern": "/fonts/.*" },
+    { "handlers": ["static"], "pattern": "/sounds.*" },
+    { "handlers": ["static"], "pattern": ".*\\..*" },
+    { "handlers": ["static"], "pattern": ".*" }
+  ]
+}

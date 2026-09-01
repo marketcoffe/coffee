@@ -62,7 +62,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       seoTitle = config.seo_catalog_title || `Comprar ${category || 'Menú Completo'} Online | ${siteName}`;
       seoDesc = config.seo_catalog_description || `Menú de ${category || 'todos nuestros productos'}. Panadería, hamburguesas, shawarmas, víveres y más con delivery en Valencia.`;
       seoKeywords = `${category.toLowerCase()}, delivery valencia, comprar online, ${siteName.toLowerCase()}`;
-      ogUrl = `${siteUrl}/catalogo/${slugify(category)}`;
+      ogUrl = `${siteUrl}/catalog/${slugify(category)}`;
     }
 
     document.title = `${seoTitle} | ${siteName}`;
@@ -250,7 +250,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       if (category) {
         breadcrumbItems.push({
           name: category,
-          url: `${siteUrl}/catalogo/${slugify(category)}`
+          url: `${siteUrl}/catalog/${slugify(category)}`
         });
       }
       breadcrumbItems.push({ name: product.nombre });
