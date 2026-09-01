@@ -204,16 +204,16 @@ async function encryptPayload(
   const salt = new Uint8Array(16);
   crypto.getRandomValues(salt);
 
-  // authInfo = "WebPush: info\0\0\0\1" || sender_public_key || subscription_public_key
+  // authInfo = "WebPush: info\0" || ua_public || as_public  (RFC 8291 §3.3)
   const authInfo = new Uint8Array([
     ...new TextEncoder().encode('WebPush: info'),
-    0x00, 0x00, 0x00, 0x01,
-    ...ephemeralPubRaw,
+    0x00,
     ...subscriptionP256dh,
+    ...ephemeralPubRaw,
   ]);
 
-  // Derive PRK via HKDF
-  const prk = await hkdf(ikm, salt, authInfo, 32);
+  // Derive PRK via HKDF (salt = subscription auth secret per RFC 8291 §3.3)
+  const prk = await hkdf(ikm, subscriptionAuth, authInfo, 32);
 
   // Derive encryption key (32 bytes, first 16 used as AES key)
   const keyInfo = new Uint8Array([

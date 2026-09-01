@@ -734,7 +734,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                   renotify: true,
                   vibrate: [200, 100, 200],
                   requireInteraction: true,
-                  data: { url: '/profile' }
+                  data: { url: `/pedido/${updated.id}` }
                 } as NotificationOptions);
               }).catch((err) => console.warn('[Push] showNotification CDC UPDATE failed:', err));
             }
@@ -753,7 +753,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 mensaje: `Tu pedido ${updated.id} ahora está: ${updated.status}${extras}`,
                 tipo: 'personal',
                 destinatario_telefono: updated.cliente_telefono,
-                link_url: '/profile'
+                link_url: `/pedido/${updated.id}`
               }).catch(err => console.warn('[Push] Error disparando push order update:', err));
             });
           }
@@ -932,7 +932,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 renotify: true,
                 vibrate: [200, 100, 200],
                 requireInteraction: true,
-                data: { url: '/profile' }
+                data: { url: `/pedido/${updatedOrder.id}` }
               } as NotificationOptions);
             }).catch((err) => console.warn('[Push] showNotification order_status broadcast failed:', err));
           }
@@ -946,7 +946,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               mensaje: `Tu pedido ${updatedOrder.id} ahora está: ${updatedOrder.status}${tiempo ? `\nTiempo estimado: ${tiempo}` : ''}`,
               tipo: 'personal',
               destinatario_telefono: updatedOrder.cliente_telefono,
-              link_url: '/profile'
+              link_url: `/pedido/${updatedOrder.id}`
             }).catch(err => console.warn('[Push] Error disparando push order status:', err));
           });
         }
@@ -1014,7 +1014,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                   icon: '/icon.png', badge: '/icon.png',
                   tag: `order-update-${updated.id}`, renotify: true,
                   vibrate: [200, 100, 200], requireInteraction: true,
-                  data: { url: '/profile' }
+                  data: { url: `/pedido/${updated.id}` }
                 } as NotificationOptions);
               }).catch(() => {});
             }
@@ -1153,7 +1153,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                     icon: '/icon.png', badge: '/icon.png',
                     tag: `order-update-${updatedOrder.id}`, renotify: true,
                     vibrate: [200, 100, 200], requireInteraction: true,
-                    data: { url: '/profile' }
+                data: { url: `/pedido/${updatedOrder.id}` }
                   } as NotificationOptions);
                 }).catch((err) => console.warn('[Push] showNotification order_status broadcast failed:', err));
               }
@@ -1166,7 +1166,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                   mensaje: `Tu pedido ${updatedOrder.id} ahora está: ${updatedOrder.status}${tiempo ? `\nTiempo estimado: ${tiempo}` : ''}`,
                   tipo: 'personal',
                   destinatario_telefono: updatedOrder.cliente_telefono,
-                  link_url: '/profile'
+                  link_url: `/pedido/${updatedOrder.id}`
                 }).catch(err => console.warn('[Push] Error disparando push order status:', err));
               });
             }

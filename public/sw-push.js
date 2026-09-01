@@ -63,6 +63,7 @@ self.addEventListener('fetch', (event) => {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const DEEP_LINK_MAP = {
+  '/order/':   { spa_route: '/profile', action: 'OPEN_ORDER_TRACKER',  extractId: true },
   '/pedido/':  { spa_route: '/profile', action: 'OPEN_ORDER_TRACKER',  extractId: true },
   '/oferta':   { spa_route: '/catalog', action: 'FILTER_OFFERS' },
   '/catalog':  { spa_route: '/catalog', action: 'NAVIGATE' },
@@ -82,7 +83,8 @@ function resolveDeepLink(url) {
     if (url.startsWith(prefix)) {
       const result = { ...mapping };
       if (mapping.extractId) {
-        result.order_id = url.replace('/pedido/', '').split('?')[0].split('#')[0];
+        const segments = url.split('/').filter(Boolean);
+        result.order_id = (segments[segments.length - 1] || '').split('?')[0].split('#')[0];
       }
       return result;
     }
@@ -237,13 +239,13 @@ self.addEventListener('notificationclick', (event) => {
           if ('focus' in client && client.url.includes(self.location.origin)) {
             console.log('[SW Click] Enviando deep link a cliente:', client.url);
             // Enviar deep link al SPA para que navegue al modal/vista correcta
+            // NOTA: No usar client.navigate() — el SPA maneja routing internamente via setTab()
             client.postMessage({
               type: 'NOTIFICATION_CLICKED',
               deepLink,
               targetUrl,
               notificationId: notifId
             });
-            client.navigate(deepLink.spa_route);
             return client.focus();
           }
         }
