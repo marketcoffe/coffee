@@ -3,8 +3,8 @@ import { supabase } from '../store/supabaseClient';
 /**
  * Trigger push notifications via the Cloudflare webhook.
  * Called after a notification is inserted into the notifications table.
- * Tries get_push_config() RPC first (admin/server-side secret),
- * falls back to VITE_PUSH_WEBHOOK_URL / VITE_PUSH_WEBHOOK_SECRET for regular users/mobile.
+ * Tries get_push_config() RPC first (admin/server-side secret).
+ * Falls back to VITE_PUSH_WEBHOOK_URL for the URL only; secret stays server-side.
  */
 export async function triggerBroadcastPush(params: {
   id: string;
@@ -31,12 +31,9 @@ export async function triggerBroadcastPush(params: {
     console.warn('[Push] get_push_config RPC exception, falling back to env:', e);
   }
 
-  // 2. Fallback to Vite env variables for client-side / mobile / ITP scenarios
+  // 2. Fallback URL from Vite env (only the URL, never the secret)
   if (!webhookUrl) {
     webhookUrl = (import.meta.env.VITE_PUSH_WEBHOOK_URL || '').trim();
-  }
-  if (!webhookSecret) {
-    webhookSecret = (import.meta.env.VITE_PUSH_WEBHOOK_SECRET || '').trim();
   }
 
   if (!webhookUrl || !webhookSecret) {

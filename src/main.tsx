@@ -104,6 +104,30 @@ if ('serviceWorker' in navigator) {
         log.info('SW', `Registrado correctamente: ${reg.scope}`);
         setInterval(() => reg.update(), 60 * 60 * 1000);
 
+        // Renovación periódica de suscripción push cada 6 horas
+        setInterval(async () => {
+          try {
+            if (Notification.permission !== 'granted') return;
+            const existingSub = await reg.pushManager.getSubscription();
+            if (!existingSub) return;
+            // Re-registrar existente para mantenerlast_used_at actualizado
+            const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+            if (!vapidPublicKey) return;
+            const anonymousId = localStorage.getItem('trv_anonymous_id') || crypto.randomUUID();
+            localStorage.setItem('trv_anonymous_id', anonymousId);
+            await fetch('/api/register-subscription', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                subscription: existingSub.toJSON(),
+                anonymous_id: anonymousId,
+                platform: /iPhone|iPad|iPod/.test(navigator.userAgent) ? 'ios' : /Android/.test(navigator.userAgent) ? 'android' : 'desktop',
+                user_agent: navigator.userAgent
+              })
+            });
+          } catch (_) { /* silent */ }
+        }, 6 * 60 * 60 * 1000);
+
         const sendVapidKey = () => {
           const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
           if (!vapidPublicKey) return;

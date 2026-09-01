@@ -222,8 +222,10 @@ function AppContent() {
   const isAdminUrl = pathname.startsWith('/admin');
   const isHome = pathname === '/' || pathname === '/coffe' || pathname === '';
   const isCatalogUrl = pathname === '/catalog';
-  const is404Url = !isHome && !isAdminUrl && !isCatalogUrl;
-  const [tab, setTab] = useState<'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout'>((isAdminAuthenticated || isAdminUrl) ? 'admin' : isCatalogUrl ? 'catalog' : 'home');
+  const isProfileUrl = pathname === '/profile';
+  const isMesaUrl = pathname === '/mesa';
+  const is404Url = !isHome && !isAdminUrl && !isCatalogUrl && !isProfileUrl && !isMesaUrl;
+  const [tab, setTab] = useState<'home' | 'catalog' | 'cart' | 'admin' | 'profile' | 'checkout' | 'mesa_checkout'>((isAdminAuthenticated || isAdminUrl) ? 'admin' : isCatalogUrl ? 'catalog' : isProfileUrl ? 'profile' : isMesaUrl ? 'mesa_checkout' : 'home');
 
   // Admin: body background blanco para evitar espacio marrón al hacer scroll
   useEffect(() => {

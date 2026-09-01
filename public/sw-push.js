@@ -288,16 +288,27 @@ self.addEventListener('pushsubscriptionchange', (event) => {
   const subscribeOptions = {
     userVisibleOnly: true,
   };
-  if (vapidPublicKey) {
-    try {
-      subscribeOptions.applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
-    } catch (e) {
-      console.error('[SW] VAPID key invalida para pushsubscriptionchange:', e);
+
+  const buildOptions = (key) => {
+    if (key) {
+      try {
+        subscribeOptions.applicationServerKey = urlBase64ToUint8Array(key);
+      } catch (e) {
+        console.error('[SW] VAPID key invalida para pushsubscriptionchange:', e);
+      }
     }
-  }
+  };
+
+  // Si la key en memoria está vacía, intentar cargar desde IndexedDB
+  const keyPromise = vapidPublicKey
+    ? Promise.resolve(vapidPublicKey)
+    : loadVapidKey();
 
   event.waitUntil(
-    self.registration.pushManager.subscribe(subscribeOptions)
+    keyPromise.then((key) => {
+      buildOptions(key);
+      return self.registration.pushManager.subscribe(subscribeOptions);
+    })
       .then((newSubscription) => {
         console.log('[SW] Nueva suscripción obtenida:', newSubscription.endpoint.substring(0, 50));
         // Enviar la nueva suscripción al backend
@@ -352,13 +363,59 @@ function urlBase64ToUint8Array(base64String) {
   return Uint8Array.from(raw, (c) => c.charCodeAt(0));
 }
 
-// ─── VAPID key para pushsubscriptionchange ───
+// ─── VAPID key para pushsubscriptionchange (persistida en IndexedDB) ───
 let vapidPublicKey = '';
+
+const VAPID_DB_NAME = 'marketcoffee-vapid';
+const VAPID_STORE = 'keys';
+const VAPID_KEY_ID = 'public';
+
+function openVapidDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(VAPID_DB_NAME, 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(VAPID_STORE)) {
+        db.createObjectStore(VAPID_STORE, { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function saveVapidKey(key) {
+  return openVapidDB().then((db) =>
+    new Promise((resolve, reject) => {
+      const tx = db.transaction(VAPID_STORE, 'readwrite');
+      tx.objectStore(VAPID_STORE).put({ id: VAPID_KEY_ID, key });
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    })
+  ).catch(() => {});
+}
+
+function loadVapidKey() {
+  return openVapidDB().then((db) =>
+    new Promise((resolve) => {
+      const tx = db.transaction(VAPID_STORE, 'readonly');
+      const req = tx.objectStore(VAPID_STORE).get(VAPID_KEY_ID);
+      req.onsuccess = () => resolve(req.result?.key || '');
+      req.onerror = () => resolve('');
+    })
+  ).catch(() => '');
+}
+
+// Cargar VAPID key persistida al iniciar el SW
+loadVapidKey().then((key) => {
+  if (key && !vapidPublicKey) vapidPublicKey = key;
+});
 
 // ─── Message handler ───
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'SET_VAPID_PUBLIC_KEY') {
     vapidPublicKey = event.data.vapidPublicKey || '';
+    if (vapidPublicKey) saveVapidKey(vapidPublicKey);
   }
 
   if (event.data?.type === 'SET_ANONYMOUS_ID') {

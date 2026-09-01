@@ -3,7 +3,6 @@ import { supabase } from '../../../../store/supabaseClient';
 import { useApp } from '../../../../store/AppContext';
 import { uploadImage } from '../../../../store/storageService';
 import { useToast } from '../../../../components/Toast';
-import { triggerBroadcastPush } from '../../../../utils/pushTrigger';
 import {
   Send, Bell, Users, Smartphone, Target, BarChart3,
   Upload, Check, ChevronDown, Eye, MousePointerClick,
@@ -175,17 +174,6 @@ const AdminPushManager: React.FC = () => {
       console.log('[PushManager] Notificación enviada exitosamente');
       showToast('success', 'Notificacion enviada correctamente');
 
-      // Trigger push via webhook (sin pg_net)
-      const pushId = 'push-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
-      triggerBroadcastPush({
-        id: pushId,
-        titulo: title.trim(),
-        mensaje: message.trim(),
-        tipo: audience === 'all' ? 'todos' : 'personal',
-        destinatario_telefono: audience === 'phone' ? targetPhone.trim() : '',
-        imagen_url: imageUrl || '',
-        link_url: linkUrl || '/',
-      });
       setTitle('');
       setMessage('');
       setImageUrl('');

@@ -509,7 +509,7 @@ export const onRequestPost: any = async (context: any) => {
 
     // 8. Send to each subscription in parallel
     const pushOptions = {
-      TTL: isHighPriority ? 0 : 86400,
+      TTL: isHighPriority ? 3600 : 86400,
       urgency: isHighPriority ? 'high' : 'normal',
       topic: 'marketcoffee-' + notifTipo,
     };
