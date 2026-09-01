@@ -22,6 +22,7 @@ import { ProductModal } from './components/ProductModal';
 import { SplashScreen } from './components/SplashScreen';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { log } from './utils/logger';
+import { generateCategorySlug } from './utils/slug';
 
 import { ToastProvider, useToast } from './components/Toast';
 
@@ -221,7 +222,7 @@ function AppContent() {
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
   const isAdminUrl = pathname.startsWith('/admin');
   const isHome = pathname === '/' || pathname === '/coffe' || pathname === '';
-  const isCatalogUrl = pathname === '/catalog';
+  const isCatalogUrl = pathname === '/catalog' || pathname.startsWith('/catalog/');
   const isProfileUrl = pathname === '/profile';
   const isMesaUrl = pathname === '/mesa';
   const is404Url = !isHome && !isAdminUrl && !isCatalogUrl && !isProfileUrl && !isMesaUrl;
@@ -254,6 +255,15 @@ function AppContent() {
   const [is404, setIs404] = useState(is404Url);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Parse category slug from URL on mount (e.g. /catalog/comida-rapida → "Comida Rapida")
+  useEffect(() => {
+    if (!isCatalogUrl || !config.categories?.length) return;
+    const slug = pathname.replace('/catalog/', '').replace('/catalog', '').replace(/\/+$/, '');
+    if (!slug) return;
+    const match = config.categories.find(cat => generateCategorySlug(cat) === slug);
+    if (match) setSelectedCategory(match);
+  }, [pathname, isCatalogUrl, config.categories]);
 
   // Custom Overlays & Modals
   const [selectedProductDetails, setSelectedProductDetails] = useState<FoodItem | null>(null);
@@ -338,13 +348,13 @@ function AppContent() {
     else if (tab === 'cart') targetPath = '/cart';
     else if (tab === 'checkout') targetPath = '/checkout';
     else if (tab === 'profile') targetPath = '/profile';
-    else if (tab === 'catalog') targetPath = '/catalog';
+    else if (tab === 'catalog') targetPath = selectedCategory ? `/catalog/${generateCategorySlug(selectedCategory)}` : '/catalog';
     else if (tab === 'mesa_checkout') targetPath = '/mesa';
     else targetPath = '/';
     if (currentPath !== targetPath) {
       window.history.pushState({ tab }, '', targetPath);
     }
-  }, [tab]);
+  }, [tab, selectedCategory]);
 
   // Handle browser back/forward
   useEffect(() => {
@@ -364,8 +374,16 @@ function AppContent() {
         setTab('checkout');
       } else if (path === '/profile') {
         setTab('profile');
-      } else if (path === '/catalog') {
+      } else if (path === '/catalog' || path.startsWith('/catalog/')) {
         setTab('catalog');
+        const slug = path.replace('/catalog/', '').replace('/catalog', '').replace(/\/+$/, '');
+        if (slug && config.categories?.length) {
+          const match = config.categories.find(cat => generateCategorySlug(cat) === slug);
+          if (match) setSelectedCategory(match);
+          else setSelectedCategory('');
+        } else {
+          setSelectedCategory('');
+        }
       } else if (path === '/mesa') {
         setTab('mesa_checkout');
       } else {
