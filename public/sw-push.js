@@ -5,12 +5,6 @@
 
 // ─── Lifecycle ───
 self.addEventListener('install', (event) => {
-  // Pre-cache SPA shell para que siempre haya fallback offline/404
-  event.waitUntil(
-    caches.open('workbox-precache-v2').then((cache) =>
-      cache.addAll(['/index.html']).catch(() => {})
-    )
-  );
   self.skipWaiting();
 });
 
@@ -42,30 +36,18 @@ self.addEventListener('fetch', (event) => {
     if (url.pathname.startsWith('/api/')) return;
     if (event.request.destination === 'document') {
       event.respondWith(
-        caches.open('workbox-precache-v2').then((cache) =>
-          cache.match('/index.html').then((cached) => {
-            // Si hay cache, servirlo inmediatamente y actualizar en background
-            const networkFetch = fetch(event.request, { redirect: 'follow' });
-            if (cached) {
-              networkFetch.then((resp) => {
-                if (resp.ok) cache.put('/index.html', resp);
-              }).catch(() => {});
-              return cached;
-            }
-            // Sin cache: fetch de red; si falla, servir index.html genérico
-            return networkFetch.then((resp) => {
-              if (resp.ok) {
-                cache.put('/index.html', resp.clone());
-                return resp;
-              }
-              return cache.match('/index.html').then((fallback) =>
-                fallback || new Response('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Market Coffee Sweet</title></head><body><script>location.reload()</script></body></html>', {
-                  status: 200, headers: { 'Content-Type': 'text/html' }
-                })
-              );
-            }).catch(() => cache.match('/index.html'));
-          })
-        )
+        fetch(event.request, { redirect: 'follow' }).then((resp) => {
+          if (resp.ok) return resp;
+          return caches.open('workbox-precache-v2').then((cache) =>
+            cache.match('/index.html').then((cached) => cached || resp)
+          );
+        }).catch(() => {
+          return caches.open('workbox-precache-v2').then((cache) =>
+            cache.match('/index.html').then((cached) =>
+              cached || new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/html' } })
+            )
+          );
+        })
       );
     }
   }

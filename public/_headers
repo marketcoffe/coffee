@@ -1,3 +1,68 @@
+# Security Headers + Core Web Vitals Optimization
+# Market Coffee Sweet — Cloudflare Pages
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.cloudflare.com https://ve.dolarapi.com https://pydolarve.org; media-src 'self' data: blob: https://assets.mixkit.co; frame-src 'self' https://www.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https:;
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-XSS-Protection: 1; mode=block
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: cross-origin
+
+# API endpoints - additional headers
+/api/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization
+  Access-Control-Max-Age: 86400
+
+# Static assets - immutable caching (hashed filenames)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/images/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images from Supabase storage
+*.supabase.co/storage/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+# HTML - never cache (always fresh for SPA)
 /index.html
   Cache-Control: no-cache, no-store, must-revalidate
-  Pragma: no-cache
+
+# Service Worker - never cache
+/sw-push.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Service-Worker-Allowed: /
+
+# Manifest - short cache
+/manifest.json
+  Cache-Control: public, max-age=86400
+
+# SEO files - short cache
+/robots.txt
+  Cache-Control: public, max-age=3600
+
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+
+# Favicon - medium cache
+/favicon.ico
+  Cache-Control: public, max-age=604800
+
+/favicon.png
+  Cache-Control: public, max-age=604800
+
+/icon.png
+  Cache-Control: public, max-age=604800
+
+# Logo - medium cache
+/logo.png
+  Cache-Control: public, max-age=604800
