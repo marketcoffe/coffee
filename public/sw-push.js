@@ -109,18 +109,22 @@ function pruneDedupCache() {
 }
 
 self.addEventListener('push', (event) => {
-  console.log('[SW Push] Evento push recibido');
+  const ts = new Date().toISOString();
+  console.log(`[SW Push] === EVENTO PUSH RECIBIDO @ ${ts} ===`);
+  console.log('[SW Push] event.data exists:', !!event.data, 'event.data type:', event.data?.constructor?.name);
   if (!event.data) {
-    console.warn('[SW Push] Evento push sin payload');
+    console.warn('[SW Push] Evento push sin payload — abortando');
     return;
   }
 
+  // PushMessageData can only be read ONCE — try json() first, text() only as fallback
   let payload;
   try {
     payload = event.data.json();
-    console.log('[SW Push] Payload parseado:', JSON.stringify(payload).substring(0, 300));
+    console.log('[SW Push] Payload parseado OK:', JSON.stringify(payload).substring(0, 300));
   } catch (e) {
-    console.error('[SW Push] Payload JSON inválido:', e, 'Raw data:', event.data.text());
+    console.error('[SW Push] ❌ Payload JSON inválido:', e.message);
+    // Can't call event.data.text() here — stream already consumed by failed json()
     return;
   }
 
@@ -142,7 +146,7 @@ self.addEventListener('push', (event) => {
   if (recentlyShown.has(tag)) {
     const elapsed = Date.now() - recentlyShown.get(tag);
     if (elapsed < DEDUP_TTL_MS) {
-      console.log('[SW Push] Deduplicada:', tag);
+      console.log('[SW Push] ⚠️ Deduplicada (tag:', tag, ', elapsed:', elapsed, 'ms) — NO se muestra');
       return;
     }
   }
@@ -168,20 +172,20 @@ self.addEventListener('push', (event) => {
     ]
   };
 
-  console.log('[SW Push] Mostrando notificación nativa:', title, 'priority:', priority, 'requireInteraction:', options.requireInteraction);
+  console.log('[SW Push] Opciones de notificación:', JSON.stringify({ title, body: body.substring(0, 50), icon, urlToOpen, priority, requireInteraction: options.requireInteraction }));
 
   event.waitUntil(
-    // SIEMPRE mostrar notificación nativa (independiente de si la app está abierta)
     self.registration.showNotification(title, options)
       .then(() => {
-        console.log('[SW Push] showNotification OK:', title);
+        const ts2 = new Date().toISOString();
+        console.log(`[SW Push] ✅ showNotification RESUELTA @ ${ts2} — notificación mostrada: "${title}"`);
 
-        // Si la app está abierta, enviar also toast + sonido al SPA
         return self.clients.matchAll({ type: 'window', includeUncontrolled: true })
           .then((clients) => {
+            console.log('[SW Push] Clientes activos:', clients.length, 'visibles:', clients.filter(c => c.visibilityState === 'visible').length);
             const hasOpenClient = clients.some(c => c.visibilityState === 'visible');
             if (hasOpenClient) {
-              console.log('[SW Push] App en foreground — toast SPA adicional');
+              console.log('[SW Push] App en foreground — enviando toast + sonido al SPA');
               clients.forEach((client) => {
                 client.postMessage({ type: 'PLAY_NOTIFICATION_SOUND', soundUrl });
                 client.postMessage({
@@ -190,10 +194,12 @@ self.addEventListener('push', (event) => {
                   priority, soundUrl,
                 });
               });
+            } else {
+              console.log('[SW Push] App en background o cerrada — solo notificación nativa del SO');
             }
           });
       })
-      .catch((err) => console.error('[SW Push] Error showNotification:', err))
+      .catch((err) => console.error('[SW Push] ❌ Error en showNotification:', err?.message || err, err?.stack))
   );
 });
 
