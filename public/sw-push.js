@@ -5,6 +5,11 @@
 
 // ─── Lifecycle ───
 self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open('workbox-precache-v2').then((cache) =>
+      cache.addAll(['/index.html']).catch(() => {})
+    )
+  );
   self.skipWaiting();
 });
 
