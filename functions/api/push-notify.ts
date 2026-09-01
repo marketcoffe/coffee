@@ -204,16 +204,16 @@ async function encryptPayload(
   const salt = new Uint8Array(16);
   crypto.getRandomValues(salt);
 
-  // authInfo = "WebPush: info\0" || ua_public || as_public  (RFC 8291 §3.3)
+  // authInfo = "WebPush: info\0\0\0\1" || sender_public_key || subscription_public_key
   const authInfo = new Uint8Array([
     ...new TextEncoder().encode('WebPush: info'),
-    0x00,
-    ...subscriptionP256dh,
+    0x00, 0x00, 0x00, 0x01,
     ...ephemeralPubRaw,
+    ...subscriptionP256dh,
   ]);
 
-  // Derive PRK via HKDF (salt = subscription auth secret per RFC 8291 §3.3)
-  const prk = await hkdf(ikm, subscriptionAuth, authInfo, 32);
+  // Derive PRK via HKDF
+  const prk = await hkdf(ikm, salt, authInfo, 32);
 
   // Derive encryption key (32 bytes, first 16 used as AES key)
   const keyInfo = new Uint8Array([
@@ -488,7 +488,7 @@ export const onRequestPost: any = async (context: any) => {
     // 7. Build payload
     const notifId = record.id || ('notif-' + crypto.randomUUID().slice(0, 12));
     const notifTipo = record.tipo || 'todos';
-    const isHighPriority = notifTipo === 'personal' || notifTipo === 'admin' || notifTipo === 'request';
+    const isHighPriority = record.priority === 'high' || notifTipo === 'personal' || notifTipo === 'admin' || notifTipo === 'request';
 
     const payloadForSW = {
       title: titulo,

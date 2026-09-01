@@ -3,6 +3,7 @@ import { supabase } from '../../../../store/supabaseClient';
 import { useApp } from '../../../../store/AppContext';
 import { uploadImage } from '../../../../store/storageService';
 import { useToast } from '../../../../components/Toast';
+import { triggerBroadcastPush } from '../../../../utils/pushTrigger';
 import {
   Send, Bell, Users, Smartphone, Target, BarChart3,
   Upload, Check, ChevronDown, Eye, MousePointerClick,
@@ -173,6 +174,19 @@ const AdminPushManager: React.FC = () => {
 
       console.log('[PushManager] Notificación enviada exitosamente');
       showToast('success', 'Notificacion enviada correctamente');
+
+      // Client-side push backup (like PromocionesSection)
+      const pushId = `promo-push-${Date.now()}`;
+      triggerBroadcastPush({
+        id: pushId,
+        titulo: title.trim(),
+        mensaje: message.trim(),
+        tipo: audience === 'phone' ? 'personal' : 'todos',
+        destinatario_telefono: audience === 'phone' ? targetPhone.trim() : '',
+        imagen_url: imageUrl || '',
+        link_url: linkUrl || '/',
+        priority: priority,
+      });
 
       setTitle('');
       setMessage('');

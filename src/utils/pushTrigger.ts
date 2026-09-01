@@ -14,6 +14,7 @@ export async function triggerBroadcastPush(params: {
   destinatario_telefono?: string;
   imagen_url?: string;
   link_url?: string;
+  priority?: string;
 }): Promise<boolean> {
   let webhookUrl = '';
   let webhookSecret = '';
@@ -62,6 +63,7 @@ export async function triggerBroadcastPush(params: {
       link_url: params.link_url || '/',
       tipo: params.tipo,
       destinatario_telefono: params.destinatario_telefono || '',
+      priority: params.priority || 'normal',
     }
   };
 

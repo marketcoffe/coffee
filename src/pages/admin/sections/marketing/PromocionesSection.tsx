@@ -115,7 +115,7 @@ const PromocionesSection: React.FC = () => {
           mensaje: promo.message,
           tipo: 'todos',
           imagen_url: promo.image_url || '',
-          link_url: '',
+          link_url: '/ofertas',
         });
       }
     } catch (err: any) {
