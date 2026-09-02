@@ -125,6 +125,7 @@ export interface Order {
   cupon_codigo?: string;
   descuento_puntos_usd?: number;
   puntos_canjeados?: number;
+  recompensa_tipo?: 'discount_percent' | 'discount_fixed' | 'free_product' | 'free_shipping' | 'custom';
   total_usd: number;
   total_bs: number;
   metodo_pago: 'Pago Móvil' | 'Zelle' | 'Efectivo' | 'Transferencia' | 'Otro' | 'Pendiente';

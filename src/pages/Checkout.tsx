@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useApp } from '../store/AppContext';
 import { motion, AnimatePresence } from 'motion/react';
-import { ListOrdered, Trash2, MapPin, Phone, CheckCircle, X, Copy, Check, ArrowRight, ArrowLeft, Store, Truck, Navigation, Search, LocateFixed, ChevronDown, FileText, Clock, UtensilsCrossed, Plus, Minus, MessageSquare } from 'lucide-react';
+import { ListOrdered, Trash2, MapPin, Phone, CheckCircle, X, Copy, Check, ArrowRight, ArrowLeft, Store, Truck, Navigation, Search, LocateFixed, ChevronDown, FileText, Clock, UtensilsCrossed, Plus, Minus, MessageSquare, Star, Gift, TruckIcon, Percent, DollarSign } from 'lucide-react';
 import { LeafletMap } from '../components/LeafletMap';
 import { SEOHead } from '../components/SEOHead';
 import { CartUpsell } from '../components/CartUpsell';
@@ -32,11 +32,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const [couponError, setCouponError] = useState('');
   const [showCelebration, setShowCelebration] = useState(false);
 
-  // Canje de puntos
-  const [usePoints, setUsePoints] = useState(false);
-  const [pointsToRedeem, setPointsToRedeem] = useState(0);
-  const [pointsDiscount, setPointsDiscount] = useState(0);
-  const [pointsError, setPointsError] = useState('');
+  // Canje de puntos — recompensas del catálogo
+  const [availableRewards, setAvailableRewards] = useState<any[]>([]);
+  const [selectedReward, setSelectedReward] = useState<any>(null);
+  const [rewardDiscount, setRewardDiscount] = useState(0);
 
   // Modal de puntos ganados
   const [showPointsModal, setShowPointsModal] = useState(false);
@@ -371,18 +370,47 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   }
   const effectiveShippingAfterCoupon = (appliedCoupon?.coupon_type === 'free_shipping') ? 0 : effectiveShippingCost;
 
-  // Canje de puntos: calcular descuento
+  // Canje de puntos: recompensas del catálogo
   const loyaltyConfig = config.loyalty;
   const userPoints = currentUser?.puntos_fidelidad || currentUser?.loyalty_points || 0;
-  const pointsRedemptionRate = loyaltyConfig?.redemption_rate || 100; // 100 puntos = $1
-  const maxDiscountPercent = loyaltyConfig?.max_discount_percent || 30;
-  const pointsValueUsd = userPoints / pointsRedemptionRate; // Valor total de puntos en $
-  const maxPointsDiscount = subtotalUsd * (maxDiscountPercent / 100); // Max descuento por %
-  const effectivePointsDiscount = usePoints && pointsToRedeem > 0
-    ? Math.min(pointsToRedeem / pointsRedemptionRate, maxPointsDiscount, subtotalUsd - discountFromCoupon)
-    : 0;
 
-  const totalUsd = subtotalUsd - discountFromCoupon - effectivePointsDiscount + effectiveShippingAfterCoupon;
+  // Cargar recompensas activas del catálogo
+  useEffect(() => {
+    if (!loyaltyConfig?.enabled) return;
+    const loadRewards = async () => {
+      const { data } = await supabase
+        .from('loyalty_rewards')
+        .select('*')
+        .eq('active', true)
+        .order('points_cost', { ascending: true });
+      if (data) setAvailableRewards(data);
+    };
+    loadRewards();
+  }, [loyaltyConfig?.enabled]);
+
+  // Calcular descuento según el tipo de recompensa seleccionada
+  const effectiveRewardDiscount = useMemo(() => {
+    if (!selectedReward) return 0;
+    const base = subtotalUsd - discountFromCoupon;
+    switch (selectedReward.reward_type) {
+      case 'discount_percent':
+        return Math.min(base * (selectedReward.reward_value / 100), base);
+      case 'discount_fixed':
+        return Math.min(selectedReward.reward_value, base);
+      case 'free_shipping':
+        return effectiveShippingAfterCoupon;
+      case 'free_product': {
+        const freeItem = cart.find(ci => ci.item.id === selectedReward.product_id);
+        if (!freeItem) return 0;
+        const extras = freeItem.selected_options?.reduce((e, opt) => e + opt.precio_usd, 0) || 0;
+        return (freeItem.item.precio_usd + extras) * freeItem.quantity;
+      }
+      default:
+        return 0;
+    }
+  }, [selectedReward, subtotalUsd, discountFromCoupon, effectiveShippingAfterCoupon, cart]);
+
+  const totalUsd = subtotalUsd - discountFromCoupon - effectiveRewardDiscount + effectiveShippingAfterCoupon;
   const totalBs = totalUsd * config.tasa_cambio;
 
   // Puntos estimados a ganar con este pedido
@@ -483,28 +511,35 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
     showToast('success', `Cupón aplicado: ${discountLabel}`);
   };
 
-  const handleToggleUsePoints = (checked: boolean) => {
-    console.log('[Checkout] handleToggleUsePoints', { checked, userPoints, maxDiscountPercent, pointsRedemptionRate });
-    setUsePoints(checked);
-    setPointsError('');
-    if (checked) {
-      const maxByPercent = subtotalUsd * (maxDiscountPercent / 100);
-      const maxByAvailable = userPoints;
-      const maxUsable = Math.min(maxByAvailable, Math.floor(maxByPercent * pointsRedemptionRate));
-      console.log('[Checkout] handleToggleUsePoints — maxUsable', { maxByPercent, maxByAvailable, maxUsable });
-      setPointsToRedeem(maxUsable > 0 ? maxUsable : 0);
+  const handleSelectReward = (reward: any) => {
+    if (selectedReward?.id === reward.id) {
+      setSelectedReward(null);
+      setRewardDiscount(0);
     } else {
-      setPointsToRedeem(0);
+      setSelectedReward(reward);
+      const base = subtotalUsd - discountFromCoupon;
+      let discount = 0;
+      switch (reward.reward_type) {
+        case 'discount_percent':
+          discount = Math.min(base * (reward.reward_value / 100), base);
+          break;
+        case 'discount_fixed':
+          discount = Math.min(reward.reward_value, base);
+          break;
+        case 'free_shipping':
+          discount = effectiveShippingAfterCoupon;
+          break;
+        case 'free_product': {
+          const freeItem = cart.find(ci => ci.item.id === reward.product_id);
+          if (freeItem) {
+            const extras = freeItem.selected_options?.reduce((e, opt) => e + opt.precio_usd, 0) || 0;
+            discount = (freeItem.item.precio_usd + extras) * freeItem.quantity;
+          }
+          break;
+        }
+      }
+      setRewardDiscount(discount);
     }
-  };
-
-  const handlePointsChange = (value: number) => {
-    setPointsError('');
-    const clamped = Math.max(0, Math.min(value, userPoints));
-    const maxByPercent = Math.floor((subtotalUsd - discountFromCoupon) * (maxDiscountPercent / 100) * pointsRedemptionRate);
-    const finalPoints = Math.min(clamped, maxByPercent);
-    console.log('[Checkout] handlePointsChange', { input: value, clamped, maxByPercent, finalPoints });
-    setPointsToRedeem(finalPoints);
   };
 
   const validateStep1 = (): boolean => {
@@ -619,11 +654,12 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
       nombre_cliente: orderType === 'mesa' ? clientName : undefined,
       referencia_pago: undefined,
       banco_origen: undefined,
-      costo_envio_usd: orderType === 'mesa' ? 0 : effectiveShippingAfterCoupon,
+      costo_envio_usd: orderType === 'mesa' ? 0 : selectedReward?.reward_type === 'free_shipping' ? 0 : effectiveShippingAfterCoupon,
       descuento_cupon_usd: discountFromCoupon,
       cupon_codigo: appliedCoupon?.code,
-      descuento_puntos_usd: effectivePointsDiscount > 0 ? effectivePointsDiscount : undefined,
-      puntos_canjeados: effectivePointsDiscount > 0 ? pointsToRedeem : undefined,
+      descuento_puntos_usd: effectiveRewardDiscount > 0 ? effectiveRewardDiscount : undefined,
+      puntos_canjeados: selectedReward ? selectedReward.points_cost : undefined,
+      recompensa_tipo: selectedReward ? selectedReward.reward_type : undefined,
       metodo_pago: orderType === 'mesa' ? mesaPaymentMethod : selectedPayment,
       lat: orderType === 'mesa' ? config?.coordenadas_tienda?.lat : shippingLat,
       lng: orderType === 'mesa' ? config?.coordenadas_tienda?.lng : shippingLng,
@@ -636,7 +672,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
     } as any, preOrderId);
 
     if (created) {
-      console.log('[Checkout] Order created', { orderId: created.id, total: created.total_usd, pointsDiscount: effectivePointsDiscount, pointsRedeemed: pointsToRedeem });
+      console.log('[Checkout] Order created', { orderId: created.id, total: created.total_usd, rewardDiscount: effectiveRewardDiscount, selectedReward: selectedReward?.name });
       if (orderType === 'mesa') {
         setMesaOrderConfirmed(true);
         setMesaPaymentPhase(true);
@@ -700,8 +736,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
         setShowPointsModal(true);
       }
 
-      if (finalUserId && effectivePointsDiscount > 0 && pointsToRedeem > 0) {
-        const redeemResult = await redeemLoyaltyPoints(finalUserId, pointsToRedeem, created.id);
+      if (finalUserId && selectedReward && selectedReward.points_cost > 0) {
+        const redeemResult = await redeemLoyaltyPoints(finalUserId, selectedReward.points_cost, created.id);
         console.log('[Checkout] redeemLoyaltyPoints — result', redeemResult);
       }
 
@@ -1428,58 +1464,81 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
 
                   <CartUpsell onAddToCart={(item: FoodItem) => addToCart(item)} />
 
-                  {/* Canje de Puntos */}
-                  {loyaltyConfig?.enabled && currentUser && userPoints > 0 && (
+                  {/* Canje de Puntos — Catálogo de Recompensas */}
+                  {loyaltyConfig?.enabled && currentUser && userPoints > 0 && availableRewards.length > 0 && (
                     <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between mb-3">
                         <label className="text-[11px] font-bold uppercase text-[#8f7065] flex items-center gap-1.5">
-                          ⭐ Usar Puntos
+                          ⭐ Canjear Puntos
                         </label>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                          {userPoints} pts = ${pointsValueUsd.toFixed(2)}
+                          Tienes {userPoints} pts
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={usePoints}
-                            onChange={(e) => handleToggleUsePoints(e.target.checked)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-                        </label>
-                        <span className="text-xs text-[#5b4137]">
-                          {usePoints ? `Canjeando ${pointsToRedeem} puntos` : 'Activar para canjear'}
-                        </span>
+                      <p className="text-[10px] text-[#8f7065] mb-3">
+                        Selecciona una recompensa para canjear con tus puntos:
+                      </p>
+                      <div className="flex flex-col gap-2">
+                        {availableRewards.map((reward) => {
+                          const canAfford = userPoints >= reward.points_cost;
+                          const isSelected = selectedReward?.id === reward.id;
+                          const isFreeProduct = reward.reward_type === 'free_product' && reward.product_id && !cart.some(ci => ci.item.id === reward.product_id);
+                          const disabled = !canAfford || isFreeProduct;
+                          return (
+                            <button
+                              key={reward.id}
+                              onClick={() => !disabled && handleSelectReward(reward)}
+                              disabled={disabled}
+                              className={`flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${
+                                disabled
+                                  ? 'bg-gray-50 border-gray-100 opacity-50 cursor-not-allowed'
+                                  : isSelected
+                                    ? 'bg-amber-50 border-amber-300 ring-1 ring-amber-200'
+                                    : 'bg-white border-[#e4beb1]/10 hover:border-amber-200 cursor-pointer'
+                              }`}
+                            >
+                              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: isSelected ? '#FEF3C7' : '#f9f9fb' }}>
+                                {reward.reward_type === 'free_shipping' && <TruckIcon size={18} className={isSelected ? 'text-amber-600' : 'text-[#8f7065]'} />}
+                                {reward.reward_type === 'discount_percent' && <Percent size={18} className={isSelected ? 'text-amber-600' : 'text-[#8f7065]'} />}
+                                {reward.reward_type === 'discount_fixed' && <DollarSign size={18} className={isSelected ? 'text-amber-600' : 'text-[#8f7065]'} />}
+                                {reward.reward_type === 'free_product' && <Gift size={18} className={isSelected ? 'text-amber-600' : 'text-[#8f7065]'} />}
+                                {!['free_shipping', 'discount_percent', 'discount_fixed', 'free_product'].includes(reward.reward_type) && <Star size={18} className={isSelected ? 'text-amber-600' : 'text-[#8f7065]'} />}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-bold text-[#1a1c1d] truncate">{reward.name}</p>
+                                <p className="text-[10px] text-[#8f7065]">
+                                  {reward.reward_type === 'free_shipping' && 'Envio gratis'}
+                                  {reward.reward_type === 'discount_percent' && `${reward.reward_value}% de descuento`}
+                                  {reward.reward_type === 'discount_fixed' && `$${reward.reward_value} de descuento`}
+                                  {reward.reward_type === 'free_product' && 'Producto gratis'}
+                                  {!['free_shipping', 'discount_percent', 'discount_fixed', 'free_product'].includes(reward.reward_type) && reward.description}
+                                </p>
+                              </div>
+                              <div className="text-right shrink-0">
+                                <p className="text-[11px] font-bold text-amber-600">{reward.points_cost} pts</p>
+                                {!canAfford && (
+                                  <p className="text-[9px] text-red-400">Faltan {reward.points_cost - userPoints}</p>
+                                )}
+                                {isFreeProduct && (
+                                  <p className="text-[9px] text-red-400">No en carrito</p>
+                                )}
+                              </div>
+                              {isSelected && (
+                                <div className="w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center shrink-0">
+                                  <Check size={12} className="text-white" />
+                                </div>
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
-                      {usePoints && (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="range"
-                              min={0}
-                              max={Math.min(userPoints, Math.floor((subtotalUsd - discountFromCoupon) * (maxDiscountPercent / 100) * pointsRedemptionRate))}
-                              value={pointsToRedeem}
-                              onChange={(e) => handlePointsChange(Number(e.target.value))}
-                              className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
-                            />
-                            <input
-                              type="number"
-                              min={0}
-                              max={userPoints}
-                              value={pointsToRedeem}
-                              onChange={(e) => handlePointsChange(Number(e.target.value))}
-                              className="w-16 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-lg px-2 py-1 text-xs text-center font-bold outline-none"
-                            />
-                          </div>
-                          <p className="text-[10px] text-[#8f7065]">
-                            Descuento: <span className="font-bold text-amber-600">-${effectivePointsDiscount.toFixed(2)}</span>
-                            {maxDiscountPercent > 0 && ` (máx. ${maxDiscountPercent}%)`}
+                      {selectedReward && (
+                        <div className="mt-3 p-2.5 rounded-xl bg-amber-50 border border-amber-200">
+                          <p className="text-[10px] text-amber-700 text-center font-bold">
+                            ✓ {selectedReward.name} — -${rewardDiscount.toFixed(2)} ({selectedReward.points_cost} pts)
                           </p>
                         </div>
                       )}
-                      {pointsError && <span className="text-[11px] text-red-500 mt-1 block">{pointsError}</span>}
                     </div>
                   )}
 
@@ -1618,15 +1677,15 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
                           <span className="font-bold">{appliedCoupon.coupon_type === 'free_shipping' ? 'Envio Gratis' : `-$${discountFromCoupon.toFixed(2)}`}</span>
                         </div>
                       )}
-                      {effectivePointsDiscount > 0 && (
+                      {effectiveRewardDiscount > 0 && selectedReward && (
                         <div className="flex justify-between text-xs text-amber-700">
-                          <span>⭐ Canje de puntos ({pointsToRedeem} pts):</span>
-                          <span className="font-bold">-${effectivePointsDiscount.toFixed(2)}</span>
+                          <span>⭐ {selectedReward.name} ({selectedReward.points_cost} pts):</span>
+                          <span className="font-bold">-${effectiveRewardDiscount.toFixed(2)}</span>
                         </div>
                       )}
                       <div className="flex justify-between text-xs">
                         <span className="text-[#8f7065]">Envío ({shippingMethod === 'recogida' ? 'Recogida' : shippingZone}):</span>
-                        <span className="font-bold">{appliedCoupon?.coupon_type === 'free_shipping' ? 'Gratis (Cupon)' : effectiveShippingAfterCoupon === 0 ? 'Gratis' : `$${effectiveShippingAfterCoupon.toFixed(2)}`}</span>
+                        <span className="font-bold">{appliedCoupon?.coupon_type === 'free_shipping' ? 'Gratis (Cupon)' : selectedReward?.reward_type === 'free_shipping' ? 'Gratis (Recompensa)' : effectiveShippingAfterCoupon === 0 ? 'Gratis' : `$${effectiveShippingAfterCoupon.toFixed(2)}`}</span>
                       </div>
                       <div className="flex justify-between text-sm pt-2 border-t border-[#e4beb1]/10">
                         <span className="font-bold text-[#1a1c1d]">Total:</span>
