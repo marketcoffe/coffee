@@ -610,15 +610,49 @@ const FidelizacionSection: React.FC = () => {
                 </select>
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase">Valor</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={newReward.reward_value || ''}
-                  onChange={(e) => setNewReward((p) => ({ ...p, reward_value: Number(e.target.value) }))}
-                  className="text-sm px-3 py-2 rounded-xl border border-zinc-200 outline-none focus:border-zinc-500 bg-zinc-50"
-                  placeholder="2.50"
-                />
+                <label className="text-[10px] font-bold text-zinc-500 uppercase">
+                  {newReward.reward_type === 'discount_percent' ? 'Porcentaje (%)' : newReward.reward_type === 'discount_fixed' ? 'Monto ($)' : 'Valor'}
+                </label>
+                {newReward.reward_type === 'discount_percent' ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      step={1}
+                      value={newReward.reward_value || ''}
+                      onChange={(e) => {
+                        const val = Math.min(100, Math.max(0, Number(e.target.value)));
+                        setNewReward((p) => ({ ...p, reward_value: val }));
+                      }}
+                      className="text-sm px-3 py-2 rounded-xl border border-zinc-200 outline-none focus:border-zinc-500 bg-zinc-50 flex-1"
+                      placeholder="15"
+                    />
+                    <span className="text-sm font-bold text-zinc-400">%</span>
+                  </div>
+                ) : newReward.reward_type === 'discount_fixed' ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-zinc-400">$</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min={0}
+                      value={newReward.reward_value || ''}
+                      onChange={(e) => setNewReward((p) => ({ ...p, reward_value: Number(e.target.value) }))}
+                      className="text-sm px-3 py-2 rounded-xl border border-zinc-200 outline-none focus:border-zinc-500 bg-zinc-50 flex-1"
+                      placeholder="2.50"
+                    />
+                  </div>
+                ) : (
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={newReward.reward_value || ''}
+                    onChange={(e) => setNewReward((p) => ({ ...p, reward_value: Number(e.target.value) }))}
+                    className="text-sm px-3 py-2 rounded-xl border border-zinc-200 outline-none focus:border-zinc-500 bg-zinc-50"
+                    placeholder="2.50"
+                  />
+                )}
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold text-zinc-500 uppercase">Stock (-1 = ilimitado)</label>

@@ -1428,10 +1428,60 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
 
                   <CartUpsell onAddToCart={(item: FoodItem) => addToCart(item)} />
 
-                  <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
-                    <label className="text-[11px] font-bold uppercase text-[#8f7065] mb-2 block">Notas del pedido (opcional)</label>
-                    <textarea value={orderNotes} onChange={(e) => setOrderNotes(e.target.value)} placeholder="Ej: Sin cebolla, extra salsa..." className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl px-3 py-2.5 text-xs outline-none focus:border-[var(--theme-color,#FF6B35)] resize-none" rows={2} />
-                  </div>
+                  {/* Canje de Puntos */}
+                  {loyaltyConfig?.enabled && currentUser && userPoints > 0 && (
+                    <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-[11px] font-bold uppercase text-[#8f7065] flex items-center gap-1.5">
+                          ⭐ Usar Puntos
+                        </label>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                          {userPoints} pts = ${pointsValueUsd.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={usePoints}
+                            onChange={(e) => handleToggleUsePoints(e.target.checked)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                        </label>
+                        <span className="text-xs text-[#5b4137]">
+                          {usePoints ? `Canjeando ${pointsToRedeem} puntos` : 'Activar para canjear'}
+                        </span>
+                      </div>
+                      {usePoints && (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="range"
+                              min={0}
+                              max={Math.min(userPoints, Math.floor((subtotalUsd - discountFromCoupon) * (maxDiscountPercent / 100) * pointsRedemptionRate))}
+                              value={pointsToRedeem}
+                              onChange={(e) => handlePointsChange(Number(e.target.value))}
+                              className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                            />
+                            <input
+                              type="number"
+                              min={0}
+                              max={userPoints}
+                              value={pointsToRedeem}
+                              onChange={(e) => handlePointsChange(Number(e.target.value))}
+                              className="w-16 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-lg px-2 py-1 text-xs text-center font-bold outline-none"
+                            />
+                          </div>
+                          <p className="text-[10px] text-[#8f7065]">
+                            Descuento: <span className="font-bold text-amber-600">-${effectivePointsDiscount.toFixed(2)}</span>
+                            {maxDiscountPercent > 0 && ` (máx. ${maxDiscountPercent}%)`}
+                          </p>
+                        </div>
+                      )}
+                      {pointsError && <span className="text-[11px] text-red-500 mt-1 block">{pointsError}</span>}
+                    </div>
+                  )}
 
                   <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
                     <label className="text-[11px] font-bold uppercase text-[#8f7065] mb-2 block">Cupón</label>
@@ -1536,60 +1586,6 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
                     )}
                   </div>
 
-                  {/* Canje de Puntos */}
-                  {loyaltyConfig?.enabled && currentUser && userPoints > 0 && (
-                    <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="text-[11px] font-bold uppercase text-[#8f7065] flex items-center gap-1.5">
-                          ⭐ Usar Puntos
-                        </label>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                          {userPoints} pts = ${pointsValueUsd.toFixed(2)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={usePoints}
-                            onChange={(e) => handleToggleUsePoints(e.target.checked)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-                        </label>
-                        <span className="text-xs text-[#5b4137]">
-                          {usePoints ? `Canjeando ${pointsToRedeem} puntos` : 'Activar para canjear'}
-                        </span>
-                      </div>
-                      {usePoints && (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="range"
-                              min={0}
-                              max={Math.min(userPoints, Math.floor((subtotalUsd - discountFromCoupon) * (maxDiscountPercent / 100) * pointsRedemptionRate))}
-                              value={pointsToRedeem}
-                              onChange={(e) => handlePointsChange(Number(e.target.value))}
-                              className="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
-                            />
-                            <input
-                              type="number"
-                              min={0}
-                              max={userPoints}
-                              value={pointsToRedeem}
-                              onChange={(e) => handlePointsChange(Number(e.target.value))}
-                              className="w-16 bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-lg px-2 py-1 text-xs text-center font-bold outline-none"
-                            />
-                          </div>
-                          <p className="text-[10px] text-[#8f7065]">
-                            Descuento: <span className="font-bold text-amber-600">-${effectivePointsDiscount.toFixed(2)}</span>
-                            {maxDiscountPercent > 0 && ` (máx. ${maxDiscountPercent}%)`}
-                          </p>
-                        </div>
-                      )}
-                      {pointsError && <span className="text-[11px] text-red-500 mt-1 block">{pointsError}</span>}
-                    </div>
-                  )}
                 </>
               ) : (
                 <>
@@ -2151,7 +2147,7 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
         onClose={() => setShowPointsModal(false)}
         points={earnedPoints}
         newBalance={earnedPointsBalance}
-        reason="por tu compra"
+        reason={`por tu compra de $${totalUsd.toFixed(2)}`}
         themeColor={themeColor}
       />
     </div>

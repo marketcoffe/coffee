@@ -21,6 +21,7 @@ import { FreeDeliveryBar } from './components/FreeDeliveryBar';
 import { ProductModal } from './components/ProductModal';
 import { SplashScreen } from './components/SplashScreen';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { PointsEarnedModal } from './components/PointsEarnedModal';
 import { log } from './utils/logger';
 import { generateCategorySlug } from './utils/slug';
 
@@ -55,7 +56,7 @@ interface WebAppManifest {
 }
 
 function AppContent() {
-  const { cart, config, addToCart, authenticateAdmin, isGlobalLoading, isAdminAuthenticated, currentUser, markUserAsPwaInstalled, isDarkMode, clearCart } = useApp();
+  const { cart, config, addToCart, authenticateAdmin, isGlobalLoading, isAdminAuthenticated, currentUser, markUserAsPwaInstalled, isDarkMode, clearCart, pendingPointsEarned, clearPendingPointsEarned } = useApp();
   const { showToast } = useToast();
 
   // PWA Install Prompt State
@@ -696,6 +697,16 @@ function AppContent() {
           </div>
         )}
       </div>
+
+      {/* Modal de puntos por descargar la aplicacion */}
+      <PointsEarnedModal
+        isOpen={!!pendingPointsEarned}
+        onClose={clearPendingPointsEarned}
+        points={pendingPointsEarned?.points || 0}
+        newBalance={pendingPointsEarned?.balance}
+        reason={pendingPointsEarned?.reason}
+        themeColor={config.theme_color || '#FF6B35'}
+      />
     </div>
   );
 }

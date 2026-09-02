@@ -11,6 +11,7 @@ import { SEOHead } from '../components/SEOHead';
 import { useToast } from '../components/Toast';
 import { OrderTracker } from '../components/OrderTracker';
 import { LoyaltyWidget } from '../components/LoyaltyWidget';
+import { PointsEarnedModal } from '../components/PointsEarnedModal';
 import { InAppNotification } from '../types/store';
 import ClientePanelPedidos from '../components/ClientePanelPedidos';
 
@@ -57,6 +58,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ setTab, deferredPrompt
     getUserLoyaltyPoints,
     promotions,
     coupons: allCoupons,
+    pendingPointsEarned,
+    clearPendingPointsEarned,
   } = useApp();
 
   const themeColor = config.theme_color || '#A4D045';
@@ -1400,9 +1403,19 @@ Contraseña/Clave: ${showReminderModal.contrasena}
               </button>
             </div>
 
-          </div>
+           </div>
         </div>
       )}
+
+      {/* Modal de puntos ganados */}
+      <PointsEarnedModal
+        isOpen={!!pendingPointsEarned}
+        onClose={clearPendingPointsEarned}
+        points={pendingPointsEarned?.points || 0}
+        newBalance={pendingPointsEarned?.balance}
+        reason={pendingPointsEarned?.reason}
+        themeColor={config.theme_color || '#FF6B35'}
+      />
     </div>
   );
 };

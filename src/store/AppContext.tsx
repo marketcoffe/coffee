@@ -109,6 +109,8 @@ interface AppContextProps {
   getUserLoyaltyTier: (userId: string) => LoyaltyTier | null;
   adjustUserPoints: (userId: string, points: number, reason: string) => Promise<void>;
   getLoyaltyTransactions: (userId: string) => LoyaltyTransaction[];
+  pendingPointsEarned: { points: number; balance: number; reason: string } | null;
+  clearPendingPointsEarned: () => void;
   
   // PWA Install
   markUserAsPwaInstalled: (userId: string) => Promise<void>;
@@ -521,6 +523,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return saved ? JSON.parse(saved) : [];
     } catch { return []; }
   });
+
+  const [pendingPointsEarned, setPendingPointsEarned] = useState<{ points: number; balance: number; reason: string } | null>(null);
+  const clearPendingPointsEarned = () => setPendingPointsEarned(null);
 
   const [rewardCatalog, setRewardCatalog] = useState<RewardItem[]>(() => {
     try {
@@ -2313,6 +2318,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         'personal',
         newUser.telefono
       ).catch(() => {});
+
+      // 7. Welcome bonus de lealtad
+      const loyaltyConf = config.loyalty;
+      if (loyaltyConf?.enabled && loyaltyConf.welcome_bonus > 0 && authSucceeded && !userId.startsWith('guest-')) {
+        const bonusPoints = loyaltyConf.welcome_bonus;
+        try {
+          await supabase.from('loyalty_history').insert({
+            user_id: userId,
+            points: bonusPoints,
+            operation: 'suma',
+            reason: 'bienvenida',
+            description: 'Bonus de bienvenida',
+            created_by: 'system',
+          });
+          await supabase.from('usuarios_clientes')
+            .update({ puntos_fidelidad: bonusPoints, puntos_historicos: bonusPoints })
+            .eq('id', userId);
+          setLoyaltyTransactions(prev => [...prev, {
+            id: `loy-tx-welcome-${Date.now()}`,
+            user_id: userId,
+            operation: 'suma',
+            reason: 'bienvenida',
+            points: bonusPoints,
+            description: 'Bonus de bienvenida',
+            created_at: new Date().toISOString(),
+          }]);
+          setUsers(prev => prev.map(u => {
+            if (u.id !== userId) return u;
+            return { ...u, puntos_fidelidad: bonusPoints, puntos_historicos: bonusPoints, loyalty_points: bonusPoints, loyalty_lifetime_points: bonusPoints };
+          }));
+          setCurrentUser(prev => prev ? { ...prev, puntos_fidelidad: bonusPoints, puntos_historicos: bonusPoints, loyalty_points: bonusPoints, loyalty_lifetime_points: bonusPoints } : prev);
+          setPendingPointsEarned({ points: bonusPoints, balance: bonusPoints, reason: 'Bonus de bienvenida por crear tu cuenta' });
+        } catch (e) {
+          console.error('[Loyalty] Guest welcome bonus failed:', e);
+        }
+      }
     }
 
     return userId;
@@ -2610,6 +2651,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return { ...u, puntos_fidelidad: bonusPoints, puntos_historicos: bonusPoints, loyalty_points: bonusPoints, loyalty_lifetime_points: bonusPoints };
       }));
       setCurrentUser(prev => prev ? { ...prev, puntos_fidelidad: bonusPoints, puntos_historicos: bonusPoints, loyalty_points: bonusPoints, loyalty_lifetime_points: bonusPoints } : prev);
+      setPendingPointsEarned({ points: bonusPoints, balance: bonusPoints, reason: 'Bonus de bienvenida por registrarte' });
     }
 
     addNotification(
@@ -3313,6 +3355,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           if (currentUser?.id === userId) {
             setCurrentUser(prev => prev ? { ...prev, puntos_fidelidad: userData.puntos_fidelidad, puntos_historicos: userData.puntos_historicos } : prev);
           }
+          setPendingPointsEarned({ points: result.points_awarded, balance: userData.puntos_fidelidad, reason: 'Bonus por descargar la aplicacion' });
         }
       }
     } catch (e) {
@@ -3621,6 +3664,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       getUserLoyaltyTier,
       adjustUserPoints,
       getLoyaltyTransactions,
+      pendingPointsEarned,
+      clearPendingPointsEarned,
       markUserAsPwaInstalled,
       rewardCatalog,
       addRewardItem,
