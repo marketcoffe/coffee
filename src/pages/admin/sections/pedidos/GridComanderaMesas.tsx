@@ -365,7 +365,7 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
         {/* Notes */}
         {order.notas_admin && (
           <div className="mb-2 p-2 bg-amber-50 rounded-lg border border-amber-200">
-            <p className="text-[9px] text-amber-700 font-semibold">📝 {order.notas_admin}</p>
+            <p className="text-sm text-amber-700 font-semibold">📝 {order.notas_admin}</p>
           </div>
         )}
 

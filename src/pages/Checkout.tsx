@@ -1747,6 +1747,20 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
                       </div>
                     </div>
                   )}
+
+                  {/* Notas del pedido */}
+                  <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4 mb-4">
+                    <label className="text-[11px] font-bold uppercase text-[#8f7065] mb-2 flex items-center gap-1.5 block">
+                      <MessageSquare size={12} /> Notas del pedido (opcional)
+                    </label>
+                    <textarea
+                      value={orderNotes}
+                      onChange={(e) => setOrderNotes(e.target.value)}
+                      placeholder="Ej: Sin cebolla, extra salsa, bien cocido..."
+                      className="w-full bg-[#f9f9fb] border border-[#e4beb1]/10 rounded-xl px-3 py-2.5 text-xs outline-none focus:border-[var(--theme-color,#FF6B35)] resize-none"
+                      rows={2}
+                    />
+                  </div>
                 </>
               )}
             </motion.div>

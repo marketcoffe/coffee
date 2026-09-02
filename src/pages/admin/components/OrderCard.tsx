@@ -180,7 +180,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onAdvanceStatus, on
 
         {/* Admin notes */}
         {order.notas_admin && (
-          <div className={`bg-amber-50 rounded text-amber-700 border border-amber-200 ${kitchenMode ? 'mt-3 p-2.5 text-xs' : 'mt-2 p-1.5 text-[9px]'}`}>
+          <div className={`bg-amber-50 rounded text-amber-700 border border-amber-200 ${kitchenMode ? 'mt-3 p-2.5 text-sm' : 'mt-2 p-2 text-sm'}`}>
             {order.notas_admin}
           </div>
         )}

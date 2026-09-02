@@ -204,6 +204,13 @@ export default function AdminOrderAlert() {
                       )}
                     </div>
 
+                    {/* Notes */}
+                    {order.notas_admin && (
+                      <div className="mt-2 p-2 bg-amber-50 rounded-lg border border-amber-200">
+                        <p className="text-sm text-amber-800 font-semibold">{order.notas_admin}</p>
+                      </div>
+                    )}
+
                     {/* Total & time */}
                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
                       <div className="flex items-center gap-1">

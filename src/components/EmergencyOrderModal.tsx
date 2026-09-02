@@ -518,7 +518,7 @@ export default function EmergencyOrderModal() {
 
                 {order.notas_admin && (
                   <div className="p-2 bg-amber-50 rounded-lg border border-amber-200 mb-2">
-                    <p className="text-[9px] text-amber-700 font-semibold">{order.notas_admin}</p>
+                    <p className="text-sm text-amber-700 font-semibold">{order.notas_admin}</p>
                   </div>
                 )}
 
