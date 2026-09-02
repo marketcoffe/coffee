@@ -4,7 +4,7 @@ import { useToast } from '../../../components/Toast';
 import { Order } from '../../../types/store';
 
 function getNextStatus(status: Order['status'], tipoEntrega?: string): Order['status'] | null {
-  if (status === 'Entregado' || status === 'Cancelado' || status === 'completado' || status === 'cancelado' || status === 'Listo') return null;
+  if (status === 'Entregado' || status === 'Cancelado' || status === 'completado' || status === 'cancelado') return null;
 
   if (status === 'En camino') return 'Entregado';
 
@@ -19,7 +19,8 @@ function getNextStatus(status: Order['status'], tipoEntrega?: string): Order['st
     status === 'pendiente_verificacion' ||
     status === 'pago_enviado' ||
     status === 'pendiente_pago' ||
-    status === 'pago_en_verificacion'
+    status === 'pago_en_verificacion' ||
+    status === 'Listo'
   ) {
     return 'En preparación';
   }

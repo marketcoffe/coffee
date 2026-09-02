@@ -2161,7 +2161,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       status: newOrder.status,
       tiempo_estimado_entrega: newOrder.tiempo_estimado_entrega,
       guest_phone: orderData.guest_phone || null,
-      guest_email: (!currentUser && orderData.cliente_email) ? orderData.cliente_email : null,
+      guest_email: orderData.cliente_email || null,
       crear_cuenta: orderData.crear_cuenta || false,
       sede_id: (orderData as any).sede_id || '',
       notas_admin: orderData.notas_admin || '',

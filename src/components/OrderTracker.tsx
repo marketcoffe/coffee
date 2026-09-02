@@ -78,7 +78,10 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ order, onClose, onCo
   const orderType = order.tipo_entrega || order.tipo_pedido || 'delivery';
   const STATUS_STEPS = useMemo(() => getStatusSteps(orderType), [orderType]);
   const statusOrder = STATUS_STEPS.map(s => s.key);
-  const currentStepIdx = Math.max(0, statusOrder.indexOf(liveStatus));
+  const normalizeStatus = (s: string) => s?.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+  const normalizedLive = normalizeStatus(liveStatus);
+  const normalizedKeys = statusOrder.map(normalizeStatus);
+  const currentStepIdx = Math.max(0, normalizedKeys.indexOf(normalizedLive));
 
   const adProducts = useMemo(() => {
     return foodItems

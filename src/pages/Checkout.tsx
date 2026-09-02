@@ -595,23 +595,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
 
     const cleanedPhone = clientPhone.replace(/[\s\-()]/g, '');
 
-    // Auto-registro de invitado ANTES de crear el pedido para que
-    // usuario_id/cliente_uid tengan el ID correcto desde el inicio
-    let registeredUserId = currentUser?.id || null;
-    if (orderType !== 'mesa' && (!currentUser || isFakeEmail) && (clientEmail || cleanedPhone)) {
-      try {
-        const userId = await registerGuestUser({
-          cliente_nombre: clientName || 'Cliente sin nombre',
-          cliente_telefono: cleanedPhone || '00000000',
-          cliente_email: clientEmail || ''
-        });
-        if (userId) registeredUserId = userId;
-      } catch (err) {
-        console.warn('[Checkout] Guest registration failed:', err);
-      }
-    }
-
-    const finalUserId = registeredUserId;
     const finalClientName = orderType === 'mesa' ? clientName : (currentUser?.nombre || clientName);
 
     const preOrderId = `ORD-${String(Math.floor(10000 + Math.random() * 90000)).padStart(6, '0')}`;
@@ -620,7 +603,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
       cliente_nombre: finalClientName || 'Cliente sin nombre',
       cliente_telefono: cleanedPhone || '00000000',
       cliente_email: clientEmail || '',
-      usuario_id: finalUserId,
+      usuario_id: currentUser?.id || null,
       items: cart.map(ci => ({
         food_id: ci.item.id,
         nombre: ci.item.nombre,
@@ -660,30 +643,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
       }
       setProcessedOrder(created);
 
-      // SEGURIDAD: Los puntos por compra se acreditan via trigger de DB
-      // (trigger_order_delivery_points) cuando el status cambia a 'Entregado'.
-      // Solo sincronizamos el saldo actual al estado local del frontend.
-      if (registeredUserId) {
-        console.log('[Checkout] earnLoyaltyPoints — syncing user points from DB', { userId: registeredUserId });
-        earnLoyaltyPoints(registeredUserId, created.id, created.total_usd, selectedSedeId || undefined);
-
-        // Mostrar modal de puntos ganados (estimado)
-        const pointsPerDollar = config.loyalty?.points_per_dollar || 10;
-        const estimatedPts = Math.floor(created.total_usd * pointsPerDollar);
-        const currentBalance = currentUser?.puntos_fidelidad || currentUser?.loyalty_points || 0;
-        setEarnedPoints(estimatedPts);
-        setEarnedPointsBalance(currentBalance + estimatedPts);
-        setShowPointsModal(true);
-      }
-
-      // Canje de puntos: descontar vía RPC atómica
-      if (registeredUserId && effectivePointsDiscount > 0 && pointsToRedeem > 0) {
-        console.log('[Checkout] redeemLoyaltyPoints — RPC call', { userId: registeredUserId, points: pointsToRedeem, orderId: created.id, discount: effectivePointsDiscount });
-        const redeemResult = await redeemLoyaltyPoints(registeredUserId, pointsToRedeem, created.id);
-        console.log('[Checkout] redeemLoyaltyPoints — result', redeemResult);
-      }
-
-      if (orderType !== 'mesa') {
+      if (orderType === 'delivery') {
         setWaitingForAdmin(true);
         localStorage.setItem('trv_waiting_for_admin', 'true');
       }
@@ -705,6 +665,44 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
           zoneIndex: selectedZoneIndex,
           sedeId: selectedSedeId
         }));
+      }
+
+      // Auto-registro de invitado DESPUÉS de crear el pedido para evitar
+      // que setCurrentUser dispare initData y desmonte el componente.
+      let finalUserId = currentUser?.id || null;
+      if (orderType !== 'mesa' && (!currentUser || isFakeEmail) && (clientEmail || cleanedPhone)) {
+        try {
+          const userId = await registerGuestUser({
+            cliente_nombre: clientName || 'Cliente sin nombre',
+            cliente_telefono: cleanedPhone || '00000000',
+            cliente_email: clientEmail || ''
+          });
+          if (userId) {
+            finalUserId = userId;
+            if (userId !== currentUser?.id) {
+              await supabase.from('orders').update({ usuario_id: userId, cliente_uid: userId }).eq('id', created.id);
+              setProcessedOrder(prev => prev ? { ...prev, usuario_id: userId } : prev);
+            }
+          }
+        } catch (err) {
+          console.warn('[Checkout] Guest registration failed:', err);
+        }
+      }
+
+      // SEGURIDAD: Los puntos por compra se acreditan via trigger de DB
+      if (finalUserId) {
+        earnLoyaltyPoints(finalUserId, created.id, created.total_usd, selectedSedeId || undefined);
+        const pointsPerDollar = config.loyalty?.points_per_dollar || 10;
+        const estimatedPts = Math.floor(created.total_usd * pointsPerDollar);
+        const currentBalance = currentUser?.puntos_fidelidad || currentUser?.loyalty_points || 0;
+        setEarnedPoints(estimatedPts);
+        setEarnedPointsBalance(currentBalance + estimatedPts);
+        setShowPointsModal(true);
+      }
+
+      if (finalUserId && effectivePointsDiscount > 0 && pointsToRedeem > 0) {
+        const redeemResult = await redeemLoyaltyPoints(finalUserId, pointsToRedeem, created.id);
+        console.log('[Checkout] redeemLoyaltyPoints — result', redeemResult);
       }
 
       // WhatsApp: se abre DESPUÉS de confirmar que el pedido se creó
