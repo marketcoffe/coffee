@@ -168,7 +168,7 @@ export function getLocalBusinessSchema(config: Record<string, any>) {
       }
     ],
     "acceptsReservations": "False",
-    "paymentAccepted": "Efectivo, Pago Móvil, Zelle, Punto de Venta, Transferencia",
+    "paymentAccepted": "Efectivo, Pago Móvil, Punto de Venta",
     "currenciesAccepted": "USD, VES",
     "sameAs": [
       "https://www.instagram.com/marketcoffeesweet",
@@ -212,7 +212,7 @@ export function getRestaurantSchema(config: Record<string, any>) {
       "url": `${SITE_URL}/catalog`
     },
     "acceptsReservations": config.tiene_mesas ? "True" : "False",
-    "paymentAccepted": "Efectivo, Pago Móvil, Zelle, Punto de Venta",
+    "paymentAccepted": "Efectivo, Pago Móvil, Punto de Venta",
     "currenciesAccepted": "USD, VES"
   };
 }

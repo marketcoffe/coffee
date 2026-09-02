@@ -15,11 +15,11 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setTab, onMenu
   const themeColor = config.theme_color || '#A4D045';
 
   const tabs = [
-    { id: 'home' as const, label: 'Home', icon: Home },
-    { id: 'catalog' as const, label: 'Menu', icon: UtensilsCrossed },
-    { id: 'catalog' as const, label: 'Search', icon: Search, isSearch: true },
-    { id: 'profile' as const, label: 'Profile', icon: User },
-    { id: 'checkout' as const, label: 'Cart', icon: ShoppingCart, badge: cartCount },
+    { id: 'home' as const, label: 'Home', icon: Home, href: '/' },
+    { id: 'catalog' as const, label: 'Menu', icon: UtensilsCrossed, href: '/catalog' },
+    { id: 'catalog' as const, label: 'Search', icon: Search, isSearch: true, href: '/catalog' },
+    { id: 'profile' as const, label: 'Profile', icon: User, href: '/profile' },
+    { id: 'checkout' as const, label: 'Cart', icon: ShoppingCart, badge: cartCount, href: '/cart' },
   ];
 
   return (
@@ -38,7 +38,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setTab, onMenu
               ? currentTab === 'cart' || currentTab === 'checkout'
               : currentTab === tabItem.id;
 
-          const handleTabClick = () => {
+          const handleTabClick = (e: React.MouseEvent) => {
+            e.preventDefault();
             if (tabItem.isSearch) {
               onSearchClick?.() || setTab('catalog');
             } else if (tabItem.label === 'Menu') {
@@ -49,9 +50,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setTab, onMenu
           };
 
           return (
-            <button
+            <a
               key={`${tabItem.id}-${idx}`}
-              type="button"
+              href={tabItem.href}
               onClick={handleTabClick}
               className="flex flex-col items-center justify-center gap-0.5 w-14 h-full cursor-pointer relative transition-transform duration-200 active:scale-90"
               style={{
@@ -86,7 +87,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setTab, onMenu
               >
                 {tabItem.label}
               </span>
-            </button>
+            </a>
           );
         })}
       </div>

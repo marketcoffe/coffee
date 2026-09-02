@@ -70,22 +70,22 @@ export const Navigation: React.FC<NavigationProps> = ({
               <Menu size={22} strokeWidth={1.8} />
             </button>
 
-            <button
-              type="button"
-              onClick={() => setTab('home')}
+            <a
+              href="/"
+              onClick={(e) => { e.preventDefault(); setTab('home'); }}
               className="flex items-center gap-3 shrink-0 cursor-pointer group"
             >
               {config.logo_url ? (
                 <img src={config.logo_url} alt={config.site_nombre || 'Market Coffee Sweet'} className="h-[85px] w-auto max-w-[200px] object-contain" />
               ) : (
-                <h1
+                <span
                   className="text-xl font-extrabold tracking-tighter"
                   style={{ color: '#fff', fontFamily: 'Plus Jakarta Sans, sans-serif' }}
                 >
                   {config.site_nombre || 'Market Coffee Sweet'}
-                </h1>
+                </span>
               )}
-            </button>
+            </a>
           </div>
 
           {/* Right: Dark Mode Toggle + Sign In + Cart */}

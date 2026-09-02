@@ -50,16 +50,18 @@ const DESC_TEMPLATES = {
 
 // ─── Descripciones únicas por categoría (sin canibalización) ───
 const CATEGORY_DESCRIPTIONS: Record<string, string> = {
-  'Panadería': 'Pan artesanal fresco horneado todos los días. Pan de jamón, canilla, guayaba y más con delivery en Valencia.',
-  'Comida Rapida': 'Hamburguesas, shawarmas y perros calientes preparados al momento. Delivery rápido en El Trigal y Valencia.',
+  'Panadería': 'Pan campesino, canilla, gallego, guayaba, coco, cachitos de jamón, empanadas, arepas rellenas y más. Horneado fresco todos los días con delivery en Valencia.',
+  'Comida Rapida': 'Hamburguesas de pollo, carne, pernil, chuleta, crispy. Shawarmas de pollo, mixto, kibbe, falafel. Perros calientes y pepitos. Delivery rápido en El Trigal y Valencia.',
   'Mercado': 'Víveres, frutas, verduras, lácteos y productos de limpieza. Todo fresco con delivery en Valencia.',
   'Frutas y Verduras': 'Frutas y verduras frescas del día directo a tu puerta. Delivery en Valencia, El Trigal y alrededores.',
-  'Bebidas': 'Refrescos, jugos, agua potable y bebidas variadas. Delivery rápido en Valencia.',
+  'Bebidas': 'Refrescos, jugos, té frío y bebidas variadas. Delivery rápido en Valencia.',
   'Lacteos': 'Leche, queso, mantequilla y productos lácteos frescos. Delivery en Valencia.',
   'Carnicería': 'Carnes frescas, pollo, res y cerdo de primera calidad. Delivery en Valencia.',
   'Snacks': 'Chucherías, papas fritas, galletas y snacks para picar. Delivery en Valencia.',
-  'Licores': 'Whisky, ron, vodka y cervezas premium. Delivery en Valencia y alrededores.',
+  'Licores': 'Vinos, whisky, ron, vodka, aguardiente, cava y anís. Delivery en Valencia y alrededores.',
   'Limpieza': 'Productos de limpieza para tu hogar. Detergentes, jabones y más. Delivery en Valencia.',
+  'Charcutería': 'Mortadela, chorizo, pavo, jamón, quesos madurados y salchichas. Delivery en Valencia.',
+  'Repostería': 'Cheesecake, baklava, brownie, donas, tortas tres leches, alfajores y más. Delivery en Valencia.',
 };
 
 interface SEOData {
@@ -117,7 +119,7 @@ export function useSEOProduct(
       description,
       ogTitle: title,
       ogDescription: description,
-      ogImage: product.imagen_urls?.[0] || config.logo_url || `${siteUrl}/logo.png`,
+      ogImage: product.imagen_urls?.[0] || config.logo_url || `${siteUrl}/imagen/descarga_app.webp`,
       ogUrl: productUrl,
       canonical: productUrl,
       keywords,
@@ -170,7 +172,7 @@ export function useSEOCategory(
       description: finalDesc,
       ogTitle: title,
       ogDescription: finalDesc,
-      ogImage: config.banners?.[0] || config.logo_url || `${siteUrl}/logo.png`,
+      ogImage: config.banners?.[0] || config.logo_url || `${siteUrl}/imagen/descarga_app.webp`,
       ogUrl: categoryUrl,
       canonical: categoryUrl,
       keywords,
@@ -188,7 +190,7 @@ export function useSEOHome(config: StoreConfig): SEOData {
       description: config.seo_home_description || `${siteName} en El Trigal, Valencia. Panadería fresca horneada diario, hamburguesas, shawarmas, víveres, frutas, verduras, bebidas y agua potable. Delivery a domicilio en menos de 45 minutos.`,
       ogTitle: config.seo_home_title || `${siteName} | Panadería, Comida Rápida y Víveres`,
       ogDescription: config.seo_home_description || `Tu minimarket de confianza en El Trigal, Valencia. Panadería fresca, comida rápida, víveres y más con delivery express.`,
-      ogImage: config.banners?.[0] || config.logo_url || `${siteUrl}/logo.png`,
+      ogImage: config.banners?.[0] || config.logo_url || `${siteUrl}/imagen/descarga_app.webp`,
       ogUrl: siteUrl,
       canonical: siteUrl,
       keywords: config.seo_home_keywords || `panadería El Trigal Valencia, comida rápida Valencia, hamburguesas delivery, shawarmas, víveres Valencia, pan fresco, minimarket, delivery express, market coffee sweet`,
@@ -204,7 +206,7 @@ function getDefaultSEO(config: StoreConfig): SEOData {
     description: config.seo_home_description || `Market Coffee Sweet - Panadería, comida rápida y víveres con delivery en Valencia.`,
     ogTitle: siteName,
     ogDescription: config.seo_home_description || `Panadería, comida rápida y víveres en Valencia.`,
-    ogImage: config.logo_url || `${siteUrl}/logo.png`,
+    ogImage: config.logo_url || `${siteUrl}/imagen/descarga_app.webp`,
     ogUrl: siteUrl,
     canonical: siteUrl,
     keywords: config.seo_home_keywords || `panadería valencia, comida rápida, delivery`,

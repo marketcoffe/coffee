@@ -127,6 +127,16 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
     }
     canonicalLink.setAttribute('href', canonicalUrl);
 
+    // Hreflang para SEO geográfico
+    let hreflangLink = document.querySelector('link[rel="alternate"][hreflang="es-ve"]') as HTMLLinkElement | null;
+    if (!hreflangLink) {
+      hreflangLink = document.createElement('link');
+      hreflangLink.setAttribute('rel', 'alternate');
+      hreflangLink.setAttribute('hreflang', 'es-ve');
+      document.head.appendChild(hreflangLink);
+    }
+    hreflangLink.setAttribute('href', canonicalUrl);
+
     // PWA: Guardar config en IndexedDB
     if (indexedDBTimeoutRef.current) {
       clearTimeout(indexedDBTimeoutRef.current);

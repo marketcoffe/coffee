@@ -47,8 +47,8 @@ const DEFAULT_FAQ = [
   { id: 'faq-2', question: '¿Venden productos de mercado?', answer: '¡Sí! Somos un mercado completo. Tenemos frutas, verduras, lácteos, embutidos, abarrotes, snacks, bebidas, artículos de limpieza e higiene personal.' },
   { id: 'faq-3', question: '¿Cómo puedo aplicar un código de descuento?', answer: 'Al finalizar tu compra en el carrito, verás un campo llamado "Código Promocional". Ingresa tu código ahí y el descuento se aplicará automáticamente al total de tu pedido.' },
   { id: 'faq-4', question: '¿Cuál es el pedido mínimo para delivery?', answer: 'El pedido mínimo para delivery es de $5.00. Para pedidos menores, puedes recoger gratis en nuestro local.' },
-  { id: 'faq-5', question: '¿Tienen pan fresco?', answer: '¡Sí! Horneamos pan fresco todos los días. Tenemos pan campesino, canilla, pan de guayaba, arequipe con queso, palmeritas, tortas y dulces.' },
-  { id: 'faq-6', question: '¿Aceptan tarjetas de crédito o débito?', answer: 'Sí, aceptamos todas las tarjetas de crédito y débito Visa, Mastercard y American Express. También aceptamos pagos móviles y Zelle.' },
+  { id: 'faq-5', question: '¿Tienen pan fresco?', answer: '¡Sí! Horneamos pan fresco todos los días. Tenemos pan campesino, pan canilla, pan de guayaba, pan de coco, pan gallego, cachitos de jamón, empanadas y más.' },
+  { id: 'faq-6', question: '¿Aceptan pagos en bolívares y dólares?', answer: 'Sí, aceptamos pago móvil en bolívares, efectivo en dólares y bolívares, y punto de venta en el negocio. Paga como te convenga al recibir tu delivery o al recoger en local.' },
 ];
 
 interface HomeProps {
@@ -333,7 +333,7 @@ export const Home: React.FC<HomeProps> = ({
                   {config.banners_mobile?.[idx] && (
                     <source media="(max-width: 767px)" srcSet={config.banners_mobile[idx]} />
                   )}
-                  <img alt="" className="absolute inset-0 w-full h-full object-cover object-center" src={banner} loading={idx === 0 ? 'eager' : 'lazy'} fetchPriority={idx === 0 ? 'high' : 'auto'} />
+                  <img alt={isHero ? `${config.site_nombre || 'Market Coffee Sweet'} — Panadería, comida rápida y minimarket en El Trigal, Valencia, Carabobo` : (config.banner_titles?.[idx] || config.site_nombre || '')} className="absolute inset-0 w-full h-full object-cover object-center" src={banner} loading={idx === 0 ? 'eager' : 'lazy'} fetchPriority={idx === 0 ? 'high' : 'auto'} />
                 </picture>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
                 <div className="absolute bottom-8 left-5 right-5 md:bottom-16 md:left-16 md:right-auto md:max-w-2xl">
@@ -344,10 +344,17 @@ export const Home: React.FC<HomeProps> = ({
                     </span>
                   )}
                   {title && (
-                    <h2 className="text-white font-extrabold text-2xl md:text-5xl leading-[1.05] mb-3"
-                      style={{ fontFamily: 'var(--font-display)' }}>
-                      {title}
-                    </h2>
+                    idx === 0 ? (
+                      <h1 className="text-white font-extrabold text-2xl md:text-5xl leading-[1.05] mb-3"
+                        style={{ fontFamily: 'var(--font-display)' }}>
+                        {title}
+                      </h1>
+                    ) : (
+                      <h2 className="text-white font-extrabold text-2xl md:text-5xl leading-[1.05] mb-3"
+                        style={{ fontFamily: 'var(--font-display)' }}>
+                        {title}
+                      </h2>
+                    )
                   )}
                   {subtitle && (
                     <p className="text-white/75 text-sm md:text-lg mb-5 max-w-sm md:max-w-md leading-relaxed">
@@ -408,6 +415,15 @@ export const Home: React.FC<HomeProps> = ({
           </>
         )}
       </section>
+
+      {/* ═══ BREADCRUMB SEO ═══ */}
+      <nav aria-label="Migas de pan" className="text-[10px] text-gray-400 px-4 md:px-8 max-w-[1440px] mx-auto pt-2 hidden md:block">
+        <ol className="flex items-center gap-1">
+          <li><a href="/" onClick={(e) => { e.preventDefault(); setTab('home'); }} className="hover:underline">Inicio</a></li>
+          <li aria-hidden="true">›</li>
+          <li className="font-medium" style={{ color: text2 }}>Menú Completo</li>
+        </ol>
+      </nav>
 
       {/* ═══ 1B. SEARCH BAR ═══ */}
       <section className="px-4 md:px-8 max-w-[1440px] mx-auto w-full -mt-5 relative z-20">
@@ -661,9 +677,9 @@ export const Home: React.FC<HomeProps> = ({
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Más Vendidos</h3>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => setTab('catalog')} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog" onClick={(e) => { e.preventDefault(); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(masVendidosRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -720,9 +736,9 @@ export const Home: React.FC<HomeProps> = ({
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Pídelo en combo</h3>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Combos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/combos" onClick={(e) => { e.preventDefault(); setSelectedCategory('Combos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(combosCategoriaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -780,12 +796,12 @@ export const Home: React.FC<HomeProps> = ({
           <div className="flex justify-between items-end mb-3">
             <div>
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Panadería</h3>
-              <p className="text-[11px]" style={{ color: text2 }}>Panes, pastelería y dulces frescos</p>
+              <p className="text-[11px]" style={{ color: text2 }}>Pan campesino, canilla, cachitos, empanadas y más</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Panaderia'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/panaderia" onClick={(e) => { e.preventDefault(); setSelectedCategory('Panaderia'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(panaderiaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -828,9 +844,9 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* ═══ BANNER COMIDA RÁPIDA ═══ */}
       <section className="px-4 md:px-8 max-w-[1440px] mx-auto w-full">
-        <div className="rounded-2xl overflow-hidden cursor-pointer group" onClick={() => { setSelectedCategory('Comida Rapida'); setTab('catalog'); }}>
+        <a href="/catalog/comida-rapida" onClick={(e) => { e.preventDefault(); setSelectedCategory('Comida Rapida'); setTab('catalog'); }} className="block rounded-2xl overflow-hidden cursor-pointer group">
           <img src="/imagen/banner-menu.webp" alt="Comida Rápida" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
-        </div>
+        </a>
       </section>
 
       {/* ═══ 5C. COMIDA RÁPIDA ═══ */}
@@ -839,12 +855,12 @@ export const Home: React.FC<HomeProps> = ({
           <div className="flex justify-between items-end mb-3">
             <div>
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Comida Rápida</h3>
-              <p className="text-[11px]" style={{ color: text2 }}>Hamburguesas, shawarmas y perros calientes</p>
+              <p className="text-[11px]" style={{ color: text2 }}>Hamburguesas, shawarmas, perros y pepitos</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Comida Rapida'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/comida-rapida" onClick={(e) => { e.preventDefault(); setSelectedCategory('Comida Rapida'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(comidaRapidaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -895,12 +911,12 @@ export const Home: React.FC<HomeProps> = ({
           <div className="flex justify-between items-end mb-3">
             <div>
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Repostería</h3>
-              <p className="text-[11px]" style={{ color: text2 }}>Tortas, pasteles y dulces artesanales</p>
+              <p className="text-[11px]" style={{ color: text2 }}>Cheesecake, baklava, brownie, donas y más</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Repostería'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/reposteria" onClick={(e) => { e.preventDefault(); setSelectedCategory('Repostería'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(reposteriaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -947,12 +963,12 @@ export const Home: React.FC<HomeProps> = ({
           <div className="flex justify-between items-end mb-3">
             <div>
               <h3 className="text-lg font-bold" style={{ color: text1 }}>Charcutería</h3>
-              <p className="text-[11px]" style={{ color: text2 }}>Chorizos, morcillas y embutidos frescos</p>
+              <p className="text-[11px]" style={{ color: text2 }}>Mortadela, chorizo, pavo, jamón y quesos</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Charcutería y Embutidos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/charcuteria-y-embutidos" onClick={(e) => { e.preventDefault(); setSelectedCategory('Charcutería y Embutidos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(charcuteriaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1002,9 +1018,9 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-[11px]" style={{ color: text2 }}>Productos frescos del día</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Frutas y Verduras'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/frutas-y-verduras" onClick={(e) => { e.preventDefault(); setSelectedCategory('Frutas y Verduras'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(frutasRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1054,9 +1070,9 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-[11px]" style={{ color: text2 }}>Arroz, pasta, aceites y más</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Viveres'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/viveres" onClick={(e) => { e.preventDefault(); setSelectedCategory('Viveres'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(viveresRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1106,9 +1122,9 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-[11px]" style={{ color: text2 }}>Refrescos, jugos, té y agua</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Bebidas'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/bebidas" onClick={(e) => { e.preventDefault(); setSelectedCategory('Bebidas'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(bebidasRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1158,9 +1174,9 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-[11px]" style={{ color: text2 }}>Alimento y cuidado para tus mascotas</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Mascotas'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/mascotas" onClick={(e) => { e.preventDefault(); setSelectedCategory('Mascotas'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(mascotasRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1210,9 +1226,9 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-[11px]" style={{ color: text2 }}>Cuidado personal y bienestar</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Higiene Personal'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/higiene-personal" onClick={(e) => { e.preventDefault(); setSelectedCategory('Higiene Personal'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(higieneRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1255,9 +1271,9 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* ═══ BANNER RECARGA DE AGUA ═══ */}
       <section className="px-4 md:px-8 max-w-[1440px] mx-auto w-full">
-        <div className="rounded-2xl overflow-hidden cursor-pointer group" onClick={() => { setSelectedCategory('Recarga de Agua'); setTab('catalog'); }}>
+        <a href="/catalog/recarga-de-agua" onClick={(e) => { e.preventDefault(); setSelectedCategory('Recarga de Agua'); setTab('catalog'); }} className="block rounded-2xl overflow-hidden cursor-pointer group">
           <img src="/imagen/banner_agua.webp" alt="Recarga de Agua" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
-        </div>
+        </a>
       </section>
 
       {/* ═══ 13. SALSAS Y CONDIMENTOS ═══ */}
@@ -1269,9 +1285,9 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-[11px]" style={{ color: text2 }}>Sabores para realzar tus comidas</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Salsas y Condimentos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/salsas-y-condimentos" onClick={(e) => { e.preventDefault(); setSelectedCategory('Salsas y Condimentos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(salsasRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1321,9 +1337,9 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-[11px]" style={{ color: text2 }}>Vinos, whisky, ron y más</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Licores'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/licores" onClick={(e) => { e.preventDefault(); setSelectedCategory('Licores'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(licoresRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1373,9 +1389,9 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-[11px]" style={{ color: text2 }}>Productos para tu hogar</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Limpieza'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/limpieza" onClick={(e) => { e.preventDefault(); setSelectedCategory('Limpieza'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(limpiezaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1425,9 +1441,9 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-[11px]" style={{ color: text2 }}>Artículos para el hogar</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Hogar'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/hogar" onClick={(e) => { e.preventDefault(); setSelectedCategory('Hogar'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(hogarRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1477,9 +1493,9 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-[11px]" style={{ color: text2 }}>Carnes frescas y embutidos</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Carnicería'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/carniceria" onClick={(e) => { e.preventDefault(); setSelectedCategory('Carnicería'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(carniceriaRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1529,9 +1545,9 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-[11px]" style={{ color: text2 }}>Leche, queso, mantequilla y más</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Lácteos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/lacteos" onClick={(e) => { e.preventDefault(); setSelectedCategory('Lácteos'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(lacteosRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
@@ -1581,9 +1597,9 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-[11px]" style={{ color: text2 }}>Combos para toda la familia</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setSelectedCategory('Combos Familiares'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
+              <a href="/catalog/combos-familiares" onClick={(e) => { e.preventDefault(); setSelectedCategory('Combos Familiares'); setTab('catalog'); }} className="font-semibold text-[11px] flex items-center gap-1 transition-all whitespace-nowrap" style={{ color: tc }}>
                 Ver más <ChevronRight size={14} />
-              </button>
+              </a>
               <button onClick={() => scroll(combosFamiliaresRef, 'left')} className="hidden md:flex w-8 h-8 rounded-full border items-center justify-center transition-all" style={{ borderColor: cardBorder, color: text2 }}>
                 <ChevronLeft size={16} />
               </button>
