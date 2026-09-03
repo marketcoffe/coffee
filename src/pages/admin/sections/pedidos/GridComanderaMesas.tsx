@@ -216,7 +216,7 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
 
   const handleMoveToPayment = async (orderId: string) => {
     const { error } = await supabase.from('orders')
-      .update({ status: 'pendiente_pago' })
+      .update({ status: 'pago_enviado' })
       .eq('id', orderId);
     if (error) {
       showToast('error', 'Error al cambiar estado: ' + (error.message || 'Error desconocido'));

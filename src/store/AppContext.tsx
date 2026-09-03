@@ -645,11 +645,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [currentUser]);
 
   useEffect(() => {
-    if (!currentUser) {
-      console.warn('[AppContext] Realtime skipped: currentUser is null');
+    if (!currentUser && !isAdminAuthenticated) {
+      console.warn('[AppContext] Realtime skipped: currentUser is null and not admin');
       return;
     }
-    console.log('[AppContext] Iniciando conexión Realtime para:', currentUser.nombre || currentUser.telefono);
+    console.log('[AppContext] Iniciando conexión Realtime para:', currentUser?.nombre || currentUser?.telefono || 'admin');
     let mainChannel: ReturnType<typeof supabase.channel> | null = null;
     let broadcastChan: ReturnType<typeof supabase.channel> | null = null;
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -1217,7 +1217,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (reconnectTimer) clearTimeout(reconnectTimer);
       if (broadcastReconnectTimer) clearTimeout(broadcastReconnectTimer);
     };
-  }, [currentUser]);
+  }, [currentUser, isAdminAuthenticated]);
   useEffect(() => {
     localStorage.setItem('trv_orders', JSON.stringify(orders));
   }, [orders]);
@@ -1234,7 +1234,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // (funciona aunque el websocket de Realtime esté bloqueado por ETP/Cloudflare)
   const notifiedOrderIdsRef = useRef(new Set<string>());
   useEffect(() => {
-    if (!currentUser || !isAdminAuthenticated) return;
+    if (!currentUser && !isAdminAuthenticated) return;
     const newMesaOrders = orders.filter(o =>
       (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') &&
       !notifiedOrderIdsRef.current.has(o.id) &&
