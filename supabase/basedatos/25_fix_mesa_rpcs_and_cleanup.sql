@@ -246,7 +246,7 @@
     GRANT EXECUTE ON FUNCTION public.cerrar_mesa TO anon;
 
 -- ============================================================================
--- 9. RPC: Cerrar mesa a Esperando Pago (no directo a completado)
+-- 9. RPC: Cerrar mesa → pago_enviado (listo para verificación del admin)
 -- ============================================================================
 CREATE OR REPLACE FUNCTION public.cerrar_mesa_cobrar(
     p_numero_mesa INTEGER
@@ -270,15 +270,20 @@ BEGIN
           AND (o.tipo_pedido = 'mesa' OR o.tipo_entrega = 'mesa')
           AND public.normalize_order_status(o.status) NOT IN (
             'Entregado', 'Cancelado', 'completado', 'cancelado',
-            'pendiente_pago', 'pago_enviado'
+            'pago_enviado'
           )
     LOOP
         UPDATE public.orders
-        SET status = 'pendiente_pago'
+        SET status = 'pago_enviado'
         WHERE id = v_order.id
-          AND status NOT IN ('pendiente_pago', 'pago_enviado', 'completado', 'Entregado', 'Cancelado', 'cancelado');
+          AND status NOT IN ('pago_enviado', 'completado', 'Entregado', 'Cancelado', 'cancelado');
         IF FOUND THEN v_count := v_count + 1; END IF;
     END LOOP;
+
+    -- Liberar la mesa
+    UPDATE public.mesas
+    SET estado = 'Disponible', updated_at = NOW()
+    WHERE numero_mesa = p_numero_mesa AND estado != 'Disponible';
 
     RETURN jsonb_build_object(
         'success', true,

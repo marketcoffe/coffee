@@ -2,8 +2,9 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useApp } from '../../../../store/AppContext';
 import { useOrders } from '../../hooks/useOrders';
 import { Order } from '../../../../types/store';
-import { Search, Download, ChevronDown, ChevronUp, CheckCircle, XCircle } from 'lucide-react';
+import { Search, Download, ChevronDown, ChevronUp, CheckCircle, XCircle, Printer } from 'lucide-react';
 import { useToast } from '../../../../components/Toast';
+import { printMesaTicket } from '../../../../utils/printMesaTicket';
 
 interface HistorialPedidosSectionProps {
   scopeSedeId?: string;
@@ -279,6 +280,16 @@ const HistorialPedidosSection: React.FC<HistorialPedidosSectionProps> = ({ scope
                         </div>
                       ))}
                     </div>
+
+                    {(order.tipo_pedido === 'mesa' || order.tipo_entrega === 'mesa') && (
+                      <button
+                        onClick={() => printMesaTicket(order, config)}
+                        className="mt-3 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold border-2 cursor-pointer transition-all hover:bg-slate-100"
+                        style={{ borderColor: config.theme_color || '#A4D045', color: config.theme_color || '#A4D045' }}
+                      >
+                        <Printer size={12} /> Reimprimir Comanda
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

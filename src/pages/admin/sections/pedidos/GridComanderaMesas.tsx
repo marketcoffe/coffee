@@ -219,11 +219,24 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
   };
 
   const handleApprovePayment = async (orderId: string) => {
-    const { error } = await supabase.rpc('aprobar_pago_mesa', { p_order_id: orderId, p_aprobar: true });
+    console.log('[GridComandera] handleApprovePayment:', orderId);
+    const { data, error } = await supabase.rpc('aprobar_pago_mesa', { p_order_id: orderId, p_aprobar: true });
+    console.log('[GridComandera] aprobar_pago_mesa result:', { data, error });
     if (error) {
       console.error('aprobar_pago_mesa error:', error);
       showToast('error', 'Error al aprobar pago: ' + (error.message || 'Error desconocido'));
       return;
+    }
+    if (!data) {
+      console.warn('[GridComandera] aprobar_pago_mesa no encontró la fila, intentando update directo...');
+      const { error: directError } = await supabase.from('orders')
+        .update({ status: 'completado' })
+        .eq('id', orderId);
+      if (directError) {
+        console.error('[GridComandera] update directo falló:', directError);
+        showToast('error', 'Error al completar pedido: ' + (directError.message || 'Error desconocido'));
+        return;
+      }
     }
     showToast('success', 'Pago aprobado');
     setShowPaymentModal(null);
@@ -260,15 +273,17 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
   const [cleanModal, setCleanModal] = useState<'stuck' | 'all' | null>(null);
 
   const handleCloseMesa = async (numeroMesa: number) => {
+    console.log('[GridComandera] handleCloseMesa:', numeroMesa);
     const { data, error } = await supabase.rpc('cerrar_mesa_cobrar', { p_numero_mesa: numeroMesa });
+    console.log('[GridComandera] cerrar_mesa_cobrar result:', { data, error });
     if (error) {
-      console.error('close_mesa_orders error:', error);
+      console.error('cerrar_mesa_cobrar error:', error);
       showToast('error', 'Error al cerrar mesa: ' + (error.message || 'Error desconocido'));
       setCloseMesaModal(null);
       return;
     }
     const result = data as any;
-    showToast('success', `Mesa #${numeroMesa} → Esperando Pago. ${result?.closed_count || 0} pedidos movidos.`);
+    showToast('success', `Mesa #${numeroMesa} cerrada. ${result?.closed_count || 0} pedidos → Pago Enviado.`);
     setCloseMesaModal(null);
     refreshOrders();
   };

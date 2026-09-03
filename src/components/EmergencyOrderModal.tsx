@@ -232,12 +232,14 @@ export default function EmergencyOrderModal() {
     channel
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload: Record<string, unknown>) => {
         const order = payload.new as Order;
+        console.log('[EmergencyModal] CDC INSERT:', order?.id, order?.status, order?.tipo_pedido || order?.tipo_entrega);
         if (order && !dismissedIdsRef.current.has(order.id)) {
           addOrdersBatch([order]);
           playNewOrderBeep();
         }
       })
       .subscribe((status: string) => {
+        console.log('[EmergencyModal] channel subscribe status:', status);
         if (status === 'SUBSCRIBED') {
           setIsConnected(true);
           retriesRef.current = 0;
@@ -254,6 +256,7 @@ export default function EmergencyOrderModal() {
     // Escuchar broadcasts via CustomEvent global (AppContext broadcastChan)
     const handleNewOrder = (e: Event) => {
       const order = (e as CustomEvent).detail as Order;
+      console.log('[EmergencyModal] new_order_received event:', order?.id, order?.status);
       if (order && !dismissedIdsRef.current.has(order.id)) {
         addOrdersBatch([order]);
         playNewOrderBeep();

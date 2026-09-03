@@ -767,6 +767,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload: Record<string, unknown>) => {
           const newOrder = payload.new as Order;
           if (!newOrder?.id) return;
+          console.log('[AppContext] CDC INSERT order:', newOrder.id, newOrder.numero_mesa, newOrder.tipo_pedido || newOrder.tipo_entrega);
 
           setOrders(prev => {
             if (prev.some(o => o.id === newOrder.id)) return prev;
@@ -775,6 +776,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
           // Notificación visual para pedidos de mesa
           if (newOrder.tipo_pedido === 'mesa' || newOrder.tipo_entrega === 'mesa') {
+            console.log('[AppContext] CDC INSERT mesa → playNotificationSound + dispatch new_order_received');
             playNotificationSound('new');
             window.dispatchEvent(new CustomEvent('new_order_received', { detail: newOrder }));
           }
@@ -870,6 +872,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
         const newOrder = payload.payload;
         if (!newOrder?.id) return;
+        console.log('[AppContext] Broadcast new_order_broadcast:', newOrder.id, newOrder.numero_mesa);
         setOrders(prev => {
           if (prev.some(o => o.id === newOrder.id)) return prev;
           return [newOrder, ...prev];
@@ -1029,6 +1032,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload: Record<string, unknown>) => {
           const newOrder = payload.new as Order;
           if (!newOrder?.id) return;
+          console.log('[AppContext] reconnectMain CDC INSERT:', newOrder.id, newOrder.numero_mesa);
           setOrders(prev => {
             if (prev.some(o => o.id === newOrder.id)) return prev;
             return [newOrder, ...prev];
@@ -1103,6 +1107,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           .on('broadcast', { event: 'new_order_broadcast' }, (payload: { payload: Order }) => {
             const newOrder = payload.payload;
             if (!newOrder?.id) return;
+            console.log('[AppContext] reconnectBroadcast new_order_broadcast:', newOrder.id);
             setOrders(prev => {
               if (prev.some(o => o.id === newOrder.id)) return prev;
               return [newOrder, ...prev];
