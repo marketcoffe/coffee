@@ -864,7 +864,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           if (status === 'SUBSCRIBED') {
             console.warn('✅ Conectado al sistema Realtime de Marketo');
             mainRetries = 0;
-          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
             console.error(`[Realtime] Canal CDC desconectado (${status}), reconectando...`);
             const delay = Math.min(BASE_DELAY * Math.pow(2, mainRetries), MAX_DELAY);
             mainRetries += 1;
@@ -969,7 +969,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         console.log('[AppContext] broadcastChan subscribe status:', status);
         if (status === 'SUBSCRIBED') {
           broadcastRetries = 0;
-        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
           console.error(`[Realtime] Broadcast canal desconectado (${status}), reconectando...`);
           const delay = Math.min(BASE_DELAY * Math.pow(2, broadcastRetries), MAX_DELAY);
           broadcastRetries += 1;
@@ -1088,7 +1088,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         .subscribe((status: string) => {
           if (status === 'SUBSCRIBED') {
             mainRetries = 0;
-          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
             console.warn(`[Realtime] Canal reconectado (${status}), reintentando...`);
             const delay = Math.min(BASE_DELAY * Math.pow(2, mainRetries), MAX_DELAY);
             mainRetries += 1;
@@ -1192,7 +1192,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           .subscribe((status: string) => {
             if (status === 'SUBSCRIBED') {
               broadcastRetries = 0;
-            } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
               console.warn(`[Realtime] Broadcast reconectado (${status}), reintentando...`);
               const delay = Math.min(BASE_DELAY * Math.pow(2, broadcastRetries), MAX_DELAY);
               broadcastRetries += 1;
@@ -1217,7 +1217,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (reconnectTimer) clearTimeout(reconnectTimer);
       if (broadcastReconnectTimer) clearTimeout(broadcastReconnectTimer);
     };
-  }, [currentUser, isAdminAuthenticated]);
+  }, [currentUser]);
   useEffect(() => {
     localStorage.setItem('trv_orders', JSON.stringify(orders));
   }, [orders]);
@@ -1234,7 +1234,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // (funciona aunque el websocket de Realtime esté bloqueado por ETP/Cloudflare)
   const notifiedOrderIdsRef = useRef(new Set<string>());
   useEffect(() => {
-    if (!currentUser && !isAdminAuthenticated) return;
+    if (!isAdminAuthenticated) return;
     const newMesaOrders = orders.filter(o =>
       (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') &&
       !notifiedOrderIdsRef.current.has(o.id) &&
