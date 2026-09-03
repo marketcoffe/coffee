@@ -1230,6 +1230,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('trv_notifications', JSON.stringify(notifications));
   }, [notifications]);
 
+  // Push notification por polling: detectar órdenes de mesa nuevas y disparar push
+  // (funciona aunque el websocket de Realtime esté bloqueado por ETP/Cloudflare)
+  const notifiedOrderIdsRef = useRef(new Set<string>());
+  useEffect(() => {
+    if (!currentUser || !isAdminAuthenticated) return;
+    const newMesaOrders = orders.filter(o =>
+      (o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa') &&
+      !notifiedOrderIdsRef.current.has(o.id) &&
+      o.status === 'enviado_cocina'
+    );
+    if (newMesaOrders.length === 0) return;
+    newMesaOrders.forEach(o => notifiedOrderIdsRef.current.add(o.id));
+    import('../utils/pushTrigger').then(({ triggerBroadcastPush }) => {
+      newMesaOrders.forEach(o => {
+        triggerBroadcastPush({
+          id: `new-order-${o.id}`,
+          titulo: '🛒 ¡NUEVO PEDIDO!',
+          mensaje: `Mesa #${o.numero_mesa} — ${o.nombre_cliente || o.cliente_nombre} — $${o.total_usd?.toFixed(2)}`,
+          tipo: 'admin',
+          link_url: '/admin'
+        }).catch(err => console.warn('[Push] Error disparando push (polling):', err));
+      });
+    });
+  }, [orders, currentUser, isAdminAuthenticated]);
+
   useEffect(() => {
     localStorage.setItem('trv_products', JSON.stringify(products));
   }, [products]);
