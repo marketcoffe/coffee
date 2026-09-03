@@ -39,9 +39,9 @@ export function useOrders(sedeId?: string) {
     return orders.filter(o => (o.sede_id || principalSedeId) === sedeId);
   }, [orders, sedeId, principalSedeId]);
 
-  const activeOrders = useMemo(() => filteredBySede.filter(o => o.status !== 'Entregado' && o.status !== 'Cancelado'), [filteredBySede]);
-  const completedOrders = useMemo(() => filteredBySede.filter(o => o.status === 'Entregado'), [filteredBySede]);
-  const cancelledOrders = useMemo(() => filteredBySede.filter(o => o.status === 'Cancelado'), [filteredBySede]);
+  const activeOrders = useMemo(() => filteredBySede.filter(o => !['Entregado', 'Cancelado', 'completado', 'cancelado'].includes(o.status)), [filteredBySede]);
+  const completedOrders = useMemo(() => filteredBySede.filter(o => o.status === 'Entregado' || o.status === 'completado'), [filteredBySede]);
+  const cancelledOrders = useMemo(() => filteredBySede.filter(o => o.status === 'Cancelado' || o.status === 'cancelado'), [filteredBySede]);
 
   const advanceStatus = useCallback(async (order: Order) => {
     const nextStatus = getNextStatus(order.status, order.tipo_entrega);

@@ -776,6 +776,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           // Notificación visual para pedidos de mesa
           if (newOrder.tipo_pedido === 'mesa' || newOrder.tipo_entrega === 'mesa') {
             playNotificationSound('new');
+            window.dispatchEvent(new CustomEvent('new_order_received', { detail: newOrder }));
           }
         })
         // Escuchar Notificaciones (CDC)
@@ -1034,6 +1035,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           });
           if (newOrder.tipo_pedido === 'mesa' || newOrder.tipo_entrega === 'mesa') {
             playNotificationSound('new');
+            window.dispatchEvent(new CustomEvent('new_order_received', { detail: newOrder }));
           }
         })
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (payload: Record<string, unknown>) => {

@@ -668,7 +668,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
       notas_admin: orderNotes,
       sede_id: selectedSedeId || undefined,
       guest_phone: !currentUser ? cleanedPhone : undefined,
-      status_override: orderType === 'mesa' ? 'En preparacion' : undefined,
+      status_override: orderType === 'mesa' ? 'enviado_cocina' : undefined,
     } as any, preOrderId);
 
     if (created) {
@@ -802,7 +802,7 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
     setValidationError('');
     setIsProcessing(true);
 
-    const updates: any = { metodo_pago: mesaPaymentMethod };
+    const updates: any = { metodo_pago: mesaPaymentMethod, status: 'pago_enviado' };
 
     if (!processedOrder?.id) {
       setValidationError('Error: pedido no encontrado.');

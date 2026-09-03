@@ -119,7 +119,7 @@ const PedidosMesaSection: React.FC<PedidosMesaSectionProps> = ({ scopeSedeId }) 
         onClick={() => setSelectedOrder(isSelected ? null : order.id)}
         className={`bg-white rounded-2xl border-2 p-4 transition-all cursor-pointer hover:shadow-md ${
           isSelected ? 'ring-2 ring-offset-2' : ''
-        } ${order.status === 'pago_enviado' ? 'border-amber-300' : 'border-[#e4beb1]/20'}`}
+        } ${(order.status === 'pago_enviado' || order.status === 'pendiente_pago') ? 'border-amber-400 shadow-lg shadow-amber-200 animate-[pulse_2s_ease-in-out_infinite]' : 'border-[#e4beb1]/20'}`}
         style={isSelected ? { outlineColor: themeColor } : {}}
       >
         {/* Header */}

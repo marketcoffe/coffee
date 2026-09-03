@@ -524,7 +524,7 @@ export default function EmergencyOrderModal() {
 
                 {/* Action buttons */}
                 <div className="flex gap-2">
-                  {order.status === 'pago_enviado' ? (
+                  {(order.status === 'pago_enviado' || order.status === 'pendiente_pago') ? (
                     <button
                       onClick={() => handleConfirmPayment(order.id)}
                       className="flex-1 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 text-white transition-all active:scale-[0.98] cursor-pointer"

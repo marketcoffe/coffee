@@ -26,13 +26,15 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
   const [currentStep, setCurrentStep] = useState<1 | 2>(1);
   const [clientName, setClientName] = useState(() => {
     if (currentUser?.nombre) return currentUser.nombre;
-    try { return localStorage.getItem('trv_guest_name') || ''; } catch { return ''; }
+    try { return localStorage.getItem('trv_last_mesa_name') || localStorage.getItem('trv_guest_name') || ''; } catch { return ''; }
   });
   const [clientPhone, setClientPhone] = useState(() => {
     if (currentUser?.telefono) return currentUser.telefono;
     try { return localStorage.getItem('trv_guest_phone') || ''; } catch { return ''; }
   });
-  const [selectedMesa, setSelectedMesa] = useState<number | null>(null);
+  const [selectedMesa, setSelectedMesa] = useState<number | null>(() => {
+    try { const v = localStorage.getItem('trv_last_mesa'); return v ? Number(v) : null; } catch { return null; }
+  });
   const [orderNotes, setOrderNotes] = useState('');
   const [couponInput, setCouponInput] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
@@ -245,6 +247,8 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
       }
 
       localStorage.setItem('trv_active_order_id', newOrder.id);
+      localStorage.setItem('trv_last_mesa', String(selectedMesa));
+      localStorage.setItem('trv_last_mesa_name', clientName.trim());
       onOrderCreated(newOrder);
     } catch (err) {
       console.error('Unexpected error:', err);
@@ -367,13 +371,14 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
                   {availableMesas.map(mesa => {
                     const isSelected = selectedMesa === mesa.numero_mesa;
                     const isOcupada = mesa.estado === 'Ocupada';
+                    const isMyMesa = isOcupada && Number(localStorage.getItem('trv_last_mesa')) === mesa.numero_mesa;
                     return (
                       <button
                         key={mesa.id}
-                        onClick={() => !isOcupada && setSelectedMesa(mesa.numero_mesa)}
-                        disabled={isOcupada}
+                        onClick={() => (isMyMesa || !isOcupada) && setSelectedMesa(mesa.numero_mesa)}
+                        disabled={isOcupada && !isMyMesa}
                         className={`relative p-3 rounded-xl text-center transition-all cursor-pointer border-2 ${
-                          isOcupada ? 'opacity-40 cursor-not-allowed border-gray-200 bg-gray-50' :
+                          (isOcupada && !isMyMesa) ? 'opacity-40 cursor-not-allowed border-gray-200 bg-gray-50' :
                           isSelected ? 'text-white shadow-md' : 'bg-[#f9f9fb] border-[#e4beb1]/10 hover:bg-[#eeeef0]'
                         }`}
                         style={isSelected ? { backgroundColor: mesaColor, borderColor: mesaColor } : {}}
@@ -383,8 +388,11 @@ export const MesaCheckout: React.FC<MesaCheckoutProps> = ({ setTab, onOrderCreat
                         {mesa.nombre_personalizado && (
                           <p className={`text-[9px] mt-0.5 ${isSelected ? 'text-white/80' : 'text-[#8f7065]'}`}>{mesa.nombre_personalizado}</p>
                         )}
-                        {isOcupada && (
+                        {isOcupada && !isMyMesa && (
                           <span className="absolute -top-1 -right-1 text-[8px] font-bold px-1 py-0.5 rounded-full bg-amber-500 text-white">Ocupada</span>
+                        )}
+                        {isMyMesa && !isSelected && (
+                          <span className="absolute -top-1 -right-1 text-[8px] font-bold px-1 py-0.5 rounded-full bg-green-500 text-white">Tu mesa</span>
                         )}
                       </button>
                     );

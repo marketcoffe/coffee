@@ -206,6 +206,18 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
     refreshOrders();
   };
 
+  const handleMoveToPayment = async (orderId: string) => {
+    const { error } = await supabase.from('orders')
+      .update({ status: 'pendiente_pago' })
+      .eq('id', orderId);
+    if (error) {
+      showToast('error', 'Error al cambiar estado: ' + (error.message || 'Error desconocido'));
+      return;
+    }
+    showToast('success', 'Movido a Esperando Pago');
+    refreshOrders();
+  };
+
   const handleApprovePayment = async (orderId: string) => {
     const { error } = await supabase.rpc('aprobar_pago_mesa', { p_order_id: orderId, p_aprobar: true });
     if (error) {
@@ -248,7 +260,7 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
   const [cleanModal, setCleanModal] = useState<'stuck' | 'all' | null>(null);
 
   const handleCloseMesa = async (numeroMesa: number) => {
-    const { data, error } = await supabase.rpc('close_mesa_orders', { p_numero_mesa: numeroMesa });
+    const { data, error } = await supabase.rpc('cerrar_mesa_cobrar', { p_numero_mesa: numeroMesa });
     if (error) {
       console.error('close_mesa_orders error:', error);
       showToast('error', 'Error al cerrar mesa: ' + (error.message || 'Error desconocido'));
@@ -256,7 +268,7 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
       return;
     }
     const result = data as any;
-    showToast('success', `Mesa #${numeroMesa} cerrada. ${result?.closed_count || 0} pedidos completados.`);
+    showToast('success', `Mesa #${numeroMesa} → Esperando Pago. ${result?.closed_count || 0} pedidos movidos.`);
     setCloseMesaModal(null);
     refreshOrders();
   };
@@ -313,6 +325,7 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
     const isPendingKitchen = order.status === 'enviado_cocina';
     const isPendingPayment = order.status === 'pago_enviado' || order.status === 'pendiente_pago';
     const isNew = newOrderIds.has(order.id);
+    const isInPreparation = order.status === 'En preparacion' || order.status === 'En preparación' || order.status === 'en_preparacion';
 
     return (
       <div
@@ -321,7 +334,7 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
         className={`bg-white rounded-2xl border-2 p-4 transition-all cursor-pointer hover:shadow-md ${
           isSelected ? 'ring-2 ring-offset-2' : ''
         } ${isNew ? 'animate-pulse border-amber-400 shadow-lg shadow-amber-100' : ''} ${
-          isPendingKitchen && !isNew ? 'border-blue-300' : isPendingPayment ? 'border-amber-300' : 'border-[#e4beb1]/20'
+          isPendingKitchen && !isNew ? 'border-blue-300' : isPendingPayment ? 'border-amber-400 shadow-lg shadow-amber-200 animate-[pulse_2s_ease-in-out_infinite]' : 'border-[#e4beb1]/20'
         }`}
         style={isSelected ? { outlineColor: themeColor } : {}}
       >
@@ -422,6 +435,13 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
                 className="w-full py-2.5 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1.5 text-white transition-all cursor-pointer hover:brightness-110 active:scale-95"
                 style={{ backgroundColor: '#10b981' }}>
                 <CheckCircle size={12} /> Verificar Pago
+              </button>
+            )}
+            {isInPreparation && (
+              <button onClick={(e) => { e.stopPropagation(); handleMoveToPayment(order.id); }}
+                className="w-full py-2.5 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1.5 text-white transition-all cursor-pointer hover:brightness-110 active:scale-95"
+                style={{ backgroundColor: '#f59e0b' }}>
+                <CreditCard size={12} /> Cobrar
               </button>
             )}
             <button onClick={(e) => { e.stopPropagation(); setCloseMesaModal(order.numero_mesa?.toString() || null); }}

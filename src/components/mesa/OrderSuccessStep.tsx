@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle, Download, Star, ShoppingBag, Gift } from 'lucide-react';
+import { CheckCircle, Download, Star, ShoppingBag, Gift, Plus } from 'lucide-react';
 import { Order } from '../../types/store';
 import { useApp } from '../../store/AppContext';
 
@@ -143,6 +143,13 @@ export const OrderSuccessStep: React.FC<OrderSuccessStepProps> = ({
           transition={{ delay: 1 }}
           className="space-y-2"
         >
+          <button
+            onClick={onContinueShopping}
+            className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
+            style={{ backgroundColor: '#e67e22', color: '#fff' }}
+          >
+            <Plus size={16} /> Agregar más items a Mesa #{order.numero_mesa}
+          </button>
           <button
             onClick={onContinueShopping}
             className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98] cursor-pointer"

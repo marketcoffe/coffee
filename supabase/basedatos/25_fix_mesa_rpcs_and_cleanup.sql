@@ -245,6 +245,50 @@
     GRANT EXECUTE ON FUNCTION public.eliminar_pedidos_antiguos TO anon;
     GRANT EXECUTE ON FUNCTION public.cerrar_mesa TO anon;
 
-    -- ============================================================================
-    -- FIN
-    -- ============================================================================
+-- ============================================================================
+-- 9. RPC: Cerrar mesa a Esperando Pago (no directo a completado)
+-- ============================================================================
+CREATE OR REPLACE FUNCTION public.cerrar_mesa_cobrar(
+    p_numero_mesa INTEGER
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_count INTEGER := 0;
+    v_order RECORD;
+BEGIN
+    IF NOT public.is_mesa_valida(p_numero_mesa) THEN
+        RAISE EXCEPTION 'La mesa % no es valida.', p_numero_mesa;
+    END IF;
+
+    FOR v_order IN
+        SELECT o.id FROM public.orders o
+        WHERE o.numero_mesa = p_numero_mesa
+          AND (o.tipo_pedido = 'mesa' OR o.tipo_entrega = 'mesa')
+          AND public.normalize_order_status(o.status) NOT IN (
+            'Entregado', 'Cancelado', 'completado', 'cancelado',
+            'pendiente_pago', 'pago_enviado'
+          )
+    LOOP
+        UPDATE public.orders
+        SET status = 'pendiente_pago'
+        WHERE id = v_order.id
+          AND status NOT IN ('pendiente_pago', 'pago_enviado', 'completado', 'Entregado', 'Cancelado', 'cancelado');
+        IF FOUND THEN v_count := v_count + 1; END IF;
+    END LOOP;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'closed_count', v_count,
+        'mesa_number', p_numero_mesa
+    );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.cerrar_mesa_cobrar TO anon;
+
+-- ============================================================================
+-- FIN
