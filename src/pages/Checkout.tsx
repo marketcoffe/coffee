@@ -41,6 +41,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
   const [showPointsModal, setShowPointsModal] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [earnedPointsBalance, setEarnedPointsBalance] = useState(0);
+  const [pointsReason, setPointsReason] = useState('');
 
   const hasFreeDeliveryItem = cart.some(item => item.item.delivery_gratis);
 
@@ -729,10 +730,26 @@ export const Checkout: React.FC<CheckoutProps> = ({ setTab, onClose }) => {
       if (finalUserId) {
         earnLoyaltyPoints(finalUserId, created.id, created.total_usd, selectedSedeId || undefined);
         const pointsPerDollar = config.loyalty?.points_per_dollar || 10;
-        const estimatedPts = Math.floor(created.total_usd * pointsPerDollar);
+        let estimatedPts = Math.floor(created.total_usd * pointsPerDollar);
         const currentBalance = currentUser?.puntos_fidelidad || currentUser?.loyalty_points || 0;
+        let reasonText = `+${estimatedPts} pts por tu compra`;
+
+        // Detectar si es primera orden del usuario
+        try {
+          const { count } = await supabase
+            .from('orders')
+            .select('id', { count: 'exact', head: true })
+            .eq('cliente_uid', finalUserId)
+            .eq('status', 'Entregado');
+          if (count === 0 && config.loyalty?.first_order_bonus > 0) {
+            estimatedPts += config.loyalty.first_order_bonus;
+            reasonText = `+${config.loyalty.first_order_bonus} pts primera compra + ${Math.floor(created.total_usd * pointsPerDollar)} pts por tu compra`;
+          }
+        } catch { /* first order detection best-effort */ }
+
         setEarnedPoints(estimatedPts);
         setEarnedPointsBalance(currentBalance + estimatedPts);
+        setPointsReason(reasonText);
         setShowPointsModal(true);
       }
 
@@ -2255,7 +2272,7 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
         onClose={() => setShowPointsModal(false)}
         points={earnedPoints}
         newBalance={earnedPointsBalance}
-        reason={`por tu compra de $${totalUsd.toFixed(2)}`}
+        reason={pointsReason || `por tu compra de $${totalUsd.toFixed(2)}`}
         themeColor={themeColor}
       />
     </div>

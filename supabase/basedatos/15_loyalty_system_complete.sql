@@ -698,6 +698,12 @@ BEGIN
             NEW.id, 'system'
         );
 
+        -- Notificar al frontend que se otorgaron puntos por compra
+        INSERT INTO points_notifications (user_id, points, reason, description, order_id)
+        VALUES (NEW.cliente_uid, v_total_points, 'compra',
+                'Puntos por pedido #' || NEW.id || ' ($' || NEW.total_usd::TEXT || ')',
+                NEW.id);
+
         -- Bono por primera compra
         IF v_is_first_order AND v_config.first_order_bonus > 0 THEN
             PERFORM public.process_loyalty_points(
@@ -705,6 +711,11 @@ BEGIN
                 'Bono por primera compra completada',
                 NEW.id, 'system'
             );
+
+            -- Notificar al frontend que se otorgo bono de primera compra
+            INSERT INTO points_notifications (user_id, points, reason, description, order_id)
+            VALUES (NEW.cliente_uid, v_config.first_order_bonus, 'primer_pedido',
+                    'Bono por primera compra completada', NEW.id);
         END IF;
 
         -- Completar referral si el usuario fue referido

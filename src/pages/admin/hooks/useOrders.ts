@@ -52,6 +52,8 @@ export function useOrders(sedeId?: string) {
       const result = await updateOrderStatus(order.id, nextStatus);
       if (result === false) {
         showToast('error', 'Error al actualizar el estado. Verifica tus permisos.');
+      } else if (nextStatus === 'Entregado') {
+        showToast('success', `Pedido #${order.id?.slice(0, 8)} entregado. Puntos acreditados al cliente.`);
       }
     } finally {
       setAdvancingId(null);

@@ -543,6 +543,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const isAdminAuthenticatedRef = useRef(isAdminAuthenticated);
   const configSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingConfigRef = useRef<Record<string, unknown>>({});
+  const broadcastChanRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   useEffect(() => {
     currentUserRef.current = currentUser;
@@ -667,6 +668,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (broadcastChan) {
         supabase.removeChannel(broadcastChan);
         broadcastChan = null;
+        broadcastChanRef.current = null;
       }
       if (reconnectTimer) {
         clearTimeout(reconnectTimer);
@@ -859,6 +861,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             });
           }
         )
+        // Escuchar notificaciones de puntos (CDC) — trigger otorga puntos
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'points_notifications' },
+          (payload: Record<string, unknown>) => {
+            const notif = payload.new as { user_id: string; points: number; reason: string; description?: string; order_id?: string };
+            if (!notif?.user_id) return;
+            const cu = currentUserRef.current;
+            if (!cu || notif.user_id !== cu.id) return;
+
+            console.log('[AppContext] Points notification:', notif.reason, notif.points);
+
+            // Sincronizar saldo desde DB
+            supabase.from('usuarios_clientes')
+              .select('puntos_fidelidad, puntos_historicos')
+              .eq('id', cu.id)
+              .single()
+              .then(({ data: userData }) => {
+                if (userData) {
+                  setUsers(prev => prev.map(u =>
+                    u.id === cu.id ? { ...u, puntos_fidelidad: userData.puntos_fidelidad, puntos_historicos: userData.puntos_historicos } : u
+                  ));
+                  setCurrentUser(prev => prev ? { ...prev, puntos_fidelidad: userData.puntos_fidelidad, puntos_historicos: userData.puntos_historicos } : prev);
+
+                  // Mostrar modal de puntos ganados
+                  setPendingPointsEarned({
+                    points: notif.points,
+                    balance: userData.puntos_fidelidad,
+                    reason: notif.description || notif.reason
+                  });
+                }
+              })
+              .catch(err => console.warn('[AppContext] Error syncing points balance:', err));
+          }
+        )
         .subscribe((status: string) => {
           console.log('[AppContext] mainChannel subscribe status:', status);
           if (status === 'SUBSCRIBED') {
@@ -976,6 +1013,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           broadcastReconnectTimer = setTimeout(() => reconnectBroadcast(), delay);
         }
       });
+    broadcastChanRef.current = broadcastChan;
 
     // Reconexión independiente para mainChannel (sin destruir broadcastChan)
     const reconnectMain = () => {
@@ -1105,6 +1143,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (broadcastChan) {
         supabase.removeChannel(broadcastChan);
         broadcastChan = null;
+        broadcastChanRef.current = null;
       }
       if (broadcastReconnectTimer) { clearTimeout(broadcastReconnectTimer); broadcastReconnectTimer = null; }
 
@@ -1199,6 +1238,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               broadcastReconnectTimer = setTimeout(() => reconnectBroadcast(), delay);
             }
           });
+        broadcastChanRef.current = broadcastChan;
       } catch (e) {
         console.error('Realtime reconnectBroadcast failed:', e);
       }
@@ -2236,23 +2276,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // BROADCAST: Enviar señal inmediata al Admin sin esperar a la DB
     try {
-      const broadcastChannel = supabase.channel('marketo_broadcast_send');
-      await new Promise<void>((resolve) => {
-        broadcastChannel.subscribe((status) => {
-          if (status === 'SUBSCRIBED') resolve();
+      if (broadcastChanRef.current) {
+        const sendResult = await broadcastChanRef.current.send({
+          type: 'broadcast',
+          event: 'new_order_broadcast',
+          payload: newOrder
         });
-      });
-      const sendResult = await broadcastChannel.send({
-        type: 'broadcast',
-        event: 'new_order_broadcast',
-        payload: newOrder
-      });
-      if (sendResult === 'ok' || (typeof sendResult === 'object' && sendResult !== null && (sendResult as { error?: unknown }).error === null)) {
-        console.log('[Broadcast] new_order_broadcast enviado:', newOrder.id);
-      } else {
-        console.warn('[Broadcast] new_order_broadcast resultado inesperado:', sendResult);
+        if (sendResult === 'ok' || (typeof sendResult === 'object' && sendResult !== null && (sendResult as { error?: unknown }).error === null)) {
+          console.log('[Broadcast] new_order_broadcast enviado:', newOrder.id);
+        } else {
+          console.warn('[Broadcast] new_order_broadcast resultado inesperado:', sendResult);
+        }
       }
-      supabase.removeChannel(broadcastChannel);
     } catch (broadcastErr) {
       console.error('[Broadcast] Error enviando new_order_broadcast:', broadcastErr);
     }
@@ -2437,16 +2472,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // Broadcast instantáneo para que el cliente reciba el cambio en <100ms
       try {
         const updatedOrder = { ...prevOrder, ...updatePayload } as Order;
-        const statusChannel = supabase.channel('marketo_broadcast_send');
-        await new Promise<void>((resolve) => {
-          statusChannel.subscribe((st) => { if (st === 'SUBSCRIBED') resolve(); });
-        });
-        await statusChannel.send({
-          type: 'broadcast',
-          event: 'order_status_broadcast',
-          payload: updatedOrder
-        });
-        supabase.removeChannel(statusChannel);
+        if (broadcastChanRef.current) {
+          await broadcastChanRef.current.send({
+            type: 'broadcast',
+            event: 'order_status_broadcast',
+            payload: updatedOrder
+          });
+        }
       } catch (e) {
         console.warn('Broadcast status update failed:', e);
       }
@@ -2474,16 +2506,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     try {
       const updatedOrder = { ...prevOrder, status: 'completado' } as Order;
-      const paymentChannel = supabase.channel('marketo_broadcast_send');
-      await new Promise<void>((resolve) => {
-        paymentChannel.subscribe((st) => { if (st === 'SUBSCRIBED') resolve(); });
-      });
-      await paymentChannel.send({
-        type: 'broadcast',
-        event: 'order_status_broadcast',
-        payload: updatedOrder
-      });
-      supabase.removeChannel(paymentChannel);
+      if (broadcastChanRef.current) {
+        await broadcastChanRef.current.send({
+          type: 'broadcast',
+          event: 'order_status_broadcast',
+          payload: updatedOrder
+        });
+      }
     } catch (e) {
       console.warn('Broadcast confirm payment failed:', e);
     }
