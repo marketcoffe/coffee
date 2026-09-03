@@ -1,3 +1,6 @@
 # Cloudflare Pages Redirects — SPA Fallback
-# Archivos fisicos se sirven primero; cualquier otra ruta sirve index.html para que React Router maneje el routing.
-/* /index.html 200
+# Cloudflare Pages sirve archivos fisicos ANTES de procesar redirects.
+# Si /assets/index-ABC123.js existe en disco, se sirve directamente.
+# Si NO existe (hash obsoleto tras redeploy), el redirect sirve index.html.
+# El Service Worker (sw-push.js) limpia caches obsoletos automaticamente.
+/*  /index.html  200

@@ -954,16 +954,16 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
                       <p className="text-[14px] text-center font-bold" style={{ color: themeColor }}>Muestre el comprobante de pago en caja para validar su pago</p>
                     </div>
                   </div>
-                )}ºº
+                )}
                 {mesaPaymentMethod === 'Efectivo' && (
                   <div className="text-center py-2">
-                    <p className="text-[14px]  text-[#5b4137] mb-2">Paga en caja al recibir tu pedido</p>
+                    <p className="text-[14px] text-[#5b4137] mb-2">Paga en caja al recibir tu pedido</p>
                     <p className="font-black text-sm" style={{ color: themeColor }}>Total: ${displayOrder.total_usd?.toFixed(2)}</p>
                   </div>
                 )}
                 {mesaPaymentMethod === 'Punto' && (
                   <div className="text-center py-2">
-                    <p className="text- text-[#5b4137] mb-2">Paga con tu punto de venta en caja</p>
+                    <p className="text-xs text-[#5b4137] mb-2">Paga con tu punto de venta en caja</p>
                     <p className="font-black text-sm" style={{ color: themeColor }}>Total: ${displayOrder.total_usd?.toFixed(2)}</p>
                   </div>
                 )}
@@ -1464,6 +1464,23 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
 
                   <CartUpsell onAddToCart={(item: FoodItem) => addToCart(item)} />
 
+                  {/* Promo: Acumular Puntos cuando el usuario tiene 0 puntos */}
+                  {loyaltyConfig?.enabled && currentUser && userPoints === 0 && (
+                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200/60 p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                          <Star size={20} className="text-amber-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold text-[#1a1c1d]">Acumula Puntos con este pedido</p>
+                          <p className="text-[10px] text-[#8f7065] mt-0.5">
+                            Registrate o inicia sesion para ganar {loyaltyConfig?.points_per_dollar || 1} pts por cada $1 y canjearlos por recompensas.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Canje de Puntos — Catálogo de Recompensas */}
                   {loyaltyConfig?.enabled && currentUser && userPoints > 0 && availableRewards.length > 0 && (
                     <div className="bg-white rounded-2xl border border-[#e4beb1]/10 p-4">
@@ -1554,6 +1571,15 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
                         ✓ "{appliedCoupon.code}" aplicado: {appliedCoupon.coupon_type === 'fixed' ? `-$${appliedCoupon.discount_amount}` : appliedCoupon.coupon_type === 'free_shipping' ? 'Envio Gratis' : `-${appliedCoupon.discount_percent}%`}
                       </p>
                     )}
+                    {loyaltyConfig?.enabled && currentUser && (
+                      <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-[#e4beb1]/10">
+                        <Star size={12} className="text-amber-500" />
+                        <span className="text-[10px] text-[#8f7065]">
+                          Puntos disponibles: <span className="font-bold text-amber-600">{userPoints} pts</span>
+                          {estimatedPointsToEarn > 0 && <span className="text-amber-500 ml-1">(Ganarás +{estimatedPointsToEarn})</span>}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -1642,6 +1668,15 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
                       <p className="text-xs font-bold mt-2" style={{ color: orderTypeColor }}>
                         ✓ "{appliedCoupon.code}" aplicado: {appliedCoupon.coupon_type === 'fixed' ? `-$${appliedCoupon.discount_amount}` : appliedCoupon.coupon_type === 'free_shipping' ? 'Envio Gratis' : `-${appliedCoupon.discount_percent}%`}
                       </p>
+                    )}
+                    {loyaltyConfig?.enabled && currentUser && (
+                      <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-[#e4beb1]/10">
+                        <Star size={12} className="text-amber-500" />
+                        <span className="text-[10px] text-[#8f7065]">
+                          Puntos disponibles: <span className="font-bold text-amber-600">{userPoints} pts</span>
+                          {estimatedPointsToEarn > 0 && <span className="text-amber-500 ml-1">(Ganarás +{estimatedPointsToEarn})</span>}
+                        </span>
+                      </div>
                     )}
                   </div> 
 

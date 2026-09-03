@@ -22,7 +22,7 @@ SET search_path = public
 LANGUAGE plpgsql SECURITY DEFINER AS $$
 DECLARE
     v_welcome_bonus int;
-    v_loyalty_config jsonb;
+    v_enabled boolean;
 BEGIN
     -- Intentar insertar en usuarios_clientes (puede fallar si la tabla no tiene las columnas)
     BEGIN
@@ -43,18 +43,26 @@ BEGIN
 
     -- Welcome Bonus: otorgar puntos si loyalty está habilitado
     BEGIN
-        SELECT loyalty INTO v_loyalty_config FROM store_config WHERE id = 1;
-        v_welcome_bonus := COALESCE((v_loyalty_config->>'welcome_bonus')::int, 0);
+        SELECT enabled, welcome_bonus INTO v_enabled, v_welcome_bonus
+        FROM loyalty_config WHERE id = 1;
 
-        IF v_welcome_bonus > 0 AND COALESCE((v_loyalty_config->>'enabled')::boolean, false) THEN
+        IF v_enabled AND COALESCE(v_welcome_bonus, 0) > 0 THEN
             UPDATE usuarios_clientes
-            SET loyalty_points = COALESCE(loyalty_points, 0) + v_welcome_bonus,
+            SET puntos_fidelidad = COALESCE(puntos_fidelidad, 0) + v_welcome_bonus,
+                puntos_historicos = COALESCE(puntos_historicos, 0) + v_welcome_bonus,
+                loyalty_points = COALESCE(loyalty_points, 0) + v_welcome_bonus,
                 loyalty_lifetime_points = COALESCE(loyalty_lifetime_points, 0) + v_welcome_bonus
             WHERE id = NEW.id::text;
 
-            INSERT INTO loyalty_transactions (user_id, type, points, description)
-            VALUES (NEW.id::text, 'bonus', v_welcome_bonus, 'Bonus de bienvenida')
+            INSERT INTO loyalty_history (user_id, points, operation, reason, description, created_by)
+            VALUES (NEW.id::text, v_welcome_bonus, 'suma', 'bienvenida', 'Bonus de bienvenida', 'system')
             ON CONFLICT DO NOTHING;
+
+            IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'loyalty_transactions') THEN
+                INSERT INTO loyalty_transactions (user_id, type, points, description)
+                VALUES (NEW.id::text, 'bonus', v_welcome_bonus, 'Bonus de bienvenida')
+                ON CONFLICT DO NOTHING;
+            END IF;
         END IF;
     EXCEPTION WHEN OTHERS THEN
         RAISE WARNING 'handle_auth_user_created: skip loyalty: %', SQLERRM;

@@ -1,30 +1,31 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // Service Worker: Market Coffee Sweet — Push + Offline + Deep Linking
 // RFC 8292 (VAPID) · RFC 8030 (Push)
+// Version: 2026-09-03-v3
 // ═══════════════════════════════════════════════════════════════════════════
+
+const SW_VERSION = '2026-09-03-v3';
+const CURRENT_CACHE = 'mc-' + SW_VERSION;
 
 // ─── Lifecycle ───
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open('workbox-precache-v2').then((cache) =>
-      cache.addAll(['/index.html']).catch(() => {})
-    )
-  );
+  // Forzar activacion inmediata del nuevo SW para limpiar caches viejos
+  // que puedan contener HTMLs con referencias a hashes de bundles anteriores.
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  const CURRENT_CACHE = 'workbox-precache-v2';
   event.waitUntil(
     Promise.all([
+      // Tomar control inmediato de todas las paginas abiertas
       self.clients.claim(),
+      // Borrar TODOS los caches que no correspondan a la version actual del SW.
+      // Esto elimina caches viejos que puedan tener HTML/JS obsoletos
+      // (e.g. cacheados por una version previa del SW o por Workbox).
       caches.keys().then((names) =>
         Promise.all(
           names.map((n) => {
-            // Delete ALL caches except the current version.
-            // This cleans stale workbox caches, old asset caches (from previous deploys),
-            // and any caches left by the previously-enabled VitePWA/Workbox config.
-            if (n !== CURRENT_CACHE) {
+            if (n !== CURRENT_CACHE && !n.startsWith('mc-')) {
               return caches.delete(n);
             }
           })
@@ -43,15 +44,9 @@ self.addEventListener('fetch', (event) => {
       event.respondWith(
         fetch(event.request, { redirect: 'follow' }).then((resp) => {
           if (resp.ok) return resp;
-          return caches.open('workbox-precache-v2').then((cache) =>
-            cache.match('/index.html').then((cached) => cached || resp)
-          );
+          return new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/html' } });
         }).catch(() => {
-          return caches.open('workbox-precache-v2').then((cache) =>
-            cache.match('/index.html').then((cached) =>
-              cached || new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/html' } })
-            )
-          );
+          return new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/html' } });
         })
       );
     }
@@ -438,10 +433,9 @@ self.addEventListener('message', (event) => {
   }
 
   if (event.data?.type === 'CLEAR_ASSETS_CACHE') {
-    const CURRENT_CACHE = 'workbox-precache-v2';
     event.waitUntil(
       caches.keys().then((names) =>
-        Promise.all(names.filter((n) => n !== CURRENT_CACHE).map((n) => caches.delete(n)))
+        Promise.all(names.filter((n) => n !== CURRENT_CACHE && !n.startsWith('mc-')).map((n) => caches.delete(n)))
       ).then(() => {
         self.clients.matchAll({ type: 'window', includeUncontrolled: true })
           .then((clients) => clients.forEach((c) => c.postMessage({ type: 'ASSETS_CACHE_CLEARED' })));

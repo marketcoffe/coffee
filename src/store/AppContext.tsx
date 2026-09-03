@@ -1572,6 +1572,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }));
       }
 
+      // Sync loyalty_config.enabled with store_config.loyalty.enabled
+      // These are separate tables that must stay in sync
+      try {
+        const { data: lcRow } = await supabase.from('loyalty_config').select('enabled').eq('id', 1).maybeSingle();
+        const dbEnabled = dbConfig?.loyalty?.enabled ?? false;
+        if (lcRow && lcRow.enabled !== dbEnabled) {
+          await supabase.from('loyalty_config').update({ enabled: dbEnabled, updated_at: new Date().toISOString() }).eq('id', 1);
+        }
+      } catch { /* loyalty_config sync best-effort */ }
+
       // Cargar cupones
       const { data: dbCoupons } = await supabase.from('coupons').select('*');
       if (dbCoupons) setCoupons(dbCoupons as Coupon[]);
@@ -2359,7 +2369,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       // 7. Welcome bonus de lealtad
       const loyaltyConf = config.loyalty;
-      if (loyaltyConf?.enabled && loyaltyConf.welcome_bonus > 0 && authSucceeded && !userId.startsWith('guest-')) {
+      if (loyaltyConf?.enabled && loyaltyConf.welcome_bonus > 0 && !userId.startsWith('guest-')) {
         const bonusPoints = loyaltyConf.welcome_bonus;
         try {
           await supabase.from('loyalty_history').insert({
