@@ -80,6 +80,14 @@ const PedidosMesaSection: React.FC<PedidosMesaSectionProps> = ({ scopeSedeId }) 
     };
   }, [refreshOrders]);
 
+  // Polling fallback: refrescar cada 15s si el websocket Realtime está caído
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshOrders();
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [refreshOrders]);
+
   const mesaOrders = useMemo(() => {
     let result = orders.filter(o => o.tipo_pedido === 'mesa' || o.tipo_entrega === 'mesa');
     if (scopeSedeId) result = result.filter(o => !o.sede_id || o.sede_id === scopeSedeId);

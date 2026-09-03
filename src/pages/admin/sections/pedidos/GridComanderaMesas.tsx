@@ -120,6 +120,14 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
     return () => clearInterval(interval);
   }, [orders, soundEnabled]);
 
+  // Polling fallback: refrescar cada 15s si el websocket Realtime está caído
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshOrders();
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [refreshOrders]);
+
   // Realtime: escuchar custom events del AppContext + refresh al volver a la pestaña
   useEffect(() => {
     const handleNewOrder = (e: Event) => {
@@ -241,6 +249,16 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
     showToast('success', 'Pago aprobado');
     setShowPaymentModal(null);
     refreshOrders();
+    // Notificar a otros clientes/tabs via CustomEvent y broadcast
+    window.dispatchEvent(new CustomEvent('order_status_changed', { detail: { id: orderId, status: 'completado' } }));
+    try {
+      const ch = supabase.channel('marketo_broadcast_send');
+      await new Promise<void>((r) => { ch.subscribe((s) => { if (s === 'SUBSCRIBED') r(); }); });
+      await ch.send({ type: 'broadcast', event: 'order_status_broadcast', payload: { id: orderId, status: 'completado' } });
+      supabase.removeChannel(ch);
+    } catch (e) {
+      console.warn('[GridComandera] broadcast after approve failed:', e);
+    }
   };
 
   const handleRejectPayment = async (orderId: string) => {

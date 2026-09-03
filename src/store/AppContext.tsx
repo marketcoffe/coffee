@@ -645,7 +645,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [currentUser]);
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      console.warn('[AppContext] Realtime skipped: currentUser is null');
+      return;
+    }
+    console.log('[AppContext] Iniciando conexión Realtime para:', currentUser.nombre || currentUser.telefono);
     let mainChannel: ReturnType<typeof supabase.channel> | null = null;
     let broadcastChan: ReturnType<typeof supabase.channel> | null = null;
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -856,11 +860,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         )
         .subscribe((status: string) => {
+          console.log('[AppContext] mainChannel subscribe status:', status);
           if (status === 'SUBSCRIBED') {
             console.warn('✅ Conectado al sistema Realtime de Marketo');
             mainRetries = 0;
           } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-            console.warn(`[Realtime] Canal desconectado (${status}), reconectando...`);
+            console.error(`[Realtime] Canal CDC desconectado (${status}), reconectando...`);
             const delay = Math.min(BASE_DELAY * Math.pow(2, mainRetries), MAX_DELAY);
             mainRetries += 1;
             reconnectTimer = setTimeout(() => reconnectMain(), delay);
@@ -961,10 +966,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
       })
       .subscribe((status: string) => {
+        console.log('[AppContext] broadcastChan subscribe status:', status);
         if (status === 'SUBSCRIBED') {
           broadcastRetries = 0;
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          console.warn(`[Realtime] Broadcast canal desconectado (${status}), reconectando...`);
+          console.error(`[Realtime] Broadcast canal desconectado (${status}), reconectando...`);
           const delay = Math.min(BASE_DELAY * Math.pow(2, broadcastRetries), MAX_DELAY);
           broadcastRetries += 1;
           broadcastReconnectTimer = setTimeout(() => reconnectBroadcast(), delay);
