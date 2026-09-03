@@ -32,16 +32,16 @@ export function getPaperDimensions(paperSize: PaperSize = '58mm'): PaperDims {
       pageWidth: '80mm',
       bodyWidth: '78mm',
       contentWidth: '74mm',
-      fontSize: '10px',
-      sizes: { tiny: '7px', xsmall: '8px', small: '9px', medium: '10px', large: '13px', xlarge: '16px' },
+      fontSize: '14px',
+      sizes: { tiny: '12px', xsmall: '13px', small: '14px', medium: '15px', large: '18px', xlarge: '26px' },
     };
   }
   return {
     pageWidth: '58mm',
     bodyWidth: '48mm',
     contentWidth: '44mm',
-    fontSize: '9px',
-    sizes: { tiny: '6px', xsmall: '7px', small: '8px', medium: '9px', large: '12px', xlarge: '14px' },
+    fontSize: '13px',
+    sizes: { tiny: '11px', xsmall: '12px', small: '13px', medium: '14px', large: '16px', xlarge: '22px' },
   };
 }
 
@@ -57,7 +57,7 @@ export function getPrintPageCss(paperSize: PaperSize = '58mm'): string {
       width: ${d.bodyWidth};
       padding: 2mm;
       color: #000;
-      line-height: 1.3;
+      line-height: 1.4;
     }
     .center { text-align: center; }
     .bold { font-weight: bold; }
@@ -66,21 +66,21 @@ export function getPrintPageCss(paperSize: PaperSize = '58mm'): string {
     .small { font-size: ${d.sizes.small}; }
     .xsmall { font-size: ${d.sizes.xsmall}; }
     .tiny { font-size: ${d.sizes.tiny}; }
-    .line { border-top: 1px dashed #000; margin: 3px 0; }
-    .double-line { border-top: 2px solid #000; margin: 4px 0; }
+    .line { border-top: 1px dashed #000; margin: 4px 0; }
+    .double-line { border-top: 2px solid #000; margin: 5px 0; }
     table { width: 100%; border-collapse: collapse; }
-    td { padding: 1px 0; vertical-align: top; }
-    .item-row td { font-size: ${d.sizes.medium}; font-weight: bold; padding: 2px 0; }
-    .totals td { padding: 1px 0; font-size: ${d.sizes.small}; }
+    td { padding: 2px 0; vertical-align: top; font-weight: bold; }
+    .item-row td { font-size: ${d.sizes.medium}; font-weight: bold; padding: 3px 0; }
+    .totals td { padding: 2px 0; font-size: ${d.sizes.small}; font-weight: bold; }
     .totals td:last-child { text-align: right; }
-    .totals .total-row td { font-size: ${d.sizes.large}; font-weight: bold; border-top: 1px solid #000; padding-top: 2px; }
+    .totals .total-row td { font-size: ${d.sizes.large}; font-weight: bold; border-top: 1px solid #000; padding-top: 3px; }
     .badge {
       display: inline-block;
-      border: 1px solid #000;
-      padding: 2px 6px;
-      font-size: ${d.sizes.tiny};
+      border: 2px solid #000;
+      padding: 4px 10px;
+      font-size: ${d.sizes.xlarge};
       font-weight: bold;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
     }
   `;
 }

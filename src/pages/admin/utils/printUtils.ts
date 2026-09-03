@@ -4,7 +4,6 @@ import { printThermalTicket, PaperSize } from '../../../utils/printBase';
 export function printOrderTicket(order: Order, config: any) {
   const paperSize: PaperSize = config?.print_config?.paper_size || '58mm';
   const businessName = config?.site_nombre || 'MARKET COFFEE SWEET';
-  const address = config?.direccion_fisica || '';
   const phone = config?.telefono_soporte || '';
   const date = new Date(order.fecha).toLocaleString('es-VE');
   const orderId = order.id;
@@ -24,53 +23,56 @@ export function printOrderTicket(order: Order, config: any) {
   let itemsHtml = '';
   order.items?.forEach(item => {
     const optStr = item.selected_options?.length
-      ? `<div style="font-size:8px;color:#666;margin-left:6px">${item.selected_options.map(o => o.option_name).join(', ')}</div>`
+      ? `<div style="margin-left:8px">${item.selected_options.map(o => o.option_name).join(', ')}</div>`
       : '';
     const removedStr = item.ingredientes_removidos?.length
-      ? `<div style="font-size:8px;color:#c00;margin-left:6px;text-decoration:line-through">Sin: ${item.ingredientes_removidos.join(', ')}</div>`
+      ? `<div style="margin-left:8px;text-decoration:line-through">Sin: ${item.ingredientes_removidos.join(', ')}</div>`
       : '';
     const itemTotal = (item.precio_usd * item.cantidad).toFixed(2);
     itemsHtml += `
       <tr class="item-row">
-        <td style="width:24px;text-align:center">${item.cantidad}x</td>
+        <td style="width:28px;text-align:center">${item.cantidad}x</td>
         <td>
           ${item.nombre}
           ${optStr}
           ${removedStr}
         </td>
-        <td style="text-align:right;width:50px">$${itemTotal}</td>
+        <td style="text-align:right;width:56px">$${itemTotal}</td>
       </tr>`;
   });
 
   const body = `
   <!-- Business Header -->
   <div class="center bold large">${businessName}</div>
-  ${address ? `<div class="center xsmall">${address}</div>` : ''}
-  ${phone ? `<div class="center xsmall">Tel: ${phone}</div>` : ''}
+  ${phone ? `<div class="center small">Tel: ${phone}</div>` : ''}
+  <div class="double-line"></div>
+
+  <!-- Delivery/Pickup Badge Grande -->
+  <div style="text-align:center;margin:6px 0">
+    <div class="badge">${deliveryLabel}</div>
+  </div>
   <div class="double-line"></div>
 
   <!-- Order Info -->
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <div class="medium bold">PEDIDO #${orderId}</div>
-    <div class="badge">${deliveryLabel}</div>
-  </div>
-  <div class="xsmall" style="margin-top:2px">${date}</div>
+  <div class="medium bold">PEDIDO #${orderId}</div>
+  <div class="small" style="margin-top:3px">${date}</div>
   <div class="small bold">${order.cliente_nombre}</div>
-  <div class="xsmall">${order.cliente_telefono}</div>
+  ${order.cliente_telefono ? `<div class="small">${order.cliente_telefono}</div>` : ''}
   <div class="line"></div>
 
-  ${order.notas_admin ? `
-  <div style="margin:3px 0;padding:3px;border:1px dashed #000">
-    <div class="small" style="margin-bottom:1px">NOTAS:</div>
-    <div class="medium">${order.notas_admin}</div>
-  </div>` : ''}
-
   <!-- Items -->
-  <div class="xsmall bold" style="margin-bottom:2px">ITEMS:</div>
+  <div class="small bold" style="margin-bottom:3px">ITEMS:</div>
   <table>
     ${itemsHtml}
   </table>
   <div class="line"></div>
+
+  <!-- Notas debajo de items -->
+  ${order.notas_admin ? `
+  <div style="margin:4px 0;padding:4px;border:1px dashed #000">
+    <div class="small bold" style="margin-bottom:2px">NOTAS:</div>
+    <div class="medium">${order.notas_admin}</div>
+  </div>` : ''}
 
   <!-- Financial Summary -->
   <table class="totals">
@@ -85,25 +87,25 @@ export function printOrderTicket(order: Order, config: any) {
   <!-- Payment & Delivery -->
   <div style="display:flex;justify-content:space-between">
     <div>
-      <div class="xsmall">PAGO</div>
-      <div class="small bold">${paymentLabel}</div>
+      <div class="small">PAGO</div>
+      <div class="medium bold">${paymentLabel}</div>
     </div>
     <div style="text-align:right">
-      <div class="xsmall">ENTREGA</div>
-      <div class="small bold">${deliveryLabel}</div>
+      <div class="small">ENTREGA</div>
+      <div class="medium bold">${deliveryLabel}</div>
     </div>
   </div>
   ${order.tipo_entrega === 'delivery' && order.direccion_envio ? `
-  <div style="margin-top:2px">
-    <div class="xsmall">DIRECCION:</div>
-    <div class="xsmall">${order.direccion_envio}</div>
-    ${order.distancia_km ? `<div class="xsmall">Distancia: ${order.distancia_km.toFixed(1)} km</div>` : ''}
+  <div style="margin-top:3px">
+    <div class="small bold">DIRECCION:</div>
+    <div class="small">${order.direccion_envio}</div>
+    ${order.distancia_km ? `<div class="small">Distancia: ${order.distancia_km.toFixed(1)} km</div>` : ''}
   </div>` : ''}
   <div class="double-line"></div>
 
   <!-- Footer -->
-  <div class="center small bold">Gracias por su compra!</div>
-  <div class="center xsmall" style="margin-top:1px">Market Coffee Sweet</div>`;
+  <div class="center medium bold" style="margin-top:4px">Gracias por su compra!</div>
+  <div class="center small">${businessName}</div>`;
 
   printThermalTicket(`Pedido #${orderId}`, body, paperSize);
 }
