@@ -53,7 +53,7 @@ const StoreGeneralSection: React.FC = () => {
                     updateConfig({ sedes: (config.sedes || []).map(s => s.id === principales[0].id ? { ...s, telefono: v, whatsapp_numero: s.whatsapp_numero || v } : s) });
                   }
                 }}
-            className="admin-input" placeholder="+584124058904" style={{
+            className="admin-input" placeholder="+584123758879" style={{
               borderColor: currentUser && config.telefono_soporte !== currentUser.telefono ? '#FF9500' : undefined
             }} />
           {currentUser && config.telefono_soporte !== currentUser.telefono && (

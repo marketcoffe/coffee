@@ -79,6 +79,8 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onAdvanceStatus, on
   const isFinal = order.status === 'Entregado' || order.status === 'Cancelado' || order.status === 'completado' || order.status === 'cancelado';
   const elapsed = getElapsed(order.fecha);
 
+  const tipoEntrega = order.tipo_entrega || order.tipo_pedido || 'delivery';
+
   const nextLabel: Record<string, string> = {
     'Pendiente': 'En Preparación',
     'Procesando': 'En Preparación',
@@ -87,10 +89,10 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onAdvanceStatus, on
     'pago_enviado': 'En Preparación',
     'pendiente_pago': 'En Preparación',
     'pago_en_verificacion': 'En Preparación',
-    'En preparación': order.tipo_entrega === 'delivery' ? 'En Camino' : 'Entregado',
-    'En preparacion': order.tipo_entrega === 'delivery' ? 'En Camino' : 'Entregado',
-    'en_preparacion': order.tipo_entrega === 'delivery' ? 'En Camino' : 'Entregado',
-    'Listo': order.tipo_entrega === 'delivery' ? 'En Camino' : 'Entregado',
+    'En preparación': tipoEntrega === 'delivery' ? 'En Camino' : 'Entregado',
+    'En preparacion': tipoEntrega === 'delivery' ? 'En Camino' : 'Entregado',
+    'en_preparacion': tipoEntrega === 'delivery' ? 'En Camino' : 'Entregado',
+    'Listo': tipoEntrega === 'delivery' ? 'En Camino' : 'Entregado',
     'En camino': 'Entregado',
   };
 
@@ -108,7 +110,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onAdvanceStatus, on
     return null;
   }
 
-  const nextStatus = getNextStatus(order.status, order.tipo_entrega);
+  const nextStatus = getNextStatus(order.status, tipoEntrega);
 
   const subtotal = order.subtotal_usd || order.total_usd;
   const shipping = order.costo_envio_usd || 0;

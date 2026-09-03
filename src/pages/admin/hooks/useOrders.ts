@@ -44,7 +44,8 @@ export function useOrders(sedeId?: string) {
   const cancelledOrders = useMemo(() => filteredBySede.filter(o => o.status === 'Cancelado' || o.status === 'cancelado'), [filteredBySede]);
 
   const advanceStatus = useCallback(async (order: Order) => {
-    const nextStatus = getNextStatus(order.status, order.tipo_entrega);
+    const tipoEntrega = order.tipo_entrega || order.tipo_pedido || 'delivery';
+    const nextStatus = getNextStatus(order.status, tipoEntrega);
     if (!nextStatus) return;
     setAdvancingId(order.id);
     try {
@@ -73,7 +74,8 @@ export function useOrders(sedeId?: string) {
     for (const id of orderIds) {
       const order = filteredBySede.find(o => o.id === id);
       if (!order) continue;
-      const nextStatus = getNextStatus(order.status, order.tipo_entrega);
+      const tipoEntrega = order.tipo_entrega || order.tipo_pedido || 'delivery';
+      const nextStatus = getNextStatus(order.status, tipoEntrega);
       if (nextStatus) {
         await updateOrderStatus(id, nextStatus);
       }

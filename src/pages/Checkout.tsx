@@ -951,19 +951,19 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
                     </div>
                     <p className="text-center font-black py-1 rounded text-sm" style={{ color: themeColor }}>Monto: {displayOrder.total_bs?.toFixed(2)} Bs.</p>
                     <div className="mt-2 pt-2 border-t border-[#e4beb1]/10 p-2 rounded-lg" style={{ backgroundColor: `${themeColor}10` }}>
-                      <p className="text-[10px] text-center font-bold" style={{ color: themeColor }}>Muestre el comprobante de pago en caja para validar su pago</p>
+                      <p className="text-[14px] text-center font-bold" style={{ color: themeColor }}>Muestre el comprobante de pago en caja para validar su pago</p>
                     </div>
                   </div>
-                )}
+                )}ºº
                 {mesaPaymentMethod === 'Efectivo' && (
                   <div className="text-center py-2">
-                    <p className="text-xs text-[#5b4137] mb-2">Paga en caja al recibir tu pedido</p>
+                    <p className="text-[14px]  text-[#5b4137] mb-2">Paga en caja al recibir tu pedido</p>
                     <p className="font-black text-sm" style={{ color: themeColor }}>Total: ${displayOrder.total_usd?.toFixed(2)}</p>
                   </div>
                 )}
                 {mesaPaymentMethod === 'Punto' && (
                   <div className="text-center py-2">
-                    <p className="text-xs text-[#5b4137] mb-2">Paga con tu punto de venta en caja</p>
+                    <p className="text- text-[#5b4137] mb-2">Paga con tu punto de venta en caja</p>
                     <p className="font-black text-sm" style={{ color: themeColor }}>Total: ${displayOrder.total_usd?.toFixed(2)}</p>
                   </div>
                 )}
@@ -1643,7 +1643,7 @@ ${orderNotes ? `\n*Notas del Pedido:* ${orderNotes}\n` : ''}
                         ✓ "{appliedCoupon.code}" aplicado: {appliedCoupon.coupon_type === 'fixed' ? `-$${appliedCoupon.discount_amount}` : appliedCoupon.coupon_type === 'free_shipping' ? 'Envio Gratis' : `-${appliedCoupon.discount_percent}%`}
                       </p>
                     )}
-                  </div>
+                  </div> 
 
                 </>
               ) : (

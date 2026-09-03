@@ -8,10 +8,10 @@
 
 -- ----------------------------------------------------------------------------
 -- 1. FIX: Teléfono principal del negocio
--- El número correcto es 0412-4058904 -> +584124058904
+-- El número correcto es 0412-3758879 -> +584123758879
 -- ----------------------------------------------------------------------------
 UPDATE public.store_config
-SET telefono_soporte = '+584124058904'
+SET telefono_soporte = '+584123758879'
 WHERE id = 1
   AND (telefono_soporte IS NULL OR telefono_soporte = '' OR telefono_soporte LIKE '%4976451%');
 
@@ -25,11 +25,11 @@ SET sedes = (
                jsonb_set(
                  sede,
                  '{telefono}',
-                 to_jsonb('+584124058904'::text),
+                 to_jsonb('+584123758879'::text),
                  true
                ),
                '{whatsapp_numero}',
-               to_jsonb('+584124058904'::text),
+               to_jsonb('+584123758879'::text),
                true
              )
       ELSE sede
@@ -47,15 +47,15 @@ WHERE id = 1
 
 -- Textos de pago: reemplazar número viejo
 UPDATE public.store_config
-SET pagomovil_data = replace(pagomovil_data, '0412-4976451', '0412-4058904')
+SET pagomovil_data = replace(pagomovil_data, '0412-4976451', '0412-3758879')
 WHERE id = 1 AND pagomovil_data LIKE '%4976451%';
 
 UPDATE public.store_config
-SET transferencia_data = replace(transferencia_data, '0412-4976451', '0412-4058904')
+SET transferencia_data = replace(transferencia_data, '0412-4976451', '0412-3758879')
 WHERE id = 1 AND transferencia_data LIKE '%4976451%';
 
 UPDATE public.store_config
-SET zelle_data = replace(zelle_data, '0412-4976451', '0412-4058904')
+SET zelle_data = replace(zelle_data, '0412-4976451', '0412-3758879')
 WHERE id = 1 AND zelle_data LIKE '%4976451%';
 
 -- ----------------------------------------------------------------------------

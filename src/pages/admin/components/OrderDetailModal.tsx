@@ -68,13 +68,15 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
   const isFinal = order.status === 'Entregado' || order.status === 'Cancelado' || order.status === 'completado' || order.status === 'cancelado';
 
+  const tipoEntrega = order.tipo_entrega || order.tipo_pedido || 'delivery';
+
   const getNextLabel = (): string => {
     const labels: Record<string, string> = {
       'Pendiente': 'En Preparación',
       'Procesando': 'En Preparación',
       'enviado_cocina': 'En Preparación',
-      'En preparación': order.tipo_entrega === 'delivery' ? 'En Camino' : 'Entregado',
-      'En preparacion': order.tipo_entrega === 'delivery' ? 'En Camino' : 'Entregado',
+      'En preparación': tipoEntrega === 'delivery' ? 'En Camino' : 'Entregado',
+      'En preparacion': tipoEntrega === 'delivery' ? 'En Camino' : 'Entregado',
       'En camino': 'Entregado',
     };
     return labels[order.status] || 'Avanzar';

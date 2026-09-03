@@ -453,11 +453,16 @@ export default function EmergencyOrderModal() {
               <div className="p-3">
                 <div className="flex items-center justify-between mb-2">
                   <div>
-                    <p className="text-sm font-bold text-[#1a1c1d]">
-                      {order.nombre_cliente || order.cliente_nombre}
-                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm font-bold text-[#1a1c1d]">
+                        {order.nombre_cliente || order.cliente_nombre}
+                      </p>
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${typeConfig.color}18`, color: typeConfig.color }}>
+                        {typeConfig.label}
+                      </span>
+                    </div>
                     {order.cliente_telefono && (
-                      <p className="text-[10px] text-slate-400">{order.cliente_telefono}</p>
+                      <p className="text-xs font-semibold text-slate-500 mt-0.5">{order.cliente_telefono}</p>
                     )}
                   </div>
                   <div className="text-right">
@@ -473,10 +478,22 @@ export default function EmergencyOrderModal() {
                 {/* Items */}
                 <div className="space-y-1 mb-2">
                   {order.items?.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-center">
-                      <span className="text-[11px] text-slate-600 truncate">
-                        {item.cantidad}x {item.nombre}
-                      </span>
+                    <div key={idx} className="flex justify-between items-start">
+                      <div className="min-w-0 flex-1">
+                        <span className="text-xs text-slate-600">
+                          {item.cantidad}x {item.nombre}
+                        </span>
+                        {item.selected_options && item.selected_options.length > 0 && (
+                          <p className="text-[10px] text-slate-400 ml-1">
+                            {item.selected_options.map(o => o.option_name).join(', ')}
+                          </p>
+                        )}
+                        {item.ingredientes_removidos && item.ingredientes_removidos.length > 0 && (
+                          <p className="text-[10px] text-red-400 ml-1">
+                            Sin: {item.ingredientes_removidos.join(', ')}
+                          </p>
+                        )}
+                      </div>
                       <span className="text-[10px] font-bold text-slate-700 ml-2 shrink-0">
                         ${((item.precio_usd + (item.options_total_usd || 0)) * item.cantidad).toFixed(2)}
                       </span>
