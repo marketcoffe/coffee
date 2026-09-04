@@ -807,6 +807,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             window.dispatchEvent(new CustomEvent('push_notification_received', {
               detail: { title: '🔔 Notificación', body: newNotif.mensaje || newNotif.titulo || 'Nueva notificación' }
             }));
+
+            // Notificacion nativa directa (garantiza que aparezca en pantalla bloqueada)
+            if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+              navigator.serviceWorker.ready.then(reg => {
+                return reg.showNotification(newNotif.titulo || 'Market Coffee', {
+                  body: newNotif.mensaje || 'Nueva notificación',
+                  icon: '/icon.png',
+                  badge: '/icon.png',
+                  tag: `notif-${newNotif.id}`,
+                  renotify: true,
+                  vibrate: [200, 100, 200],
+                  requireInteraction: true,
+                  data: { url: newNotif.link_url || '/profile' }
+                } as NotificationOptions);
+              }).catch((err) => console.warn('[Push] showNotification notif CDC failed:', err));
+            }
           }
         })
         // Escuchar cambios en FoodItems (CDC)
@@ -1702,12 +1718,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           .order('fecha', { ascending: false });
         if (dbOrders) setOrders(dbOrders as Order[]);
 
-        // Cargar Notificaciones (broadcasts + personales + requests del usuario)
-        const { data: dbNotifs } = await supabase.from('notifications')
-          .select('*')
-          .or(`tipo.eq.todos,and(tipo.eq.personal,destinatario_telefono.eq.${currentUser.telefono}),and(tipo.eq.request,destinatario_telefono.eq.${currentUser.telefono})`)
-          .order('id', { ascending: false });
-        if (dbNotifs) setNotifications(dbNotifs as InAppNotification[]);
+        // Cargar Notificaciones (broadcasts post-registro + personales + requests del usuario)
+        const userCreatedAt = currentUser.createdAt || currentUser.created_at || '';
+        const [broadcastRes, personalRes] = await Promise.all([
+          supabase.from('notifications')
+            .select('*')
+            .eq('tipo', 'todos')
+            .gte('created_at', userCreatedAt || '1970-01-01')
+            .order('created_at', { ascending: false }),
+          supabase.from('notifications')
+            .select('*')
+            .or(`and(tipo.eq.personal,destinatario_telefono.eq.${currentUser.telefono}),and(tipo.eq.request,destinatario_telefono.eq.${currentUser.telefono})`)
+            .order('created_at', { ascending: false })
+        ]);
+        const allNotifs = [...(broadcastRes.data || []), ...(personalRes.data || [])];
+        if (allNotifs.length > 0) setNotifications(allNotifs as InAppNotification[]);
 
         // Cargar mesas para que el checkout pueda mostrar el selector
         try {
