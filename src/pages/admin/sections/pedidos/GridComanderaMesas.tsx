@@ -289,21 +289,28 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
 
   const [closeMesaModal, setCloseMesaModal] = useState<string | null>(null);
   const [cleanModal, setCleanModal] = useState<'stuck' | 'all' | null>(null);
+  const isClosingRef = useRef(false);
 
   const handleCloseMesa = async (numeroMesa: number) => {
-    console.log('[GridComandera] handleCloseMesa:', numeroMesa);
-    const { data, error } = await supabase.rpc('cerrar_mesa_cobrar', { p_numero_mesa: numeroMesa });
-    console.log('[GridComandera] cerrar_mesa_cobrar result:', { data, error });
-    if (error) {
-      console.error('cerrar_mesa_cobrar error:', error);
-      showToast('error', 'Error al cerrar mesa: ' + (error.message || 'Error desconocido'));
+    if (isClosingRef.current) return;
+    isClosingRef.current = true;
+    try {
+      console.log('[GridComandera] handleCloseMesa:', numeroMesa);
+      const { data, error } = await supabase.rpc('cerrar_mesa_cobrar', { p_numero_mesa: numeroMesa });
+      console.log('[GridComandera] cerrar_mesa_cobrar result:', { data, error });
+      if (error) {
+        console.error('cerrar_mesa_cobrar error:', error);
+        showToast('error', 'Error al cerrar mesa: ' + (error.message || 'Error desconocido'));
+        setCloseMesaModal(null);
+        return;
+      }
+      const result = data as any;
+      showToast('success', `Mesa #${numeroMesa} cerrada. ${result?.closed_count || 0} pedidos → Pago Enviado.`);
       setCloseMesaModal(null);
-      return;
+      refreshOrders();
+    } finally {
+      isClosingRef.current = false;
     }
-    const result = data as any;
-    showToast('success', `Mesa #${numeroMesa} cerrada. ${result?.closed_count || 0} pedidos → Pago Enviado.`);
-    setCloseMesaModal(null);
-    refreshOrders();
   };
 
   const handleCleanStuck = async () => {
@@ -649,7 +656,8 @@ const GridComanderaMesas: React.FC<GridComanderaMesasProps> = ({ scopeSedeId }) 
               <button onClick={() => setCloseMesaModal(null)}
                 className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-[#eeeef0] text-[#5b4137] cursor-pointer">Cancelar</button>
               <button onClick={() => handleCloseMesa(Number(closeMesaModal))}
-                className="flex-1 py-2.5 rounded-xl font-bold text-xs text-white cursor-pointer" style={{ backgroundColor: '#f59e0b' }}>
+                disabled={isClosingRef.current}
+                className="flex-1 py-2.5 rounded-xl font-bold text-xs text-white cursor-pointer disabled:opacity-50" style={{ backgroundColor: '#f59e0b' }}>
                 <RotateCcw size={12} className="inline mr-1" /> Cerrar Mesa
               </button>
             </div>
