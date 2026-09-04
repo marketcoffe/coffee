@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useApp } from '../../../store/AppContext';
 import { useToast } from '../../../components/Toast';
 import { Order } from '../../../types/store';
@@ -32,6 +32,7 @@ export function useOrders(sedeId?: string) {
   const { orders, config, updateOrderStatus } = useApp();
   const { showToast } = useToast();
   const [advancingId, setAdvancingId] = useState<string | null>(null);
+  const advancingRef = useRef<Set<string>>(new Set());
   const principalSedeId = (config.sedes || []).find(s => s.es_principal)?.id || (config.sedes || [])[0]?.id || '';
 
   const filteredBySede = useMemo(() => {
@@ -44,9 +45,11 @@ export function useOrders(sedeId?: string) {
   const cancelledOrders = useMemo(() => filteredBySede.filter(o => o.status === 'Cancelado' || o.status === 'cancelado'), [filteredBySede]);
 
   const advanceStatus = useCallback(async (order: Order) => {
+    if (advancingRef.current.has(order.id)) return;
     const tipoEntrega = order.tipo_entrega || order.tipo_pedido || 'delivery';
     const nextStatus = getNextStatus(order.status, tipoEntrega);
     if (!nextStatus) return;
+    advancingRef.current.add(order.id);
     setAdvancingId(order.id);
     try {
       const result = await updateOrderStatus(order.id, nextStatus);
@@ -56,11 +59,14 @@ export function useOrders(sedeId?: string) {
         showToast('success', `Pedido #${order.id?.slice(0, 8)} entregado. Puntos acreditados al cliente.`);
       }
     } finally {
+      advancingRef.current.delete(order.id);
       setAdvancingId(null);
     }
   }, [updateOrderStatus, showToast]);
 
   const cancelOrder = useCallback(async (order: Order, reason?: string) => {
+    if (advancingRef.current.has(order.id)) return;
+    advancingRef.current.add(order.id);
     setAdvancingId(order.id);
     try {
       const result = await updateOrderStatus(order.id, 'Cancelado', undefined, reason || 'Cancelado por administrador');
@@ -68,6 +74,7 @@ export function useOrders(sedeId?: string) {
         showToast('error', 'Error al cancelar el pedido. Verifica tus permisos.');
       }
     } finally {
+      advancingRef.current.delete(order.id);
       setAdvancingId(null);
     }
   }, [updateOrderStatus, showToast]);
